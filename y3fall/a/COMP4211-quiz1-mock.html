@@ -1,0 +1,321 @@
+<p>Unofficial practice paper written from the three lecture slides (<code>1-intro</code>, <code>2-linear</code>, <code>3-model-slct</code>). Same rules as the real quiz: 80 minutes, closed book, no calculator. All numbers are chosen to be computable by hand. Total <strong>100 points</strong>.</p>
+<p>Notation follows the slides: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> = feature vector, score <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>, margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mtext> </mtext><mi>y</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><msub><mi mathvariant="script">D</mi><mtext>train</mtext></msub><mi mathvariant="normal">∣</mi></mrow></mfrac><mo>∑</mo><mtext>Loss</mtext><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi mathvariant="bold">w</mi><mo stretchy="false">)</mo></mrow></math>.</p>
+<h2>Part I · Questions</h2>
+<h3>Q1 · Learning paradigms and tasks (10 pts)</h3>
+<p>For each scenario, state (i) the learning paradigm (supervised / unsupervised / reinforcement) and (ii) if supervised, the task type (binary classification / multiclass classification / regression / structured prediction). Give a one-line reason.</p>
+<ol>
+<li>Predict the price of a flat from its size, floor and district, given past transactions.</li>
+<li>Group news articles into topics; no topic labels are available.</li>
+<li>A robot learns to walk; it receives <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math> for each step forward and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>10</mn></mrow></math> when it falls.</li>
+<li>Decide whether a credit-card transaction is fraudulent, given historical transactions labelled fraud / not fraud.</li>
+<li>Generate a caption sentence for an input image, given images paired with human-written captions.</li>
+</ol>
+<h3>Q2 · True or false (10 pts)</h3>
+<p>State T or F. For each <strong>F</strong>, give a one-line correction.</p>
+<ol>
+<li>The gradient <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo stretchy="false">)</mo></mrow></math> points in the direction in which TrainLoss decreases the fastest.</li>
+<li>The zero-one loss can be minimized directly by gradient descent.</li>
+<li>The hinge loss of an example is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> whenever the example is correctly classified.</li>
+<li>For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi mathvariant="bold">w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>, the decision boundary <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>x</mi><mo>:</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> is orthogonal to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="bold">w</mi></mrow></math>.</li>
+<li>The logistic loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mo stretchy="false">)</mo></mrow></math> is strictly positive for every margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math>.</li>
+<li>The model with the lowest training error always has the lowest testing error.</li>
+<li>In <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-fold cross-validation, every example is used for validation exactly once.</li>
+<li>Making a model more complex typically decreases bias and increases variance.</li>
+<li>Using the test set to choose the number of hidden units is fine, as long as the weights are never trained on the test set.</li>
+<li>In reinforcement learning, the learner is told the correct action for each state.</li>
+</ol>
+<h3>Q3 · Linear regression (20 pts)</h3>
+<p>Training data <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="script">D</mi><mtext>train</mtext></msub><mo>=</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mrow></math>, feature extractor <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math>, predictor <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi mathvariant="bold">w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>, squared loss.</p>
+<p>(a) (5 pts) For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>, compute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math>.</p>
+<p>(b) (6 pts) Compute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math>.</p>
+<p>(c) (5 pts) Perform one step of gradient descent with step size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>0.3</mn></mrow></math>. Give <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></math>. Did the loss decrease?</p>
+<p>(d) (4 pts) Show that <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup><mo>=</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.5</mn><mo stretchy="false">]</mo></mrow></math> satisfies <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn mathvariant="bold">0</mn></mrow></math>, and compute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup><mo stretchy="false">)</mo></mrow></math>.</p>
+<h3>Q4 · Derivations (15 pts)</h3>
+<p>(a) (5 pts) Derive <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext> </mtext><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math>.</p>
+<p>(b) (5 pts) Derive <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mi>log</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi></mrow></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math>.</p>
+<p>(c) (5 pts) Prove that <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Loss</mtext><mtext>hinge</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi mathvariant="bold">w</mi><mo stretchy="false">)</mo><mo>≥</mo><msub><mtext>Loss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi mathvariant="bold">w</mi><mo stretchy="false">)</mo></mrow></math> for every example, where the zero-one loss is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn mathvariant="bold">1</mn><mo stretchy="false">[</mo><mi>m</mi><mo>≤</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>.</p>
+<h3>Q5 · Linear classification (20 pts)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">]</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi mathvariant="bold">w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="bold">w</mi><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>. Training data:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>(a) (3 pts) Give the decision boundary of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi mathvariant="bold">w</mi></msub></mrow></math> and state which side is predicted <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math>.</p>
+<p>(b) (6 pts) For each example compute the score and the margin. Then compute the zero-one TrainLoss and the hinge TrainLoss.</p>
+<p>(c) (5 pts) Compute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><msub><mtext>TrainLoss</mtext><mtext>hinge</mtext></msub><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo stretchy="false">)</mo></mrow></math> and perform one gradient-descent step with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>1</mn></mrow></math>.</p>
+<p>(d) (4 pts) For the new weight vector, compute the zero-one TrainLoss and the hinge TrainLoss.</p>
+<p>(e) (2 pts) For example 3 only, compute the gradient of the <strong>logistic</strong> loss at the original <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="bold">w</mi><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>.</p>
+<h3>Q6 · Model selection (15 pts)</h3>
+<p>Polynomial regressors of degree 1, 3 and 9 are trained on the same training set. Mean squared errors:</p>
+<table>
+<thead>
+<tr>
+<th>Degree</th>
+<th>Training error</th>
+<th>Validation error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.30</td>
+<td>0.32</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.10</td>
+<td>0.12</td>
+</tr>
+<tr>
+<td>9</td>
+<td>0.00</td>
+<td>0.45</td>
+</tr>
+</tbody>
+</table>
+<p>(a) (4 pts) Which degree should be selected? Justify.</p>
+<p>(b) (5 pts) Which model overfits? Prove it using the definition of overfitting.</p>
+<p>(c) (4 pts) Describe the degree-1 and degree-9 models in terms of bias and variance.</p>
+<p>(d) (2 pts) After selecting the degree, how should its performance be reported, and why not report 0.12?</p>
+<h3>Q7 · Cross-validation (10 pts)</h3>
+<p>A data set has <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>120</mn></mrow></math> examples.</p>
+<p>(a) (4 pts) With 6-fold cross-validation: the size of each validation fold, the number of training examples per run, the number of training runs, and how many times each example is used for training.</p>
+<p>(b) (2 pts) The 6 validation errors are <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.10</mn><mo separator="true">,</mo><mn>0.15</mn><mo separator="true">,</mo><mn>0.05</mn><mo separator="true">,</mo><mn>0.10</mn><mo separator="true">,</mo><mn>0.20</mn><mo separator="true">,</mo><mn>0.10</mn></mrow></math>. Give the cross-validation error estimate.</p>
+<p>(c) (2 pts) 4 candidate models are compared with 6-fold CV, followed by one final retraining of the chosen model on all the data. How many training runs in total?</p>
+<p>(d) (2 pts) Leave-one-out CV on the same data: how many training runs, each on how many examples? When is LOOCV preferred?</p>
+<h2>Part II · Solutions</h2>
+<h3>Q1</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Paradigm</th>
+<th>Task</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Supervised</td>
+<td>Regression</td>
+<td>labelled pairs (features, price); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>∈</mo><mi mathvariant="double-struck">R</mi></mrow></math></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Unsupervised</td>
+<td>(clustering)</td>
+<td>inputs only, no teacher</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Reinforcement</td>
+<td>—</td>
+<td>only evaluative reward, never the correct action</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Supervised</td>
+<td>Binary classification</td>
+<td>labels given; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>∈</mo><mo stretchy="false">{</mo><mtext>fraud</mtext><mo separator="true">,</mo><mtext>not fraud</mtext><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Supervised</td>
+<td>Structured prediction</td>
+<td>labelled pairs; the output is a sentence, not a single label</td>
+</tr>
+</tbody>
+</table>
+<h3>Q2</h3>
+<ol>
+<li><strong>F.</strong> The gradient is the direction in which TrainLoss <strong>increases</strong> fastest; gradient descent moves along <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi mathvariant="normal">∇</mi></mrow></math>.</li>
+<li><strong>F.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mn mathvariant="bold">1</mn><mo stretchy="false">[</mo><mi>m</mi><mo>≤</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn mathvariant="bold">0</mn></mrow></math> almost everywhere, so gradient descent never moves.</li>
+<li><strong>F.</strong> Hinge loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mn>1</mn><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> only when <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>≥</mo><mn>1</mn></mrow></math>; a correct example with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>m</mi><mo>&lt;</mo><mn>1</mn></mrow></math> has hinge loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>m</mi><mo>&gt;</mo><mn>0</mn></mrow></math>.</li>
+<li><strong>T.</strong> For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>x</mi></mrow></math>: any two boundary points <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo separator="true">,</mo><mi>b</mi></mrow></math> satisfy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>a</mi><mo>=</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>b</mi><mo>=</mo><mn>0</mn></mrow></math>, so <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="bold">w</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>a</mi><mo>−</mo><mi>b</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>.</li>
+<li><strong>T.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mo>&gt;</mo><mn>0</mn><mo>⇒</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mo>&gt;</mo><mn>1</mn><mo>⇒</mo><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mo stretchy="false">)</mo><mo>&gt;</mo><mn>0</mn></mrow></math>.</li>
+<li><strong>F.</strong> Low training error can come from overfitting; select by testing / validation error.</li>
+<li><strong>T.</strong> The <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> folds are disjoint and cover all <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> examples, and each fold is the validation set in exactly one run.</li>
+<li><strong>T.</strong> Complex model: small bias, large variance (sensitive to the finite training set).</li>
+<li><strong>F.</strong> Test data must not be used <strong>in any way</strong> to learn the hypothesis, including model selection; use a validation set.</li>
+<li><strong>F.</strong> RL receives only rewards (evaluative feedback), not the correct answer.</li>
+</ol>
+<h3>Q3</h3>
+<p>(a) Predictions <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>+</mo><mi>x</mi></mrow></math>, residual <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><msub><mi>f</mi><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi></mrow></math>:</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>r</mi><mn>2</mn></msup></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4</td>
+<td>3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<section class="eqno"><eqn><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle></mstyle></mstyle></mstyle></menclose></mrow></math></span></eqn><span>(b)</span></section><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>0</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo>+</mo><mn>1</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mtext> </mtext><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><section class="eqno"><eqn><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></span></eqn><span>(c)</span></section><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi mathvariant="bold">w</mi><mn>0</mn></msub><mo>−</mo><mi>η</mi><mi mathvariant="normal">∇</mi><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo>−</mo><mn>0.3</mn><mtext> </mtext><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.2</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>f</mi><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub></msub><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><msub><mi>f</mi><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub></msub><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><msub><mi>f</mi><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub></msub><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mn>2.2</mn><mo separator="true">,</mo><mtext> </mtext><mn>3.4</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>r</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.2</mn><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mn>0.6</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mn>1.44</mn><mo>+</mo><mn>0.36</mn><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1.8</mn><mn>3</mn></mfrac></mstyle><mo>=</mo><mn>0.6</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.2</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="1em"/><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msub><mi mathvariant="bold">w</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mn>0.6</mn><mo>&lt;</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Yes, the loss decreased.</p>
+<p>(d) Predictions <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn><mo>+</mo><mn>1.5</mn><mi>x</mi></mrow></math> give <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.5</mn><mo separator="true">,</mo><mtext> </mtext><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><mn>3.5</mn></mrow></math>, so <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mo>−</mo><mn>0.5</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mn>0.5</mn></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo>−</mo><mn>0.5</mn><mtext> </mtext><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo>+</mo><mn>1</mn><mtext> </mtext><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo>−</mo><mn>0.5</mn><mtext> </mtext><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mtext> </mtext><mo stretchy="false">[</mo><mo>−</mo><mn>0.5</mn><mo>+</mo><mn>1</mn><mo>−</mo><mn>0.5</mn><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo>+</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0.25</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>0.25</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn mathvariant="bold">0</mn><mo separator="true">,</mo><mspace width="1em"/><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><msup><mi mathvariant="bold">w</mi><mo>∗</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>TrainLoss is a sum of squares of affine functions of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="bold">w</mi></mrow></math>, hence convex, so this stationary point is the global minimum. Consistent with (a) and (c): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mo>&gt;</mo><mn>0.6</mn><mo>&gt;</mo><mn>0.5</mn></mrow></math>.</p>
+<h3>Q4</h3>
+<p>(a) Let <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi></mrow></math>. Chain rule, with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>:</p>
+<section class="eqno"><eqn><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><msup><mi>r</mi><mn>2</mn></msup><mo>=</mo><mn>2</mn><mi>r</mi><mtext> </mtext><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mi>r</mi><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>2</mn><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></span></eqn><span>(b)</span></section><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mi>d</mi><mrow><mi>d</mi><mi>m</mi></mrow></mfrac><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup></mrow></mfrac><mo>⋅</mo><mo stretchy="false">(</mo><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup></mrow></mfrac><mtext> </mtext><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><mi>m</mi></mrow></mstyle></mtd></mtr></mtable></math></div><section class="eqno"><eqn><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><msub><mtext>Loss</mtext><mtext>logistic</mtext></msub><mo>=</mo><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>y</mi><mtext> </mtext><mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></span></eqn><span>(c)</span></section><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>≤</mo><mn>0</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Loss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo>=</mo><mn>1</mn></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>m</mi><mo>≥</mo><mn>1</mn></mrow></math>, so <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mn>1</mn><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo><mo>≥</mo><mn>1</mn></mrow></math>.</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>&gt;</mo><mn>0</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Loss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo>=</mo><mn>0</mn></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mn>1</mn><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo><mo>≥</mo><mn>0</mn></mrow></math>.</li>
+</ul>
+<p>In both cases <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mn>1</mn><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo><mo>≥</mo><mn mathvariant="bold">1</mn><mo stretchy="false">[</mo><mi>m</mi><mo>≤</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">■</mi></mrow></math></p>
+<p>Consequence: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>TrainLoss</mtext><mtext>hinge</mtext></msub><mo>≥</mo><msub><mtext>TrainLoss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub></mrow></math>, so minimizing the hinge loss minimizes an upper bound of the training error.</p>
+<h3>Q5</h3>
+<p>(a)</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="bold">w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>0</mn><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Predicted <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math> where <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo>&gt;</mo><mn>0</mn></mrow></math>, i.e. <strong>below</strong> the line <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub></mrow></math> (the side <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="bold">w</mi><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> points to).</p>
+<p>(b) Score <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mtext>score</mtext><mo>⋅</mo><mi>y</mi></mrow></math>, hinge <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mn>1</mn><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math>, zero-one <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn mathvariant="bold">1</mn><mo stretchy="false">[</mo><mi>m</mi><mo>≤</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>score</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math></th>
+<th>0-1</th>
+<th>hinge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>−</mo><mn>1</mn><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>3</mn><mo>+</mo><mn>1</mn><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>TrainLoss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>0</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mn>0.5</mn></mstyle></mstyle></mstyle></menclose></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>TrainLoss</mtext><mtext>hinge</mtext></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>0</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mn>0.75</mn></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Example 3 has <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>0</mn></mrow></math>: it lies on the boundary and counts as an error (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>≤</mo><mn>0</mn></mrow></math>).</p>
+<p>(c) Per-example hinge gradient: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>y</mi></mrow></math> if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>m</mi><mo>&gt;</mo><mn>0</mn></mrow></math>, else <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn mathvariant="bold">0</mn></mrow></math>. Only examples 2 and 3 have <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>&lt;</mo><mn>1</mn></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>ex. 2:</mtext><mspace width="1em"/><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mtext> </mtext><mo stretchy="false">(</mo><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>ex. 3:</mtext><mspace width="1em"/><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mtext> </mtext><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><msub><mtext>TrainLoss</mtext><mtext>hinge</mtext></msub></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>=</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi mathvariant="bold">w</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>−</mo><mn>1</mn><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mn>0</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><section class="eqno"><eqn><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">∇</mi><mo>=</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mn>0</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mo separator="true">,</mo><mspace width="2em"/><msup><mi mathvariant="bold">w</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mo stretchy="false">[</mo><mn>0.75</mn><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></span></eqn><span>(d)</span></section><table>
+<thead>
+<tr>
+<th>#</th>
+<th>score</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math></th>
+<th>0-1</th>
+<th>hinge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.5</mn></mrow></math></td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.75</mn><mo>−</mo><mn>1</mn><mo>=</mo><mo>−</mo><mn>0.25</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.25</mn></mrow></math></td>
+<td>0</td>
+<td>0.75</td>
+</tr>
+<tr>
+<td>4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2.25</mn><mo>+</mo><mn>1</mn><mo>=</mo><mo>−</mo><mn>1.25</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.25</mn></mrow></math></td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>TrainLoss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle></mstyle></mstyle></mstyle></menclose></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>TrainLoss</mtext><mtext>hinge</mtext></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>0.75</mn><mo>+</mo><mn>0</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mn>0.6875</mn></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Both losses decreased (0.5 → 0.25 and 0.75 → 0.6875). Example 3 is now correct, but with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>0.25</mn><mo>&lt;</mo><mn>1</mn></mrow></math> it still has positive hinge loss.</p>
+<p>(e) Example 3 has <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>0</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>. From Q4(b), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msup><mi>e</mi><mn>0</mn></msup><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mn>0</mn></msup></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="normal">∇</mi><mi mathvariant="bold">w</mi></msub><msub><mtext>Loss</mtext><mtext>logistic</mtext></msub><mo>=</mo><mo>−</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mtext> </mtext><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>⋅</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo separator="true">,</mo><mtext> </mtext><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>Q6</h3>
+<p>(a) <strong>Degree 3.</strong> It has the lowest validation error (0.12), and validation error estimates the testing error. Training error is not used: degree 9 has the lowest training error but the highest validation error.</p>
+<p>(b) <strong>Degree 9 overfits.</strong> Let <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> = the degree-9 model and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> = the degree-3 model. Every cubic is a degree-9 polynomial (higher coefficients <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0</mn></mrow></math>), so <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><msub><mi mathvariant="script">H</mi><mn>9</mn></msub></mrow></math>. Then:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>error</mtext><mi>S</mi></msub><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.00</mn><mo>&lt;</mo><mn>0.10</mn><mo>=</mo><msub><mtext>error</mtext><mi>S</mi></msub><mo stretchy="false">(</mo><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mover accent="true"><mtext>error</mtext><mo stretchy="true">^</mo></mover><mi mathvariant="script">D</mi></msub><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.45</mn><mo>&gt;</mo><mn>0.12</mn><mo>=</mo><msub><mover accent="true"><mtext>error</mtext><mo stretchy="true">^</mo></mover><mi mathvariant="script">D</mi></msub><mo stretchy="false">(</mo><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></div><p>where <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mover accent="true"><mtext>error</mtext><mo stretchy="true">^</mo></mover><mi mathvariant="script">D</mi></msub></mrow></math> is the validation estimate of the testing error. This matches the definition: smaller training error but larger error over the distribution.</p>
+<p>(c)</p>
+<ul>
+<li><strong>Degree 1:</strong> too simple, so <strong>large bias</strong> (it cannot get close to the ground truth; training error is already high at 0.30) and <strong>small variance</strong> (training ≈ validation error, 0.30 vs 0.32).</li>
+<li><strong>Degree 9:</strong> too complex, so <strong>small bias</strong> (training error 0) and <strong>large variance</strong> (it fits the particular finite training set; the validation error jumps to 0.45).</li>
+</ul>
+<p>(d) Optionally retrain the degree-3 model on training + validation data, then report its error on a <strong>separate test set</strong> that was never used. The value 0.12 is optimistically biased: the validation set was used to choose the model, so it is no longer independent of the hypothesis.</p>
+<h3>Q7</h3>
+<p>(a)</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>fold size</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>m</mi><mi mathvariant="normal">/</mi><mi>k</mi><mo>=</mo><mn>120</mn><mi mathvariant="normal">/</mi><mn>6</mn><mo>=</mo><mn>20</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>training examples per run</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>120</mn><mo>−</mo><mn>20</mn><mo>=</mo><mn>100</mn><mspace width="1em"/><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mi>k</mi></mfrac></mstyle><mo stretchy="false">)</mo><mi>m</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>training runs</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>k</mi><mo>=</mo><mn>6</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p>Each example is validated on once and used for training in the other <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>−</mo><mn>1</mn><mo>=</mo><mn>5</mn></mrow></math> runs.</p>
+<p>(b)</p>
+<section class="eqno"><eqn><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>CV error</mtext><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>6</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0.10</mn><mo>+</mo><mn>0.15</mn><mo>+</mo><mn>0.05</mn><mo>+</mo><mn>0.10</mn><mo>+</mo><mn>0.20</mn><mo>+</mo><mn>0.10</mn><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>0.70</mn><mn>6</mn></mfrac></mstyle><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>7</mn><mn>60</mn></mfrac></mstyle><mo>≈</mo><mn>0.117</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></span></eqn><span>(c)</span></section><p>(d) LOOCV: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mi>m</mi></mrow></math>, so there are <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mn>120</mn></mstyle></mstyle></mstyle></menclose></mrow></math> training runs, each on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mn>119</mn></mstyle></mstyle></mstyle></menclose></mrow></math> examples. It is preferred for <strong>small data sets</strong>: it uses almost all the data for training and every example for validation, but it costs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> training runs.</p>

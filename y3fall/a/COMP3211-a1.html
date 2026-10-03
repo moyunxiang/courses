@@ -1,0 +1,235 @@
+<p>Fully executed notebook: <code>a1_assignment1.ipynb</code> (same folder). Submit Q1 as PDF (hand-drawn graph), Q2 + Q3 as notebook: <code>StudentID_assignment1.pdf</code> / <code>StudentID_assignment1.ipynb</code>.</p>
+<h2>Q1 Computation Graph</h2>
+<p>Graph, forward and backward of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo>=</mo><msub><mi>x</mi><mn>0</mn></msub><mtext> </mtext><msup><mi>e</mi><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><msub><mi>x</mi><mn>3</mn></msub></mrow></msup></mrow></math> at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math>.</p>
+<h3>Graph (elementary nodes)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left" columnspacing="0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>a</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">[</mo><mo stretchy="false">(</mo><mo>⋅</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>b</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><mi>a</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">[</mo><mo>+</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>c</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><msub><mi>x</mi><mn>3</mn></msub></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">[</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>d</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>b</mi><mo>⋅</mo><mi>c</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">[</mo><mo>×</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>g</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mi>e</mi><mi>d</mi></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">[</mo><mi>exp</mi><mo>⁡</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>f</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>x</mi><mn>0</mn></msub><mo>⋅</mo><mi>g</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">[</mo><mo>×</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>x</mi><mn>2</mn></msub><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mo stretchy="false">(</mo><mo>⋅</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mpadded></mover><mi>a</mi><mo separator="true">;</mo><mspace width="1em"/><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mo lspace="0em" rspace="0em">+</mo></mpadded></mover><mi>b</mi><mo separator="true">;</mo><mspace width="1em"/><msub><mi>x</mi><mn>3</mn></msub><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></mpadded></mover><mi>c</mi><mo separator="true">;</mo><mspace width="1em"/><mo stretchy="false">(</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi><mo stretchy="false">)</mo><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mo lspace="0em" rspace="0em">×</mo></mpadded></mover><mi>d</mi><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mi>exp</mi><mo>⁡</mo></mpadded></mover><mi>g</mi><mo separator="true">;</mo><mspace width="1em"/><mo stretchy="false">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo separator="true">,</mo><mi>g</mi><mo stretchy="false">)</mo><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mo lspace="0em" rspace="0em">×</mo></mpadded></mover><mi>f</mi></mrow></math></div><ul>
+<li>Drawing: forward value above each edge, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>f</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow></math> below (summary table).</li>
+<li>⚠️ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mi>b</mi><mi mathvariant="normal">/</mi><msub><mi>x</mi><mn>3</mn></msub></mrow></math> as one <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>÷</mo></mrow></math> node gives identical results; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo></mrow></math> follows the Lecture 4 (CS231n) gate set.</li>
+</ul>
+<h3>Forward pass</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>a</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mn>2</mn><mn>2</mn></msup><mo>=</mo><mn>4</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>b</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>5</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>c</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><mn>5</mn><mo>=</mo><mn>0.2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>d</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>5</mn><mo>×</mo><mn>0.2</mn><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>g</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mi>e</mi><mn>1</mn></msup><mo>≈</mo><mn>2.7183</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>f</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><mi>e</mi><mo>≈</mo><mn>5.4366</mn></mrow></mstyle></mtd></mtr></mtable></math></div><h3>Backward pass</h3>
+<p>Downstream <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo></mrow></math> upstream <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo></mrow></math> local; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>f</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>f</mi><mo>=</mo><mn>1</mn></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left" columnspacing="0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>f</mi><mo>=</mo><msub><mi>x</mi><mn>0</mn></msub><mi>g</mi><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>0</mn></msub></mrow></mfrac><mo>=</mo><mn>1</mn><mo>⋅</mo><mi>g</mi><mo>=</mo><mi>e</mi><mo>≈</mo><mn>2.7183</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>g</mi></mrow></mfrac><mo>=</mo><mn>1</mn><mo>⋅</mo><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>g</mi><mo>=</mo><msup><mi>e</mi><mi>d</mi></msup><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>d</mi></mrow></mfrac><mo>=</mo><mn>2</mn><mo>⋅</mo><msup><mi>e</mi><mi>d</mi></msup><mo>=</mo><mn>2</mn><mi>e</mi><mo>≈</mo><mn>5.4366</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>d</mi><mo>=</mo><mi>b</mi><mi>c</mi><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>b</mi></mrow></mfrac><mo>=</mo><mn>2</mn><mi>e</mi><mo>⋅</mo><mi>c</mi><mo>=</mo><mn>2</mn><mi>e</mi><mo>⋅</mo><mn>0.2</mn><mo>=</mo><mn>0.4</mn><mi>e</mi><mo>≈</mo><mn>1.0873</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>c</mi></mrow></mfrac><mo>=</mo><mn>2</mn><mi>e</mi><mo>⋅</mo><mi>b</mi><mo>=</mo><mn>2</mn><mi>e</mi><mo>⋅</mo><mn>5</mn><mo>=</mo><mn>10</mn><mi>e</mi><mo>≈</mo><mn>27.1828</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>c</mi><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><msub><mi>x</mi><mn>3</mn></msub><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>3</mn></msub></mrow></mfrac><mo>=</mo><mn>10</mn><mi>e</mi><mo>⋅</mo><mrow><mo fence="true">(</mo><mo>−</mo><mfrac><mn>1</mn><msubsup><mi>x</mi><mn>3</mn><mn>2</mn></msubsup></mfrac><mo fence="true">)</mo></mrow><mo>=</mo><mn>10</mn><mi>e</mi><mo>⋅</mo><mo stretchy="false">(</mo><mo>−</mo><mn>0.04</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>0.4</mn><mi>e</mi><mo>≈</mo><mo>−</mo><mn>1.0873</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>b</mi><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><mi>a</mi><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>1</mn></msub></mrow></mfrac><mo>=</mo><mn>0.4</mn><mi>e</mi><mo>⋅</mo><mn>1</mn><mo>=</mo><mn>0.4</mn><mi>e</mi><mo>≈</mo><mn>1.0873</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>=</mo><mn>0.4</mn><mi>e</mi><mo>⋅</mo><mn>1</mn><mo>=</mo><mn>0.4</mn><mi>e</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>a</mi><mo>=</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>2</mn></msub></mrow></mfrac><mo>=</mo><mn>0.4</mn><mi>e</mi><mo>⋅</mo><mn>2</mn><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>0.4</mn><mi>e</mi><mo>⋅</mo><mn>4</mn><mo>=</mo><mn>1.6</mn><mi>e</mi><mo>≈</mo><mn>4.3493</mn></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>Each variable feeds exactly one node <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> no branch sums.</li>
+</ul>
+<h3>Summary (edge values)</h3>
+<table>
+<thead>
+<tr>
+<th>edge</th>
+<th>forward (above)</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>f</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow></math> (below)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>≈</mo><mn>2.7183</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.4</mn><mi>e</mi><mo>≈</mo><mn>1.0873</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.6</mn><mi>e</mi><mo>≈</mo><mn>4.3493</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>3</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.4</mn><mi>e</mi><mo>≈</mo><mo>−</mo><mn>1.0873</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.4</mn><mi>e</mi><mo>≈</mo><mn>1.0873</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><mi>a</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.4</mn><mi>e</mi><mo>≈</mo><mn>1.0873</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><msub><mi>x</mi><mn>3</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mi>e</mi><mo>≈</mo><mn>27.1828</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mi>b</mi><mtext> </mtext><mi>c</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>e</mi><mo>≈</mo><mn>5.4366</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><msup><mi>e</mi><mi>d</mi></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>≈</mo><mn>2.7183</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>e</mi><mo>≈</mo><mn>5.4366</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>Check (closed form), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><msub><mi>x</mi><mn>3</mn></msub><mo>=</mo><mn>5</mn><mi mathvariant="normal">/</mi><mn>5</mn><mo>=</mo><mn>1</mn></mrow></math></h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>0</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mi>e</mi><mi>u</mi></msup><mo>=</mo><mi>e</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>1</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><msub><mi>x</mi><mn>0</mn></msub><msup><mi>e</mi><mi>u</mi></msup></mrow><msub><mi>x</mi><mn>3</mn></msub></mfrac><mo>=</mo><mfrac><mrow><mn>2</mn><mi>e</mi></mrow><mn>5</mn></mfrac><mo>=</mo><mn>0.4</mn><mi>e</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>2</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mn>2</mn><msub><mi>x</mi><mn>0</mn></msub><msub><mi>x</mi><mn>2</mn></msub><msup><mi>e</mi><mi>u</mi></msup></mrow><msub><mi>x</mi><mn>3</mn></msub></mfrac><mo>=</mo><mfrac><mrow><mn>8</mn><mi>e</mi></mrow><mn>5</mn></mfrac><mo>=</mo><mn>1.6</mn><mi>e</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>3</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mfrac><mrow><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup><mo stretchy="false">)</mo><msup><mi>e</mi><mi>u</mi></msup></mrow><msubsup><mi>x</mi><mn>3</mn><mn>2</mn></msubsup></mfrac><mo>=</mo><mo>−</mo><mfrac><mrow><mn>10</mn><mi>e</mi></mrow><mn>25</mn></mfrac><mo>=</mo><mo>−</mo><mn>0.4</mn><mi>e</mi></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>Matches the graph; PyTorch autograd: <code>f = 5.43656</code>, <code>grad = [2.71828, 1.08731, 4.34925, -1.08731]</code>.</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>f</mi><mo>=</mo><mn>2</mn><mi>e</mi><mo>≈</mo><mn>5.4366</mn><mo separator="true">,</mo><mspace width="1em"/><mi mathvariant="normal">∇</mi><mi>f</mi><mo>=</mo><mo stretchy="false">(</mo><mi>e</mi><mo separator="true">,</mo><mtext> </mtext><mn>0.4</mn><mi>e</mi><mo separator="true">,</mo><mtext> </mtext><mn>1.6</mn><mi>e</mi><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mn>0.4</mn><mi>e</mi><mo stretchy="false">)</mo><mo>≈</mo><mo stretchy="false">(</mo><mn>2.7183</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.0873</mn><mo separator="true">,</mo><mtext> </mtext><mn>4.3493</mn><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mn>1.0873</mn><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h2>Q2 2-Cluster (one-hidden-layer MLP)</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><msub><mi>W</mi><mn>2</mn></msub><mtext> </mtext><mi mathvariant="normal">ReLU</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mn>1</mn></msub><mi>x</mi><mo>+</mo><msub><mi>b</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>+</mo><msub><mi>b</mi><mn>2</mn></msub><mo separator="true">,</mo><mspace width="2em"/><msub><mi>W</mi><mn>1</mn></msub><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mi>h</mi><mo>×</mo><mn>2</mn></mrow></msup><mo separator="true">,</mo><mtext> </mtext><msub><mi>b</mi><mn>1</mn></msub><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mi>h</mi></msup><mo separator="true">,</mo><mtext> </mtext><msub><mi>W</mi><mn>2</mn></msub><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mn>2</mn><mo>×</mo><mi>h</mi></mrow></msup><mo separator="true">,</mo><mtext> </mtext><msub><mi>b</mi><mn>2</mn></msub><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mn>2</mn></msup></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math> output logits: <code>CrossEntropyLoss</code> = softmax + NLL, one score per class.</li>
+</ul>
+<h3><code>build_1_layer_mlp</code></h3>
+<pre><code class="language-python">def build_1_layer_mlp(nbr_hidden_unit):
+    mlp = nn.Sequential(
+        nn.Linear(2, nbr_hidden_unit),   # W1, b1
+        nn.ReLU(),
+        nn.Linear(nbr_hidden_unit, 2),   # W2, b2 -&gt; 2 class scores
+    )
+    return mlp
+</code></pre>
+<ul>
+<li><code>train_mlp()</code> provided, unchanged: full-batch, Adam lr <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0.001</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn></mrow></math> epochs, seed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3211</mn></mrow></math>, train <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∪</mo></mrow></math> valid for training.</li>
+</ul>
+<h3>Test accuracy (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>200</mn></mrow></math> test points)</h3>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math></th>
+<th>2</th>
+<th>5</th>
+<th>10</th>
+<th>50</th>
+<th>100</th>
+<th>500</th>
+<th>1000</th>
+<th>5000</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>test acc</td>
+<td>0.875</td>
+<td>0.875</td>
+<td>0.880</td>
+<td>0.895</td>
+<td>0.900</td>
+<td>0.950</td>
+<td>0.960</td>
+<td>0.965</td>
+</tr>
+<tr>
+<td>misclassified</td>
+<td>25</td>
+<td>25</td>
+<td>24</td>
+<td>21</td>
+<td>20</td>
+<td>10</td>
+<td>8</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+<h3>Observation (also in the notebook markdown cell)</h3>
+<ul>
+<li><strong>Accuracy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↑</mo></mrow></math> with width:</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>≤</mo><mn>100</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.875</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.900</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>≥</mo><mn>500</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.950</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.965</mn></mrow></math>. Errors <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>20</mn><mo>→</mo><mn>10</mn></mrow></math> for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>100</mn><mo>→</mo><mn>500</mn></mrow></math>, only <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>→</mo><mn>7</mn></mrow></math> for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1000</mn><mo>→</mo><mn>5000</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> diminishing returns.</li>
+<li><strong>Boundary shape:</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>≤</mo><mn>100</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> nearly one straight line (≈ linear classifier), misses the diagonal red points inside the blue region; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>≥</mo><mn>1000</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> visibly piecewise linear (one kink per ReLU unit), bends around that red cluster.</li>
+<li><strong>Capacity + optimisation:</strong> same budget (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn></mrow></math> full-batch steps, lr <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.001</mn></mrow></math>) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> wider nets fit faster; small nets underfit.</li>
+<li><strong>Limits:</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>5000</mn></mrow></math> still <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mi mathvariant="normal">/</mi><mn>200</mn></mrow></math> wrong; extra width mainly costs compute; outside the data range the boundary only extrapolates linearly (meaningless).</li>
+</ul>
+<p>⚠️ Exact accuracies depend on PyTorch version + CPU RNG (run: latest torch, Python 3.14, CPU); a local Anaconda run may differ in the last digits, same trend.</p>
+<h2>Q3 MNIST (two hidden layers: 512 → 64)</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>16</mn><msup><mo stretchy="false">]</mo><mn>64</mn></msup><mtext> </mtext><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mtext> </mtext><mo>÷</mo><mn>16</mn><mtext> </mtext></mrow></mpadded></mover><mtext> </mtext><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">]</mo><mn>64</mn></msup><mtext> </mtext><mo>→</mo><mtext> </mtext><mi mathvariant="normal">Linear</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>64</mn><mo separator="true">,</mo><mn>512</mn><mo stretchy="false">)</mo><mo>→</mo><mi mathvariant="normal">ReLU</mi><mo>⁡</mo><mo>→</mo><mi mathvariant="normal">Linear</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>512</mn><mo separator="true">,</mo><mn>64</mn><mo stretchy="false">)</mo><mo>→</mo><mi mathvariant="normal">ReLU</mi><mo>⁡</mo><mo>→</mo><mi mathvariant="normal">Linear</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>64</mn><mo separator="true">,</mo><mn>10</mn><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="script">L</mi><mtext>epoch</mtext></msub><mo>=</mo><mfrac><mn>1</mn><mi>B</mi></mfrac><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>B</mi></munderover><msub><mi mathvariant="script">L</mi><mtext>CE</mtext></msub><mo stretchy="false">(</mo><msub><mtext>batch</mtext><mi>k</mi></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>B</mi><mo>=</mo><mo stretchy="false">⌈</mo><mn>1257</mn><mi mathvariant="normal">/</mi><mn>64</mn><mo stretchy="false">⌉</mo><mo>=</mo><mn>20</mn><mtext> mini-batches </mtext><mo stretchy="false">(</mo><mo>=</mo><mtext>updates/epoch</mtext><mo stretchy="false">)</mo></mrow></math></div><h3><code>build_mlp</code></h3>
+<pre><code class="language-python">def build_mlp():
+    mlp = nn.Sequential(
+        nn.Linear(64, 512),   # 8x8 pixels -&gt; 512
+        nn.ReLU(),
+        nn.Linear(512, 64),
+        nn.ReLU(),
+        nn.Linear(64, 10),    # 10 class scores
+    )
+    return mlp
+</code></pre>
+<h3><code>train_mlp</code></h3>
+<pre><code class="language-python">def train_mlp():
+    epochs = 50
+    batch_size = 64
+    lossfunc = torch.nn.CrossEntropyLoss()
+    train_x = train_input / 16.0          # [0,16] -&gt; [0,1]; locals, data cell untouched
+    valid_x = valid_input / 16.0          # same scaling for all three splits
+    test_x = test_input / 16.0
+
+    mlp = build_mlp()
+    optimizer = torch.optim.Adam(mlp.parameters(), lr=0.001)   # optimizer not fixed by task
+    loss_list, valid_acc = [], []
+    for i_epoch in range(epochs):
+        mlp.train()
+        batch_losses = []
+        for batch_x, batch_y in iterate_minibatches(train_x, train_label, batch_size, shuffle=True):
+            optimizer.zero_grad()
+            outputs = mlp(batch_x)
+            loss = lossfunc(outputs, batch_y)
+            loss.backward()
+            optimizer.step()              # one update per mini-batch
+            batch_losses.append(loss.item())
+        loss_list.append(np.mean(batch_losses))   # L_epoch = mean over B batches
+        mlp.eval()
+        with torch.no_grad():
+            acc = AccuarcyCompute(mlp(valid_x), valid_label)   # valid acc every epoch
+        valid_acc.append(acc)
+        print('epoch {:2d}: train loss {:.4f}, valid acc {:.4f}'.format(i_epoch + 1, loss_list[-1], acc))
+
+    plot_fig(loss_list, 'MNIST training loss', 'mnist_train_loss.png')      # &quot;loss&quot; in title -&gt; y = loss
+    plot_fig(valid_acc, 'MNIST validation accuracy', 'mnist_valid_acc.png') # else y = accuracy
+
+    with torch.no_grad():
+        test_outputs = mlp(test_x)
+    test_acc = AccuarcyCompute(test_outputs, test_label)
+    print('test accuracy: {:.4f}'.format(test_acc))
+    predicted_label = test_outputs.argmax(dim=1).cpu().numpy()
+    visualize_mnist_predictions(test_x.cpu().numpy(), test_label.cpu().numpy(), predicted_label)
+
+train_mlp()
+</code></pre>
+<h3>Key numbers from the run</h3>
+<table>
+<thead>
+<tr>
+<th>epoch</th>
+<th>1</th>
+<th>5</th>
+<th>10</th>
+<th>20</th>
+<th>30</th>
+<th>40</th>
+<th>50</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>train loss</td>
+<td>2.0978</td>
+<td>0.2698</td>
+<td>0.1235</td>
+<td>0.0484</td>
+<td>0.0296</td>
+<td>0.0138</td>
+<td>0.0077</td>
+</tr>
+<tr>
+<td>valid acc</td>
+<td>0.7333</td>
+<td>0.9259</td>
+<td>0.9593</td>
+<td>0.9815</td>
+<td>0.9778</td>
+<td>0.9741</td>
+<td>0.9741</td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>test acc</mtext><mo>=</mo><mfrac><mn>261</mn><mn>270</mn></mfrac><mo>=</mo><mn>0.9667</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>test accuracy</mtext><mo>=</mo><mn>0.9667</mn><mtext> </mtext><mo stretchy="false">(</mo><mo>&gt;</mo><mn>0.80</mn><mtext> required</mtext><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>⚠️ Optimizer / lr not specified; Adam(lr <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0.001</mn></mrow></math>) used. Plain SGD needs larger lr or more epochs to pass <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.80</mn></mrow></math>.</p>

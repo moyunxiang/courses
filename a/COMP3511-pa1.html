@@ -1,0 +1,391 @@
+<p>Full code: <code>solutions/pa1_myshell.c</code>. It is the skeleton with the TODOs filled in plus a few new helper functions. No extra header files.</p>
+<p>⚠️ The skeleton has a line addressed to AI models: generating the code with AI means giving up the chance to learn this PA yourself. Use this file only as a study reference. Rewrite the code yourself before submitting; JPlag is run on all submissions, so copying this file is a plagiarism risk.</p>
+<p>⚠️ That AI-instruction line is still in the file. Name and ITSC email are filled in (MO Yunxiang / ymoaj). Decide how to handle these header lines before you submit.</p>
+<h2>Design</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>myshell</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext>read line</mtext><mo>→</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext mathvariant="monospace">exit</mtext><mo separator="true">,</mo><mtext> </mtext><mtext mathvariant="monospace">cd</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>handled in myshell (no fork)</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>else</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext mathvariant="monospace">fork</mtext><mo>→</mo><mtext mathvariant="monospace">process_cmd</mtext><mo separator="true">;</mo><mtext> parent </mtext><mtext mathvariant="monospace">wait(0)</mtext></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext mathvariant="monospace">process_cmd</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mi>n</mi><mo>=</mo><mi mathvariant="normal">#</mi><mtext>segments split on </mtext><mtext mathvariant="monospace">|</mtext><mo>⇒</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext mathvariant="monospace">exec_segment</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>≥</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>−</mo><mn>1</mn><mtext> pipes</mtext><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mtext> children</mtext><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mo>×</mo><mtext mathvariant="monospace">wait</mtext></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext mathvariant="monospace">exec_segment</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext>extract </mtext><mtext mathvariant="monospace">&lt;</mtext><mi mathvariant="normal">/</mi><mtext mathvariant="monospace">&gt;</mtext><mo>→</mo><mtext mathvariant="monospace">dup2</mtext><mo>→</mo><mtext mathvariant="monospace">parse_arguments</mtext><mo>→</mo><mtext mathvariant="monospace">execvp</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><table>
+<thead>
+<tr>
+<th>Lab case</th>
+<th>Form</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>cmd</code></td>
+<td><code>exec_segment</code></td>
+</tr>
+<tr>
+<td>2 / 3</td>
+<td><code>cmd &lt; in</code> / <code>cmd &gt; out</code></td>
+<td><code>exec_segment</code> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>×</mo></mrow></math> <code>dup2</code></td>
+</tr>
+<tr>
+<td>4 / 5</td>
+<td><code>cmd &lt; in &gt; out</code> / <code>cmd &gt; out &lt; in</code></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo></mrow></math> <code>dup2</code>, order-independent</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>c1 | c2 | … | cn</code></td>
+<td>pipe loop</td>
+</tr>
+</tbody>
+</table>
+<h2>1. exit</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext mathvariant="monospace">exit</mtext><mtext> checked in myshell (no fork)</mtext><mo>⇒</mo><msub><mtext>pid</mtext><mtext>end</mtext></msub><mo>=</mo><msub><mtext>pid</mtext><mtext>start</mtext></msub></mrow></math></div><pre><code class="language-c">char cmdline_copy[MAX_CMDLINE_LENGTH];     // 256 &gt;= |cmdline| incl. NUL
+char *tokens[MAX_CMDLINE_TOKENS];          // 256/2+1 = 129 slots
+int num_tokens = 0;
+strcpy(cmdline_copy, cmdline);             // parse_arguments mutates; keep cmdline for process_cmd
+parse_arguments(tokens, cmdline_copy, &amp;num_tokens, SPACE_CHARS);
+if (num_tokens == 0)
+    continue;
+
+if (strcmp(tokens[0], &quot;exit&quot;) == 0)
+{
+    printf(TEMPLATE_MYSHELL_END, getpid());
+    exit(0);
+}
+</code></pre>
+<ul>
+<li>⚠️ <code>parse_arguments</code> has no bounds check: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn></mrow></math> slots <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math> tokens of the 8-segment pipe test <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> stack overflow; size for a whole line (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>256</mn><mi mathvariant="normal">/</mi><mn>2</mn><mo>+</mo><mn>1</mn></mrow></math>).</li>
+</ul>
+<h2>2. Ctrl-C (SIGINT)</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>handler only in myshell</mtext><mo separator="true">;</mo><mspace width="1em"/><mtext mathvariant="monospace">process_cmd</mtext><mo>:</mo><mtext mathvariant="monospace">SIG_DFL</mtext><mtext> </mtext><mo stretchy="false">(</mo><mtext>and </mtext><mtext mathvariant="monospace">execvp</mtext><mtext> resets caught signals</mtext><mo stretchy="false">)</mo><mo>⇒</mo><mtext>message printed exactly once</mtext></mrow></math></div><pre><code class="language-c">void sigint_handler(int signum)            // signum = 2
+{
+    printf(TEMPLATE_MYSHELL_TERMINATE, getpid(), signum);   // same pid as start message
+    exit(0);                               // flushes stdout
+}
+
+// main():
+signal(SIGINT, sigint_handler);
+
+// start of process_cmd():
+signal(SIGINT, SIG_DFL);                   // children die silently on Ctrl-C
+</code></pre>
+<ul>
+<li>Terminal echoes <code>^C</code> itself <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> do not print it; Ctrl-C <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> whole foreground process group.</li>
+</ul>
+<h2>3. cd</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext mathvariant="monospace">chdir</mtext><mtext> in child</mtext><mo>⇒</mo><mtext>parent cwd unchanged</mtext><mo>⇒</mo><mtext mathvariant="monospace">chdir</mtext><mtext> must run in myshell</mtext><mo separator="true">;</mo><mtext>  prompt</mtext><mo>←</mo><mtext mathvariant="monospace">getcwd</mtext><mtext> next iteration</mtext></mrow></math></div><pre><code class="language-c">if (strcmp(tokens[0], &quot;cd&quot;) == 0)
+{
+    if (num_tokens &lt; 2 || chdir(tokens[1]) != 0)   // check argc before reading tokens[1]
+        printf(TEMPLATE_MYSHELL_CD_ERROR);
+    continue;                                      // chdir handles ., .., relative, absolute
+}
+</code></pre>
+<h2>4. fflush before fork</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>stdout not a tty</mtext><mo>⇒</mo><mtext>fully buffered</mtext><mo>⇒</mo><mtext>prompt copied by </mtext><mtext mathvariant="monospace">fork</mtext><mo>⇒</mo><mtext>printed twice on child </mtext><mtext mathvariant="monospace">exit</mtext></mrow></math></div><pre><code class="language-c">fflush(stdout);                            // added just before the skeleton's fork()
+pid_t pid = fork();
+</code></pre>
+<ul>
+<li>⚠️ Reference executable lacks this; its <code>process_cmd</code> never <code>exit</code>s before exec. This version calls <code>exit(0)</code> in the pipe branch <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> flush required.</li>
+</ul>
+<h2>5. Redirection (dup2)</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>scan segment (skip text in quotes)</mtext><mo>:</mo><mtext mathvariant="monospace">&lt;</mtext><mi mathvariant="normal">/</mi><mtext mathvariant="monospace">&gt;</mtext><mo>+</mo><mtext>filename</mtext><mo>→</mo><mtext>spaces</mtext><mo>⇒</mo><mtext>argv never contains them</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext mathvariant="monospace">&lt;</mtext><mo>:</mo><mtext mathvariant="monospace">open(O_RDONLY)</mtext><mo>→</mo><mrow><mtext mathvariant="monospace">dup2(fd,</mtext><mtext> </mtext><mtext mathvariant="monospace">0)</mtext></mrow><mo separator="true">;</mo><mspace width="1em"/><mtext mathvariant="monospace">&gt;</mtext><mo>:</mo><mrow><mtext mathvariant="monospace">open(O_CREAT|O_WRONLY|O_TRUNC,</mtext><mtext> </mtext><mtext mathvariant="monospace">0600)</mtext></mrow><mo>→</mo><mrow><mtext mathvariant="monospace">dup2(fd,</mtext><mtext> </mtext><mtext mathvariant="monospace">1)</mtext></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>fd 0 and fd 1 disjoint</mtext><mo>⇒</mo><mrow><mtext mathvariant="monospace">&lt;</mtext><mtext> </mtext><mtext mathvariant="monospace">a</mtext><mtext> </mtext><mtext mathvariant="monospace">&gt;</mtext><mtext> </mtext><mtext mathvariant="monospace">b</mtext></mrow><mo>≡</mo><mrow><mtext mathvariant="monospace">&gt;</mtext><mtext> </mtext><mtext mathvariant="monospace">b</mtext><mtext> </mtext><mtext mathvariant="monospace">&lt;</mtext><mtext> </mtext><mtext mathvariant="monospace">a</mtext></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><pre><code class="language-c">void extract_redirection(char *segment, char *in_file, char *out_file)
+{
+    int i = 0, in_quotes = 0;
+    in_file[0] = '\0';
+    out_file[0] = '\0';
+    while (segment[i] != '\0')
+    {
+        char c = segment[i];
+        if (c == '&quot;')
+            in_quotes = !in_quotes;
+        if (!in_quotes &amp;&amp; (c == '&lt;' || c == '&gt;'))
+        {
+            segment[i++] = ' ';                                         // blank the symbol
+            take_file_name(segment, &amp;i, c == '&lt;' ? in_file : out_file); // copy + blank name; &quot;&lt;file&quot; ok
+            continue;
+        }
+        i++;
+    }
+}
+
+void exec_segment(char *segment)          // never returns
+{
+    ...
+    extract_redirection(segment, in_file, out_file);
+    if (in_file[0] != '\0')
+    {
+        fd = open(in_file, O_RDONLY);
+        if (fd &lt; 0) exit(1);
+        dup2(fd, STDIN_FILENO);           // atomically close 0, make 0 a copy of fd
+        close(fd);                        // no leaked fd in the exec'd program
+    }
+    if (out_file[0] != '\0')
+    {
+        fd = open(out_file, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);  // 0600
+        if (fd &lt; 0) exit(1);
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+    }
+    parse_arguments(arguments, segment, &amp;num_arguments, SPACE_CHARS);
+    if (num_arguments == 0) exit(0);
+    arguments[num_arguments] = NULL;      // &lt;= 8 args -&gt; index &lt;= 8 &lt; 9 slots
+    execvp(arguments[0], arguments);
+    exit(1);                              // reached only if execvp fails
+}
+</code></pre>
+<ul>
+<li>Mode <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0600</mn></mrow></math> = lab example = reference. Reference has no <code>O_TRUNC</code> (spec: file does not exist); added so an existing file is overwritten cleanly.</li>
+</ul>
+<h2>6. Splitting pipe segments</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mrow><mtext mathvariant="monospace">parse_arguments(...,</mtext><mtext> </mtext><mtext mathvariant="monospace">&quot;|&quot;)</mtext></mrow><mtext> strips quotes</mtext><mo>⇒</mo><mrow><mtext mathvariant="monospace">&quot;Hello</mtext><mtext> </mtext><mtext mathvariant="monospace">Hong</mtext><mtext> </mtext><mtext mathvariant="monospace">Kong&quot;</mtext></mrow><mo>→</mo><mn>3</mn><mtext> args </mtext><mo>×</mo><mo separator="true">;</mo><mspace width="2em"/><mtext>manual split outside quotes</mtext><mo>⇒</mo><mn>2</mn><mtext> args </mtext><mi mathvariant="normal">✓</mi></mrow></math></div><pre><code class="language-c">int split_pipe_segments(char *cmdline, char **segments)
+{
+    int n = 0, in_quotes = 0;
+    char *p = cmdline;
+    segments[n++] = cmdline;
+    for (; *p != '\0'; p++)
+    {
+        if (*p == '&quot;')
+            in_quotes = !in_quotes;
+        else if (!in_quotes &amp;&amp; *p == PIPE_CHAR[0] &amp;&amp; n &lt; MAX_PIPE_SEGMENTS)  // n &lt;= 8 slots
+        {
+            *p = '\0';                    // segments are substrings of cmdline, no copies
+            segments[n++] = p + 1;
+        }
+    }
+    return n;
+}
+</code></pre>
+<h2>7. Multi-level pipe</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>child </mtext><mi>i</mi><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mtext>stdin</mtext><mo>←</mo><msub><mtext>pipe</mtext><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mtext> </mtext><mo stretchy="false">(</mo><mi>i</mi><mo>&gt;</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mtext>stdout</mtext><mo>→</mo><msub><mtext>pipe</mtext><mi>i</mi></msub><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo><mtext> </mtext><mo stretchy="false">(</mo><mi>i</mi><mo>&lt;</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>invariant</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mtext>at start of iteration </mtext><mi>i</mi><mo>+</mo><mn>1</mn><mo separator="true">,</mo><mtext> parent holds only </mtext><msub><mtext>pipe</mtext><mi>i</mi></msub><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mo lspace="0em" rspace="0em">⇒</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><msub><mtext>open write ends of pipe</mtext><mi>i</mi></msub><mo>=</mo><mo stretchy="false">{</mo><mtext>child </mtext><mi>i</mi><mtext>’s stdout</mtext><mo stretchy="false">}</mo><mo>⇒</mo><mtext>child </mtext><mi>i</mi><mtext> exits</mtext><mo>⇒</mo><mtext>child </mtext><mi>i</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn><mtext> gets EOF</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><pre><code class="language-c">if (num_pipe_segments == 1)
+    exec_segment(pipe_segments[0]);       // no pipe: exec directly, no extra process
+
+for (i = 0; i &lt; num_pipe_segments; i++)
+{
+    int is_last = (i == num_pipe_segments - 1);
+    if (!is_last)
+        pipe(pfds);                       // pipe_i before fork_i: child i inherits it
+
+    pid_t pid = fork();
+    if (pid == 0)
+    {
+        if (prev_read != -1) { dup2(prev_read, STDIN_FILENO); close(prev_read); }
+        if (!is_last) { close(pfds[0]); dup2(pfds[1], STDOUT_FILENO); close(pfds[1]); }
+        exec_segment(pipe_segments[i]);   // child keeps only fds 0,1,2; file redirs override pipe
+    }
+    if (prev_read != -1)
+        close(prev_read);                 // only child i reads pipe_{i-1}
+    if (!is_last) { close(pfds[1]); prev_read = pfds[0]; }   // only child i writes pipe_i
+}
+for (i = 0; i &lt; num_pipe_segments; i++)
+    wait(0);                              // reap all n children: no zombies
+exit(0);                                  // main's wait(0) returns -&gt; next prompt after whole pipeline
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EOF reaches <code>sort</code> / <code>wc</code></td>
+<td>parent closes <code>pfds[1]</code> after each fork (else readers block forever)</td>
+</tr>
+<tr>
+<td>No deadlock</td>
+<td>all <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> children forked before any <code>wait</code>; waiting inside loop <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> writer blocks on full <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>64</mn></mrow></math> KB buffer with reader not yet forked</td>
+</tr>
+<tr>
+<td>Hidden01 count</td>
+<td>single command <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> forked child <code>execvp</code>s directly <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math> myshell in <code>ps</code></td>
+</tr>
+<tr>
+<td>Extra process</td>
+<td>during a pipe command: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math> <code>process_cmd</code> (blocked in <code>wait</code>), exits after pipeline; reference same</td>
+</tr>
+</tbody>
+</table>
+<h2>8. Mixing pipes and redirection (discussion board)</h2>
+<ul>
+<li>Spec Assumptions: no command has both redirection and pipe <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> not tested.</li>
+<li>Here: pipe <code>dup2</code> first, then file redirection overrides (bash semantics): <code>ls &gt; tmp | sort</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <code>sort</code> reads nothing.</li>
+<li>⚠️ Thread has 1 reply, but the archive captured only the question; follow the spec Assumption.</li>
+</ul>
+<h2>Tests</h2>
+<p>Build (macOS, Apple clang 17.0.0), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> warnings:</p>
+<pre><code class="language-bash">clang -pedantic -Wall -Wextra -std=c99 -o myshell myshell.c   # rc=0, no output
+./myshell &lt; t1.txt                                             # non-interactive cases
+python3 pty_test.py                                            # Ctrl-C + nested myshell via pty
+</code></pre>
+<p><code>&lt;PA1&gt;</code> = test directory.</p>
+<h3>Given test cases</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Expected</th>
+<th>Actual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>exit</code></td>
+<td><code>Myshell (pid=X) ends</code>, same X as start</td>
+<td>✅ pids match</td>
+</tr>
+<tr>
+<td><code>echo &quot;Hello Hong Kong&quot;</code></td>
+<td><code>Hello Hong Kong</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ls  -l  -h</code> (mixed tabs/spaces)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≡</mo></mrow></math> <code>ls -lh</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>echo a1 a2 a3 a4 a5 a6 a7</code></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn></mrow></math> args + NULL <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>9</mn></mrow></math> slots</td>
+<td>✅ <code>a1 a2 a3 a4 a5 a6 a7</code></td>
+</tr>
+<tr>
+<td><code>wc -l &lt; myshell.c</code></td>
+<td>line count</td>
+<td>✅ <code>429</code></td>
+</tr>
+<tr>
+<td><code>ls -lh &gt; tmp_out_only.txt</code></td>
+<td>nothing on screen; file lists itself</td>
+<td>✅ mode <code>-rw-------</code></td>
+</tr>
+<tr>
+<td><code>ls | sort</code></td>
+<td>sorted list</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>8-segment <code>ls | sort -r | … | sort -r</code></td>
+<td>last stage <code>sort -r</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> reverse order</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>cd example</td>
+<td>below</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Ctrl-C</td>
+<td><code>^CMyshell (pid=X) terminates by Ctrl-C with signal: 2</code></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-text">ymoaj &lt;PA1&gt;&gt; cd subfolder
+ymoaj &lt;PA1&gt;/subfolder&gt; cd wrong_folder
+Myshell cd command error
+ymoaj &lt;PA1&gt;/subfolder&gt; cd ..
+ymoaj &lt;PA1&gt;&gt; cd /
+ymoaj /&gt; exit
+</code></pre>
+<pre><code class="language-text">Myshell (pid=52296) starts
+ymoaj &lt;PA1&gt;&gt; ls | sort | wc -l
+      10
+ymoaj &lt;PA1&gt;&gt; ^CMyshell (pid=52296) terminates by Ctrl-C with signal: 2
+</code></pre>
+<h3>Hidden test cases (built from the descriptions)</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Commands</th>
+<th>Expected</th>
+<th>Actual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hidden01</td>
+<td><code>./myshell</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mn>2</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>ps</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>exit</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mn>3</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math> myshell; each <code>ends</code> with own pid</td>
+<td>✅ below</td>
+</tr>
+<tr>
+<td>Hidden02</td>
+<td><code>wc -l &lt; myshell.c &gt; tmp_in_then_out.txt</code>; <code>cat</code></td>
+<td>line count</td>
+<td>✅ <code>429</code></td>
+</tr>
+<tr>
+<td>Hidden03</td>
+<td><code>wc -l &gt; tmp_out_then_in.txt &lt; myshell.c</code>; <code>cat</code></td>
+<td>line count</td>
+<td>✅ <code>429</code></td>
+</tr>
+<tr>
+<td>Hidden04</td>
+<td><code>ls | wc -l</code>; <code>echo hello world | wc -w</code></td>
+<td>#files; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td>✅ <code>7</code>; <code>2</code></td>
+</tr>
+<tr>
+<td>Hidden05</td>
+<td><code>cat myshell.c | wc -l</code>; <code>cat myshell.c | grep include | wc -l</code></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>429</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn></mrow></math></td>
+<td>✅ <code>429</code>; <code>11</code></td>
+</tr>
+<tr>
+<td>Hidden06</td>
+<td><code>cd subfolder</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>cd no_such_dir</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>cd ../subfolder/..</code></td>
+<td>enter; error; back to start</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-text">  PID TTY           TIME CMD
+52375 ttys010    0:00.00 ./myshell
+52378 ttys010    0:00.00 ./myshell
+52415 ttys010    0:00.00 ./myshell
+ymoaj &lt;PA1&gt;&gt; exit
+Myshell (pid=52415) ends
+ymoaj &lt;PA1&gt;&gt; exit
+Myshell (pid=52378) ends
+ymoaj &lt;PA1&gt;&gt; exit
+Myshell (pid=52375) ends
+</code></pre>
+<h3>Extra</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Actual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cat big.txt | sort -n | sort -rn | wc -l</code> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>200,000</mn></mrow></math> lines <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≫</mo><mn>64</mn></mrow></math> KB buffer)</td>
+<td><code>200000</code>, no deadlock</td>
+</tr>
+<tr>
+<td><code>wc -l &lt;myshell.c &gt;tmp_nospace.txt</code></td>
+<td><code>429</code></td>
+</tr>
+<tr>
+<td><code>nosuchcmd_xyz</code></td>
+<td>no output, back to prompt (= reference)</td>
+</tr>
+<tr>
+<td>line of only spaces/tabs</td>
+<td>next prompt immediately</td>
+</tr>
+<tr>
+<td><code>ps | grep myshell</code> after all tests</td>
+<td>empty (no leftovers)</td>
+</tr>
+</tbody>
+</table>
+<h3>Platform differences</h3>
+<ul>
+<li>⚠️ macOS <code>ps</code>: all terminals of this user, no <code>ps</code> line; Linux: current terminal only (<code>tcsh</code> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo></mrow></math> <code>myshell</code> + <code>ps</code>, as in spec). Criterion same: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math> myshell.</li>
+<li>⚠️ macOS <code>wc -l</code> pads (<code>     429</code>); GNU <code>wc</code> on stdin prints <code>429</code>; <code>ls -lh</code> date format and <code>@</code> xattr marker differ — external commands, not myshell.</li>
+<li>⚠️ <code>signal()</code>: BSD semantics on macOS; glibc with <code>_GNU_SOURCE</code> (skeleton defines it) also BSD (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext mathvariant="monospace">SA_RESTART</mtext></mrow></math>, no reset); handler calls <code>exit</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> same behaviour.</li>
+<li>⚠️ No gcc 11 / glibc here; skeleton redefines <code>STDIN_FILENO</code> with the same value as <code>&lt;unistd.h&gt;</code> (no warning here). Recheck <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> warnings with <code>gcc -pedantic -Wall -Wextra -std=c99</code> on Lab 2.</li>
+<li>⚠️ Skeleton <code>get_cmd_line</code> returns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math> on EOF <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>continue</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> input without final <code>exit</code> loops forever printing prompts (skeleton code; graders type <code>exit</code>). Always end input files with <code>exit</code>.</li>
+<li>Reference <code>site/pa1/myshell</code> is Linux x86-64 ELF; Docker not running <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> not diffed line by line.</li>
+<li><strong>Before submitting: compile on CS Lab 2 (<code>csl2wkXX.cse.ust.hk</code>) and rerun every case above.</strong></li>
+</ul>
