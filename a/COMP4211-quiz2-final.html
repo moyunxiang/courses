@@ -1,0 +1,279 @@
+<p>中英对照，题目和答案放在一起，考前最后过一遍用。范围：<code>4-ann-*</code>（6 份）和 <code>5-cnn-*</code>（3 份），<strong>不考 <code>6-rnn</code></strong>。10/26（一）课上考，闭卷，没有编程题，不能用计算器。</p>
+<h2>A · Neurons &amp; perceptrons 神经元与感知机</h2>
+<p><strong>1. Biological vs artificial? · 生物神经元和人工神经元怎么对应？</strong></p>
+<table>
+<thead>
+<tr>
+<th>Biological 生物</th>
+<th>Artificial 人工</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>neuron（dendrite 树突 → soma 胞体 → axon 轴突 → synapse 突触）</td>
+<td>unit 单元</td>
+</tr>
+<tr>
+<td>synapse strength 突触强度</td>
+<td>weight 权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow></math></td>
+</tr>
+<tr>
+<td>pulses summed 脉冲相加</td>
+<td>weighted sum 加权和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>fires if strong enough 够强才放电</td>
+<td>activation / threshold function 激活函数</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Structure 结构三要素：unit、link、weight；unit 分 input / hidden / output。<strong>Learning = updating weights 学习就是改权重。</strong></li>
+<li>Feedforward 前馈：无环；feedback / recurrent 反馈：有环（RNN，不考）。</li>
+</ul>
+<p><strong>2. Perceptron model? · 感知机模型？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>O</mi><mo>=</mo><mtext>step</mtext><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mi>θ</mi><mo separator="true">,</mo><mspace width="2em"/><mtext>step</mtext><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>x</mi><mo>&lt;</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p><strong>step(0) = 1</strong>（课件定义 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow></math> 取 1，trace 第一步就靠它）。</p>
+<p><strong>3. AND / OR / NOT / XOR? · 逻辑门？</strong></p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>w</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AND</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1.5</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>OR</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>0.5</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>NOT</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0.5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>NAND（自己推）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1.5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>单个感知机能表示 ⟺ <strong>linearly separable 线性可分</strong>。XOR 的两类在对角线上交错 → <strong>不行</strong>。</li>
+<li>多层可以表示<strong>任意</strong> Boolean function：DNF / CNF，AND、OR、NOT 都能用感知机做。</li>
+</ul>
+<p><strong>4. Learning rule and the slide trace? · 学习规则与课件 trace？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>w</mi><mi>j</mi></msub><mo>←</mo><msub><mi>w</mi><mi>j</mi></msub><mo>+</mo><mi>α</mi><mtext> </mtext><msub><mi>I</mi><mi>j</mi></msub><mtext> </mtext><mo stretchy="false">(</mo><mi>T</mi><mo>−</mo><mi>O</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li>只在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo mathvariant="normal">≠</mo><mi>O</mi></mrow></math> 时更新；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math>（bias 也更新）。</li>
+<li>课件 trace（6 个样本，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>1</mn></mrow></math>，从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math> 开始）→ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math>，边界 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>2</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>3</mn><mn>4</mn></mfrac></mstyle><msub><mi>I</mi><mn>1</mn></msub><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle></mrow></math>。</li>
+<li><strong>Convergence theorem 收敛定理</strong>：数据线性可分 ⇒ 任意初值、有限步收敛。不可分 ⇒ 不保证（会震荡）。</li>
+</ul>
+<h2>B · Adaline &amp; GD 自适应线性元与梯度下降</h2>
+<p><strong>5. Adaline vs perceptron? · 两者区别？</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Perceptron</th>
+<th>Adaline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>output 输出单元</td>
+<td>threshold 阈值</td>
+<td><strong>linear 线性</strong></td>
+</tr>
+<tr>
+<td>learning 学习</td>
+<td>perceptron rule（错了才改）</td>
+<td><strong>GD on squared error</strong> 对平方误差做梯度下降</td>
+</tr>
+<tr>
+<td>not separable 不可分时</td>
+<td>does not converge 不收敛</td>
+<td>converges to min-error 收敛到最小误差解</td>
+</tr>
+</tbody>
+</table>
+<p>Adaline = <strong>linear regression 线性回归</strong>。误差面是<strong>二次的（碗形）→ 只有一个全局最小</strong>。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>E</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><munder><mo>∑</mo><mi>d</mi></munder><mo stretchy="false">(</mo><msub><mi>t</mi><mi>d</mi></msub><mo>−</mo><msub><mi>o</mi><mi>d</mi></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mspace width="2em"/><msub><mi>w</mi><mi>i</mi></msub><mo>←</mo><msub><mi>w</mi><mi>i</mi></msub><mo>+</mo><mi>η</mi><munder><mo>∑</mo><mi>d</mi></munder><mo stretchy="false">(</mo><msub><mi>t</mi><mi>d</mi></msub><mo>−</mo><msub><mi>o</mi><mi>d</mi></msub><mo stretchy="false">)</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>d</mi></mrow></msub></mrow></math></div><p><strong>6. Learning rate and batch size? · 学习率与批量？</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math> 太大 → <strong>overshoot 越过最小值</strong>、震荡；用 schedule 逐渐减小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math>；先在小子集上调 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math>。</li>
+<li>Batch GD 全量：准但慢；SGD 单样本：快但抖，需要更小步长；mini-batch：折中。</li>
+</ul>
+<h2>C · MLP, activations, loss 多层感知机、激活函数、损失</h2>
+<p><strong>7. XOR network? · XOR 网络？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>y</mi><mn>3</mn></msub><mo>=</mo><mtext>step</mtext><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>1.5</mn><mo stretchy="false">)</mo><mtext> </mtext><mo stretchy="false">(</mo><mtext>AND</mtext><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>y</mi><mo>=</mo><mtext>step</mtext><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>2</mn><msub><mi>y</mi><mn>3</mn></msub><mo>−</mo><mn>0.5</mn><mo stretchy="false">)</mo></mrow></math></div><p>验证：00→0，01→1，10→1，11→（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mn>3</mn></msub><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>−</mo><mn>2</mn><mo>−</mo><mn>0.5</mn><mo>&lt;</mo><mn>0</mn></mrow></math>）0 ✓。</p>
+<p><strong>8. Why nonlinear hidden units? · 为什么 hidden 必须非线性？</strong></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>2</mn></msub><msub><mi>W</mi><mn>1</mn></msub><mi>x</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mn>2</mn></msub><msub><mi>W</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mi>x</mi></mrow></math> → 线性层叠多少层都等于一层。Step 不可导 → 用 sigmoid。</p>
+<p><strong>9. Activation functions? · 激活函数？</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Formula</th>
+<th>Key fact 要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sigmoid</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">)</mo></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>RBF</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>exp</mi><mo>⁡</mo><mo stretchy="false">(</mo><mo>−</mo><mo stretchy="false">∥</mo><mi>𝐱</mi><mo>−</mo><msub><mi>𝐰</mi><mi>j</mi></msub><msup><mo stretchy="false">∥</mo><mn>2</mn></msup><mi mathvariant="normal">/</mi><mn>2</mn><msubsup><mi>σ</mi><mi>j</mi><mn>2</mn></msubsup><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>local 局部响应</strong>（sigmoid 全局非零）</td>
+</tr>
+<tr>
+<td>ReLU</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>快、梯度 1/0、sparse；⚠️ 梯度可能为 0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Universal approximation 万能逼近</strong>：一层 sigmoid hidden 就能把任意 well-behaved 函数逼近到任意精度。</li>
+<li>分类输出：多类取 argmax；二类单输出，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>&gt;</mo><mn>0</mn></mrow></math> 为 yes。</li>
+</ul>
+<p><strong>10. Entropy? · 熵？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mi>x</mi></munder><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mn>0</mn><mi>log</mi><mo>⁡</mo><mn>0</mn><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mspace width="2em"/><mn>0</mn><mo>≤</mo><mi>H</mi><mo>≤</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>n</mi></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>9</mn><mo>+</mo><mo separator="true">,</mo><mn>5</mn><mo>−</mo><mo stretchy="false">]</mo></mrow></math> → <strong>0.94</strong>；全同类 → 0；五五开 → 1。</li>
+<li>最优码长 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo>−</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>p</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>8</mn></mfrac></mstyle><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>8</mn></mfrac></mstyle><mo stretchy="false">}</mo></mrow></math> 用 0/10/110/111，期望 <strong>1.75 bits</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>H</mi></mrow></math>；定长码 2 bits。</li>
+</ul>
+<p><strong>11. Cross-entropy &amp; softmax? · 交叉熵与 softmax？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>p</mi><mi>i</mi></msub><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>i</mi></msub><mo separator="true">,</mo><mspace width="2em"/><msub><mi>q</mi><mi>i</mi></msub><mo>=</mo><mfrac><msup><mi>e</mi><msub><mi>α</mi><mi>i</mi></msub></msup><mrow><munder><mo>∑</mo><mi>k</mi></munder><msup><mi>e</mi><msub><mi>α</mi><mi>k</mi></msub></msup></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"/><mtext>CE loss</mtext><mo>=</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>c</mi></msub></mrow></math></div><ul>
+<li><strong>不对称</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>H</mi><mo stretchy="false">(</mo><mi>q</mi><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo><mo>=</mo><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> = target（one-hot），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> = model。</li>
+<li>例：logits <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mi>ln</mi><mo>⁡</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> → softmax <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">)</mo></mrow></math>；真类是 3 → loss 1 bit，真类是 1 → 2 bits。</li>
+<li>Binary 二分类：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mo>∑</mo><mo stretchy="false">[</mo><mi>t</mi><mi>log</mi><mo>⁡</mo><mi>f</mi><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>f</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math>。</li>
+</ul>
+<h2>D · Backpropagation 反向传播</h2>
+<p><strong>12. Sigmoid unit gradient? · sigmoid 单元梯度？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>E</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mtext> </mtext><msub><mi>x</mi><mi>i</mi></msub><mo separator="true">,</mo><mspace width="2em"/><msub><mi>w</mi><mi>i</mi></msub><mo>←</mo><msub><mi>w</mi><mi>i</mi></msub><mo>+</mo><mi>η</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><msub><mi>x</mi><mi>i</mi></msub></mrow></math></div><p>推导三步：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math> 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>o</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo></mrow></math>）× <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>o</mi></mrow></math> 对 net（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo></mrow></math>）× net 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>i</mi></msub></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mi>i</mi></msub></mrow></math>）。
+例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>net</mtext><mo>=</mo><mn>0</mn></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>o</mi><mo>=</mo><mn>0.5</mn></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mn>0.125</mn><msub><mi>x</mi><mi>i</mi></msub></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow></math>）。</p>
+<p><strong>13. Computation graph rules? · 计算图规则？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>N</mi></msub><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mspace width="2em"/><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>i</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mtext>Ch</mtext><mo stretchy="false">(</mo><msub><mi>v</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></munder><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>j</mi></msub><mfrac><mrow><mi mathvariant="normal">∂</mi><msub><mi>v</mi><mi>j</mi></msub></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>v</mi><mi>i</mi></msub></mrow></mfrac><mspace width="1em"/><mo stretchy="false">(</mo><mtext>local</mtext><mo>×</mo><mtext>upstream</mtext><mo stretchy="false">)</mo></mrow></math></div><table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Rule 规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>add</td>
+<td>distributor 分发：每个输入都拿<strong>完整</strong>的 upstream</td>
+</tr>
+<tr>
+<td>max</td>
+<td>router 路由：全给大的那个，另一个 0</td>
+</tr>
+<tr>
+<td>mul</td>
+<td>switcher 交换：upstream × <strong>另一个</strong>输入的值</td>
+</tr>
+<tr>
+<td>branch 分支</td>
+<td>gradients <strong>add</strong> 相加</td>
+</tr>
+</tbody>
+</table>
+<p>Local gradients 局部梯度：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mi>x</mi></msup><mo>→</mo><msup><mi>e</mi><mi>x</mi></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi>x</mi><mo>→</mo><mi>a</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi><mo>→</mo><mo>−</mo><mn>1</mn><mi mathvariant="normal">/</mi><msup><mi>x</mi><mn>2</mn></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>+</mo><mi>x</mi><mo>→</mo><mn>1</mn></mrow></math>。</p>
+<p><strong>14. Slide examples? · 课件两个例子？</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mo>−</mo><mn>12</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math>。</li>
+<li>Sigmoid neuron：输出 0.73；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mn>0.20</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mn>0.40</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>0.40</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>0.60</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>=</mo><mn>0.20</mn></mrow></math>（sigmoid gate：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.73</mn><mo>×</mo><mn>0.27</mn><mo>≈</mo><mn>0.2</mn></mrow></math>）。</li>
+<li>自测：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false">)</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>y</mi><mo separator="true">,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mn>12</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi><mo>=</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mtext> </mtext><mn>3</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>7</mn><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo stretchy="false">)</mo></mrow></math>。</li>
+</ul>
+<p><strong>15. Practice details? · 实践细节？</strong></p>
+<ul>
+<li>Init 初始化：small random 小随机数。</li>
+<li>Stop 停止：固定迭代数 / training error 低于阈值 / <strong>validation error 最小处</strong>（early stopping）。</li>
+<li>Momentum 动量：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>w</mi><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mi>η</mi><mtext> </mtext><mi mathvariant="normal">∂</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>w</mi><mo>+</mo><mi>α</mi><mi mathvariant="normal">Δ</mi><mi>w</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>≈</mo><mn>0.9</mn></mrow></math>。例：梯度 2、1，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>0.1</mn></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.2</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.28</mn></mrow></math>。</li>
+<li>GD 只保证 <strong>local minimum 局部最小</strong> → 多次随机初始化。</li>
+</ul>
+<h2>E · Convolution 卷积与滤波</h2>
+<p><strong>16. Why CV? · 为什么做计算机视觉？</strong></p>
+<p>一图胜千言；海量图像 / 视频。典型任务 object recognition；应用：实时检测、自动驾驶卡车、人脸识别 / 刷脸支付、biometrics。</p>
+<p><strong>17. Flip or not? · 翻不翻转？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>conv: </mtext><mi>S</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><munder><mo>∑</mo><mi>n</mi></munder><mi>I</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mi>j</mi><mo>−</mo><mi>n</mi><mo stretchy="false">)</mo><mi>K</mi><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>NN（cross-correlation）: </mtext><mi>S</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><munder><mo>∑</mo><mi>n</mi></munder><mi>I</mi><mo stretchy="false">(</mo><mi>i</mi><mo>+</mo><mi>m</mi><mo separator="true">,</mo><mi>j</mi><mo>+</mo><mi>n</mi><mo stretchy="false">)</mo><mi>K</mi><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></div><p>神经网络<strong>不翻转</strong>。题目说 flipped / true convolution 时先把核转 180°。Valid 输出大小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>H</mi><mo>−</mo><mi>K</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>×</mo><mo stretchy="false">(</mo><mi>W</mi><mo>−</mo><mi>K</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>。</p>
+<p>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math> → 不翻转 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math>，翻转 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math>。</p>
+<p><strong>18. Filters? · 滤波器？</strong></p>
+<ul>
+<li>Smoothing 平滑：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>9</mn></mfrac><msub><mn>𝟏</mn><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow></msub></mrow></math>，blur；窗口越大越糊。加权平均：中心权重大，除以权重和。</li>
+<li>Averaging ↔ <strong>integration 积分</strong>（模糊）；differencing ↔ <strong>differentiation 微分</strong>（锐化），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>。</li>
+<li>Edge 边缘：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mtext> </mtext><mn>0</mn><mtext> </mtext><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 每行（水平差分）→ <strong>竖直边缘</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mtext> </mtext><mn>0</mn><mtext> </mtext><mn>1</mn><msup><mo stretchy="false">]</mo><mi mathvariant="normal">⊤</mi></msup></mrow></math> 每列 → <strong>水平边缘</strong>；平坦区输出 0。</li>
+</ul>
+<h2>F · CNN 卷积神经网络</h2>
+<p><strong>19. Size and parameters? · 尺寸与参数？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>H</mi><mtext>out</mtext></msub><mo>=</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">⌊</mo><mfrac><mrow><mi>H</mi><mo>+</mo><mn>2</mn><mi>p</mi><mo>−</mo><mi>K</mi></mrow><mi>s</mi></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">⌋</mo><mo>+</mo><mn>1</mn><mo separator="true">,</mo><mspace width="2em"/><mi mathvariant="normal">#</mi><mtext>params</mtext><mo>=</mo><msub><mi>C</mi><mi>o</mi></msub><msub><mi>C</mi><mi>i</mi></msub><msub><mi>K</mi><mi>h</mi></msub><msub><mi>K</mi><mi>w</mi></msub><mo>+</mo><msub><mi>C</mi><mi>o</mi></msub></mrow></math></div><table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math></th>
+<th>out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>0</td>
+<td>1</td>
+<td>6</td>
+</tr>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>8</td>
+</tr>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>32</td>
+<td>5</td>
+<td>2</td>
+<td>2</td>
+<td>16</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn><mo>×</mo><mn>3</mn><mo>×</mo><mn>3</mn><mo>×</mo><mn>3</mn><mo>=</mo><mn>432</mn></mrow></math>（+16 bias）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn></mrow></math> 个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>×</mo><mn>5</mn></mrow></math> 卷积核作用在 3 通道输入上 → 1216。<strong>和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo separator="true">,</mo><mi>W</mi></mrow></math> 无关。</strong></li>
+<li>Pooling <strong>0 个参数</strong>；flatten 长度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>H</mi><mo>×</mo><mi>W</mi><mo>×</mo><mi>C</mi></mrow></math>。</li>
+</ul>
+<p><strong>20. Why CNN works? · CNN 的几个想法？</strong></p>
+<ul>
+<li><strong>Sparse connectivity 稀疏连接</strong>：receptive field 感受野，越深越大；层级特征 边 → 部件 → 物体。</li>
+<li><strong>Parameter sharing 参数共享</strong>：一个核到处用 → 平移鲁棒、参数少。效率表：卷积 <strong>2</strong> 个数 vs dense <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>8</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup></mrow></math> vs sparse 178,640（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>320</mn><mo>×</mo><mn>280</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>1</mn></mrow></math> 核）。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>×</mo><mn>1</mn></mrow></math> conv：只混通道，用来降维。</li>
+<li>Nonlinearity（ReLU）：卷积是线性的。Padding：防止每层缩小。Pooling：spatial invariance（「7」的例子）+ downsampling。</li>
+<li>一个 complex layer = conv → detector（ReLU）→ pooling。</li>
+<li>课件架构：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>256</mn><mn>2</mn></msup><mo>×</mo><mn>3</mn><mo>→</mo><msup><mn>256</mn><mn>2</mn></msup><mo>×</mo><mn>64</mn><mo>→</mo></mrow></math> pool/4 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo><msup><mn>64</mn><mn>2</mn></msup><mo>×</mo><mn>64</mn><mo>→</mo><msup><mn>64</mn><mn>2</mn></msup><mo>×</mo><mn>64</mn><mo>→</mo></mrow></math> pool/4 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo><msup><mn>16</mn><mn>2</mn></msup><mo>×</mo><mn>64</mn><mo>=</mo><mn>16,384</mn><mo>→</mo><mn>1000</mn><mo>→</mo></mrow></math> softmax。</li>
+</ul>
+<h2>G · Last-minute traps 最后提醒</h2>
+<ul>
+<li>step(0) = <strong>1</strong>；更新时带上 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math>；预测对了<strong>不更新</strong>。</li>
+<li>Convergence only if <strong>linearly separable</strong>. 收敛只在<strong>线性可分</strong>时保证。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">)</mo></mrow></math>；sigmoid 梯度带<strong>负号</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mo>⋯</mo></mrow></math>，更新变成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mi>η</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mo>⋯</mo></mrow></math>。</li>
+<li>Add gate gives <strong>each</strong> input the full gradient (not split). add 门<strong>不平分</strong>。</li>
+<li>A variable used twice → gradients <strong>add</strong>. 用了两次的变量梯度<strong>相加</strong>。</li>
+<li>Momentum multiplies the previous <strong>update</strong>, not the gradient. 动量乘的是上一步的<strong>更新量</strong>。</li>
+<li>CE is not symmetric; one-hot → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>c</mi></msub></mrow></math>. 交叉熵不对称。</li>
+<li>NN conv = <strong>no flip</strong>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> rows → <strong>vertical</strong> edges. 不翻转；横向差分检测<strong>竖直</strong>边。</li>
+<li>Size formula: <strong>2</strong>·pad, <strong>floor</strong>, then <strong>+1</strong>. 尺寸公式：两倍 pad，向下取整，再加一。</li>
+<li>Parameters ignore <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo separator="true">,</mo><mi>W</mi></mrow></math>; pooling has none. 参数与 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo separator="true">,</mo><mi>W</mi></mrow></math> 无关；pooling 无参数。</li>
+</ul>

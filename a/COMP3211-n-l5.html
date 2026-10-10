@@ -1,0 +1,496 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap 五块：</p>
+<ol>
+<li><strong>K-means</strong>（unsupervised learning / clustering）</li>
+<li><strong>Stochastic Gradient Descent</strong>（SGD、mini-batch）</li>
+<li><strong>Generalization</strong>（overfitting、regularization、early stopping）</li>
+<li><strong>Best practices</strong>（hyperparameters、validation set、K-fold cross validation）</li>
+<li><strong>Summary of Machine Learning</strong></li>
+</ol>
+<blockquote>
+<p>计算题最可能出 <strong>K-means 手算迭代</strong>（一维点、给初始 centroid，算 assignment 和新 centroid 直到收敛）。概念题集中在 <strong>SGD vs GD vs mini-batch</strong>、<strong>为什么 training loss 不是真正目标</strong>、<strong>regularization 的梯度</strong>、<strong>validation / test 的用途</strong>。</p>
+</blockquote>
+<h2>1 · 为什么要 unsupervised learning</h2>
+<h3>1.1 三个例子</h3>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>输入</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unsupervised image classification</td>
+<td>一堆<strong>没标签</strong>的图片</td>
+<td>自动分成 Parrot / Mountain / Leopard / Golden Fish 等组</td>
+</tr>
+<tr>
+<td>Unsupervised image segmentation</td>
+<td>图片，<strong>without labels</strong></td>
+<td>像素分成 Group 1、2、3、4…</td>
+</tr>
+<tr>
+<td>Word clustering [Brown et al, 1992]</td>
+<td>1 亿词的新闻原文</td>
+<td>词聚成类：星期几一类、月份一类、物质（water gas coal…）一类、人名一类、亲属称谓一类…</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 Supervised vs unsupervised</h3>
+<p>回顾 supervised classification：训练数据 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math> 每行是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></math>，例如</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><msub><mo stretchy="false">)</mo><mn>1</mn></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><msub><mo stretchy="false">)</mo><mn>2</mn></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>−2</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>−1</td>
+<td>−1</td>
+</tr>
+</tbody>
+</table>
+<p>学出 classifier <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math>，对新点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math> 预测 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>。三个 design decisions：hypothesis class、loss function、optimization algorithm（gradient descent）。</p>
+<p><strong>关键问题</strong>：loss function（zero-one / hinge / logistic，横轴都是 margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi></mrow></math>）<strong>里面有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></strong>——要用 ground-truth label 衡量预测对不对。</p>
+<ul>
+<li><strong>Labeled data is expensive to obtain</strong>（要人工标）</li>
+<li><strong>Unlabeled data is very cheap to obtain</strong>（图片、视频、文本到处都是）</li>
+</ul>
+<p>→ 所以想要一种<strong>不需要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></strong> 的学习方法：clustering。</p>
+<h2>2 · Clustering 与 K-means</h2>
+<h3>2.1 Clustering 的定义</h3>
+<p>课件例子：训练数据只有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>，没有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><msub><mo stretchy="false">)</mo><mn>1</mn></msub></mrow></math></th>
+<th>−2</th>
+<th>0</th>
+<th>−2</th>
+<th>0</th>
+<th>2</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><msub><mo stretchy="false">)</mo><mn>2</mn></msub></mrow></math></td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+<td>−1</td>
+<td>−2</td>
+<td>−3</td>
+<td>−2</td>
+</tr>
+<tr>
+<td>输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi></mrow></math></td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>前四个点在左上角挤在一起，后四个在右下角 → 分成两类。<strong>Intuition: want to assign nearby points to same cluster.</strong></p>
+<blockquote>
+<p><strong>Definition: clustering</strong></p>
+<ul>
+<li><strong>Input</strong>：training points <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>Output</strong>：每个点的 cluster assignment <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>z</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>z</mi><mi>n</mi></msub><mo stretchy="false">]</mo></mrow></math>，其中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>K</mi><mo stretchy="false">}</mo></mrow></math></li>
+</ul>
+</blockquote>
+<p><strong>注意</strong>：cluster 的编号 1、2 本身没意义（和 supervised 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math> 不同），只表示「哪些点在同一组」。把所有 1 和 2 对调，聚类结果是一样的。</p>
+<h3>2.2 Centroids</h3>
+<ul>
+<li>每个 cluster <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>K</mi></mrow></math> 用一个 <strong>centroid</strong>（中心点）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mi>k</mi></msub><mo>∈</mo><msup><mi>ℝ</mi><mi>d</mi></msup></mrow></math> 代表</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝝁</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>μ</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>μ</mi><mi>K</mi></msub><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>Target</strong>：每个点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></math> 要离<strong>它被分到的 centroid</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><msub><mi>z</mi><mi>i</mi></msub></msub></mrow></math> 近</li>
+</ul>
+<h3>2.3 K-means objective</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mtext>Loss</mtext><mtext>kmeans</mtext></msub><mo stretchy="false">(</mo><mi>𝐳</mi><mo separator="true">,</mo><mi>𝝁</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mo stretchy="false">∥</mo><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>μ</mi><msub><mi>z</mi><mi>i</mi></msub></msub><msup><mo stretchy="false">∥</mo><mn>2</mn></msup></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>对每个点，算它到<strong>自己 cluster 的 centroid</strong> 的距离平方，全部加起来。</li>
+<li><strong>Two objectives</strong>：同时要找最好的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 个 centroid（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝝁</mi></mrow></math>），以及把每个点分给最近的 centroid（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi></mrow></math>）。</li>
+<li>优化目标：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><munder><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>𝐳</mi></munder><munder><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>𝝁</mi></munder><msub><mtext>Loss</mtext><mtext>kmeans</mtext></msub><mo stretchy="false">(</mo><mi>𝐳</mi><mo separator="true">,</mo><mi>𝝁</mi><mo stretchy="false">)</mo></mrow></math></div><p><strong>为什么不能直接用 gradient descent？</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi></mrow></math> 是<strong>离散</strong>的（每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mi>i</mi></msub></mrow></math> 只能取 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>K</mi></mrow></math>），没有梯度可言。</li>
+<li>但是：<strong>固定一个，另一个很好求</strong>。这就是 <strong>alternating minimization</strong>（交替最小化）。</li>
+</ul>
+<h3>2.4 Alternating minimization：两步各自怎么做</h3>
+<p>一维例子：点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>10</mn><mo separator="true">,</mo><mn>12</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>=</mo><mn>2</mn></mrow></math>。</p>
+<p><strong>Step 1：已知 centroid，求 assignment。</strong> 设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>2</mn></msub><mo>=</mo><mn>11</mn></mrow></math>。每个点选距离平方最小的 centroid：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>z</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>arg</mi><mo>⁡</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>0</mn><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>0</mn><mo>−</mo><mn>11</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">}</mo><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>z</mi><mn>2</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>arg</mi><mo>⁡</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>2</mn><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>2</mn><mo>−</mo><mn>11</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">}</mo><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>z</mi><mn>3</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>arg</mi><mo>⁡</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>10</mn><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>10</mn><mo>−</mo><mn>11</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">}</mo><mo>=</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>z</mi><mn>4</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>arg</mi><mo>⁡</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>12</mn><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>12</mn><mo>−</mo><mn>11</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">}</mo><mo>=</mo><mn>2</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p>→ <strong>Calculate distance between points and the centroids</strong>，取最近的。</p>
+<p><strong>为什么这样就是最优的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi></mrow></math>？</strong> loss 是每个点各自一项相加，每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mi>i</mi></msub></mrow></math> 只影响自己那一项；让每一项都最小，总和就最小。</p>
+<p><strong>Step 2：已知 assignment，求 centroid。</strong> 已知 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>=</mo><msub><mi>z</mi><mn>2</mn></msub><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mn>3</mn></msub><mo>=</mo><msub><mi>z</mi><mn>4</mn></msub><mo>=</mo><mn>2</mn></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>μ</mi><mn>1</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mspace width="2em"/><msub><mi>μ</mi><mn>2</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>10</mn><mo>+</mo><mn>12</mn><mo stretchy="false">)</mo><mo>=</mo><mn>11</mn></mrow></math></div><p>→ <strong>Calculate the mean of each cluster.</strong></p>
+<p><strong>为什么最优 centroid 是平均值？</strong> 对 cluster <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>，要最小化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mrow><mi>i</mi><mo>:</mo><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><mi>k</mi></mrow></msub><mo stretchy="false">∥</mo><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>μ</mi><mi>k</mi></msub><msup><mo stretchy="false">∥</mo><mn>2</mn></msup></mrow></math>。对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mi>k</mi></msub></mrow></math> 求导令其为 0：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><munder><mo>∑</mo><mrow><mi>i</mi><mo>:</mo><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><mi>k</mi></mrow></munder><mn>2</mn><mo stretchy="false">(</mo><msub><mi>μ</mi><mi>k</mi></msub><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>⇒</mo><mtext>  </mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><msub><mi>μ</mi><mi>k</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><mo stretchy="false">{</mo><mi>i</mi><mo>:</mo><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><mi>k</mi><mo stretchy="false">}</mo><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>i</mi><mo>:</mo><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><mi>k</mi></mrow></munder><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>也就是这个 cluster 所有点的平均。</p>
+<h3>2.5 从随机初始化开始：完整手算（考试重点）</h3>
+<p>点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>10</mn><mo separator="true">,</mo><mn>12</mn></mrow></math>；<strong>Initialize</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>1</mn></msub><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>2</mn></msub><mo>=</mo><mn>2</mn></mrow></math>。</p>
+<table>
+<thead>
+<tr>
+<th>轮</th>
+<th>Step 1：assignment</th>
+<th>Step 2：新 centroid</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Loss</mtext><mtext>kmeans</mtext></msub></mrow></math>（step 2 之后）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Iteration 1</td>
+<td>0 → 1（离 0 最近）；2、10、12 → 2（离 2 更近）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>1</mn></msub><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>2</mn></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mo>+</mo><mn>10</mn><mo>+</mo><mn>12</mn></mrow><mn>3</mn></mfrac><mo>=</mo><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>+</mo><mn>36</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>16</mn><mo>=</mo><mn>56</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Iteration 2</td>
+<td>0 → 1；<strong>2 → 1</strong>（到 0 是 4，到 8 是 36）；10、12 → 2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mn>0</mn><mo>+</mo><mn>2</mn></mrow><mn>2</mn></mfrac><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mn>2</mn></msub><mo>=</mo><mfrac><mrow><mn>10</mn><mo>+</mo><mn>12</mn></mrow><mn>2</mn></mfrac><mo>=</mo><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>4</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Iteration 3</td>
+<td>assignment 和上一轮<strong>一样</strong></td>
+<td>centroid 不变</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Converged.</strong> 课件原话：<em>The assignments will remain the same in Iteration 3!</em></p>
+<p><strong>How do we determine if it is converged?</strong> —— 看 <strong>assignment 不再变化</strong>，或者 <strong>centroid 基本稳定</strong>。</p>
+<blockquote>
+<p>解题套路：每一轮先写「每个点到每个 centroid 的距离平方」，取最小的定 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mi>i</mi></msub></mrow></math>；再对每组求平均得新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mi>k</mi></msub></mrow></math>；直到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi></mrow></math> 不变。</p>
+</blockquote>
+<p><strong>补充（帮助理解，课件没单独列）</strong>：每一步都只会让 loss 变小或不变（step 1 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi></mrow></math> 最优、step 2 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝝁</mi></mrow></math> 最优），所以一定会停下来；但停下来的可能是 <strong>local minimum</strong>，结果依赖初始化。</p>
+<h3>2.6 K-means 算法框</h3>
+<blockquote>
+<p><strong>Algorithm: K-means</strong></p>
+<p>Initialize <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝝁</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>μ</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>μ</mi><mi>K</mi></msub><mo stretchy="false">]</mo></mrow></math> randomly.</p>
+<p>For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>T</mi></mrow></math>:</p>
+<ul>
+<li><strong>Step 1</strong>: set assignments <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi></mrow></math> given <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝝁</mi></mrow></math>
+<ul>
+<li>For each point <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>n</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><msub><mi>z</mi><mi>i</mi></msub><mo>←</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>min</mi><mo>⁡</mo></mrow><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>K</mi></mrow></msub><mo stretchy="false">∥</mo><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>μ</mi><mi>k</mi></msub><msup><mo stretchy="false">∥</mo><mn>2</mn></msup></mrow></math></li>
+</ul>
+</li>
+<li><strong>Step 2</strong>: set centroids <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝝁</mi></mrow></math> given <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐳</mi></mrow></math>
+<ul>
+<li>For each cluster <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>K</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><msub><mi>μ</mi><mi>k</mi></msub><mo>←</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><mo stretchy="false">{</mo><mi>i</mi><mo>:</mo><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><mi>k</mi><mo stretchy="false">}</mo><mo stretchy="false">∣</mo></mrow></mfrac></mstyle><mstyle scriptlevel="0" displaystyle="true"><munder><mo>∑</mo><mrow><mi>i</mi><mo>:</mo><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><mi>k</mi></mrow></munder><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mstyle></mrow></math></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>课件图：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>=</mo><mn>3</mn></mrow></math> 的二维例子，平面被分成三块区域（每块里的点离该块的 centroid 最近），方块是 centroid。</p>
+<p>最后回到开头：<strong>K-means 可以用来做 unsupervised image classification</strong>（对图片特征聚类）。</p>
+<h2>3 · Stochastic Gradient Descent</h2>
+<h3>3.1 Gradient descent is slow</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>∈</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></munder><mtext>Loss</mtext><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></div><blockquote>
+<p><strong>Algorithm: gradient descent</strong></p>
+<p>Initialize <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math></p>
+<p>For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>T</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>−</mo><mi>η</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></p>
+</blockquote>
+<p><strong>Problem</strong>：每更新<strong>一次</strong>，都要把<strong>所有</strong>训练样本的梯度算一遍再平均——数据多的时候非常贵。</p>
+<h3>3.2 SGD</h3>
+<blockquote>
+<p><strong>Algorithm: stochastic gradient descent</strong></p>
+<p>Initialize <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math></p>
+<p>For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>T</mi></mrow></math>:</p>
+<ul>
+<li>For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>∈</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>−</mo><mi>η</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>Loss</mtext><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</blockquote>
+<ul>
+<li>区别：梯度 <strong>只用一个训练样本</strong>（gradient with only one training sample），看一个样本就更新一次。</li>
+<li>一轮（一个 epoch）里，GD 更新 1 次，SGD 更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo stretchy="false">∣</mo></mrow></math> 次。</li>
+<li><strong>Problem</strong>：单个样本的梯度<strong>很 noisy</strong>（一个样本的方向不代表整体）→ <strong>unstable learning</strong>。</li>
+</ul>
+<h3>3.3 Mini-batch SGD</h3>
+<blockquote>
+<p>For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>T</mi></mrow></math>:</p>
+<ul>
+<li>For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msub><mi>x</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>y</mi><mi>i</mi></msub><msubsup><mo stretchy="false">}</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>B</mi></msubsup><mo>⊂</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>−</mo><mi>η</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>Loss</mtext><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</blockquote>
+<ul>
+<li>每次用 <strong>一个 batch（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi></mrow></math> 个样本）</strong> 的平均梯度。</li>
+<li><strong>A tradeoff between GD and SGD</strong>：<strong>less noisy gradients but still efficient</strong>。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>每次更新用多少样本</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GD</td>
+<td>全部 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo stretchy="false">∣</mo></mrow></math></td>
+<td>梯度准、稳定</td>
+<td>每步太贵</td>
+</tr>
+<tr>
+<td>SGD</td>
+<td>1</td>
+<td>每步很便宜</td>
+<td>梯度 noisy、不稳定</td>
+</tr>
+<tr>
+<td>Mini-batch SGD</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi></mrow></math></td>
+<td>折中：较稳定又高效</td>
+<td>多一个超参数 batch size</td>
+</tr>
+</tbody>
+</table>
+<h2>4 · Generalization</h2>
+<h3>4.1 Training loss 是不是好的（唯一的）目标？</h3>
+<p>目前的配方：hypothesis class <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> + 最小化 TrainLoss + SGD。问题：<strong>Is the training loss a good (only) objective to optimize?</strong></p>
+<p><strong>A strawman algorithm</strong>（稻草人反例）：</p>
+<blockquote>
+<p><strong>Algorithm: rote learning</strong>（死记硬背）</p>
+<ul>
+<li><strong>Training</strong>：just store <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math></li>
+<li><strong>Predictor</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>：if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>∈</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math>, return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>；else: <strong>segfault</strong></li>
+</ul>
+</blockquote>
+<ul>
+<li>它让 training loss <strong>完美为 0</strong>，但显然很差——没见过的输入就崩了。</li>
+<li>结论：<strong>training loss 为 0 不等于好模型</strong>。</li>
+</ul>
+<h3>4.2 Overfitting</h3>
+<ul>
+<li>曲线：随 iteration 增加，loss 一直下降；<strong>Train accuracy 一直上升，Val accuracy 先升后平 / 下降</strong>。</li>
+<li>定义特征：<strong>training performance 上升，validation performance 下降</strong>。</li>
+<li>图示：overfitting 的边界弯弯曲曲、把每个训练点都绕进去；<strong>right fitting</strong> 是平滑的边界。</li>
+</ul>
+<h3>4.3 真正的目标</h3>
+<blockquote>
+<p><strong>Key idea: the real learning objective</strong>
+Our goal is to minimize <strong>error on unseen future examples</strong>.</p>
+</blockquote>
+<p>但我们手上没有「未来的样本」，次优选择：</p>
+<blockquote>
+<p><strong>Definition: test set</strong>
+Test set <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>test</mtext></msub></mrow></math> contains examples <strong>not used for training</strong>.</p>
+</blockquote>
+<p>问题变成：<strong>How can we make a learning algorithm generalize well?</strong>（从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math> 学的东西在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>test</mtext></msub></mrow></math> 上也好用）</p>
+<h3>4.4 Strategy 1：Regularization</h3>
+<p><strong>思路</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>d</mi></msup></mrow></math>，<strong>reduce the norm（length）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>𝐰</mi><mo stretchy="false">∥</mo></mrow></math></strong>——keep the weights small to avoid a complex model。</p>
+<p><strong>为什么权重小 ≈ 模型简单？</strong> 权重大，输入稍微变一点，输出就剧烈变化，边界可以扭得很复杂去迁就每个训练点；权重小，函数更平滑。</p>
+<p><strong>Regularized objective：</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><munder><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>𝐰</mi></munder><mtext>  </mtext><munder><munder><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>data loss term</mtext></munder><mo>+</mo><munder><munder><mrow><mfrac><mi>λ</mi><mn>2</mn></mfrac><mo stretchy="false">∥</mo><mi>𝐰</mi><msup><mo stretchy="false">∥</mo><mn>2</mn></msup></mrow><mo stretchy="true">⏟</mo></munder><mtext>regularization term</mtext></munder></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> 越大，越强调「权重小」。</li>
+</ul>
+<p><strong>对应的 gradient descent：</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>−</mo><mi>η</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><munder><munder><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>from data loss</mtext></munder><mo>+</mo><munder><munder><mrow><mi>λ</mi><mi>𝐰</mi></mrow><mo stretchy="true">⏟</mo></munder><mtext>from regularization</mtext></munder><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mi>𝐰</mi></mrow></math> 怎么来的？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mi>λ</mi><mn>2</mn></mfrac><mo stretchy="false">∥</mo><mi>𝐰</mi><msup><mo stretchy="false">∥</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>=</mo><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mi>λ</mi><mn>2</mn></mfrac><munder><mo>∑</mo><mi>j</mi></munder><msubsup><mi>w</mi><mi>j</mi><mn>2</mn></msubsup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>=</mo><mi>λ</mi><mi>𝐰</mi></mrow></math></div><p>这里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math> 就是为了求导后把 2 消掉。</p>
+<p><strong>直觉</strong>：整理一下，</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>𝐰</mi><mo>←</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>η</mi><mi>λ</mi><mo stretchy="false">)</mo><mi>𝐰</mi><mo>−</mo><mi>η</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></div><p>每一步先把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 缩小一点（乘 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>η</mi><mi>λ</mi></mrow></math>），再按数据梯度走——所以也叫 weight decay。</p>
+<p>课件第三页写成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi><mo>=</mo><msub><mi>L</mi><mtext>data</mtext></msub><mo>+</mo><msub><mi>L</mi><mtext>reg</mtext></msub></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>L</mi><mtext>reg</mtext></msub><mo>=</mo><mi>λ</mi><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">∥</mo><mi>W</mi><msubsup><mo stretchy="false">∥</mo><mn>2</mn><mn>2</mn></msubsup></mrow></math>，配了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>0.001</mn><mo separator="true">,</mo><mn>0.01</mn><mo separator="true">,</mo><mn>0.1</mn></mrow></math> 三张分类边界图：<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> 越大，边界越平滑</strong>。→ <strong>Regularization helps reduce overfitting.</strong></p>
+<h3>4.5 Strategy 2：Early stopping</h3>
+<blockquote>
+<p><strong>Algorithm: gradient descent</strong>：Initialize <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>；For <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>𝐓</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>−</mo><mi>η</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></p>
+</blockquote>
+<ul>
+<li><strong>Idea</strong>：simply make <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> smaller（少迭代几轮，在 val 开始变差之前停）</li>
+<li><strong>Lesson</strong>：try to minimize the training error, <strong>but don't try too hard</strong>.</li>
+</ul>
+<h3>4.6 Summary</h3>
+<ul>
+<li><strong>Not the real objective</strong>：training loss</li>
+<li><strong>Real objective</strong>：loss on unseen future examples（test loss）</li>
+<li><strong>Key idea: keep it simple</strong> —— try to minimize training error, but keep the model less complex.</li>
+</ul>
+<h2>5 · Best Practices</h2>
+<h3>5.1 Choose your own adventure：有哪些设计选择</h3>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>可选项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hypothesis class</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>sign</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></td>
+<td>Feature extractor <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi></mrow></math>：linear、quadratic；Architecture：number of layers、number of hidden units</td>
+</tr>
+<tr>
+<td><strong>Training objective</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo stretchy="false">∣</mo></mrow></mfrac><mo>∑</mo><mtext>Loss</mtext><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>+</mo><mtext>Reg</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>Loss function：hinge、logistic；Regularization：none、L1、L2</td>
+</tr>
+<tr>
+<td><strong>Optimization algorithm</strong>（SGD）</td>
+<td>Number of iterations（epochs）；Step size：constant、decreasing、adaptive；Initialization：zero initialization with noisy variations、pre-training；Batch size</td>
+</tr>
+</tbody>
+</table>
+<h3>5.2 Hyperparameters</h3>
+<blockquote>
+<p><strong>Definition: hyperparameters</strong>
+Design decisions（hypothesis class, training objective, optimization algorithm）that need to be made <strong>before running the learning algorithm</strong>.</p>
+</blockquote>
+<ul>
+<li>和参数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 的区别：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 是算法<strong>学出来</strong>的；hyperparameter（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math>、层数）是<strong>事先定好</strong>的。</li>
+<li>问题：How do we choose hyperparameters（<strong>model selection</strong>）？</li>
+</ul>
+<h3>5.3 Validation set</h3>
+<blockquote>
+<p><strong>Definition: validation set</strong>
+A validation set is <strong>taken out of the training set</strong> and used to optimize hyperparameters.</p>
+</blockquote>
+<p>数据划分：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math> ｜ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>val</mtext></msub></mrow></math>（从 train 里切出来）｜ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>test</mtext></msub></mrow></math>（单独）</p>
+<ul>
+<li>For each setting of hyperparameters, <strong>train on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></math>, evaluate on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>val</mtext></msub></mrow></math></strong></li>
+<li>Select the hyperparameters（model）based on <strong>evaluation error on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>val</mtext></msub></mrow></math></strong></li>
+<li><strong>The test data should never be used for hyperparameter tuning</strong></li>
+</ul>
+<p><strong>为什么 test 不能用来调参？</strong> 用 test 选超参数，就等于让 test 参与了「训练」，最后报告的 test error 会偏乐观，不再代表 unseen examples 上的表现。</p>
+<h3>5.4 K-Fold cross validation</h3>
+<ul>
+<li><strong>Objective</strong>：making error of evaluation <strong>more reliable</strong>（只切一次 val，结果可能碰巧好 / 坏）</li>
+<li><strong>K-fold</strong>：把训练数据分成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 份等大的子集；每一折（fold）用其中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></math> 份训练、剩下 1 份做 validation；轮流 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 次，每份都当一次 validation。</li>
+<li>课件图：5-fold，第 1～5 轮的 validation fold 依次是第 1～5 块。</li>
+<li><strong>If all partitions perform well, this is a good sign</strong>（计算这些 error 的 <strong>mean 和 variance</strong>）。</li>
+</ul>
+<h3>5.5 Model development strategy</h3>
+<blockquote>
+<p><strong>Algorithm: Model development strategy</strong></p>
+<ul>
+<li><strong>Split</strong> data into train, validation, test</li>
+<li>Look at data to get intuition</li>
+<li><strong>Repeat</strong>:
+<ul>
+<li>Implement model / feature, adjust hyperparameters</li>
+<li>Run learning algorithm</li>
+<li>Check train and validation loss rates</li>
+<li>Look at weights and prediction accuracy</li>
+</ul>
+</li>
+<li><strong>Evaluate</strong> on test set to get final error rates</li>
+</ul>
+</blockquote>
+<p>注意 test 只在<strong>最后</strong>用一次。</p>
+<h2>6 · Machine Learning Summary</h2>
+<ul>
+<li><strong>Feature extraction</strong>（hand-crafted，或用 neural network 学）</li>
+<li><strong>Prediction</strong>（linear regression / classification、k-means）</li>
+<li><strong>Loss functions</strong>（用 error 评价 predictor）</li>
+<li><strong>Optimization</strong>（stochastic gradient、alternating minimization）</li>
+<li><strong>Generalization</strong>（machine learning 模型的真正目标）</li>
+<li>没讲的重要方面：privacy、interpretability</li>
+</ul>
+<blockquote>
+<p><strong>Key idea: learning</strong> —— Programs should improve with experience.</p>
+</blockquote>
+<p>So far: <strong>reflex-based models</strong>；Next time: <strong>state-based models</strong>（搜索）。</p>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supervised vs unsupervised</td>
+<td>loss 里要用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>；labeled data 贵、unlabeled 便宜</td>
+</tr>
+<tr>
+<td>Clustering 定义</td>
+<td>输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><msub><mi>x</mi><mi>n</mi></msub></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false">{</mo><mn>1..</mn><mi>K</mi><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+<tr>
+<td>K-means objective</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mi>i</mi></msub><mo stretchy="false">∥</mo><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>μ</mi><msub><mi>z</mi><mi>i</mi></msub></msub><msup><mo stretchy="false">∥</mo><mn>2</mn></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>z</mi></msub><msub><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>μ</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Alternating minimization</td>
+<td>step 1 分给最近 centroid；step 2 取平均；会说为什么各自最优</td>
+</tr>
+<tr>
+<td>K-means 手算</td>
+<td>点 0,2,10,12、初始 0,2 → (0,8) → (1,11) → 收敛</td>
+</tr>
+<tr>
+<td>收敛判断</td>
+<td>assignment 不变 / centroid 稳定</td>
+</tr>
+<tr>
+<td>GD vs SGD vs mini-batch</td>
+<td>每步用多少样本、各自优缺点</td>
+</tr>
+<tr>
+<td>Rote learning</td>
+<td>training loss 为 0 但不能泛化</td>
+</tr>
+<tr>
+<td>Overfitting</td>
+<td>train ↑、val ↓</td>
+</tr>
+<tr>
+<td>Real objective</td>
+<td>unseen examples 上的 error；test set 定义</td>
+</tr>
+<tr>
+<td>Regularization</td>
+<td>objective、梯度多出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mi>𝐰</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> 大边界更平滑</td>
+</tr>
+<tr>
+<td>Early stopping</td>
+<td>减小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>，don't try too hard</td>
+</tr>
+<tr>
+<td>Hyperparameters</td>
+<td>定义；举例（层数、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math>、batch size…）</td>
+</tr>
+<tr>
+<td>Validation set / K-fold</td>
+<td>val 从 train 切；test 不调参；K-fold 算 mean / variance</td>
+</tr>
+<tr>
+<td>Model development strategy</td>
+<td>split → repeat 调参 → 最后 test</td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li>K-means 的 step 2 是<strong>平均值</strong>，不是中位数，也不是离得最近的那个数据点。</li>
+<li>手算时 step 1 用的是<strong>这一轮开始时</strong>的 centroid，不要边分配边更新 centroid。</li>
+<li>收敛条件是 assignment <strong>不再变化</strong>，不是 loss 等于 0。</li>
+<li>SGD 的「stochastic」指每次只用一个（随机的）样本估计梯度，不是指随机初始化。</li>
+<li>Regularization 的梯度项是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mi>𝐰</mi></mrow></math>（因为有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>），不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>λ</mi><mi>𝐰</mi></mrow></math>；如果题目没写 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>，就是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>λ</mi><mi>𝐰</mi></mrow></math>。</li>
+<li>Validation set 是<strong>从 training set 里切出来</strong>的；test set 永远不用来调超参数。</li>
+<li>Early stopping 是让 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> <strong>变小</strong>，不是让 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math> 变小。</li>
+</ul>

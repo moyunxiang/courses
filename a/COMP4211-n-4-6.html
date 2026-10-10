@@ -1,0 +1,261 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>用 CS231n 的两个例子手算 backprop：</p>
+<ol>
+<li><strong>简单例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mn>5</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo>=</mo><mo>−</mo><mn>4</mn></mrow></math></li>
+<li><strong>Local gradient × upstream gradient</strong> 的通用规则</li>
+<li><strong>Sigmoid 神经元例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo separator="true">,</mo><mi>𝐱</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></msup></mrow></mfrac></mrow></math>；<strong>sigmoid gate</strong> 合并</li>
+<li><strong>反向流动的模式</strong>：add = distributor、max = router、mul = switcher；<strong>分支处梯度相加</strong></li>
+</ol>
+<blockquote>
+<p>必会计算：这两个例子<strong>每个节点的前向值和梯度</strong>（必考手算题型）。必会概念：add / max / mul gate 的反向规则；分支处梯度相加。</p>
+</blockquote>
+<h2>1 · 简单例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></math></h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mn>5</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo>=</mo><mo>−</mo><mn>4</mn></mrow></math>。</p>
+<p><strong>Forward</strong>：令 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi>q</mi><mi>z</mi><mo>=</mo><mo>−</mo><mn>12</mn></mrow></math>。</p>
+<p><strong>想要</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo separator="true">,</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo separator="true">,</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac></mrow></math>。</p>
+<p><strong>Local derivatives</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>q</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>:</mo><mtext> </mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo>=</mo><mn>1</mn><mo separator="true">;</mo><mspace width="2em"/><mi>f</mi><mo>=</mo><mi>q</mi><mi>z</mi><mo>:</mo><mtext> </mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mo>=</mo><mi>z</mi><mo separator="true">,</mo><mtext> </mtext><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>=</mo><mi>q</mi></mrow></math></div><p><strong>Backward</strong>（从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math> 开始）：</p>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>梯度</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow></mfrac></mrow></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>=</mo><mi>q</mi></mrow></math></td>
+<td><strong>3</strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mo>=</mo><mi>z</mi></mrow></math></td>
+<td><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>4</mn></mrow></math></strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mn>4</mn><mo>⋅</mo><mn>1</mn></mrow></math></td>
+<td><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>4</mn></mrow></math></strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mn>4</mn><mo>⋅</mo><mn>1</mn></mrow></math></td>
+<td><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>4</mn></mrow></math></strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chain rule</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac></mrow></math>。</p>
+<h2>2 · 通用规则：Local × Upstream</h2>
+<p>对计算图中的一个门 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math>，输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo separator="true">,</mo><mi>y</mi></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi></mrow></math>：</p>
+<ul>
+<li><strong>Local gradient</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac></mrow></math>（只看这个门本身，前向时就能算）</li>
+<li><strong>Upstream gradient</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac></mrow></math>（从后面传回来）</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><munder><munder><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo stretchy="true">⏟</mo></munder><mtext>local</mtext></munder><mo>⋅</mo><munder><munder><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo stretchy="true">⏟</mo></munder><mtext>upstream</mtext></munder></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（每个门只需要知道自己的 local gradient——这就是 backprop 可以模块化的原因。）</p>
+<h2>3 · Sigmoid 神经元例</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo separator="true">,</mo><mi>𝐱</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></msup></mrow></mfrac></mrow></math></div><p>值：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>=</mo><mo>−</mo><mn>3</mn></mrow></math>。</p>
+<p><strong>需要的 local gradients</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mi>x</mi></msup><mo>→</mo><msup><mi>e</mi><mi>x</mi></msup><mo separator="true">,</mo><mspace width="2em"/><msub><mi>f</mi><mi>a</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>a</mi><mi>x</mi><mo>→</mo><mi>a</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mi>x</mi></mfrac><mo>→</mo><mo>−</mo><mfrac><mn>1</mn><msup><mi>x</mi><mn>2</mn></msup></mfrac><mo separator="true">,</mo><mspace width="2em"/><msub><mi>f</mi><mi>c</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mo>+</mo><mi>x</mi><mo>→</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Forward</strong>（拓扑序）：</p>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>运算</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>3</mn><mo stretchy="false">)</mo><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>6</td>
+</tr>
+<tr>
+<td>和</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn><mo>+</mo><mn>6</mn></mrow></math></td>
+<td>4</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>exp</mi><mo>⁡</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math></td>
+<td>0.37</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></td>
+<td></td>
+<td>1.37</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>1.37</mn></mrow></math></td>
+<td><strong>0.73</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Backward</strong>（从输出往回，每步 = local × upstream）：</p>
+<table>
+<thead>
+<tr>
+<th>门</th>
+<th>local</th>
+<th>upstream</th>
+<th>梯度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输出</td>
+<td></td>
+<td></td>
+<td>1.00</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>1.37</mn></mrow></math>）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mn>1</mn><msup><mn>1.37</mn><mn>2</mn></msup></mfrac></mrow></math></td>
+<td>1.00</td>
+<td><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.53</mn></mrow></math></strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></td>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.53</mn></mrow></math></td>
+<td><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.53</mn></mrow></math></strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>exp</mi><mo>⁡</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.53</mn></mrow></math></td>
+<td><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.20</mn></mrow></math></strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.20</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mo>−</mo><mn>0.20</mn><mo stretchy="false">)</mo><mo>=</mo></mrow></math> <strong>0.20</strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub></mrow></math>（add）</td>
+<td>1, 1</td>
+<td>0.20</td>
+<td>和：<strong>0.20</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>2</mn></msub></mrow></math>：<strong>0.20</strong>（两个输入都是！）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math>（add）</td>
+<td>1, 1</td>
+<td>0.20</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub></mrow></math>：0.20；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub></mrow></math>：0.20</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub></mrow></math>（mul）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn></mrow></math></td>
+<td>0.20</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>×</mo><mn>0.2</mn><mo>=</mo></mrow></math> <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.20</mn></mrow></math></strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>2</mn><mo stretchy="false">]</mo><mo>×</mo><mn>0.2</mn><mo>=</mo></mrow></math> <strong>0.40</strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub></mrow></math>（mul）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>3</mn></mrow></math></td>
+<td>0.20</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub></mrow></math>：<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.40</mn></mrow></math></strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow></math>：<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.60</mn></mrow></math></strong></td>
+</tr>
+</tbody>
+</table>
+<h3>3.1 Sigmoid gate</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"/><mfrac><mrow><mi>d</mi><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></div><p>把后四个门（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>、exp、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math>）<strong>合成一个 sigmoid gate</strong>：输入 1，输出 0.73，local gradient <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>0.73</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mn>0.73</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.2</mn></mrow></math>——一步就得到上表中的 0.20。</p>
+<blockquote>
+<p>计算图的粒度可以自己选：只要能写出 local gradient 的子表达式，都可以合成一个门。</p>
+</blockquote>
+<p>（python 复算：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.7311</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mn>0.1966</mn><mo>≈</mo><mn>0.20</mn></mrow></math> ✓。）</p>
+<h2>4 · 反向流动的模式</h2>
+<table>
+<thead>
+<tr>
+<th>门</th>
+<th>名字</th>
+<th>反向规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>add</strong></td>
+<td>gradient <strong>distributor</strong></td>
+<td>把 upstream 梯度<strong>原样</strong>分给每个输入</td>
+</tr>
+<tr>
+<td><strong>max</strong></td>
+<td>gradient <strong>router</strong></td>
+<td>梯度<strong>全部</strong>给值较大的那个输入，另一个得 0</td>
+</tr>
+<tr>
+<td><strong>mul</strong></td>
+<td>gradient <strong>switcher</strong></td>
+<td>每个输入得到 upstream × <strong>另一个输入的值</strong>（「交换」）</td>
+</tr>
+</tbody>
+</table>
+<p>（例：mul 门 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub></mrow></math> 的梯度用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow></math> 的值，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow></math> 的梯度用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub></mrow></math> 的值。）</p>
+<p><strong>Gradients add at branches</strong>：一个变量被多个下游节点使用时，回传的梯度<strong>相加</strong>（多变量链式法则，就是 4.5 公式里对 children 求和）。</p>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>简单例</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mo>−</mo><mn>12</mn></mrow></math>；梯度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Local × upstream</td>
+<td>规则</td>
+</tr>
+<tr>
+<td>Sigmoid 例</td>
+<td>前向 0.73；所有梯度（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mn>0.2</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mn>0.4</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>0.4</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>0.6</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>=</mo><mn>0.2</mn></mrow></math>）</td>
+</tr>
+<tr>
+<td>Sigmoid gate</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.73</mn><mo>×</mo><mn>0.27</mn><mo>≈</mo><mn>0.2</mn></mrow></math></td>
+</tr>
+<tr>
+<td>门的模式</td>
+<td>add / max / mul</td>
+</tr>
+<tr>
+<td>分支</td>
+<td>梯度相加</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 易错点</h2>
+<ul>
+<li>add 门两个输入<strong>都</strong>得到同样的梯度（不是平分）。</li>
+<li>mul 门的 local gradient 是<strong>另一个</strong>输入的值。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math> 的导数是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mn>1</mn><msup><mi>x</mi><mn>2</mn></msup></mfrac></mrow></math>（负号）。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> 门会翻转梯度符号：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.20</mn><mo>→</mo><mn>0.20</mn></mrow></math>。</li>
+<li>一个变量用了多次时，梯度要<strong>加起来</strong>，不是取其一。</li>
+</ul>

@@ -1,0 +1,711 @@
+<h2>0 · 这一章在讲什么</h2>
+<p>课件前 16 页是课程安排，之后是 Chapter 1：</p>
+<ol>
+<li><strong>What operating systems do</strong>：OS 的角色和定义；kernel / middleware / system programs</li>
+<li><strong>Computer system organization and architecture</strong>：von Neumann 结构；storage hierarchy；<strong>caching 与 locality</strong></li>
+<li><strong>Multiprocessor and parallel systems</strong>：SMP、multicore、NUMA</li>
+<li><strong>OS structure</strong>：multiprogramming、timesharing</li>
+<li><strong>Virtualization and cloud computing</strong></li>
+</ol>
+<blockquote>
+<p>考试形式（往年期中，来自课程网站的 Spring 2026 真题）：<strong>open-book、open-notes（纸质）</strong>，可用计算器。题型：<strong>选择题</strong>（每题对应课件某一页的概念）+ <strong>简答题</strong>。本章往年考过：storage hierarchy 的性质（<strong>main memory 是 byte addressable</strong>）、von Neumann 的核心特征（<strong>指令和数据存在同一个内存</strong>）、<strong>caching 的基本思想 + 为什么 hit ratio 不够</strong>。</p>
+</blockquote>
+<h2>1 · 课程安排要点</h2>
+<ul>
+<li>教材：Silberschatz, Galvin, Gagne <em>Operating System Concepts</em> 10th；参考书 <em>OSTEP</em>（免费在线）</li>
+<li>先修：Computer Organization（von Neumann、pipelining、caching、memory hierarchy、I/O、interrupt）；C 编程；UNIX 基础</li>
+<li><strong>评分</strong>：4 次 written homework 20%（各 5%）；3 个 programming project 30%（各 10%）；<strong>Midterm 20%</strong>（10/29 周四；课件写 7–9pm，9/21 公告把 L2 改到 <strong>20:00–22:00</strong>，考场 LSKG012）；<strong>Final 30%</strong></li>
+<li><strong>所有考试 open-book、open-notes（纸质）</strong>，<strong>不能用电子设备</strong>（往年允许计算器）；无补考（除非病假有证明且事先通知）</li>
+<li>迟交：扣 10%，<strong>只能晚一天</strong></li>
+<li>抄袭：第一次全部相关人零分并上报；第二次 fail；考试作弊直接 fail</li>
+<li>每章有 <strong>Chapter Summary</strong>（官网 summary 目录）</li>
+</ul>
+<p><strong>Course coverage</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>章节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overview</td>
+<td>Ch1（OS 概述、计算机组成、多处理器、虚拟化）；Ch2（OS services、API、system call、设计结构）</td>
+</tr>
+<tr>
+<td>Process and Thread</td>
+<td>Ch3 Process；Ch4 Thread；Ch5 CPU scheduling；Ch6–7 Synchronization；Ch8 Deadlock</td>
+</tr>
+<tr>
+<td>Memory and Storage</td>
+<td>Ch9 Memory；Ch10 Virtual memory；Ch11 Secondary storage；Ch13–14 File systems</td>
+</tr>
+<tr>
+<td>Protection</td>
+<td>Ch17 Protection；Ch16 Security（optional）</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · What Is an Operating System?</h2>
+<h3>2.1 计算机系统的四个组成</h3>
+<table>
+<thead>
+<tr>
+<th>组成</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Users</strong></td>
+<td>人、机器、其他计算机或设备</td>
+</tr>
+<tr>
+<td><strong>Application programs</strong></td>
+<td>定义如何用系统资源解决问题（编辑器、编译器、浏览器、数据库、游戏…）</td>
+</tr>
+<tr>
+<td><strong>Operating system</strong></td>
+<td><strong>控制并协调</strong>各应用和用户对计算资源的使用</td>
+</tr>
+<tr>
+<td><strong>Hardware</strong></td>
+<td>基本计算资源：CPU、memory、I/O devices</td>
+</tr>
+</tbody>
+</table>
+<p>层次：user → application programs → <strong>operating system</strong> → computer hardware。</p>
+<h3>2.2 OS 的作用</h3>
+<ul>
+<li>OS 是一种 <strong>system software</strong>，是<strong>用户 / 应用软件与硬件之间的中介（intermediary）</strong></li>
+<li><strong>隐藏硬件的复杂细节</strong>，提供简单易用的接口：机器语言层面的结构（尤其 I/O）对程序很复杂；OS 提供<strong>抽象层</strong>，让程序 / 用户面对的是照片、网页、邮件、文件，而不是设备上的字节和块</li>
+<li><strong>高效地分配资源</strong>：处理器、内存、计时器、磁盘、鼠标、网卡、打印机……OS 负责有序、受控的分配</li>
+</ul>
+<h3>2.3 不同环境下的 OS</h3>
+<table>
+<thead>
+<tr>
+<th>环境</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>共享计算机（mainframe、minicomputer）</td>
+<td>让所有用户满意：<strong>performance vs fairness</strong></td>
+</tr>
+<tr>
+<td>个人系统（workstation）</td>
+<td>专用资源，<strong>重性能而不是公平</strong>；可能用服务器上的共享资源</td>
+</tr>
+<tr>
+<td>移动设备（smartphone）</td>
+<td><strong>资源受限</strong>；有各种传感器；特定交互（触屏、语音如 Siri）；为<strong>可用性和电池寿命</strong>优化</td>
+</tr>
+<tr>
+<td>几乎没有用户界面的设备</td>
+<td><strong>Embedded systems</strong>：OS 预装（在 ROM），如空调、烤面包机、汽车、飞船；<strong>Real-time systems</strong> 有严格时间约束</td>
+</tr>
+</tbody>
+</table>
+<h3>2.4 OS 的定义</h3>
+<p><strong>没有公认的定义</strong>。「卖家在你订购 OS 时送来的一切」是个不错的近似，但差别很大。</p>
+<ul>
+<li><strong>OS is a resource allocator</strong>：管理<strong>所有</strong>资源（硬件和软件）；在冲突的请求之间做出<strong>高效而公平</strong>的决定</li>
+<li><strong>OS is a control program</strong>：控制程序的执行，<strong>防止错误和不当使用</strong></li>
+<li>一句话：<strong>OS 管理和控制硬件，帮助程序在计算机上运行</strong></li>
+</ul>
+<p>（Summary 的说法：OS 的两个目标是 <strong>user convenience</strong>（方便、安全、受保护、高效地执行程序）和 <strong>resource allocation</strong>（公平高效地分配资源，硬件如 CPU / 内存，软件如 signal、lock）。）</p>
+<h3>2.5 常见术语</h3>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kernel</strong></td>
+<td>「<strong>在计算机上一直运行的那个程序</strong>」；本课讲的就是 kernel 的基本功能</td>
+</tr>
+<tr>
+<td><strong>Middleware</strong></td>
+<td>给应用开发者提供额外服务的软件框架（数据库、多媒体、图形）；在 iOS、Android 中很流行</td>
+</tr>
+<tr>
+<td><strong>System programs</strong></td>
+<td>随 OS 一起提供、但<strong>不属于 kernel</strong>（如文字处理、浏览器、编译器）</td>
+</tr>
+<tr>
+<td><strong>Application programs</strong></td>
+<td>与 OS 无关的程序（如应用商店的 app）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>OS = 一直运行的 kernel + middleware frameworks + system programs</strong>。</p>
+<h2>3 · Computer System Organization</h2>
+<h3>3.1 系统组成</h3>
+<ul>
+<li>一个或多个 <strong>CPU core</strong>、<strong>device controllers</strong>，通过<strong>共同的 bus</strong> 连接，访问<strong>共享 memory</strong></li>
+<li>CPU 和设备<strong>并发执行</strong>，通过共享 bus <strong>竞争 memory cycles</strong></li>
+<li>图（System Architecture with I/O）：processor + cache、memory 通过 bridge/memory controller 接 <strong>PCI bus</strong>；PCI bus 上挂 graphics controller、IDE disk controller、<strong>SCSI controller</strong>、expansion bus interface（再接 keyboard、parallel / serial port）</li>
+</ul>
+<h3>3.2 von Neumann Architecture（往年考过）</h3>
+<p><strong>执行一条指令的步骤</strong>：</p>
+<ol>
+<li><strong>Fetch</strong> instruction</li>
+<li><strong>Decode</strong> instruction</li>
+<li><strong>Fetch data</strong></li>
+<li><strong>Execute</strong> instruction</li>
+<li><strong>Write back</strong>（if any）</li>
+</ol>
+<p>组成：</p>
+<ul>
+<li><strong>CPU</strong>：含 <strong>ALU</strong>（arithmetic logic unit）和 processor registers——<strong>PC</strong>（Program Counter）、<strong>AC</strong>（Accumulator）、<strong>MAR</strong>（Memory Address Register）、<strong>MDR</strong>（Memory Data Register）</li>
+<li><strong>Control unit</strong>：<strong>IR</strong>（instruction register）和 PC</li>
+<li><strong>Memory</strong>：存放 <strong>data 和 instructions</strong>（加上 caches）</li>
+<li>External mass storage（secondary storage，图中没画）</li>
+<li>Input、output</li>
+</ul>
+<p><strong>核心特征（stored-program architecture）</strong>：<strong>指令和数据存在同一个内存空间</strong>，按地址访问；程序和数据<strong>必须先载入内存才能执行</strong>。</p>
+<p>（Summary 补充：MMU（后面讲）只看到一串内存地址，<strong>不知道</strong>它们是怎么产生的、是指令还是数据。）</p>
+<blockquote>
+<p><strong>往年考法</strong>：选择题问 von Neumann 的核心特征——答「指令和数据存在<strong>同一个</strong>内存空间、按地址访问」；「指令和数据分开存放」是错误选项（那是 Harvard 结构）。</p>
+</blockquote>
+<h3>3.3 Storage 单位</h3>
+<ul>
+<li><strong>bit</strong>：0 或 1；<strong>byte</strong> = 8 bits，大多数计算机上<strong>最小的方便操作单位</strong>（通常没有移动单个 bit 的指令，但有移动 byte 的）</li>
+<li><strong>word</strong>：该计算机结构的原生数据单位，由一个或多个 byte 组成（64 位寄存器、64 位寻址 ⇒ 64-bit（8-byte）word）</li>
+<li><strong>KB = 1024 bytes</strong>，MB = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>1024</mn><mn>2</mn></msup></mrow></math>，GB = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>1024</mn><mn>3</mn></msup></mrow></math>，TB = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>1024</mn><mn>4</mn></msup></mrow></math>，PB = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>1024</mn><mn>5</mn></msup></mrow></math></li>
+<li>厂商常把 MB 说成 100 万字节、GB 说成 10 亿字节</li>
+<li><strong>网络例外</strong>：用 <strong>bits</strong> 计（Mb/s、Gb/s），因为网络一次传一个 bit</li>
+</ul>
+<h3>3.4 Storage Hierarchy</h3>
+<p>按 <strong>speed、cost per unit、capacity、volatility</strong> 组织成层次：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>例子</th>
+<th>类别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最上</td>
+<td>registers</td>
+<td>primary，volatile</td>
+</tr>
+<tr>
+<td></td>
+<td>cache</td>
+<td>primary，volatile</td>
+</tr>
+<tr>
+<td></td>
+<td>main memory</td>
+<td>primary，volatile</td>
+</tr>
+<tr>
+<td></td>
+<td>nonvolatile memory（SSD 等）</td>
+<td>secondary，nonvolatile</td>
+</tr>
+<tr>
+<td></td>
+<td>hard-disk drives</td>
+<td>secondary</td>
+</tr>
+<tr>
+<td></td>
+<td>optical disk</td>
+<td>tertiary</td>
+</tr>
+<tr>
+<td>最下</td>
+<td>magnetic tapes</td>
+<td>tertiary</td>
+</tr>
+</tbody>
+</table>
+<p><strong>越往上</strong>：越快、越小、每字节越贵；<strong>越往下</strong>：越慢、越大、越便宜。</p>
+<p><strong>Characteristics of Various Types of Storage</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name</td>
+<td>registers</td>
+<td>cache</td>
+<td>main memory</td>
+<td>solid-state disk</td>
+<td>magnetic disk</td>
+</tr>
+<tr>
+<td>Typical size</td>
+<td>&lt; 1 KB</td>
+<td>&lt; 16 MB</td>
+<td>&lt; 64 GB</td>
+<td>&lt; 1 TB</td>
+<td>&lt; 10 TB</td>
+</tr>
+<tr>
+<td>Implementation</td>
+<td>custom memory with multiple ports CMOS</td>
+<td>on-chip or off-chip CMOS SRAM</td>
+<td>CMOS SRAM</td>
+<td>flash memory</td>
+<td>magnetic disk</td>
+</tr>
+<tr>
+<td>Access time (ns)</td>
+<td>0.25–0.5</td>
+<td>0.5–25</td>
+<td>80–250</td>
+<td>25,000–50,000</td>
+<td>5,000,000</td>
+</tr>
+<tr>
+<td>Bandwidth (MB/s)</td>
+<td>20,000–100,000</td>
+<td>5,000–10,000</td>
+<td>1,000–5,000</td>
+<td>500</td>
+<td>20–150</td>
+</tr>
+<tr>
+<td>Managed by</td>
+<td>compiler</td>
+<td>hardware</td>
+<td>operating system</td>
+<td>operating system</td>
+<td>operating system</td>
+</tr>
+<tr>
+<td>Backed by</td>
+<td>cache</td>
+<td>main memory</td>
+<td>disk</td>
+<td>disk</td>
+<td>disk or tape</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>层与层之间的移动可以是 <strong>explicit</strong>（显式，如 OS 把文件从磁盘读进内存）或 <strong>implicit</strong>（隐式，如硬件管理 cache）</li>
+<li>注意 <strong>cache 由 hardware 管理</strong>，registers 由 <strong>compiler</strong> 管理</li>
+</ul>
+<h3>3.5 Main memory</h3>
+<ul>
+<li><strong>CPU 能直接访问的唯一大容量存储</strong></li>
+<li><strong>Volatile</strong>；通常是 <strong>DRAM</strong>（Dynamic Random-Access Memory）</li>
+<li>基本操作是对特定地址的 <strong>load</strong> 和 <strong>store</strong>；<strong>byte addressable</strong>：每个地址对应一个字节</li>
+<li>其他形式：开机第一个运行的 <strong>bootstrap program</strong> 存在 <strong>EEPROM</strong>（electrically erasable programmable read-only memory）</li>
+</ul>
+<blockquote>
+<p><strong>往年考法</strong>：选择题判断 storage hierarchy 的说法——干扰项常把方向说反：registers 比内存<strong>慢</strong>（错）、main memory <strong>nonvolatile</strong>（错）、HDD 比内存<strong>小</strong>（错）；正确的是 <strong>main memory is byte addressable</strong>。</p>
+</blockquote>
+<h3>3.6 Secondary storage</h3>
+<ul>
+<li>main memory 的<strong>扩展</strong>，提供<strong>大容量、非易失</strong>的存储，可永久保存大量数据</li>
+<li>最常见：<strong>HDD</strong> 和 <strong>NVM</strong>（nonvolatile memory，如 SSD）</li>
+<li><strong>Mechanical</strong>：HDD、光盘、全息存储、磁带；<strong>Electrical</strong>：flash、SSD、FRAM、NRAM（统称 NVM）</li>
+<li>Mechanical 一般<strong>更大、每字节更便宜</strong>；electrical <strong>更贵、更小、更可靠、更快</strong></li>
+<li>（Summary：<strong>CPU 间接访问</strong> secondary storage）</li>
+</ul>
+<h3>3.7 Caching（往年简答题）</h3>
+<ul>
+<li><strong>重要原则</strong>，在计算机的很多层次使用：内存的 cache、地址转换（TLB）、文件块、常用文件名、文件目录、网络路由……</li>
+<li><strong>Fundamental idea</strong>：把一部分信息从<strong>较慢但较大</strong>的存储<strong>临时复制</strong>到<strong>较快但较小</strong>的存储
+<ul>
+<li>让常见情况更快，少见情况占比更小</li>
+</ul>
+</li>
+<li>访问时先查 cache：
+<ul>
+<li><strong>Hit</strong>：在 cache 里，直接用（快）</li>
+<li><strong>Miss</strong>：不在，从慢存储复制到 cache 再用</li>
+</ul>
+</li>
+<li>cache 通常比被 cache 的存储小得多；<strong>cache management</strong>：cache size 和 <strong>replacement policy</strong></li>
+<li>主要指标：<strong>cache hit ratio</strong>（在 cache 中找到的比例）</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>Average Access Time</mtext><mo>=</mo><mrow></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>Hit Ratio</mtext><mo>×</mo><mtext>Hit Time</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>+</mo><mtext>Miss Ratio</mtext><mo>×</mo><mtext>Miss Time</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>补充算例</strong>：hit ratio 0.9，hit time 1 ns，miss time 100 ns ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.9</mn><mo>×</mo><mn>1</mn><mo>+</mo><mn>0.1</mn><mo>×</mo><mn>100</mn><mo>=</mo><mn>10.9</mn></mrow></math> ns。若 hit ratio 提高到 0.95 但 hit time 变成 5 ns ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.95</mn><mo>×</mo><mn>5</mn><mo>+</mo><mn>0.05</mn><mo>×</mo><mn>100</mn><mo>=</mo><mn>9.75</mn></mrow></math> ns——hit ratio 和 hit time 要一起看。</p>
+<blockquote>
+<p><strong>往年考法（简答）</strong>：问 caching 的基本思想，以及「只看 hit ratio 够不够」。
+<strong>答题要点</strong>：基本思想是把较慢较大存储中的一部分信息<strong>临时复制</strong>到较快较小的存储，让常用数据访问更快。<strong>不能只看 hit ratio</strong>：hit ratio 是主要指标，但整体性能要用 <strong>average access time</strong> 衡量，它同时取决于 <strong>hit time</strong> 和 <strong>miss time（miss penalty）</strong>。</p>
+</blockquote>
+<h3>3.8 为什么 caching 有效：Locality</h3>
+<ul>
+<li><strong>Temporal locality</strong>（时间局部性）：最近访问过的项<strong>很可能再次被访问</strong></li>
+<li><strong>Spatial locality</strong>（空间局部性）：最近访问项<strong>附近</strong>（连续块）的项很可能很快被访问（数据和程序都是）</li>
+<li><strong>没有访问局部性</strong>（例如所有项被等概率访问），<strong>cache 根本不会起作用</strong>！</li>
+<li>做法：保留最近访问的数据靠近处理器（temporal）；把连续块移到上层（spatial）</li>
+</ul>
+<h3>3.9 Range of timescales（Jeff Dean：Numbers Everyone Should Know）</h3>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1 cache reference</td>
+<td>0.5 ns</td>
+</tr>
+<tr>
+<td>Branch mispredict</td>
+<td>5 ns</td>
+</tr>
+<tr>
+<td>L2 cache reference</td>
+<td>7 ns</td>
+</tr>
+<tr>
+<td>Mutex lock/unlock</td>
+<td>25 ns</td>
+</tr>
+<tr>
+<td>Main memory reference</td>
+<td>100 ns</td>
+</tr>
+<tr>
+<td>Compress 1K bytes with Zippy</td>
+<td>3,000 ns</td>
+</tr>
+<tr>
+<td>Send 2K bytes over 1 Gbps network</td>
+<td>20,000 ns</td>
+</tr>
+<tr>
+<td>Read 1 MB sequentially from memory</td>
+<td>250,000 ns</td>
+</tr>
+<tr>
+<td>Round trip within same datacenter</td>
+<td>500,000 ns</td>
+</tr>
+<tr>
+<td>Disk seek</td>
+<td>10,000,000 ns</td>
+</tr>
+<tr>
+<td>Read 1 MB sequentially from disk</td>
+<td>20,000,000 ns</td>
+</tr>
+<tr>
+<td>Send packet CA → Netherlands → CA</td>
+<td>150,000,000 ns</td>
+</tr>
+</tbody>
+</table>
+<p>（记个数量级：内存 ~100 ns，磁盘寻道 ~10 ms，相差 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mn>5</mn></msup></mrow></math> 倍。）</p>
+<h2>4 · Multiprocessor and Parallel Systems</h2>
+<h3>4.1 Single-processor systems</h3>
+<ul>
+<li>过去大多数系统只有一个处理器，含<strong>一个单核 CPU</strong></li>
+<li>core 执行指令、用寄存器存本地数据；能执行<strong>通用</strong>指令集</li>
+<li>还有<strong>专用处理器</strong>（disk、graphics controller / GPU）：执行有限的特定指令集，<strong>通常不执行用户进程的指令</strong></li>
+</ul>
+<h3>4.2 Multiprocessor systems</h3>
+<ul>
+<li>现在从手机到服务器都是多处理器</li>
+<li><strong>N 个处理器的加速比 &lt; N</strong>：有额外开销，如<strong>共享资源（bus、memory）的竞争</strong></li>
+<li><strong>优点</strong>：
+<ul>
+<li><strong>Increased throughput</strong>：更多计算能力</li>
+<li><strong>Economy of scale</strong>：共享其他设备（如 I/O）</li>
+<li><strong>Increased reliability</strong>：<strong>graceful degradation</strong> 或 <strong>fault tolerance</strong>（一个坏了其他还能工作）</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Asymmetric multiprocessing</strong></td>
+<td>通常 <strong>master-slave</strong>：master 给 slave 分配特定任务，<strong>master 处理 I/O</strong></td>
+</tr>
+<tr>
+<td><strong>Symmetric multiprocessing（SMP）</strong></td>
+<td><strong>每个处理器做所有任务</strong>，包括 OS 功能和用户进程</td>
+</tr>
+</tbody>
+</table>
+<p><strong>SMP 的结构</strong>：每个 CPU 有<strong>自己的寄存器</strong>和<strong>私有（local）cache</strong>；<strong>所有处理器通过 system bus 共享物理内存</strong>。</p>
+<h3>4.3 Multicore</h3>
+<ul>
+<li>多个 computing core 在<strong>同一块物理芯片</strong>上</li>
+<li><strong>片内通信</strong>比片间通信<strong>更快</strong></li>
+<li><strong>功耗低得多</strong>——对手机和笔记本很重要</li>
+</ul>
+<h3>4.4 NUMA（Non-Uniform Memory Access）</h3>
+<ul>
+<li>给多处理器加更多 CPU 可能<strong>不能扩展</strong>：system bus 的竞争成为瓶颈</li>
+<li>替代方案：每个 CPU（或一组 CPU）有<strong>自己的 local memory</strong>，通过小而快的 local bus 访问</li>
+<li>CPU 之间用共享的 <strong>system interconnect</strong> 相连，<strong>所有 CPU 共享一个物理地址空间</strong></li>
+<li><strong>缺点</strong>：CPU 访问<strong>远端内存</strong>（跨 interconnect）时<strong>延迟增加</strong>——对调度和内存管理有影响（尽量让进程用本地内存）</li>
+</ul>
+<h3>4.5 术语</h3>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CPU</strong></td>
+<td>执行指令的硬件</td>
+</tr>
+<tr>
+<td><strong>Processor</strong></td>
+<td>一块物理芯片，含一个或多个 CPU</td>
+</tr>
+<tr>
+<td><strong>Core</strong></td>
+<td>CPU 的基本计算单元，执行指令并有寄存器存本地数据</td>
+</tr>
+<tr>
+<td><strong>Multicore</strong></td>
+<td>一块处理器芯片上有多个 core</td>
+</tr>
+<tr>
+<td><strong>Multiprocessor system</strong></td>
+<td>有多个处理器</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · Operating System Structure</h2>
+<p>所有现代 OS 的两个共同特征：</p>
+<h3>5.1 Multiprogramming（batch system）——为了效率</h3>
+<ul>
+<li>早期 OS 一次只把<strong>一个程序</strong>装进内存执行</li>
+<li>单个程序<strong>不能一直让 CPU 或 I/O 设备都忙</strong>（等 I/O 时 CPU 闲着）——所有现代系统都是 multiprogrammed</li>
+<li><strong>组织 jobs，让 CPU 总有一个可以执行</strong>（一个 job 等 I/O 时，切换到另一个）</li>
+<li>大型机中，作业远程提交并排队，通过 <strong>job scheduling</strong> 选择并装入内存</li>
+</ul>
+<h3>5.2 Timesharing（multitasking）——为了交互</h3>
+<ul>
+<li><strong>multiprogramming 的逻辑延伸</strong>：CPU 在 jobs 之间<strong>频繁切换</strong>，用户在程序运行时可以和每个 job 交互 ⇒ <strong>interactive computing</strong></li>
+<li><strong>response time</strong> 要低于某个阈值</li>
+<li>执行中的程序叫 <strong>process</strong></li>
+<li>多个 process 同时就绪 ⇒ <strong>CPU scheduling</strong></li>
+<li>process 装不进内存 ⇒ <strong>swapping</strong>（执行中把它们换入换出内存）</li>
+<li><strong>Virtual memory</strong> 允许执行<strong>不完全在内存中</strong>的 process</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Multiprogramming</th>
+<th>Timesharing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>目标</td>
+<td><strong>效率</strong>（CPU 利用率）</td>
+<td><strong>交互</strong>（响应时间短）</td>
+</tr>
+<tr>
+<td>何时切换</td>
+<td>当前 job 等待（如 I/O）时</td>
+<td>频繁地（时间片到了也切）</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · Virtualization 与 Cloud Computing</h2>
+<h3>6.1 Virtualization</h3>
+<ul>
+<li>把<strong>一台</strong>计算机的硬件抽象成<strong>多个</strong>不同的执行环境——制造「每个用户 / 程序都在自己的<strong>私有计算机</strong>上运行」的<strong>错觉</strong></li>
+<li>创建 <strong>virtual machine（VM）</strong>，OS 和应用在上面运行</li>
+<li>允许一个 OS 作为<strong>另一个 OS 里的应用</strong>运行（巨大且增长中的产业）</li>
+</ul>
+<p><strong>动机</strong>：</p>
+<ul>
+<li><strong>Server consolidation</strong>：把多个 OS 整合到更少的硬件平台上，用户可以在跑不同 OS / 不同版本的机器上运行服务</li>
+<li>桌面上跑一个 OS（如 Linux、macOS），仍能用另一平台（如 Windows）的原生应用</li>
+<li>开发者在一台机器上运行多种 OS 类型和版本——方便测试和调试</li>
+</ul>
+<p><strong>组成</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>组成</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Host</strong></td>
+<td>底层硬件系统</td>
+</tr>
+<tr>
+<td><strong>VMM</strong>（virtual machine manager）/ <strong>hypervisor</strong></td>
+<td>创建和管理 VM，为 VM / guest OS 提供与 host <strong>相同</strong>的接口</td>
+</tr>
+<tr>
+<td><strong>Guest OS</strong></td>
+<td>得到 host 的虚拟副本的进程，通常是一个 OS</td>
+</tr>
+</tbody>
+</table>
+<p><strong>System models</strong>（图）：(a) 无虚拟化：processes → kernel → hardware；(b) 虚拟化：每个 VM（VM1、VM2、VM3）各有自己的 kernel 和 processes，跑在 <strong>virtual machine manager</strong> 之上，VMM 在 hardware 上。</p>
+<p><strong>一点历史</strong>：</p>
+<ul>
+<li>最早用于 <strong>IBM mainframe（1972）</strong>，让多个用户在为单用户设计的系统上并发运行任务</li>
+<li><strong>VMware</strong> 在 Intel x86 CPU 上运行多个 Windows guest，各跑自己的应用</li>
+<li>VMM 提供与原机器<strong>本质相同</strong>的环境（接口）；VM 中的程序<strong>性能只略有下降</strong>（多经过一层软件）；<strong>VMM 完全控制系统资源</strong></li>
+<li>1990 年代末 Intel CPU 够快 ⇒ 通用 PC 上的虚拟化；Xen、VMware 的技术至今仍在用</li>
+</ul>
+<h3>6.2 Cloud computing</h3>
+<ul>
+<li>通过网络把<strong>计算、存储、应用作为服务</strong>提供</li>
+<li>是虚拟化的<strong>逻辑延伸</strong>：以虚拟化为基础</li>
+<li>例：<strong>Amazon EC2</strong>：数百万服务器、数千万 VM、PB 级存储，按使用付费</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Public cloud</strong></td>
+<td>通过互联网对任何愿意付费的人开放</td>
+</tr>
+<tr>
+<td><strong>Private cloud</strong></td>
+<td>公司为自己使用而运营</td>
+</tr>
+<tr>
+<td><strong>Hybrid cloud</strong></td>
+<td>同时包含 public 和 private 部分</td>
+</tr>
+<tr>
+<td><strong>SaaS</strong>（Software as a Service）</td>
+<td>通过互联网提供一个或多个<strong>应用</strong>（如文字处理）</td>
+</tr>
+<tr>
+<td><strong>PaaS</strong>（Platform as a Service）</td>
+<td>通过互联网提供可直接用于应用的<strong>软件栈</strong>（如数据库服务器）</td>
+</tr>
+<tr>
+<td><strong>IaaS</strong>（Infrastructure as a Service）</td>
+<td>通过互联网提供<strong>服务器或存储</strong>（如备份用的存储）</td>
+</tr>
+</tbody>
+</table>
+<p>还有越来越多的其他服务，如 <strong>MaaS（Machine learning as a Service）</strong>。</p>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OS 的角色</td>
+<td>中介、抽象、资源分配；resource allocator + control program</td>
+</tr>
+<tr>
+<td>系统四层</td>
+<td>users / apps / OS / hardware</td>
+</tr>
+<tr>
+<td>不同环境</td>
+<td>共享机、个人机、移动、嵌入式、实时</td>
+</tr>
+<tr>
+<td>Kernel 等术语</td>
+<td>kernel 一直在运行；middleware；system programs vs applications</td>
+</tr>
+<tr>
+<td>von Neumann</td>
+<td>五步；PC / AC / MAR / MDR / IR；<strong>指令和数据同一内存</strong></td>
+</tr>
+<tr>
+<td>存储单位</td>
+<td>KB = 1024；网络用 bit</td>
+</tr>
+<tr>
+<td>Storage hierarchy</td>
+<td>速度 / 容量 / 成本 / 易失性；表格中各层 managed by</td>
+</tr>
+<tr>
+<td>Main memory</td>
+<td>CPU 唯一能直接访问的大存储；volatile；DRAM；<strong>byte addressable</strong>；bootstrap 在 EEPROM</td>
+</tr>
+<tr>
+<td>Secondary storage</td>
+<td>HDD vs NVM 的比较</td>
+</tr>
+<tr>
+<td>Caching</td>
+<td>基本思想；hit / miss；<strong>average access time 公式</strong>；hit ratio 不够</td>
+</tr>
+<tr>
+<td>Locality</td>
+<td>temporal / spatial；没有 locality cache 无效</td>
+</tr>
+<tr>
+<td>Multiprocessor</td>
+<td>加速比 &lt; N 的原因；三个优点；asymmetric vs SMP</td>
+</tr>
+<tr>
+<td>Multicore、NUMA</td>
+<td>优点；NUMA 的缺点</td>
+</tr>
+<tr>
+<td>CPU / processor / core</td>
+<td>术语区别</td>
+</tr>
+<tr>
+<td>Multiprogramming vs timesharing</td>
+<td>目标、切换时机；CPU scheduling、swapping、VM 的出现</td>
+</tr>
+<tr>
+<td>Virtualization</td>
+<td>定义、动机、host / VMM / guest</td>
+</tr>
+<tr>
+<td>Cloud</td>
+<td>public / private / hybrid；SaaS / PaaS / IaaS</td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li>Main memory 是 <strong>volatile</strong>、<strong>byte addressable</strong>；是 CPU <strong>唯一</strong>能直接访问的大容量存储（CPU 不能直接访问磁盘）。</li>
+<li>von Neumann：指令和数据<strong>在同一个内存里</strong>（不是分开）。</li>
+<li>Cache 性能看 <strong>average access time</strong>，不能只看 hit ratio。</li>
+<li>N 个处理器的加速比<strong>小于</strong> N。</li>
+<li>SMP 每个 CPU 有<strong>私有 cache</strong>，但<strong>共享</strong> physical memory。</li>
+<li>NUMA 共享<strong>同一个</strong>物理地址空间，只是访问远端更慢。</li>
+<li>Timesharing 是 multiprogramming 的延伸，目标是<strong>交互 / 响应时间</strong>。</li>
+<li>SaaS 给应用，PaaS 给平台（软件栈），IaaS 给基础设施（服务器 / 存储）。</li>
+</ul>

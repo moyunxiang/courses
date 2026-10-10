@@ -1,0 +1,522 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap：<strong>Constraint Satisfaction Problems</strong> → <strong>Solving CSPs by Search</strong>（backtracking）→ <strong>CSP Improvement Strategies</strong>（ordering、filtering、iterative min-conflicts）</p>
+<blockquote>
+<p>必考：把问题写成 CSP（variables / domains / constraints）；naive DFS 的节点数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo stretchy="false">!</mo><mtext> </mtext><msup><mi>d</mi><mi>n</mi></msup></mrow></math> 和 backtracking 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>d</mi><mi>n</mi></msup><mo stretchy="false">)</mo></mrow></math>；backtracking 三个 idea；<strong>MRV 为什么选最少、LCV 为什么选最少</strong>；在澳大利亚地图上<strong>手推 forward checking 和 arc consistency</strong>（课件两张表）；arc consistency 的定义和「X 丢值后邻居要重查」。</p>
+</blockquote>
+<h2>1 · Search 用来干什么：Planning vs Identification</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Planning</th>
+<th>Identification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>要的是</td>
+<td><strong>sequences of actions</strong></td>
+<td><strong>assignments to variables</strong></td>
+</tr>
+<tr>
+<td>重要的</td>
+<td><strong>到达 goal 的路径</strong>（cost、深度不同；heuristic 引导）</td>
+<td><strong>goal 本身</strong>，路径无所谓</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>L6–L7 的路线规划、8 puzzle</td>
+<td><strong>CSP</strong>（专门处理 identification 问题）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Real-world CSPs</strong>：assignment problems（谁教哪门课）、timetabling（哪门课什么时候在哪上）、hardware configuration、transportation scheduling、factory scheduling……</p>
+<h2>2 · CSP 的定义</h2>
+<blockquote>
+<p><strong>CSP Problem Definition</strong></p>
+<ul>
+<li>A <strong>special subset of search problems</strong></li>
+<li><strong>State</strong>：由 <strong>variables</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mi>i</mi></msub></mrow></math> 定义，取值来自 <strong>domain</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mi>i</mi></msub></mrow></math></li>
+<li><strong>Goal</strong>：找到满足<strong>一组给定 constraints</strong> 的某个 state
+<ul>
+<li><strong>Goal test</strong>：检查对变量的一组赋值是否满足全部 constraints</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p><strong>4-queens identification problem</strong>：</p>
+<ul>
+<li>variables：棋盘上的各个位置</li>
+<li>values：Boolean，该位置有没有 queen</li>
+<li>goal：任意两个 queen 不在同一行、同一列、同一对角线</li>
+</ul>
+<h3>2.1 例：Map Coloring（澳大利亚）</h3>
+<table>
+<thead>
+<tr>
+<th>组成</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Variables</td>
+<td>WA、NT、Q、NSW、V、SA、T</td>
+</tr>
+<tr>
+<td>Domains</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>D</mi><mo>=</mo><mo stretchy="false">{</mo><mtext>red</mtext><mo separator="true">,</mo><mtext>green</mtext><mo separator="true">,</mo><mtext>blue</mtext><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Constraints</td>
+<td>相邻区域颜色不同</td>
+</tr>
+<tr>
+<td>— Implicit 写法</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>WA</mtext><mo mathvariant="normal">≠</mo><mtext>NT</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>— Explicit 写法</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>WA</mtext><mo separator="true">,</mo><mtext>NT</mtext><mo stretchy="false">)</mo><mo>∈</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mtext>red</mtext><mo separator="true">,</mo><mtext>green</mtext><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mtext>red</mtext><mo separator="true">,</mo><mtext>blue</mtext><mo stretchy="false">)</mo><mo separator="true">,</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">}</mo></mrow></math>（列出所有允许的组合）</td>
+</tr>
+<tr>
+<td>Solution</td>
+<td>满足所有约束的赋值（<strong>不关心路径</strong>），例：WA=red、NT=green、Q=red、NSW=green、V=red、SA=blue、T=green</td>
+</tr>
+</tbody>
+</table>
+<p>相邻关系（constraint graph 的边）：WA–NT、WA–SA、NT–SA、NT–Q、SA–Q、SA–NSW、SA–V、Q–NSW、NSW–V；<strong>T（Tasmania）不和任何区域相邻</strong>。</p>
+<h3>2.2 约束的种类</h3>
+<table>
+<thead>
+<tr>
+<th>种类</th>
+<th>涉及几个变量</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unary</strong></td>
+<td>1 个</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>SA</mtext><mo mathvariant="normal">≠</mo><mtext>green</mtext></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Binary</strong></td>
+<td>2 个</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>SA</mtext><mo mathvariant="normal">≠</mo><mtext>WA</mtext></mrow></math></td>
+</tr>
+<tr>
+<td><strong>High-order</strong></td>
+<td>3 个及以上</td>
+<td>cryptarithmetic puzzle</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Binary constraints 可以画成 <strong>constraint graph</strong>：<strong>节点 = 变量，边 = 约束</strong>。</li>
+</ul>
+<h3>2.3 例：Cryptarithmetic Puzzle</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.16em" columnalign="right" columnspacing="1em" rowlines="none solid"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>T</mi><mtext> </mtext><mi>W</mi><mtext> </mtext><mi>O</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>+</mo><mtext>  </mtext><mi>T</mi><mtext> </mtext><mi>W</mi><mtext> </mtext><mi>O</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>F</mi><mtext> </mtext><mi>O</mi><mtext> </mtext><mi>U</mi><mtext> </mtext><mi>R</mi></mrow></mstyle></mtd></mtr></mtable></math></div><table>
+<thead>
+<tr>
+<th>组成</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Variables</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo separator="true">,</mo><mi>T</mi><mo separator="true">,</mo><mi>U</mi><mo separator="true">,</mo><mi>W</mi><mo separator="true">,</mo><mi>R</mi><mo separator="true">,</mo><mi>O</mi></mrow></math>，以及进位 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>X</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>X</mi><mn>3</mn></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Domains</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>9</mn><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Constraints</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>alldiff</mtext><mo stretchy="false">(</mo><mi>F</mi><mo separator="true">,</mo><mi>T</mi><mo separator="true">,</mo><mi>U</mi><mo separator="true">,</mo><mi>W</mi><mo separator="true">,</mo><mi>R</mi><mo separator="true">,</mo><mi>O</mi><mo stretchy="false">)</mo></mrow></math>（6 个字母两两不同）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo>+</mo><mi>O</mi><mo>=</mo><mi>R</mi><mo>+</mo><mn>10</mn><mo>⋅</mo><msub><mi>X</mi><mn>1</mn></msub></mrow></math>；……</td>
+</tr>
+</tbody>
+</table>
+<p>课件只写了前两条，后面是「…」。<strong>补充</strong>（按同样的列竖式方法写完）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>X</mi><mn>1</mn></msub><mo>+</mo><mi>W</mi><mo>+</mo><mi>W</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>U</mi><mo>+</mo><mn>10</mn><mo>⋅</mo><msub><mi>X</mi><mn>2</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>X</mi><mn>2</mn></msub><mo>+</mo><mi>T</mi><mo>+</mo><mi>T</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>O</mi><mo>+</mo><mn>10</mn><mo>⋅</mo><msub><mi>X</mi><mn>3</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>X</mi><mn>3</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>F</mi></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mn>1</mn></msub></mrow></math> 是什么？</strong> 个位 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo>+</mo><mi>O</mi></mrow></math> 可能 ≥ 10，向十位进 1；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mn>1</mn></msub><mo>∈</mo><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math> 就是这个进位。</li>
+<li>alldiff 涉及 6 个变量，是 <strong>high-order constraint</strong>；课件的图里用方框节点表示这种约束（一个方框连向它涉及的所有变量）。</li>
+</ul>
+<h2>3 · 用标准搜索解 CSP</h2>
+<h3>3.1 Standard search formulation</h3>
+<blockquote>
+<ul>
+<li><strong>State space</strong>：每个 state 是已赋的值（<strong>partial assignment</strong>）</li>
+<li><strong>Initial state</strong>：空赋值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mo stretchy="false">}</mo></mrow></math></li>
+<li><strong>Successor function</strong>：给一个<strong>未赋值</strong>的变量赋一个值</li>
+<li><strong>Goal test</strong>：当前赋值<strong>完整</strong>且满足全部约束</li>
+</ul>
+</blockquote>
+<p>先用最朴素的方法（DFS），再改进。</p>
+<h3>3.2 Naive DFS 有多大？</h3>
+<p>设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 个变量，每个 domain 大小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi></mrow></math>：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>branching factor</th>
+<th>这一层节点数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 1 层</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mi>n</mi><mi>d</mi></mrow></math>（任一变量 × 任一值）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mi>d</mi></mrow></math></td>
+</tr>
+<tr>
+<td>第 2 层</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi>d</mi></mrow></math>（已经赋了一个）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi>d</mi><mo>×</mo><mi>n</mi><mi>d</mi><mo>=</mo><mi>n</mi><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mtext> </mtext><msup><mi>d</mi><mn>2</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 层</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mi>d</mi></mrow></math>（只剩一个变量）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>⋯</mo><mn>1</mn><mo>×</mo><msup><mi>d</mi><mi>n</mi></msup><mo>=</mo><mi>n</mi><mo stretchy="false">!</mo><mtext> </mtext><msup><mi>d</mi><mi>n</mi></msup></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>huge search tree</strong>；every solution appears at depth <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>。</li>
+<li>但所有可能的完整赋值只有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>d</mi><mi>n</mi></msup></mrow></math> 种——树大了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo stretchy="false">!</mo></mrow></math> 倍，<strong>could we do better?</strong></li>
+</ul>
+<h3>3.3 Naive DFS 的两个问题</h3>
+<p><strong>Issue 1：Variable assignments are commutative（赋值顺序无关）</strong></p>
+<ul>
+<li>[WA = red 然后 NT = green] 和 [NT = green 然后 WA = red] 是<strong>同一个</strong>结果。</li>
+<li>→ <strong>每个节点只需要考虑给一个固定的变量赋值</strong>。</li>
+<li>branching factor 变成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mi>d</mi></mrow></math>，树的大小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>d</mi><mi>n</mi></msup><mo stretchy="false">)</mo></mrow></math>（去掉了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo stretchy="false">!</mo></mrow></math>）。</li>
+</ul>
+<p><strong>Issue 2：每个变量可以赋任何值</strong></p>
+<ul>
+<li>→ <strong>只考虑和之前赋值不冲突的值</strong>（不要等到最后才 goal test）。</li>
+</ul>
+<p><strong>DFS + 这两个改进 = backtracking search。</strong></p>
+<h2>4 · Backtracking Search</h2>
+<h3>4.1 Key ideas</h3>
+<ul>
+<li><strong>Idea 1：One variable at a time</strong>——赋值可交换，一个节点只对一个变量赋值 → 更小的 branching factor</li>
+<li><strong>Idea 2：Check constraints as you go</strong>——只考虑不和之前赋值冲突的值</li>
+<li><strong>Idea 3：Backtrack</strong>——当某个变量<strong>没有合法值可赋</strong>时，回到上一个决策点</li>
+</ul>
+<h3>4.2 地图例子</h3>
+<p>WA 先试 red / green / blue 三支；在 WA=red 下面 NT 试 green、blue；再往下……某一步发现某个区域<strong>没有合法颜色了（No legal values left）→ backtrack</strong>。</p>
+<h3>4.3 算法（课件伪代码）</h3>
+<pre><code class="language-text">function BACKTRACKING-SEARCH(csp) returns solution/failure
+  return RECURSIVE-BACKTRACKING({}, csp)
+
+function RECURSIVE-BACKTRACKING(assignment, csp) returns soln/failure
+  if assignment is complete then return assignment
+  var &lt;- SELECT-UNASSIGNED-VARIABLE(VARIABLES[csp], assignment, csp)
+  for each value in ORDER-DOMAIN-VALUES(var, assignment, csp) do
+    if value is consistent with assignment given CONSTRAINTS[csp] then
+      add {var = value} to assignment
+      result &lt;- RECURSIVE-BACKTRACKING(assignment, csp)
+      if result != failure then return result
+      remove {var = value} from assignment
+  return failure
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>代码位置</th>
+<th>对应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RECURSIVE-BACKTRACKING({}, csp)</code></td>
+<td>initial state：空赋值</td>
+</tr>
+<tr>
+<td><code>SELECT-UNASSIGNED-VARIABLE</code></td>
+<td><strong>Idea 1</strong>：选一个未赋值变量</td>
+</tr>
+<tr>
+<td><code>if value is consistent …</code></td>
+<td><strong>Idea 2</strong>：检查和已有赋值的冲突</td>
+</tr>
+<tr>
+<td><code>remove …</code> / <code>return failure</code></td>
+<td><strong>Idea 3</strong>：这个节点下没有解（某变量没有合法值），回溯</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Backtracking = DFS + One variable at a time + Violation-checking</strong></p>
+<p>还剩两个问题：<strong>先给哪个变量赋值？给它哪个值？</strong> → <strong>Heuristics!!</strong></p>
+<h2>5 · 改进 1：Ordering</h2>
+<h3>5.1 Variable ordering：Minimum Remaining Values（MRV）</h3>
+<ul>
+<li><strong>选 domain 里剩余合法值最少的变量</strong></li>
+<li>课件例子：WA=red、NT=green 之后，SA 只剩 blue（它和 WA、NT 都相邻），Q 还有两种可能 → 先给 SA 赋值（SA=blue）</li>
+</ul>
+<p><strong>Why min rather than max?</strong></p>
+<ul>
+<li>也叫 <strong>「most constrained variable」</strong>：它是最容易失败的变量。如果留着不赋，后面它很容易变成「没有值可选」，<strong>easily cause backtracking</strong>。</li>
+<li>先处理它，要么马上成功、要么马上发现失败，失败越早发现，浪费越少（fail-first）。</li>
+</ul>
+<h3>5.2 Value ordering：Least Constraining Value（LCV）</h3>
+<ul>
+<li>选定变量之后，<strong>选那个让剩下的变量被排除掉的值最少的值</strong></li>
+<li>课件例子：WA=red、NT=green，现在给 Q 选值：
+<ul>
+<li>Q = red：SA 还能选 blue</li>
+<li>Q = blue：SA（邻接 WA red、NT green、Q blue）<strong>一个值都不剩</strong></li>
+<li>→ 选 Q = red</li>
+</ul>
+</li>
+</ul>
+<p><strong>Why least rather than most?</strong></p>
+<ul>
+<li>选值是要<strong>找到一个解</strong>；给其他变量留的选择越多，越不容易走进死路。选「最限制」的值会让剩下的变量 <strong>no values left to assign, easily cause backtracking</strong>。</li>
+</ul>
+<p><strong>注意两者的方向「看起来相反」</strong>：变量选<strong>最受限</strong>的（尽早暴露失败），值选<strong>最不限制别人</strong>的（尽量保留成功的可能）。</p>
+<ul>
+<li><strong>Combining these ordering ideas makes 1000-queens feasible.</strong></li>
+</ul>
+<h2>6 · 改进 2：Filtering</h2>
+<ul>
+<li><strong>Can we detect inevitable failure early?</strong></li>
+<li><strong>Key idea</strong>：为未赋值变量<strong>维护 domain</strong>，把不可能的选项<strong>划掉</strong>。</li>
+</ul>
+<h3>6.1 Forward checking</h3>
+<ul>
+<li><strong>Forward checking</strong>：每赋一个值，就把<strong>和它冲突的</strong>、相邻未赋值变量 domain 里的值划掉。</li>
+<li>某个变量的 domain 变空 → <strong>No value left, terminate search from this node and backtrack</strong>。</li>
+</ul>
+<p><strong>课件手推</strong>（顺序 WA → Q → V）：</p>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>WA</th>
+<th>NT</th>
+<th>Q</th>
+<th>NSW</th>
+<th>V</th>
+<th>SA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开始</td>
+<td>RGB</td>
+<td>RGB</td>
+<td>RGB</td>
+<td>RGB</td>
+<td>RGB</td>
+<td>RGB</td>
+</tr>
+<tr>
+<td>WA = red</td>
+<td><strong>R</strong></td>
+<td>GB</td>
+<td>RGB</td>
+<td>RGB</td>
+<td>RGB</td>
+<td>GB</td>
+</tr>
+<tr>
+<td>Q = green</td>
+<td>R</td>
+<td>B</td>
+<td><strong>G</strong></td>
+<td>RB</td>
+<td>RGB</td>
+<td>B</td>
+</tr>
+<tr>
+<td>V = blue</td>
+<td>R</td>
+<td>B</td>
+<td>G</td>
+<td>R</td>
+<td><strong>B</strong></td>
+<td><strong>∅</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>WA=red：划掉邻居 NT、SA 的 red</li>
+<li>Q=green：划掉 NT、SA、NSW 的 green</li>
+<li>V=blue：划掉 NSW、SA 的 blue → <strong>SA 空了 → backtrack</strong></li>
+</ul>
+<h3>6.2 Forward checking 的不足</h3>
+<p>看 Q=green 那一行：NT = {B}，SA = {B}，而 <strong>NT 和 SA 相邻，不能都是 blue！</strong> 这时其实已经注定失败，但 forward checking 没发现——因为它只把信息从<strong>已赋值</strong>变量传给<strong>未赋值</strong>变量，<strong>不检查未赋值变量之间</strong>的约束。</p>
+<p>→ <strong>Constraint propagation</strong>：在<strong>未赋值变量之间</strong>也继续从约束推到约束。</p>
+<h3>6.3 Arc consistency</h3>
+<blockquote>
+<p>An arc <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>→</mo><mi>Y</mi></mrow></math> is <strong>consistent</strong> if for <strong>every</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> in the tail（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math>）there is <strong>some</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math> in the head（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Y</mi></mrow></math>）which could be assigned without violating a constraint.</p>
+</blockquote>
+<ul>
+<li>例：WA=red，NT ∈ {blue, green}：
+<ul>
+<li>WA → NT consistent：WA 的 red，NT 可以选 blue 或 green</li>
+<li>NT → WA consistent：NT 的 blue / green，WA 的 red 都不冲突</li>
+</ul>
+</li>
+<li><strong>让 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>→</mo><mi>Y</mi></mrow></math> consistent 的做法</strong>：把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 里<strong>找不到任何搭档</strong>的值删掉（只删 tail 的值）。</li>
+</ul>
+<p><strong>课件手推</strong>（WA=red、Q=green 之后，未赋值变量 NT、NSW、V、SA；检查它们之间的所有 arc）：</p>
+<table>
+<thead>
+<tr>
+<th>检查的 arc</th>
+<th>发生了什么</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>初始</td>
+<td>NT {B}、NSW {R,B}、V {R,G,B}、SA {B}</td>
+<td></td>
+</tr>
+<tr>
+<td>NSW → SA</td>
+<td>NSW 取 blue 时，SA 只有 blue，没有搭档 → 删 NSW 的 blue</td>
+<td>NSW {R}</td>
+</tr>
+<tr>
+<td>V → NSW</td>
+<td>V 取 red 时，NSW 只有 red → 删 V 的 red</td>
+<td>V {G,B}</td>
+</tr>
+<tr>
+<td>SA → NT</td>
+<td>SA 取 blue 时，NT 只有 blue → 删 SA 的 blue</td>
+<td><strong>SA = ∅ → Failure</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>和 forward checking 对比：forward checking 要再赋 V 之后才发现失败；<strong>arc consistency 在赋完 Q 之后就发现了</strong>。</li>
+<li><strong>Important：If <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> loses a value, neighbors of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> need to be rechecked!</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 少了值，原本靠这个值做搭档的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Z</mi><mo>→</mo><mi>X</mi></mrow></math> 可能不再 consistent。比如 NSW 删掉 blue 之后，就得重查 V → NSW。）</li>
+<li><strong>Arc consistency detects failure earlier than forward checking.</strong></li>
+</ul>
+<h2>7 · Iterative Algorithm（Min-conflicts）</h2>
+<blockquote>
+<p><strong>Iterative Improvement for CSPs</strong></p>
+<ul>
+<li>用 <strong>「complete」states</strong>：所有变量都已赋值</li>
+<li>用到 CSP 上：
+<ul>
+<li><strong>允许 state 有未满足的约束</strong></li>
+<li>Operators <strong>reassign</strong> variable values</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p><strong>例：4-queens</strong>，移动 queen 来减少 conflicts（互相攻击的对数）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>5</mn><mo>→</mo><mi>h</mi><mo>=</mo><mn>2</mn><mo>→</mo><mi>h</mi><mo>=</mo><mn>0</mn></mrow></math>。</p>
+<ul>
+<li><strong>Which variable to pick up?</strong> —— <strong>随机选一个有冲突的变量</strong></li>
+<li><strong>How to choose a new value?</strong> —— 选<strong>违反约束最少</strong>的值（min-conflicts）</li>
+<li><strong>Iterative min-conflicts is often effective in practice.</strong></li>
+</ul>
+<p>和 backtracking 的区别：backtracking 从空赋值一点点<strong>建</strong>；min-conflicts 从一个完整（可能不合法）的赋值出发<strong>修</strong>。（下一讲的 local search 就是这个思路。）</p>
+<h2>8 · Summary</h2>
+<ul>
+<li>CSPs are a <strong>special kind of search problem</strong>：
+<ul>
+<li>States are <strong>partial assignments</strong></li>
+<li>Goal test defined by <strong>constraints</strong></li>
+</ul>
+</li>
+<li><strong>Basic solution</strong>：<strong>Backtracking search = DFS + one variable at a time + constraint checking</strong></li>
+<li><strong>Speed-ups</strong>：
+<ul>
+<li><strong>Ordering</strong>：variable ordering（MRV）和 value ordering（LCV）heuristically help significantly</li>
+<li><strong>Filtering</strong>：forward checking（从已赋值传到未赋值）；constraint propagation（未赋值之间 → early failure detection）</li>
+</ul>
+</li>
+<li><strong>Iterative min-conflicts</strong> is often effective in practice</li>
+</ul>
+<h2>9 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Planning vs identification</td>
+<td>要路径 vs 只要 goal；CSP 属于后者</td>
+</tr>
+<tr>
+<td>CSP 定义</td>
+<td>variables、domains、constraints；goal test</td>
+</tr>
+<tr>
+<td>建模</td>
+<td>map coloring、4-queens、cryptarithmetic（含进位变量、alldiff）</td>
+</tr>
+<tr>
+<td>约束种类</td>
+<td>unary / binary / high-order；constraint graph</td>
+</tr>
+<tr>
+<td>Standard formulation</td>
+<td>state = partial assignment；初始 {}；successor；goal test</td>
+</tr>
+<tr>
+<td>Naive DFS 规模</td>
+<td>每层 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math>；总 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo stretchy="false">!</mo><mtext> </mtext><msup><mi>d</mi><mi>n</mi></msup></mrow></math> vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>d</mi><mi>n</mi></msup></mrow></math></td>
+</tr>
+<tr>
+<td>两个改进</td>
+<td>commutative → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mi>d</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>d</mi><mi>n</mi></msup><mo stretchy="false">)</mo></mrow></math>；只选不冲突的值</td>
+</tr>
+<tr>
+<td>Backtracking</td>
+<td>三个 idea；伪代码每行对应哪个 idea</td>
+</tr>
+<tr>
+<td>MRV</td>
+<td>选剩余值最少的变量；为什么（most constrained、fail early）</td>
+</tr>
+<tr>
+<td>LCV</td>
+<td>选排除别人最少的值；为什么</td>
+</tr>
+<tr>
+<td>Forward checking</td>
+<td>手推表（WA→Q→V，SA 空）</td>
+</tr>
+<tr>
+<td>FC 的不足</td>
+<td>NT、SA 都只剩 blue 却没发现</td>
+</tr>
+<tr>
+<td>Arc consistency</td>
+<td>定义（every x / some y）；手推；删 tail；丢值后重查邻居</td>
+</tr>
+<tr>
+<td>Min-conflicts</td>
+<td>complete state；随机挑冲突变量；选冲突最少的值</td>
+</tr>
+</tbody>
+</table>
+<h2>10 · 易错点</h2>
+<ul>
+<li>Naive DFS 的节点数是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo stretchy="false">!</mo><mtext> </mtext><msup><mi>d</mi><mi>n</mi></msup></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>d</mi><mi>n</mi></msup></mrow></math>；后者是改进 1 之后的。</li>
+<li>MRV 是选 <strong>remaining values 最少</strong>的变量；LCV 是选<strong>约束别人最少</strong>的值——一个「最多受限」，一个「最少限制」，不要都背成「最少」或「最多」。</li>
+<li>Arc <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>→</mo><mi>Y</mi></mrow></math> consistent 是对 <strong>tail <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 的每一个值</strong>而言；修正时删的是 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math></strong> 的值，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Y</mi></mrow></math> 的。</li>
+<li>Arc consistency 是<strong>双向</strong>的：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>→</mo><mi>Y</mi></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Y</mi><mo>→</mo><mi>X</mi></mrow></math> 是两条不同的 arc，要分别检查。</li>
+<li>Forward checking 只看「刚赋值的变量 → 它的邻居」，不看未赋值变量之间。</li>
+<li>T（Tasmania）不和任何区域相邻，任何颜色都行。</li>
+<li>Min-conflicts 的 state 是<strong>完整</strong>赋值（允许冲突），backtracking 的 state 是<strong>部分</strong>赋值（不允许冲突）。</li>
+</ul>

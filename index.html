@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#f3efe6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171614" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="课程">
+<title>课程</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="stylesheet" href="style.css?v=20261010220314">
+<script src="app.js?v=20261010220314" defer></script>
+</head>
+<body>
+<div class="page">
+  <section id="lock" class="lock" hidden>
+    <form id="unlock" autocomplete="on">
+      <div class="eyebrow">Course dashboard</div>
+      <h1 class="display">课程</h1>
+      <p class="muted">数据已加密，输入口令解锁</p>
+      <input type="text" name="username" value="dashboard" autocomplete="username" hidden>
+      <input id="pass" type="password" autocomplete="current-password" placeholder="口令" required>
+      <label class="check"><input id="remember" type="checkbox" checked> 在此设备上记住</label>
+      <button id="go" type="submit">解锁</button>
+      <p id="lock-msg" class="msg" role="status"></p>
+    </form>
+  </section>
+  <main id="app" hidden></main>
+</div>
+</body>
+</html>

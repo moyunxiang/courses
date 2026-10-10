@@ -1,0 +1,520 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap：<strong>Greedy Search</strong> → <strong>A* Search</strong> → <strong>Inventing Heuristics</strong></p>
+<blockquote>
+<p>必考：Greedy 为什么<strong>不 complete、不 optimal</strong>（课件 Lasi → Fagaras 的环）；A* 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi>g</mi><mo>+</mo><mi>h</mi></mrow></math>；<strong>admissible</strong> 的定义；课件「Is A* optimal?」反例；<strong>A* 最优性证明三步</strong>；8 puzzle 两个 heuristic 的值（8、18）以及为什么 admissible；<strong>dominance</strong> 和 <strong>max of heuristics</strong>。</p>
+</blockquote>
+<h2>1 · 回顾与动机</h2>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>先展开谁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DFS</td>
+<td>deepest node</td>
+</tr>
+<tr>
+<td>BFS</td>
+<td>shallowest node</td>
+</tr>
+<tr>
+<td>UCS</td>
+<td>lowest path cost <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>它们的 strategy <strong>只用了问题定义里的信息</strong>（uninformed）——不知道目标在哪个方向，只能「四面八方」地搜。</p>
+<p><strong>Informed search</strong>：</p>
+<ul>
+<li>用 <strong>problem-specific（heuristic）knowledge</strong> 决定先展开哪个节点</li>
+<li><strong>guide search towards the goal</strong> instead of all over the state space</li>
+</ul>
+<h2>2 · Greedy Search</h2>
+<h3>2.1 Key ideas</h3>
+<ul>
+<li>展开 frontier 中<strong>看起来离 goal 最近</strong>的节点</li>
+<li>需要一个 <strong>evaluation function <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></strong>：估计从节点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> <strong>到 goal</strong> 的 cost</li>
+<li>选 frontier 中 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 最小</strong>的节点</li>
+</ul>
+<p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> 怎么来？</strong> 用问题本身的知识。Romania 例子：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>straight-line distance from </mtext><mi>n</mi><mtext> to Bucharest</mtext></mrow></math></div><ul>
+<li><strong>useful but potentially error-prone</strong>（所以叫 heuristic）</li>
+<li><strong>heuristic functions are problem-specific</strong></li>
+</ul>
+<h3>2.2 Romania 上的 Greedy 手推</h3>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>展开</th>
+<th>生成的孩子（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math>）</th>
+<th>下一步选</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Arad（366）</td>
+<td>Sibiu 253、Timisoara 329、Zerind 374</td>
+<td>Sibiu（253 最小）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Sibiu</td>
+<td>Arad 366、Fagaras 178、Oradea 380、Rimnicu Vilcea 193</td>
+<td>Fagaras（178）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Fagaras</td>
+<td>Sibiu 253、Bucharest 0</td>
+<td>Bucharest（0）→ 到达</td>
+</tr>
+</tbody>
+</table>
+<p>Greedy 的路径：Arad → Sibiu → Fagaras → Bucharest，路程 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>140</mn><mo>+</mo><mn>99</mn><mo>+</mo><mn>211</mn><mo>=</mo><mn>450</mn></mrow></math>。</p>
+<p><strong>补充（用课件地图上的距离）</strong>：经 Rimnicu Vilcea、Pitesti 的路是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>140</mn><mo>+</mo><mn>80</mn><mo>+</mo><mn>97</mn><mo>+</mo><mn>101</mn><mo>=</mo><mn>418</mn></mrow></math>，更短。Greedy 只看「离终点还有多远」，不看「已经走了多远」，所以<strong>不 optimal</strong>。</p>
+<h3>2.3 Greedy Search: Complete?（课件反例）</h3>
+<p><strong>Task</strong>：从 Lasi 到 Fagaras，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> = 到 Fagaras 的直线距离。</p>
+<ul>
+<li>Lasi（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>90</mn></mrow></math>）的邻居：Neamt（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>80</mn></mrow></math>）、Vaslui（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>100</mn></mrow></math>）</li>
+<li>选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 小的 Neamt → Neamt 是死胡同，唯一邻居是 Lasi（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>90</mn></mrow></math>）</li>
+<li>frontier 里 Lasi（90）比 Vaslui（100）小 → 又回到 Lasi → 又选 Neamt → ……</li>
+</ul>
+<p><strong>Complete? No! In a cycle!</strong> 真正的路要经过 Vaslui，但它的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 一直比 Lasi、Neamt 大，永远轮不到。</p>
+<p><strong>Any idea to jump out of the cycle?</strong> → 像 UCS 一样<strong>把已走的 path cost 也算进去</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>+</mo><mi>h</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lasi（根）</td>
+<td>0</td>
+<td>90</td>
+<td>90</td>
+</tr>
+<tr>
+<td>Neamt</td>
+<td>87</td>
+<td>80</td>
+<td>167</td>
+</tr>
+<tr>
+<td>Vaslui</td>
+<td>92</td>
+<td>100</td>
+<td>192</td>
+</tr>
+<tr>
+<td>Lasi（经 Neamt 回来）</td>
+<td>87+87=174</td>
+<td>90</td>
+<td>264</td>
+</tr>
+</tbody>
+</table>
+<p>展开 Neamt 后，回到 Lasi 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>+</mo><mi>h</mi><mo>=</mo><mn>264</mn><mo>&gt;</mo><mn>192</mn></mrow></math>，所以下一个展开的是 Vaslui，跳出了环。<strong>这就是 A*。</strong></p>
+<h2>3 · A* Search</h2>
+<h3>3.1 Key ideas</h3>
+<ul>
+<li>展开 frontier 中 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>+</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> 最小</strong>的节点
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>：从根到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 的 cost</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>：从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 到 goal 的<strong>最优（真实）</strong> cost</li>
+</ul>
+</li>
+<li>我们很少知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>，但可以有 heuristic 近似 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>A* = tree search，frontier 的优先级由</strong></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>+</mo><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>Combining UCS and Greedy Search：</strong></p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>backward cost</strong>：已经花了多少（UCS）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>forward cost</strong>：估计还要花多少（Greedy）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>→</mo><mn>0</mn></mrow></math></td>
+<td>退化成 <strong>greedy search</strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>→</mo><mn>0</mn></mrow></math></td>
+<td>退化成 <strong>uniform-cost search</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>直觉</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> 是「经过 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 的完整路线总 cost 的估计」。A* 每次展开估计总 cost 最小的那条路。</p>
+<h3>3.2 Is A* Optimal?（课件反例）</h3>
+<p>图：S → A cost 1，A → G cost 3，S → G cost 5。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><mn>7</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>。</p>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S</td>
+<td>0</td>
+<td>7</td>
+<td>7</td>
+</tr>
+<tr>
+<td>A</td>
+<td>1</td>
+<td>6</td>
+<td><strong>7</strong></td>
+</tr>
+<tr>
+<td>G（直接从 S）</td>
+<td>5</td>
+<td>0</td>
+<td><strong>5</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>展开 S 后，frontier 里 G 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mn>5</mn><mo>&lt;</mo><mn>7</mn></mrow></math>，先取出 G → 返回 S → G。</li>
+<li><strong>Do we find a solution path?</strong> Yes, S → G.</li>
+<li><strong>Is it optimal?</strong> <strong>No!</strong> S → A → G 的总 cost 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mn>3</mn><mo>=</mo><mn>4</mn><mo>&lt;</mo><mn>5</mn></mrow></math>。</li>
+</ul>
+<p><strong>What went wrong?</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn></mrow></math>，但 A 到 G 实际只要 3——heuristic <strong>高估</strong>了。</li>
+<li>于是「<strong>实际很差的 goal 的 cost</strong>（5）&lt; <strong>好路线的估计 cost</strong>（7）」，好路线被压在后面。</li>
+<li>→ 需要 heuristic <strong>不能高估</strong>真实 cost。</li>
+</ul>
+<p><strong>补充验证</strong>：若把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math> 改成不高估的值，例如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn></mrow></math>，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn><mo>&lt;</mo><mn>5</mn></mrow></math>，先展开 A，生成 G（经 A）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mn>4</mn><mo>&lt;</mo><mn>5</mn></mrow></math>，取出的就是 cost 4 的最优路。</p>
+<h3>3.3 Admissible heuristics</h3>
+<blockquote>
+<p><strong>Definition</strong>：A heuristic <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> is <strong>admissible（optimistic）</strong> if for any node <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>:
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mn>0</mn><mo>≤</mo><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≤</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></div>
+where <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> is the true cost from node <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> to the goal.</p>
+</blockquote>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≤</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>：<strong>never overestimate</strong> the actual cost from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> to the goal</li>
+<li>例子：
+<ul>
+<li><strong>Route finding</strong>：直线距离永远 ≤ 实际公路距离（两点之间直线最短）</li>
+<li><strong>Food finding（迷宫吃豆）</strong>：Manhattan distance 永远 ≤ 迷宫里的实际距离（墙只会让路变长）</li>
+</ul>
+</li>
+<li><strong>Remember</strong>：A* 用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi>g</mi><mo>+</mo><mi>h</mi></mrow></math>；<strong>If <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> is admissible, A* search is optimal.</strong></li>
+</ul>
+<h3>3.4 Optimality of A* Tree Search（证明，考试可能要写）</h3>
+<p><strong>Assume</strong>：A 是 optimal goal node，B 是 suboptimal goal node，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> admissible。
+<strong>Claim</strong>：A 会在 B 之前被展开（所以 A* 返回的是 A）。</p>
+<p><strong>Proof</strong>：设 B 在 frontier 上。A 的某个祖先 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 也在 frontier 上（可能就是 A 自己）。证明 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 在 B 之前展开：</p>
+<p><strong>1. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≤</mo><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math></strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left" columnspacing="0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>+</mo><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>definition of </mtext><mi>f</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>≤</mo><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>+</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>admissibility of </mtext><mi>h</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>g</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>n</mi><mtext> 在 A 的最优路径上</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>h</mi><mo>=</mo><mn>0</mn><mtext> at a goal</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>+</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> 就是「从根经 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 到 A 的真实 cost」，即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math>。）</p>
+<p><strong>2. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mi>f</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math></strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mi>g</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math>：B 是 suboptimal</li>
+<li>在 goal 处 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow></math>，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mi>g</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mi>g</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<p><strong>3. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> is expanded before B</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≤</mo><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mi>f</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math>，A* 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math> 从小到大取，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 先于 B</li>
+<li>对 A 的<strong>每个</strong>祖先都成立 → <strong>all ancestors of A are expanded before B</strong></li>
+<li>→ A is expanded before B → <strong>A* tree search is optimal</strong> ∎</li>
+</ul>
+<h3>3.5 UCS vs A*</h3>
+<p>课件两张搜索树的图：</p>
+<ul>
+<li><strong>UCS</strong>：以起点为中心、<strong>向所有方向</strong>均匀扩张（cost 等高线是圆）</li>
+<li><strong>A*</strong>：扩张区域<strong>朝 goal 方向拉长</strong>，展开的节点少得多</li>
+</ul>
+<h3>3.6 Properties of A*</h3>
+<table>
+<thead>
+<tr>
+<th>性质</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Optimal?</td>
+<td><strong>Yes, if the heuristic is admissible</strong></td>
+</tr>
+<tr>
+<td>Complete?</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Time</td>
+<td><strong>Exponential</strong> in the length of the solution</td>
+</tr>
+<tr>
+<td>Space</td>
+<td><strong>Exponential</strong> in the length of the solution</td>
+</tr>
+</tbody>
+</table>
+<p>With a good heuristic, significant savings are possible compared to uninformed search.</p>
+<h2>4 · Inventing Heuristics</h2>
+<h3>4.1 Relaxed problems</h3>
+<ul>
+<li>Admissible heuristics 常常是 <strong>relaxed problem</strong>（放宽限制、允许新 action 的问题）的<strong>精确解</strong>的 cost。</li>
+<li><strong>The cost of an exact solution to a relaxed problem is a good heuristic for the original problem.</strong></li>
+</ul>
+<p><strong>为什么 relaxed problem 的解一定 admissible？</strong> 放宽限制只会让可选的路变多；原问题的任何解在 relaxed problem 里也是解，所以 relaxed 的最优 cost ≤ 原问题的最优 cost，即不会高估。</p>
+<h3>4.2 8 Puzzle：两个 heuristic</h3>
+<p>Start 和 Goal（空格记作 ␣）：</p>
+<table>
+<thead>
+<tr>
+<th>Start</th>
+<th></th>
+<th></th>
+<th>Goal</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td>2</td>
+<td>4</td>
+<td>␣</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>␣</td>
+<td>6</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>1</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Heuristic 1：Number of tiles misplaced</strong></p>
+<ul>
+<li>数一数有多少块<strong>不在目标位置</strong>（空格不算）：8 块全错 → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mtext>start</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>8</mn></mrow></math></strong></li>
+<li><strong>为什么 admissible？</strong> 每块错位的 tile 至少要移动一次，一次只能移动一块 → 至少 8 步。</li>
+<li>对应的 relaxed problem：tile 可以<strong>直接瞬移</strong>到任何位置。</li>
+</ul>
+<p><strong>Heuristic 2：Total Manhattan distance</strong></p>
+<ul>
+<li>每块 tile 当前位置到目标位置的「横向 + 纵向」格数之和：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>tile</th>
+<th>7</th>
+<th>2</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>8</th>
+<th>3</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>距离</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mtext>start</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>3</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>3</mn><mo>=</mo><mn>18</mn></mrow></math></p>
+<ul>
+<li><strong>为什么 admissible？</strong> 每次移动只让一块 tile 走一格，每块至少要走它的 Manhattan 距离那么多步。</li>
+<li>对应的 relaxed problem：tile 可以<strong>移到相邻格，不管那里有没有别的 tile</strong>。</li>
+</ul>
+<p><strong>Statistics（Andrew Moore）</strong>：最优路径分别为 4、8、12 步时，平均展开的节点数：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>4 steps</th>
+<th>8 steps</th>
+<th>12 steps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UCS</td>
+<td>112</td>
+<td>6,300</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>A* TILES</td>
+<td>13</td>
+<td>39</td>
+<td>227</td>
+</tr>
+<tr>
+<td>A* MANHATTAN</td>
+<td>12</td>
+<td>25</td>
+<td>73</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>A better approximation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> of the actual cost <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> results in a faster search.</strong></p>
+<h3>4.3 Heuristic Dominance</h3>
+<blockquote>
+<p><strong>Dominance</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>1</mn></msub><mo>≥</mo><msub><mi>h</mi><mn>2</mn></msub></mrow></math> if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>n</mi><mo>:</mo><mtext>  </mtext><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≥</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></p>
+</blockquote>
+<ul>
+<li><strong>Roughly speaking, larger is better as long as both are admissible.</strong>（越接近 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo>∗</mo></msup></mrow></math> 越好，但不能超过）</li>
+<li><strong>The zero heuristic is pretty bad</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow></math> 时 A* 就是 UCS。</li>
+<li><strong>The exact heuristic（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><msup><mi>h</mi><mo>∗</mo></msup></mrow></math>）is pretty good, but usually too expensive</strong> to compute。</li>
+<li>8 puzzle：Manhattan ≥ misplaced tiles（每块错位的 tile Manhattan 距离至少为 1），所以 Manhattan dominates。</li>
+</ul>
+<p><strong>为什么大的好？</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 越接近真实 cost，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math> 就越准，A* 越不会去展开那些实际上不在最优路上的节点。</p>
+<h3>4.4 Combining multiple heuristics</h3>
+<p><strong>Question</strong>：有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>h</mi><mi>m</mi></msub></mrow></math>，谁也不 dominate 谁，怎么办？</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><mi>max</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>h</mi><mi>m</mi></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p><strong>Max of admissible heuristics is admissible and dominates all the individual heuristics!</strong></p>
+<ul>
+<li>admissible：每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≤</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>，最大的那个也 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>dominates：max 在每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 上都 ≥ 每一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<p>（注意是 <strong>max</strong>，不是 sum——加起来可能高估。）</p>
+<h2>5 · Summary</h2>
+<ul>
+<li>Heuristic functions 估计节点到 goal 的 cost（<strong>forward cost</strong>）</li>
+<li>Good heuristics can dramatically reduce search</li>
+<li><strong>Greedy search</strong> 展开 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 最小的节点——<strong>neither complete nor optimal</strong></li>
+<li><strong>A* search</strong> 展开 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi>g</mi><mo>+</mo><mi>h</mi></mrow></math> 最小的节点（backward + forward cost）</li>
+<li>Admissible heuristics can be derived from exact solution of <strong>relaxed problems</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>优先级</th>
+<th>Complete</th>
+<th>Optimal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UCS</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Greedy</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>A*</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>+</mo><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>✓</td>
+<td>✓（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> admissible 时）</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Informed vs uninformed</td>
+<td>是否用 heuristic / problem-specific knowledge</td>
+</tr>
+<tr>
+<td>Greedy</td>
+<td>按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 选；Romania 手推；Lasi 环 → 不 complete；不 optimal</td>
+</tr>
+<tr>
+<td>A*</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi>g</mi><mo>+</mo><mi>h</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math> = backward、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> = forward；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>→</mo><mn>0</mn></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>→</mo><mn>0</mn></mrow></math> 退化</td>
+</tr>
+<tr>
+<td>A* 反例</td>
+<td>S-A-G 图：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>7</mn><mo>&gt;</mo><mi>f</mi><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo><mo>=</mo><mn>5</mn></mrow></math>，返回 cost 5 而非 4；原因是高估</td>
+</tr>
+<tr>
+<td>Admissible</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>h</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≤</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>；直线距离、Manhattan 的例子</td>
+</tr>
+<tr>
+<td>最优性证明</td>
+<td>三步：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>≤</mo><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mi>f</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math>、所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 先于 B</td>
+</tr>
+<tr>
+<td>A* 性质</td>
+<td>optimal（admissible）、complete、time / space 指数</td>
+</tr>
+<tr>
+<td>Relaxed problem</td>
+<td>为什么得到 admissible heuristic</td>
+</tr>
+<tr>
+<td>8 puzzle</td>
+<td>misplaced = 8，Manhattan = 18；各自为什么 admissible</td>
+</tr>
+<tr>
+<td>Dominance</td>
+<td>定义；admissible 前提下越大越好；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow></math> 即 UCS</td>
+</tr>
+<tr>
+<td>Max of heuristics</td>
+<td>仍 admissible，且 dominate 每一个</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>Greedy 用的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math>，A* 用的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>+</mo><mi>h</mi></mrow></math>，UCS 用的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math>——三者别混。</li>
+<li>Admissible 是「<strong>不高估</strong>」：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>≤</mo><msup><mi>h</mi><mo>∗</mo></msup></mrow></math>。高估才会破坏最优性；低估只会让搜索变慢。</li>
+<li>课件反例里出错的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn><mo>&gt;</mo><msup><mi>h</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math>。</li>
+<li>A* 也要等 goal 被<strong>取出</strong>时才停，生成时不能停（否则证明不成立）。</li>
+<li>Manhattan distance 是对<strong>每块 tile</strong>分别算再求和，<strong>空格不算</strong>。</li>
+<li>组合 heuristics 用 <strong>max</strong>，不要用 sum 或 average。</li>
+<li>Dominance 是对<strong>所有</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 成立的不等式，只在 start 处大不够。</li>
+</ul>

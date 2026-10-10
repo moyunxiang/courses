@@ -1,0 +1,623 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p><strong>不知道 MDP 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math></strong>，怎样评估一个 policy（估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>）？答案是<strong>采样</strong>：用采样到的 return 的平均来代替期望。</p>
+<ol>
+<li><strong>Introduction</strong>：从 DP 到 model-free</li>
+<li><strong>Monte-Carlo learning</strong>：first-visit / every-visit、incremental 更新、Blackjack</li>
+<li><strong>Temporal-Difference learning</strong>：bootstrapping、TD(0)、TD target / TD error、Driving Home、<strong>bias / variance</strong>、batch MC vs TD（AB 例子）、DP / MC / TD 的统一视角</li>
+<li><strong>TD(λ)</strong>：n-step return、λ-return</li>
+</ol>
+<blockquote>
+<p>必考：MC 与 TD(0) 的更新式；<strong>TD target、TD error</strong>；MC vs TD 的优缺点（bias / variance、online、incomplete episode、Markov 性）；<strong>Driving Home 两种方法各自的更新量</strong>；<strong>AB 例子 MC 给 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>、TD 给 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.75</mn></mrow></math></strong> 及原因；bootstrapping / sampling 表；n-step return 和 λ-return 的公式与权重。</p>
+</blockquote>
+<h2>1 · Introduction</h2>
+<p>到目前为止，估计 value function 用的是 <strong>DP</strong>，需要已知 reward 和 dynamics：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>V</mi><mrow><mi>π</mi><mo separator="true">,</mo><mo stretchy="false">[</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>a</mi></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><msub><mi>V</mi><mrow><mi>π</mi><mo separator="true">,</mo><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo></mrow></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo separator="true">,</mo><mspace width="1em"/><mi mathvariant="normal">∀</mi><mi>s</mi></mrow></math></div><p><strong>接下来</strong>：直接从<strong>交互经验</strong>中估计 value function 和 policy，<strong>不需要已知 dynamics</strong>。<strong>怎么做？——Sampling!</strong> 不用概率分布算期望，而是<strong>对采样到的 return 取平均</strong>来估计期望。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>问题</th>
+<th>方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上一讲</td>
+<td>Planning：解一个<strong>已知</strong>的 MDP</td>
+<td>DP</td>
+</tr>
+<tr>
+<td><strong>这一讲</strong></td>
+<td><strong>Model-free prediction</strong>：估计<strong>未知</strong> MDP 的 value function</td>
+<td>MC、TD</td>
+</tr>
+<tr>
+<td>下一讲</td>
+<td>Model-free control：优化未知 MDP 的 value function</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>2 · Monte-Carlo Learning</h2>
+<h3>2.1 MC policy evaluation</h3>
+<ul>
+<li><strong>Goal</strong>：从 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 下的 episodes 学 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>⋯</mo><mo>∼</mo><mi>π</mi></mrow></math></li>
+<li>Return：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msup><mi>γ</mi><mrow><mi>T</mi><mo>−</mo><mi>t</mi></mrow></msup><msub><mi>r</mi><mi>T</mi></msub></mrow></math></li>
+<li>Value：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>MC 用 empirical mean return 代替 expected return</strong></li>
+</ul>
+<p><strong>MC 的特点</strong>：</p>
+<ul>
+<li>直接从 episodes 学（experience → values、policy）</li>
+<li>最简单的想法：<strong>value = mean return</strong></li>
+<li><strong>Model-free</strong>：不需要 MDP 转移 / reward 的知识</li>
+<li>从<strong>完整的</strong> episode 学：<strong>no bootstrapping</strong></li>
+<li><strong>Caveat</strong>：只能用在 <strong>episodic</strong> MDP（所有 episode 都必须终止）——不终止就没有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math></li>
+</ul>
+<h3>2.2 First-visit vs Every-visit</h3>
+<p><strong>Idea</strong>：对访问 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 之后观察到的 return 取平均。</p>
+<table>
+<thead>
+<tr>
+<th>First-Visit MC</th>
+<th>Every-Visit MC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一个 episode 中<strong>第一次</strong>访问 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 的时刻 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></td>
+<td>一个 episode 中<strong>每次</strong>访问 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 的时刻 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mi>S</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>G</mi><mi>t</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mi>S</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>G</mi><mi>t</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>S</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>S</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>两者都收敛</strong>：由大数定律，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>→</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+<p><strong>算法框</strong>（课件 Q：这是 first-visit 还是 every-visit？）：</p>
+<blockquote>
+<p>Input <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>；初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 任意，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo></mrow></math> 空列表</p>
+<p>Loop forever（for each episode）：</p>
+<ul>
+<li>按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 生成 episode：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>R</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>S</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>R</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>S</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>A</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>R</mi><mi>T</mi></msub></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>←</mo><mn>0</mn></mrow></math></li>
+<li>Loop for each step，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>T</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>T</mi><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn></mrow></math>：
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>←</mo><mi>γ</mi><mi>G</mi><mo>+</mo><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math></li>
+<li><strong>Unless <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mi>t</mi></msub></mrow></math> appears in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>S</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>S</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></math></strong>：Append <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi></mrow></math> to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mtext>average</mtext><mo stretchy="false">(</mo><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p><strong>A：First-visit MC</strong>——因为有「Unless <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mi>t</mi></msub></mrow></math> appears in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>0</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>S</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></math>」：前面出现过就跳过，只记第一次。</p>
+<p><strong>注意算法从后往前算</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>←</mo><mi>γ</mi><mi>G</mi><mo>+</mo><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math> 一次就能递推出每个时刻的 return。</p>
+<h3>2.3 Incremental MC</h3>
+<p>均值可以增量计算（1.2 讲过）。每个 episode 结束后，对每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow></math> 及其 return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>N</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>N</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>1</mn><mrow><mi>N</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Non-stationary</strong> 问题中常用 <strong>running mean</strong>（忘掉旧的 episode），用固定 step size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p>（固定 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 时，越旧的样本权重按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><msup><mo stretchy="false">)</mo><mi>k</mi></msup></mrow></math> 指数衰减。）</p>
+<h3>2.4 例：Blackjack（S&amp;B Ch5 p.93）</h3>
+<ul>
+<li><strong>Goal</strong>：手牌点数之和尽量大但<strong>不超过 21</strong>；人头牌算 10，ace 可算 1 或 11</li>
+<li><strong>stick</strong>：停止要牌（结束）；<strong>draw</strong>：再要一张牌</li>
+<li><strong>Reward</strong>：stick 时，比庄家大 / 相等 / 小 → +1 / 0 / −1；draw 时爆牌（&gt;21）→ −1 并结束，否则 0</li>
+<li><strong>Transitions</strong>：点数 &lt; 12 时自动要牌</li>
+<li><strong>Q：多少个 state？200 个</strong>：
+<ul>
+<li>当前点数（12–21）：10 种</li>
+<li>庄家明牌（ace–10）：10 种</li>
+<li>有没有「<strong>usable ace</strong>」（能算 11 而不爆）：2 种</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>×</mo><mn>10</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>200</mn></mrow></math></li>
+</ul>
+</li>
+</ul>
+<p><strong>Policy</strong>：点数 ≥ 20 就 stick，否则 draw。MC 学到的 value function 图（10,000 / 500,000 个 episode）：</p>
+<ul>
+<li><strong>Observation</strong>：上面一行（有 usable ace）比较「少见」，所以曲面更<strong>颠簸</strong>（样本少，估计方差大）</li>
+<li>点数 20、21 时 value 高（policy 在这里 stick）</li>
+</ul>
+<h3>2.5 MC 相对 DP 的优势</h3>
+<ul>
+<li><strong>环境未知时也能用</strong></li>
+<li>即使完全知道 dynamics，用采样的 episode 也有很大优势——例如转移概率很难算的时候（Blackjack 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 很难写出来，但模拟一局很容易）</li>
+<li><strong>估计单个 state 的 value 的成本与 state 总数无关</strong>：从感兴趣的 state 出发采样 episode，平均 return 即可</li>
+</ul>
+<h3>2.6 MC 估计 action values</h3>
+<ul>
+<li>没有 model 时，**估计 action values（state-action 对的 value）**特别有用（因为 1.3 讲过：只有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 时选 action 需要 model，有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 就不需要）</li>
+<li><strong>问题</strong>：很多 state-action 对可能<strong>从来没被访问</strong>（deterministic policy 在每个 state 只选一个 action）</li>
+<li><strong>Exploring starts</strong>：指定 episode 从某个 state-action 对开始，并且<strong>每个对都有非零概率</strong>被选为起点</li>
+</ul>
+<h2>3 · Temporal-Difference Learning</h2>
+<h3>3.1 Bootstrapping</h3>
+<ul>
+<li>字面：「拉着自己的鞋带把自己提起来」</li>
+<li>在 RL 里：<strong>在更新某个估计值时，用到了同类的估计值</strong></li>
+</ul>
+<h3>3.2 从 MC 到 TD(0)</h3>
+<p><strong>Every-visit MC</strong>：把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 往<strong>实际 return</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math> 更新：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><munder><munder><msub><mi>G</mi><mi>t</mi></msub><mo stretchy="true">⏟</mo></munder><mrow><mtext>target：时刻 </mtext><mi>t</mi><mtext> 之后的实际 return</mtext></mrow></munder><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>TD(0)</strong>：把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 往<strong>估计的 return</strong> 更新：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li><strong>TD target</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math>（对 return 的<strong>估计</strong>）</li>
+<li><strong>TD error</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<p><strong>TD 的特点</strong>：</p>
+<ul>
+<li>直接从 episodes 学；<strong>model-free</strong></li>
+<li>从<strong>不完整</strong>的 episode 学，靠 <strong>bootstrapping</strong>：<strong>TD updates a guess towards a guess</strong></li>
+</ul>
+<p><strong>为什么 TD target 合理？</strong> Bellman expectation equation 说 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math>。TD 用一个采样的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math> 代替期望，用当前估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 代替 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>。</p>
+<h3>3.3 例：Driving Home（S&amp;B Ch6 p.122）</h3>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Elapsed Time（分钟）</th>
+<th>Predicted Time to Go</th>
+<th>Predicted Total Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>leave office</td>
+<td>0</td>
+<td>30</td>
+<td>30</td>
+</tr>
+<tr>
+<td>reach car, raining</td>
+<td>5</td>
+<td>35</td>
+<td>40</td>
+</tr>
+<tr>
+<td>exit highway</td>
+<td>20</td>
+<td>15</td>
+<td>35</td>
+</tr>
+<tr>
+<td>2ndary road, behind truck</td>
+<td>30</td>
+<td>10</td>
+<td>40</td>
+</tr>
+<tr>
+<td>entering home street</td>
+<td>40</td>
+<td>3</td>
+<td>43</td>
+</tr>
+<tr>
+<td>arrive home</td>
+<td>43</td>
+<td>0</td>
+<td>43</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两种方法建议的修改</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>1</mn></mrow></math>，修改的是 predicted total time）：</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>原预测</th>
+<th><strong>MC</strong>：改成<strong>最终实际结果</strong> 43</th>
+<th><strong>TD</strong>：改成<strong>下一个 state 的预测</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>leave office</td>
+<td>30</td>
+<td>+13 → 43</td>
+<td>+10 → 40</td>
+</tr>
+<tr>
+<td>reach car</td>
+<td>40</td>
+<td>+3 → 43</td>
+<td>−5 → 35</td>
+</tr>
+<tr>
+<td>exit highway</td>
+<td>35</td>
+<td>+8 → 43</td>
+<td>+5 → 40</td>
+</tr>
+<tr>
+<td>behind truck</td>
+<td>40</td>
+<td>+3 → 43</td>
+<td>+3 → 43</td>
+</tr>
+<tr>
+<td>home street</td>
+<td>43</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>MC</strong>：要等到家（episode 结束）才知道 43，才能更新</li>
+<li><strong>TD</strong>：每走一步就能更新（例如刚到车边发现下雨，立刻把出发时的预测 30 往 40 调）</li>
+</ul>
+<h3>3.4 MC vs TD：何时能学</h3>
+<table>
+<thead>
+<tr>
+<th>TD</th>
+<th>MC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>在知道最终结果之前</strong>就能学</td>
+<td>要等 episode 结束、return 已知</td>
+</tr>
+<tr>
+<td>每一步之后<strong>在线</strong>学</td>
+<td></td>
+</tr>
+<tr>
+<td>能从<strong>不完整</strong>序列学</td>
+<td>只能从<strong>完整</strong>序列学</td>
+</tr>
+<tr>
+<td>能用于<strong>continuing</strong>（不终止）环境</td>
+<td>只能用于 <strong>episodic</strong>（终止）环境</td>
+</tr>
+</tbody>
+</table>
+<h3>3.5 Bias / Variance trade-off（重点）</h3>
+<ul>
+<li>Return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msup><mi>γ</mi><mrow><mi>T</mi><mo>−</mo><mi>t</mi></mrow></msup><msub><mi>r</mi><mi>T</mi></msub></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 的<strong>无偏</strong>估计</li>
+<li><strong>真正的</strong> TD target <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math> 也是<strong>无偏</strong>估计</li>
+<li><strong>实际用的</strong> TD target <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math> 是<strong>有偏</strong>估计（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 只是当前估计，不等于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>）</li>
+<li>TD target 的<strong>方差比 return 小得多</strong>：
+<ul>
+<li>return 依赖<strong>很多</strong>随机的 action、transition、reward</li>
+<li>TD target 只依赖<strong>一个</strong>随机的 action、transition、reward</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>MC</th>
+<th>TD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Variance</td>
+<td><strong>high</strong></td>
+<td><strong>low</strong></td>
+</tr>
+<tr>
+<td>Bias</td>
+<td><strong>zero</strong></td>
+<td><strong>some</strong></td>
+</tr>
+<tr>
+<td>收敛性</td>
+<td>好（<strong>即使用 function approximation</strong>）</td>
+<td>TD(0) 收敛到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>（但用 function approximation <strong>不一定</strong>）</td>
+</tr>
+<tr>
+<td>对初值</td>
+<td><strong>不敏感</strong></td>
+<td><strong>更敏感</strong>（因为 bootstrap 用到初值）</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>非常简单易用</td>
+<td>通常比 MC <strong>更高效</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>3.6 例：Random Walk（S&amp;B Ch6 p.125）</h3>
+<ul>
+<li>MRP：A B C D E 五个 state，从 C 出发，等概率左右走；左端终止 reward 0，<strong>右端终止 reward 1</strong>，其他 0</li>
+<li><strong>真实 value</strong>：A 到 E 依次为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>6</mn></mfrac><mo separator="true">,</mo><mfrac><mn>2</mn><mn>6</mn></mfrac><mo separator="true">,</mo><mfrac><mn>3</mn><mn>6</mn></mfrac><mo separator="true">,</mo><mfrac><mn>4</mn><mn>6</mn></mfrac><mo separator="true">,</mo><mfrac><mn>5</mn><mn>6</mn></mfrac></mrow></math>（= 从该处最终走到右端的概率）</li>
+<li>图：TD 估计随 episode 数逐渐接近真值；<strong>empirical RMS error：TD 比 MC 下降得更快</strong>（各种 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 下 TD 曲线都在 MC 下方）</li>
+</ul>
+<h3>3.7 Batch MC 与 TD</h3>
+<ul>
+<li>MC 和 TD 都收敛：experience → ∞ 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>→</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>但有限经验下的 batch 解呢？</strong> 有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 个 episode，反复从中采样 episode <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>K</mi><mo stretchy="false">]</mo></mrow></math> 训练，直到收敛</li>
+</ul>
+<h3>3.8 例：AB（S&amp;B Ch6 p.127，考试常考）</h3>
+<p>两个 state A、B；无 discount；8 个 episode：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>A</mi><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mi>B</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math>（从 A 出发，reward 0 到 B，再 reward 0 结束）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>B</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math> × 6</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>B</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> × 1</li>
+</ul>
+<p><strong>Q：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math> 是多少？</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math>：B 出现 8 次，return 为 1 的有 6 次 ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn><mi mathvariant="normal">/</mi><mn>8</mn><mo>=</mo><mn>0.75</mn></mrow></math></strong>（两种方法一致）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math>：两种方法<strong>不同</strong></li>
+</ul>
+<p><strong>MC：minimize mean-squared error</strong></p>
+<ul>
+<li>MC 收敛到对观察到的 return <strong>最小均方误差</strong>的解（best fit to the observed returns）：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>T</mi><mi>k</mi></msub></munderover><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msubsup><mi>G</mi><mi>t</mi><mi>k</mi></msubsup><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msubsup><mi>s</mi><mi>t</mi><mi>k</mi></msubsup><mo stretchy="false">)</mo><msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mn>2</mn></msup></mrow></math></div><ul>
+<li>A 只出现一次，那次 return 是 0 ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></strong></li>
+</ul>
+<p><strong>TD：certainty equivalence</strong></p>
+<ul>
+<li>TD(0) 收敛到<strong>最大似然 Markov 模型</strong>的解——即最能拟合数据的 MDP <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒜</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>ℛ</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow></math>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>p</mi><mo>^</mo></mover><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>T</mi><mi>k</mi></msub></munderover><mn>𝟙</mn><mo stretchy="false">(</mo><msubsup><mi>s</mi><mi>t</mi><mi>k</mi></msubsup><mo separator="true">,</mo><msubsup><mi>a</mi><mi>t</mi><mi>k</mi></msubsup><mo separator="true">,</mo><msubsup><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>k</mi></msubsup><mo>=</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>r</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>T</mi><mi>k</mi></msub></munderover><mn>𝟙</mn><mo stretchy="false">(</mo><msubsup><mi>s</mi><mi>t</mi><mi>k</mi></msubsup><mo separator="true">,</mo><msubsup><mi>a</mi><mi>t</mi><mi>k</mi></msubsup><mo>=</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mtext> </mtext><msubsup><mi>r</mi><mi>t</mi><mi>k</mi></msubsup></mrow></math></div><p>（课件的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>r</mi><mo>^</mo></mover></mrow></math> 式子漏了因子 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>r</mi><mi>t</mi><mi>k</mi></msubsup></mrow></math>，没有它求出来的是频率而不是平均 reward。）</p>
+<ul>
+<li>数据中 A <strong>100%</strong> 以 reward 0 转到 B ⇒ $V(A) = 0 + V(B) = $ <strong>0.75</strong></li>
+</ul>
+<p><strong>谁对？</strong> 如果过程真的是 Markov 的，TD 的答案（0.75）更合理：A 之后的一切都由 B 决定，而 B 的 value 是用 8 个样本估计的；MC 只用了 A 自己那 1 个样本。</p>
+<blockquote>
+<p><strong>Certainty-equivalence estimate</strong>：先拟合一个最佳的 Markov 模型，<strong>假设它完全正确</strong>，然后算它预测的 value。这正是 TD(0) 的 batch 解。</p>
+</blockquote>
+<h3>3.9 Markov 性</h3>
+<table>
+<thead>
+<tr>
+<th>TD</th>
+<th>MC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>利用</strong> Markov property</td>
+<td><strong>不利用</strong> Markov property</td>
+</tr>
+<tr>
+<td>在 Markov 环境中通常<strong>更高效</strong></td>
+<td>在 <strong>non-Markov</strong> 环境中通常更有效</td>
+</tr>
+</tbody>
+</table>
+<h3>3.10 MC vs TD 的路径直觉（课件网格图）</h3>
+<ul>
+<li><strong>MC</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><msubsup><mi>r</mi><mi>t</mi><mi>i</mi></msubsup><mo>+</mo><mi>γ</mi><msubsup><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>i</mi></msubsup><mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><msubsup><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow><mi>i</mi></msubsup><mo>+</mo><mo>⋯</mo></mrow></math>——每一项都是<strong>本条路径</strong>上的 reward</li>
+<li><strong>TD</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>𝔼</mi><mo stretchy="false">[</mo><msubsup><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo stretchy="false">]</mo><mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><mi>𝔼</mi><mo stretchy="false">[</mo><msubsup><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msubsup><mo stretchy="false">]</mo><mo>+</mo><mo>⋯</mo></mrow></math>——第一项来自本条路径，之后的是<strong>所有与本路径相交的路径</strong>的期望（通过 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math> 间接用到别的 episode 的经验）</li>
+</ul>
+<p>即 TD 能把<strong>不同 episode 的经验在共同经过的 state 处「拼接」起来</strong>，MC 不能。</p>
+<h3>3.11 DP vs MC vs TD</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msup><mi>γ</mi><mi>k</mi></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>k</mi></mrow></msub><mtext> </mtext><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">∣</mo><mtext> </mtext><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msup><mi>γ</mi><mi>k</mi></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mtext> </mtext><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">∣</mo><mtext> </mtext><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>MC</strong>：用 sample average return 近似<strong>第一行</strong>的期望</li>
+<li><strong>TD</strong>：两者结合——<strong>采样</strong>第三行的期望，并用当前估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math> 代替真的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>DP</strong>：期望由 <strong>model 提供</strong>（不采样），但同样用当前估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>更新</th>
+<th>backup 图</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MC</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></td>
+<td>一条路径<strong>走到底</strong>（到 terminal）</td>
+</tr>
+<tr>
+<td><strong>TD</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></td>
+<td>一条路径<strong>只走一步</strong></td>
+</tr>
+<tr>
+<td><strong>DP</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math></td>
+<td><strong>所有</strong>分支，只走一步</td>
+</tr>
+</tbody>
+</table>
+<h3>3.12 Bootstrapping 与 Sampling（必背）</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Bootstrapping（更新用到估计值）</th>
+<th>Sampling（用样本代替期望）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MC</strong></td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr>
+<td><strong>DP</strong></td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td><strong>TD</strong></td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Unified view</strong>（二维图）：横轴 = <strong>width of update</strong>（只用一个样本 → 考虑所有分支），纵轴 = <strong>depth / height of update</strong>（只看一步 → 走到底）</p>
+<ul>
+<li>左上：<strong>TD</strong>（窄、浅）</li>
+<li>右上：<strong>DP</strong>（宽、浅）</li>
+<li>左下：<strong>MC</strong>（窄、深）</li>
+<li>右下：<strong>Exhaustive search</strong>（宽、深）</li>
+</ul>
+<h2>4 · TD(λ)</h2>
+<h3>4.1 n-step prediction</h3>
+<p>让 TD target <strong>往后看 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 步</strong>：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></th>
+<th></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>（TD）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>⋮</td>
+<td></td>
+<td>⋮</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∞</mi></mrow></math></td>
+<td>（MC）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">∞</mi><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msup><mi>γ</mi><mrow><mi>T</mi><mo>−</mo><mi>t</mi></mrow></msup><msub><mi>r</mi><mi>T</mi></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>定义 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step return</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></msubsup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msup><mi>γ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><msup><mi>γ</mi><mi>n</mi></msup><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step TD learning</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></msubsup><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 越大，用的真实 reward 越多、bootstrap 越少：bias 小、variance 大。）</p>
+<p><strong>例：Large Random Walk</strong>（19 个 state，前 10 个 episode 的平均 RMS error 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 的曲线）：<strong>中间的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>（如 4、8）比 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow></math>（TD）和很大的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>（接近 MC）误差都小</strong>——推广到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step 可能比两个极端都好。</p>
+<h3>4.2 平均 n-step returns</h3>
+<ul>
+<li>可以对不同 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 的 return 取平均，例如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>G</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>G</mi><mrow><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></msup></mrow></math></li>
+<li>结合了两个不同时间步的信息</li>
+<li><strong>Q：能不能高效地结合所有时间步的信息？</strong></li>
+</ul>
+<h3>4.3 λ-return</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></msubsup></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>用权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> 组合<strong>所有</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step return</li>
+<li><strong>Forward-view TD(λ)</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p><strong>权重函数</strong>（课件图）：</p>
+<ul>
+<li>权重随 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> <strong>几何衰减</strong>；<strong>总面积 = 1</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><msub><mo>∑</mo><mrow><mi>n</mi><mo>≥</mo><mn>1</mn></mrow></msub><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mn>1</mn></mrow></math>）</li>
+<li>例如 3-step return 的权重是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><msup><mi>λ</mi><mn>2</mn></msup></mrow></math></li>
+<li>episode 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 结束时，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>≥</mo><mi>T</mi><mo>−</mo><mi>t</mi></mrow></math> 的所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step return 都等于实际 return，<strong>剩下的权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>λ</mi><mrow><mi>T</mi><mo>−</mo><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> 全给实际最终 return</strong></li>
+</ul>
+<p><strong>两个极端</strong>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup><mo>=</mo><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup></mrow></math>，就是 <strong>TD(0)</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow></math>：所有权重都到最终 return，就是 <strong>MC</strong></li>
+</ul>
+<p><strong>Extra reading</strong>：Sutton &amp; Barto Ch 5（MC）、Ch 6（TD）。</p>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model-free 动机</td>
+<td>用采样平均代替期望</td>
+</tr>
+<tr>
+<td>MC 特点</td>
+<td>model-free、完整 episode、no bootstrap、只能 episodic</td>
+</tr>
+<tr>
+<td>First / every visit</td>
+<td>区别；算法框中「Unless…」意味着 first-visit；都收敛（大数定律）</td>
+</tr>
+<tr>
+<td>Incremental MC</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac></mrow></math> 和常数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 两种</td>
+</tr>
+<tr>
+<td>Blackjack</td>
+<td>200 个 state 的来历；usable ace 一行更颠簸的原因</td>
+</tr>
+<tr>
+<td>MC vs DP</td>
+<td>三条优势</td>
+</tr>
+<tr>
+<td>MC 估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math></td>
+<td>为什么要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>；exploring starts</td>
+</tr>
+<tr>
+<td>Bootstrapping</td>
+<td>定义</td>
+</tr>
+<tr>
+<td>TD(0)</td>
+<td>更新式；TD target；TD error <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Driving Home</td>
+<td>MC 和 TD 的每行更新量</td>
+</tr>
+<tr>
+<td>MC vs TD</td>
+<td>online、incomplete、continuing</td>
+</tr>
+<tr>
+<td>Bias / variance</td>
+<td>哪个有偏、哪个方差大；为什么</td>
+</tr>
+<tr>
+<td>优缺点表</td>
+<td>收敛性、function approximation、对初值的敏感度、效率</td>
+</tr>
+<tr>
+<td>Random walk</td>
+<td>真值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mi mathvariant="normal">/</mi><mn>6</mn></mrow></math>；TD 误差下降更快</td>
+</tr>
+<tr>
+<td>AB 例子</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.75</mn></mrow></math>；MC <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>（MSE）；TD <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.75</mn></mrow></math>（certainty equivalence）</td>
+</tr>
+<tr>
+<td>Markov 性</td>
+<td>TD 利用，MC 不利用</td>
+</tr>
+<tr>
+<td>DP / MC / TD</td>
+<td>三种对期望式的近似；backup 图</td>
+</tr>
+<tr>
+<td>Bootstrap / sample 表</td>
+<td>2×3</td>
+</tr>
+<tr>
+<td>n-step</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>G</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></msubsup></mrow></math> 公式；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow></math> TD、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></math> MC</td>
+</tr>
+<tr>
+<td>λ-return</td>
+<td>公式；权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>、和为 1；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 易错点</h2>
+<ul>
+<li>MC 的 target 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math>（实际 return），TD(0) 的 target 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math>（估计）。</li>
+<li>TD error 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>。</li>
+<li><strong>MC 无偏、高方差；TD 有偏、低方差</strong>——别反过来。</li>
+<li>DP bootstrap 但<strong>不 sample</strong>；MC sample 但<strong>不 bootstrap</strong>；TD 两者都有。</li>
+<li>AB 例子里 MC 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math> 不是「错的」，它是对观察数据的 MSE 最优；TD 的 0.75 是假设 Markov 性下的最大似然解。</li>
+<li>λ-return 权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> 中是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></math> 次方；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow></math> 是 TD(0) 不是 MC。</li>
+<li>MC 只能用在 episodic 任务；TD 也能用在 continuing 任务。</li>
+</ul>

@@ -1,0 +1,142 @@
+<h2>0 · 这个 lab 在练什么</h2>
+<ol>
+<li><strong>采样与离散化</strong>：连续信号 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>s</mi></msub></mrow></math> 采样成序列；一个周期需要多少点</li>
+<li><strong>复指数信号的四种画法</strong>：幅度 / 相位 / 实部 / 虚部</li>
+<li><strong>音频文件</strong>：采样率、声道、点数、时长；<strong>降采样 = time compression</strong>（1.2 讲的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math>）</li>
+<li><strong>图像文件</strong>：像素数、位深；<strong>按行列切块</strong>；datatip；RGB 通道</li>
+</ol>
+<blockquote>
+<p>规则（Lab Instruction）：<strong>不能用 for / while / if-else</strong>；输出 inline；<strong>导出 PDF 交</strong>，只评 PDF；不收迟交。参数由学号第 5、6 位 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi></mrow></math> 决定。</p>
+</blockquote>
+<h2>1 · Part I：复指数信号的采样</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>A</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><mi>t</mi></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><mi>f</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>A</mi><mo stretchy="false">)</mo><mo>×</mo><mn>10</mn><mtext> Hz</mtext><mo separator="true">,</mo><mspace width="2em"/><msub><mi>f</mi><mi>s</mi></msub><mo>=</mo><mn>75600</mn><mtext> Hz</mtext></mrow></math></div><p><strong>一个周期的点数</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>T</mi><mn>0</mn></msub><mo>=</mo><mfrac><mn>1</mn><mi>f</mi></mfrac><mo separator="true">,</mo><mspace width="1em"/><msub><mi>T</mi><mi>s</mi></msub><mo>=</mo><mfrac><mn>1</mn><msub><mi>f</mi><mi>s</mi></msub></mfrac><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><msub><mi>N</mi><mn>0</mn></msub><mo>=</mo><mfrac><msub><mi>T</mi><mn>0</mn></msub><msub><mi>T</mi><mi>s</mi></msub></mfrac><mo>=</mo><mfrac><msub><mi>f</mi><mi>s</mi></msub><mi>f</mi></mfrac><mo>=</mo><mfrac><mn>7560</mn><mrow><mn>1</mn><mo>+</mo><mi>A</mi></mrow></mfrac></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7560</mn><mo>=</mo><msup><mn>2</mn><mn>3</mn></msup><mo>⋅</mo><msup><mn>3</mn><mn>3</mn></msup><mo>⋅</mo><mn>5</mn><mo>⋅</mo><mn>7</mn></mrow></math> 能被 1–10 整除，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mn>0</mn></msub></mrow></math> 一定是整数。）</p>
+<p><strong>时间轴</strong>：<code>t = 0 : Ts : (N0-1)*Ts</code>——<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mn>0</mn></msub></mrow></math> 个点</strong>，不含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><msub><mi>T</mi><mn>0</mn></msub></mrow></math>（含了就重复了下一周期的第一点）。</p>
+<p><strong>四张图应该长什么样</strong>（概念检查，对应 1.1 讲复指数信号）：</p>
+<table>
+<thead>
+<tr>
+<th>图</th>
+<th>MATLAB</th>
+<th>形状</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>幅度</td>
+<td><code>abs(x)</code></td>
+<td>水平线，高 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mi>A</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>θ</mi></mrow></msup><mo stretchy="false">∣</mo><mo>=</mo><mn>1</mn></mrow></math>）</td>
+</tr>
+<tr>
+<td>相位</td>
+<td><code>angle(x)</code></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>π</mi></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 的锯齿（<code>angle</code> 把相位折回 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mi>π</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">]</mo></mrow></math>）</td>
+</tr>
+<tr>
+<td>实部</td>
+<td><code>real(x)</code></td>
+<td>一个完整 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo></mrow></math> 周期，振幅 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mi>A</mi></mrow></math></td>
+</tr>
+<tr>
+<td>虚部</td>
+<td><code>imag(x)</code></td>
+<td>一个完整 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo></mrow></math> 周期，振幅 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mi>A</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>（Euler：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>A</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>ω</mi><mi>t</mi></mrow></msup><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>A</mi><mo stretchy="false">)</mo><mi>cos</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo>+</mo><mi>j</mi><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>A</mi><mo stretchy="false">)</mo><mi>sin</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi></mrow></math>。）</p>
+<p><strong>MATLAB 要点</strong>：四个独立 <code>figure</code>（<strong>不准 subplot</strong>）；<code>'g-'</code> 绿色实线；<code>xlabel</code> / <code>ylabel</code> 必须标；用 <code>1j</code> 而不是 <code>i</code>。</p>
+<h2>2 · Part II：音频</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>怎么得到</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>采样率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mrow><mi>s</mi><mn>2</mn></mrow></msub></mrow></math></td>
+<td><code>[y, fs2] = audioread(...)</code></td>
+</tr>
+<tr>
+<td>声道数、每声道点数</td>
+<td><code>[N, ch] = size(y)</code>（每列一个声道）</td>
+</tr>
+<tr>
+<td>时长</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>N</mi><msub><mi>f</mi><mrow><mi>s</mi><mn>2</mn></mrow></msub></mfrac></mrow></math> 秒，<code>%.4f</code></td>
+</tr>
+</tbody>
+</table>
+<h3>2.1 降采样 = 时间压缩</h3>
+<p><code>ynew = y(1:30:end, :)</code>——每 30 点取 1 点，点数变 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≈</mo><mfrac><mi>N</mi><mn>30</mn></mfrac></mrow></math>。</p>
+<p><strong>用同样的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mrow><mi>s</mi><mn>2</mn></mrow></msub></mrow></math> 播放</strong>：</p>
+<ul>
+<li>时长变成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>30</mn></mfrac></mrow></math></li>
+<li>等价于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>x</mi><mo stretchy="false">(</mo><mn>30</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math>——1.2 讲的 <strong>time compression</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mn>30</mn><mo>&gt;</mo><mn>1</mn></mrow></math>）</li>
+<li>由尺度性质（3.3 讲）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo stretchy="false">)</mo><mo>↔</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo></mrow></mfrac><mi>X</mi><mo stretchy="false">(</mo><mfrac><mi>ω</mi><mi>a</mi></mfrac><mo stretchy="false">)</mo></mrow></math>：<strong>所有频率放大 30 倍</strong> → 音调升高很多，听起来像一段很短的电子噪声</li>
+</ul>
+<p><strong>为什么还会失真</strong>：降采样后的等效采样率是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>f</mi><mrow><mi>s</mi><mn>2</mn></mrow></msub><mn>30</mn></mfrac></mrow></math>，原信号中高于新 Nyquist 频率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>f</mi><mrow><mi>s</mi><mn>2</mn></mrow></msub><mn>60</mn></mfrac></mrow></math> 的成分会<strong>混叠</strong>（aliasing，Ch5 / Lab4 的采样定理），因为没先做 anti-aliasing 低通滤波。</p>
+<p>（对照：如果用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>f</mi><mrow><mi>s</mi><mn>2</mn></mrow></msub><mn>30</mn></mfrac></mrow></math> 播放 <code>ynew</code>，时长和音调都还原，但高频丢失，声音发闷。）</p>
+<h2>3 · Part III：图像</h2>
+<h3>3.1 基本信息</h3>
+<ul>
+<li><code>imread</code> 读成 <code>H × W × 3</code> 的 <code>uint8</code> 数组；<code>imfinfo</code> 给 <code>Width</code>、<code>Height</code>、<code>BitDepth</code></li>
+<li>总像素 = <code>Width × Height</code>；彩色 JPEG 的 <code>BitDepth = 24</code>（RGB 各 8 bit，取值 0–255）</li>
+</ul>
+<h3>3.2 按区域切块</h3>
+<p>图被均分成 3 列 × 4 行共 12 块，每块编号 0–9（两块 don't care）。</p>
+<ul>
+<li>不准用 if-else ⇒ <strong>查表</strong>：<code>map(B+1, :)</code> 存每个编号对应的 (行, 列)</li>
+<li>区域 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>r</mi><mo separator="true">,</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math> 的像素范围：行 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>r</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi>h</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>r</mi><mi>h</mi></mrow></math>，列 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi>w</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>c</mi><mi>w</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mi>H</mi><mi mathvariant="normal">/</mi><mn>4</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>=</mo><mi>W</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow></math>）</li>
+</ul>
+<blockquote>
+<p>🔑 <strong>索引顺序</strong>：数组是 <code>img(row, col, channel)</code>——<strong>行在前</strong>；<code>datatip(h, x, y)</code> 是 <strong>x = 列在前</strong>。两者相反，最容易错。</p>
+</blockquote>
+<h3>3.3 像素与通道</h3>
+<ul>
+<li>某点 RGB：<code>squeeze(region(row, col, :))</code>——和 datatip 显示的必须一致（不一致就是行列反了）</li>
+<li><strong>只显示红色</strong>：把 G、B 两个通道置 0（<code>R(:,:,2) = 0; R(:,:,3) = 0</code>），仍是三通道彩色图；<strong>不是</strong> <code>imshow(region(:,:,1))</code>（那会显示成灰度图）</li>
+</ul>
+<h2>4 · 和课堂内容的联系</h2>
+<table>
+<thead>
+<tr>
+<th>Lab 操作</th>
+<th>对应课堂概念</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mn>0</mn></msub><mo>=</mo><msub><mi>f</mi><mi>s</mi></msub><mi mathvariant="normal">/</mi><mi>f</mi></mrow></math></td>
+<td>周期信号、离散化（1.1）</td>
+</tr>
+<tr>
+<td><code>abs / angle / real / imag</code></td>
+<td>复指数信号 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi>s</mi><mi>t</mi></mrow></msup></mrow></math>（1.1）</td>
+</tr>
+<tr>
+<td><code>y(1:30:end)</code> 原速播放</td>
+<td>尺度变换 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math>（1.2）；FT 尺度性质（3.3）</td>
+</tr>
+<tr>
+<td>失真</td>
+<td>混叠 / 采样定理（Ch5、Lab4）</td>
+</tr>
+<tr>
+<td>图像通道、切块</td>
+<td>二维离散信号的索引</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · 易错点</h2>
+<ul>
+<li>时间轴多取一点（写成 <code>0:Ts:T0</code>）→ 不是「一个周期」。</li>
+<li>用 <code>subplot</code>、忘标轴、颜色不是绿色实线——都扣分。</li>
+<li>时长要用 (a)(b) 的结果算（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mi mathvariant="normal">/</mi><msub><mi>f</mi><mrow><mi>s</mi><mn>2</mn></mrow></msub></mrow></math>），并保留 4 位小数。</li>
+<li>行列顺序：数组 (row, col)，datatip (x = col, y = row)。</li>
+<li>「只显示红色」是置零 G、B，不是取单通道。</li>
+<li>任何地方出现 for / while / if-else 都违规。</li>
+<li>交 PDF（Live Editor 导出），输出 inline，先从头跑一遍。</li>
+</ul>

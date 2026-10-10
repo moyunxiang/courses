@@ -1,0 +1,214 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>ML 的历史与应用</strong>：HAL 9000、Deep Blue（1997）、Watson（2011 Jeopardy!）、AlphaGo（2016）</li>
+<li><strong>什么是 ML</strong>：improving with experience（Simon 83 的定义）</li>
+<li><strong>一个分类系统的流程</strong>（fish sorting）：pre-processing → feature extraction → training（decision boundary）→ 分类新样本 → 评价（error rate、generalization）</li>
+<li><strong>三种学习范式</strong>：supervised / unsupervised / reinforcement</li>
+</ol>
+<blockquote>
+<p>必会：给一个场景<strong>判断属于哪种范式</strong>；supervised 里判断是 classification 还是 regression；说出 pipeline 每一步的作用；<strong>generalization</strong> 是核心问题。</p>
+</blockquote>
+<h2>1 · 什么是 Machine Learning</h2>
+<blockquote>
+<p><strong>Simon (1983)</strong>：Learning denotes changes in the system that are adaptive in the sense that they enable the system to do the same task or tasks drawn from the same population more effectively the next time.</p>
+</blockquote>
+<p>机器 / 人的学习 = <strong>随经验而改进</strong>。</p>
+<p><strong>里程碑</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>年份</th>
+<th>事件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1968</td>
+<td>电影 <em>2001</em> 中的 HAL 9000（下棋、对话、读唇……）</td>
+</tr>
+<tr>
+<td>1996 / 1997</td>
+<td>Kasparov vs IBM Deep Blue：1996 Kasparov 胜，1997 Deep Blue 胜</td>
+</tr>
+<tr>
+<td>2011</td>
+<td>IBM Watson 在 Jeopardy! 击败人类</td>
+</tr>
+<tr>
+<td>2016.3</td>
+<td>DeepMind AlphaGo 击败李世石（9 段）——第一个击败围棋世界冠军的程序</td>
+</tr>
+</tbody>
+</table>
+<p><strong>应用例子</strong>（raw data → class）：</p>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>raw data</th>
+<th>class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Character recognition</td>
+<td>图像</td>
+<td>数字、英文 / 中文字符</td>
+</tr>
+<tr>
+<td>Speech recognition</td>
+<td>语音信号</td>
+<td>词</td>
+</tr>
+<tr>
+<td>Face detection</td>
+<td>图像</td>
+<td>face / non-face</td>
+</tr>
+<tr>
+<td>Fingerprint identification</td>
+<td>指纹图像</td>
+<td>known / unknown person</td>
+</tr>
+<tr>
+<td>Financial engineering</td>
+<td>金融时间序列</td>
+<td>公司财务健康 / 不健康</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · 一个分类系统：Automatic Fish Sorting</h2>
+<p>「这是苹果吗？」——需要 <strong>training examples</strong>（apples / not apples）。</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>做什么</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pre-processing</strong></td>
+<td>去噪、消除无关变化（光照、位置）</td>
+<td>去背景、调亮度</td>
+</tr>
+<tr>
+<td><strong>Feature extraction</strong></td>
+<td>每条鱼变成 feature space 中的一个点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><msup><mo stretchy="false">]</mo><mi mathvariant="normal">⊤</mi></msup></mrow></math></td>
+<td>长度、亮度、宽度、鳍的数目和形状、嘴的位置</td>
+</tr>
+<tr>
+<td><strong>Learning (training)</strong></td>
+<td>用 training sample（已知种类）把 feature space 分成两个区域</td>
+<td><strong>decision boundary</strong></td>
+</tr>
+<tr>
+<td><strong>Classifier</strong></td>
+<td>linear、quadratic、更复杂的边界</td>
+<td>怎么学边界（参数）？</td>
+</tr>
+<tr>
+<td><strong>分类新样本</strong></td>
+<td>用训练好的 classifier</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>评价</strong></td>
+<td><strong>classification error rate</strong> = 被分错的 pattern 的比例；也看 computational complexity、user-friendliness</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Generalization</strong>：分类器对<strong>没见过的</strong>鱼还有效吗？——边界太复杂可能在训练集上完美、在新数据上很差（见第 3 讲 overfitting）。</p>
+</blockquote>
+<h2>3 · 三种学习范式</h2>
+<table>
+<thead>
+<tr>
+<th>范式</th>
+<th>训练数据</th>
+<th>有没有 teacher</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Supervised</strong></td>
+<td>输入 + <strong>对应的期望输出</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>有</td>
+<td>教小孩认动物；有标准答案的考试；<strong>regression</strong>、<strong>recommender system</strong>、<strong>control</strong>（ALVINN：30×32 sensor retina → 4 hidden → 30 output，sharp left / straight / sharp right）</td>
+</tr>
+<tr>
+<td><strong>Unsupervised</strong></td>
+<td>只有输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math>，没有输出</td>
+<td>没有；靠 similarity measure 找分组</td>
+<td>见下</td>
+</tr>
+<tr>
+<td><strong>Reinforcement</strong></td>
+<td>输入 + <strong>只有评价性</strong>的输出（reward）</td>
+<td>只有分数</td>
+<td>只给总分、不给正确答案的考试</td>
+</tr>
+</tbody>
+</table>
+<h3>3.1 Unsupervised 的用途</h3>
+<ul>
+<li><strong>找 clusters</strong></li>
+<li><strong>找 / 预处理特征</strong>，供后续 supervised 分类用：<strong>PCA</strong>（例：eigenface）</li>
+<li><strong>Content-based image retrieval</strong>：可视化图像位置和距离</li>
+<li><strong>Outlier detection</strong>（找最不可能的观测）：network intrusion detection；database cleaning（错别字、标错的数字、难看的数字、坏照片）；fraud detection（信用卡、电话账单、病历）</li>
+<li><strong>Data generation</strong></li>
+</ul>
+<h3>3.2 Reinforcement learning</h3>
+<ul>
+<li>与环境<strong>交互</strong>以达成目标；<strong>state、action、reward</strong>；目标是<strong>最大化总 reward</strong></li>
+<li>例：投资组合——action：做一笔交易；reward：组合回报</li>
+<li><strong>Mountain car</strong>：goal 最短时间到达终点；state = 位置、速度；action = forward / reverse / none；reward 每步 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math> 直到到达</li>
+<li><strong>Acrobot</strong>：state = 2 个关节角 + 2 个角速度；reward 每步 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></li>
+<li><strong>Robotics</strong>：输入 = 传感器信息 + reinforcement signal；避开负 reward（避障、沿墙走）</li>
+</ul>
+<h2>4 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ML 定义</td>
+<td>improving with experience；Simon 的定义</td>
+</tr>
+<tr>
+<td>Pipeline</td>
+<td>pre-processing / feature extraction / training / classify / evaluate</td>
+</tr>
+<tr>
+<td>评价</td>
+<td>error rate；generalization</td>
+</tr>
+<tr>
+<td>三种范式</td>
+<td>数据形式、有无 teacher、各举例</td>
+</tr>
+<tr>
+<td>Unsupervised 用途</td>
+<td>clustering、PCA、outlier detection、data generation</td>
+</tr>
+<tr>
+<td>RL 要素</td>
+<td>state / action / reward；mountain car 的设定</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · 易错点</h2>
+<ul>
+<li><strong>Reinforcement ≠ supervised</strong>：RL 只告诉「好不好」（分数），不告诉「正确答案」。</li>
+<li>Outlier detection、PCA 属于 <strong>unsupervised</strong>（没有标签）。</li>
+<li>Regression、recommender system、ALVINN（control）是 <strong>supervised</strong>。</li>
+<li>训练误差低 ≠ 好；要看 <strong>generalization</strong>。</li>
+</ul>

@@ -1,0 +1,453 @@
+<h2>1. Multiple Choices</h2>
+<table>
+<thead>
+<tr>
+<th>MC1</th>
+<th>MC2</th>
+<th>MC3</th>
+<th>MC4</th>
+<th>MC5</th>
+<th>MC6</th>
+<th>MC7</th>
+<th>MC8</th>
+<th>MC9</th>
+<th>MC10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C</td>
+<td>B</td>
+<td>C</td>
+<td>D</td>
+<td>B</td>
+<td>C</td>
+<td>A</td>
+<td>B</td>
+<td>C</td>
+<td>D</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Q</th>
+<th>Ans</th>
+<th>Key fact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MC1 (NOT)</td>
+<td>C</td>
+<td>DMA: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">#</mi><mtext>interrupts</mtext><mo>=</mo><mn>1</mn></mrow></math> per <strong>block</strong>, not per byte; A, B, D true</td>
+</tr>
+<tr>
+<td>MC2 (NOT)</td>
+<td>B</td>
+<td>interrupt sources <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">{</mo><mtext>I/O</mtext><mo separator="true">,</mo><mtext> timer</mtext><mo separator="true">,</mo><mtext> other HW</mtext><mo stretchy="false">}</mo></mrow></math>; traps from software; A, C, D true</td>
+</tr>
+<tr>
+<td>MC3</td>
+<td>C</td>
+<td>OS decides CPU time + memory <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> resource allocator</td>
+</tr>
+<tr>
+<td>MC4 (NOT)</td>
+<td>D</td>
+<td>NUMA: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mtext>local</mtext></msub><mo>&lt;</mo><msub><mi>t</mi><mtext>remote</mtext></msub></mrow></math> (= C) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> latency not uniform</td>
+</tr>
+<tr>
+<td>MC5 (true)</td>
+<td>B</td>
+<td>A = microkernel; C: layer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> uses only layers <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mi>i</mi></mrow></math>; D: LKMs load at run time, no recompile/reboot</td>
+</tr>
+<tr>
+<td>MC6</td>
+<td>C</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext mathvariant="monospace">read()</mtext><mo>→</mo></mrow></math> syscall interface <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> kernel service <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> return; A breaks dual mode, B needs kernel, D no new process</td>
+</tr>
+<tr>
+<td>MC7</td>
+<td>A</td>
+<td>privileged instr. with mode bit <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>1</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> illegal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> trap to OS (usually terminate)</td>
+</tr>
+<tr>
+<td>MC8 (NOT)</td>
+<td>B</td>
+<td>guest <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> VMM <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> HW adds overhead <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo><msub><mi>t</mi><mtext>VM</mtext></msub><mo>≥</mo><msub><mi>t</mi><mtext>native</mtext></msub></mrow></math> usually; &quot;always faster&quot; false</td>
+</tr>
+<tr>
+<td>MC9 (NOT)</td>
+<td>C</td>
+<td>after <code>fork()</code>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mtext>child</mtext></msub></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mtext>parent</mtext></msub></mrow></math> are separate copies</td>
+</tr>
+<tr>
+<td>MC10 (NOT)</td>
+<td>D</td>
+<td>FIFO is a file-system object; persists until <code>unlink</code></td>
+</tr>
+</tbody>
+</table>
+<h2>2. Short Answer</h2>
+<h3>(1) Average access time; locality</h3>
+<p>Compute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mrow><mi>a</mi><mi>v</mi><mi>g</mi></mrow></msub></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>0.9</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mrow><mi>h</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>=</mo><mn>2</mn></mrow></math> ns, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>s</mi><mi>s</mi></mrow></msub><mo>=</mo><mn>50</mn></mrow></math> ns (Ch. 1, slide 1.32).</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>T</mi><mrow><mi>a</mi><mi>v</mi><mi>g</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>h</mi><mo>⋅</mo><msub><mi>T</mi><mrow><mi>h</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>h</mi><mo stretchy="false">)</mo><mo>⋅</mo><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>s</mi><mi>s</mi></mrow></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.9</mn><mo>×</mo><mn>2</mn><mo>+</mo><mn>0.1</mn><mo>×</mo><mn>50</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1.8</mn><mo>+</mo><mn>5.0</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>T</mi><mrow><mi>a</mi><mi>v</mi><mi>g</mi></mrow></msub><mo>=</mo><mn>6.8</mn><mtext> ns</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><table>
+<thead>
+<tr>
+<th>Locality</th>
+<th>Definition</th>
+<th>Example: <code>for (i = 0; i &lt; n; i++) sum += a[i];</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temporal</td>
+<td>address <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> accessed at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> likely accessed again at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>+</mo><mi mathvariant="normal">Δ</mi></mrow></math></td>
+<td><code>i</code>, <code>sum</code>, loop-body instructions reused every iteration</td>
+</tr>
+<tr>
+<td>Spatial</td>
+<td>address <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> accessed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>±</mo><mi>δ</mi></mrow></math> likely accessed soon</td>
+<td><code>a[0], a[1], a[2], …</code> consecutive; one cache line serves several accesses</td>
+</tr>
+</tbody>
+</table>
+<h3>(2) Multiprogramming vs. time sharing</h3>
+<ul>
+<li><strong>Multiprogramming</strong> (Ch. 1, slide 1.42): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>2</mn></mrow></math> jobs in memory; running job waits for I/O <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> CPU switches to another ready job.
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>CPU idle</mtext><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mtext>no job ready </mtext><mo>⇒</mo><mtext> utilization</mtext><mo>↑</mo></mrow></math></div></li>
+<li><strong>Time sharing adds</strong>:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Multiprogramming</th>
+<th>Time sharing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Switch trigger</td>
+<td>job blocks (I/O)</td>
+<td>also timer interrupt every time slice <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> (preemption)</td>
+</tr>
+<tr>
+<td>Switch frequency</td>
+<td>low</td>
+<td>high (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> small)</td>
+</tr>
+<tr>
+<td>Goal</td>
+<td>CPU utilization</td>
+<td>response time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mo>∼</mo><mn>1</mn></mrow></math> s <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> interactive</td>
+</tr>
+<tr>
+<td>OS support needed</td>
+<td>job scheduling</td>
+<td>CPU scheduling + swapping / virtual memory</td>
+</tr>
+</tbody>
+</table>
+<h3>(3) Process state sequence and the PCB</h3>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Transition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admitted</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>New</mtext><mo>→</mo><mtext>Ready</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>dispatched</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Ready</mtext><mo>→</mo><mtext>Running</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>requests disk I/O</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Running</mtext><mo>→</mo><mtext>Waiting</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>I/O completes</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Waiting</mtext><mo>→</mo><mtext>Ready</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>dispatched (resumes)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Ready</mtext><mo>→</mo><mtext>Running</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>timer interrupt</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Running</mtext><mo>→</mo><mtext>Ready</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>dispatched again</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Ready</mtext><mo>→</mo><mtext>Running</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>exits</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Running</mtext><mo>→</mo><mtext>Terminated</mtext></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>New</mtext><mo>→</mo><mtext>Ready</mtext><mo>→</mo><mtext>Running</mtext><mo>→</mo><mtext>Waiting</mtext><mo>→</mo><mtext>Ready</mtext><mo>→</mo><mtext>Running</mtext><mo>→</mo><mtext>Ready</mtext><mo>→</mo><mtext>Running</mtext><mo>→</mo><mtext>Terminated</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>⚠️ &quot;Resumes after the I/O completes&quot; read as <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Waiting</mtext><mo>→</mo><mtext>Ready</mtext><mo>→</mo><mtext>Running</mtext></mrow></math> (I/O completion never goes straight to Running).</p>
+<p>PCB saved on leaving Running (context save, Ch. 3, slide 3.10):</p>
+<table>
+<thead>
+<tr>
+<th>PCB field</th>
+<th>Saved value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Process state</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>←</mo></mrow></math> Waiting or Ready</td>
+</tr>
+<tr>
+<td>Program counter</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>←</mo></mrow></math> address of next instruction</td>
+</tr>
+<tr>
+<td>CPU registers</td>
+<td>accumulators, index/general registers, SP, condition codes</td>
+</tr>
+<tr>
+<td>Scheduling info</td>
+<td>priority; queue pointer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> I/O wait queue or ready queue</td>
+</tr>
+<tr>
+<td>Memory / accounting / I/O status</td>
+<td>page/segment tables; CPU time used; device waited on, open files</td>
+</tr>
+</tbody>
+</table>
+<h3>(4) <code>read()</code>: user <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> kernel <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> user</h3>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Mode bit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Trap</td>
+<td>wrapper puts syscall no. + (<code>fd</code>, <code>buf</code>, <code>count</code>) in registers/stack; executes <code>syscall</code>; HW jumps via trap vector</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>→</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>2. Service</td>
+<td>syscall table[no.] <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>sys_read</code>; validate args; do I/O (may block); copy data <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>buf</code></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>3. Return</td>
+<td>return value (bytes read, or <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> register; return-from-trap; resume after the call</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>→</mo><mn>1</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>(5) Parent <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> child through an ordinary pipe</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext mathvariant="monospace">pipe(fd)</mtext><mtext> </mtext><mo>≺</mo><mtext> </mtext><mtext mathvariant="monospace">fork()</mtext><mspace width="2em"/><mo stretchy="false">(</mo><mtext mathvariant="monospace">fd[0]</mtext><mo>=</mo><mtext>read end</mtext><mo separator="true">,</mo><mtext> </mtext><mtext mathvariant="monospace">fd[1]</mtext><mo>=</mo><mtext>write end</mtext><mo stretchy="false">)</mo></mrow></math></div><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Parent (writer)</th>
+<th>Child (reader)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>pipe(fd)</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>fork()</code></td>
+<td>inherits <code>fd[0]</code>, <code>fd[1]</code> (same pipe)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>close(fd[0])</code></td>
+<td><code>close(fd[1])</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>write(fd[1], …)</code></td>
+<td><code>read(fd[0], …)</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>close(fd[1])</code></td>
+<td><code>close(fd[0])</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>pipe()</code> after <code>fork()</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> two unrelated pipes (not shared).</li>
+<li><code>read()</code> returns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> (EOF) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> <strong>all</strong> write ends closed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> child must close <code>fd[1]</code> or it may block forever.</li>
+<li>Ordinary pipe is unidirectional <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> data flows parent <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> child only.</li>
+</ul>
+<h2>3. Simple C Programs on fork</h2>
+<h3>(1) Two children</h3>
+<h4>(a) Values of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></h4>
+<p><code>fork()</code> copies the address space at the moment of the fork; later writes are private.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>P</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mi>x</mi><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>C1 (copy of </mtext><mi>x</mi><mo>=</mo><mn>1</mn><mtext>)</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mi>x</mi><mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>P</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mi>x</mi><mo>=</mo><mn>1</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>C2 (copy of </mtext><mi>x</mi><mo>=</mo><mn>2</mn><mtext>)</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mi>x</mi><mo>=</mo><mn>2</mn><mo>+</mo><mn>3</mn><mo>=</mo><mn>5</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>P</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mi>x</mi><mo>=</mo><mn>2</mn><mtext> (unchanged)</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>C1: </mtext><mn>3</mn><mo separator="true">,</mo><mspace width="1em"/><mtext>C2: </mtext><mn>5</mn><mo separator="true">,</mo><mspace width="1em"/><mtext>P: </mtext><mn>2</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Values differ: separate copies; C1 forked at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></math>, C2 forked at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math>.</li>
+</ul>
+<h4>(b) All possible output sequences</h4>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>C1</mtext><mo>≺</mo><mtext>P</mtext><mo separator="true">,</mo><mtext>  C2</mtext><mo>≺</mo><mtext>P</mtext><mspace width="1em"/><mo stretchy="false">(</mo><mtext>P prints after two </mtext><mtext mathvariant="monospace">wait</mtext><mtext>s</mtext><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mtext>C1</mtext><mo>∥</mo><mtext>C2  </mtext><mo stretchy="false">(</mo><mtext>no sync</mtext><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">#</mi><mtext>sequences</mtext><mo>=</mo><mn>2</mn><mo stretchy="false">!</mo><mo>×</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow></math></div><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>C1: 3</code> → <code>C2: 5</code> → <code>P: 2</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>C2: 5</code> → <code>C1: 3</code> → <code>P: 2</code></td>
+</tr>
+</tbody>
+</table>
+<h4>(c) First <code>wait(NULL)</code> moved before <code>x *= 2</code></h4>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>C1 prints</mtext><mo>≺</mo><mtext>C1 exits</mtext><mo>≺</mo><mtext mathvariant="monospace">wait</mtext><mtext> returns</mtext><mo>≺</mo><mrow><mtext mathvariant="monospace">x</mtext><mtext> </mtext><mtext mathvariant="monospace">*=</mtext><mtext> </mtext><mtext mathvariant="monospace">2</mtext></mrow><mo>≺</mo><msub><mtext mathvariant="monospace">fork()</mtext><mtext>C2</mtext></msub><mo>≺</mo><mtext>C2 prints</mtext><mo>≺</mo><mtext mathvariant="monospace">wait</mtext><mo>≺</mo><mtext>P prints</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow><mtext mathvariant="monospace">C1:</mtext><mtext> </mtext><mtext mathvariant="monospace">3</mtext></mrow><mtext> </mtext><mo>→</mo><mtext> </mtext><mrow><mtext mathvariant="monospace">C2:</mtext><mtext> </mtext><mtext mathvariant="monospace">5</mtext></mrow><mtext> </mtext><mo>→</mo><mtext> </mtext><mrow><mtext mathvariant="monospace">P:</mtext><mtext> </mtext><mtext mathvariant="monospace">2</mtext></mrow><mtext> (only order)</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Values unchanged: C1 still copies <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></math>, C2 still copies <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math>, P still ends at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math>.</li>
+</ul>
+<h3>(2) <code>execlp</code> with two levels of fork</h3>
+<h4>(a) Processes and tree</h4>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">#</mi><mtext>processes</mtext><mo>=</mo><mn>1</mn><mtext> </mtext><mo stretchy="false">(</mo><mtext>P</mtext><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn><mtext> </mtext><mo stretchy="false">(</mo><mtext>P’s fork</mtext><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn><mtext> </mtext><mo stretchy="false">(</mo><mtext>C’s fork</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mspace width="2em"/><mtext mathvariant="monospace">execlp</mtext><mtext> adds </mtext><mn>0</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>3</mn><mtext> processes</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><pre><code>P            prints A, P; wait(C); prints D
+└── C        (p == 0) fork G; wait(G); prints C
+    └── G    (q == 0) execlp(&quot;./worker&quot;) -&gt; runs worker, prints W
+</code></pre>
+<h4>(b) Is <code>X</code> printed?</h4>
+<ul>
+<li><strong>No.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext mathvariant="monospace">execlp</mtext></mrow></math> succeeds <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> G's code/data/stack replaced by worker <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> never returns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <code>printf(&quot;X\n&quot;)</code> unreachable.</li>
+</ul>
+<h4>(c) All possible output sequences</h4>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left" columnspacing="0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>A</mtext><mo>≺</mo><mtext mathvariant="monospace">fork()</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">(</mo><mtext>printed once; buffer flushed before fork</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>W</mtext><mo>≺</mo><mtext>G exits</mtext><mo>≺</mo><mtext>C’s </mtext><mtext mathvariant="monospace">wait</mtext><mo>≺</mo><mtext>C</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mtext>W</mtext><mo>≺</mo><mtext>C</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>C</mtext><mo>≺</mo><mtext>C exits</mtext><mo>≺</mo><mtext>P’s </mtext><mtext mathvariant="monospace">wait</mtext><mo>≺</mo><mtext>D</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mtext>C</mtext><mo>≺</mo><mtext>D</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>P</mtext><mo>≺</mo><mtext mathvariant="monospace">wait</mtext><mo>≺</mo><mtext>D</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mtext>P</mtext><mo>≺</mo><mtext>D</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>P</mtext><mo>∥</mo><mo stretchy="false">{</mo><mtext>W</mtext><mo separator="true">,</mo><mtext>C</mtext><mo stretchy="false">}</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">(</mo><mtext>no constraint</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>A </mtext><munder><munder><mrow><mo stretchy="false">{</mo><mtext>P</mtext><mo stretchy="false">}</mo><mtext> interleaved into </mtext><mo stretchy="false">(</mo><mtext>W</mtext><mo separator="true">,</mo><mtext>C</mtext><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mrow><mn>3</mn><mtext> slots</mtext></mrow></munder><mtext> D </mtext><mo>⇒</mo><mtext> </mtext><mn>3</mn><mtext> sequences</mtext></mrow></math></div><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>A P W C D</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>A W P C D</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>A W C P D</code></td>
+</tr>
+</tbody>
+</table>
+<h3>(3) Sending an integer through a pipe</h3>
+<h4>(a) Ends closed / used</h4>
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th>Closes</th>
+<th>Uses</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parent</td>
+<td><code>fd[0]</code> (read)</td>
+<td><code>fd[1]</code> (write)</td>
+<td><code>write</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>6</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Child</td>
+<td><code>fd[1]</code> (write)</td>
+<td><code>fd[0]</code> (read)</td>
+<td><code>read</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>6</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>direction: parent</mtext><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mtext> </mtext><mtext mathvariant="monospace">fd[1]</mtext><mtext> </mtext><mo>→</mo><mtext> </mtext><mtext mathvariant="monospace">fd[0]</mtext><mtext> </mtext></mrow></mpadded></mover><mtext>child</mtext><mspace width="1em"/><mo stretchy="false">(</mo><mtext mathvariant="monospace">pipe</mtext><mo>≺</mo><mtext mathvariant="monospace">fork</mtext><mo>⇒</mo><mtext>shared pipe</mtext><mo stretchy="false">)</mo></mrow></math></div><h4>(b) Exact output and order</h4>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>n</mi><mo>⋅</mo><mn>2</mn><mo>=</mo><mn>6</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>12</mn></mrow></math></div><pre><code>Child: 12
+Parent: done
+</code></pre>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext mathvariant="monospace">read</mtext><mtext> blocks until 4 bytes arrive</mtext><mo>⇒</mo><mi>n</mi><mo>=</mo><mn>6</mn><mo separator="true">;</mo><mspace width="2em"/><mtext>Child prints</mtext><mo>≺</mo><mtext>child exits</mtext><mo>≺</mo><mtext mathvariant="monospace">wait(NULL)</mtext><mo>≺</mo><mtext>Parent prints</mtext></mrow></math></div><h4>(c) <code>pipe(fd)</code> called separately after <code>fork()</code></h4>
+<ul>
+<li><strong>No.</strong> Each <code>pipe()</code> creates a new kernel pipe; descriptors shared only if created before <code>fork()</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>pipe</mtext><mi>P</mi></msub><mo mathvariant="normal">≠</mo><msub><mtext>pipe</mtext><mi>C</mi></msub></mrow></math>, not connected.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Child</td>
+<td>closes write end of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>pipe</mtext><mi>C</mi></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> no writer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <code>read</code> returns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> (EOF); <code>n</code> uninitialized <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> garbage printed</td>
+</tr>
+<tr>
+<td>Parent</td>
+<td>closes read end of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>pipe</mtext><mi>P</mi></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <code>write</code> with no reader <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <code>SIGPIPE</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> killed; <code>Parent: done</code> never printed (if ignored: <code>write</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>, <code>EPIPE</code>)</td>
+</tr>
+</tbody>
+</table>
+<h2>Verification</h2>
+<pre><code class="language-python">from itertools import permutations
+print(0.9*2 + 0.1*50)          # 6.8
+def seqs(items, before):
+    return [p for p in permutations(items)
+            if all(p.index(a) &lt; p.index(b) for a, b in before)]
+print(seqs([&quot;C1&quot;,&quot;C2&quot;,&quot;P&quot;], [(&quot;C1&quot;,&quot;P&quot;),(&quot;C2&quot;,&quot;P&quot;)]))   # 2 sequences
+r = seqs(list(&quot;APWCD&quot;), [(&quot;A&quot;,x) for x in &quot;PWCD&quot;]+[(&quot;W&quot;,&quot;C&quot;),(&quot;C&quot;,&quot;D&quot;),(&quot;P&quot;,&quot;D&quot;)])
+print(len(r), r)                # 3 sequences
+</code></pre>
+<p>Each program compiled with clang on macOS and run 200 times (<code>./prog | tr '\n' ' ' | sort | uniq -c</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Program</th>
+<th>Observed outputs (count / 200)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3(1)</td>
+<td><code>C1: 3 C2: 5 P: 2</code> (197), <code>C2: 5 C1: 3 P: 2</code> (3)</td>
+</tr>
+<tr>
+<td>3(1)(c)</td>
+<td><code>C1: 3 C2: 5 P: 2</code> (200)</td>
+</tr>
+<tr>
+<td>3(2)</td>
+<td><code>A P W C D</code> (200); other two orders possible but not observed</td>
+</tr>
+<tr>
+<td>3(3)</td>
+<td><code>Child: 12 Parent: done</code> (200)</td>
+</tr>
+<tr>
+<td>3(3)(c)</td>
+<td>child <code>read</code> returned <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math>; parent exit status <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>141</mn><mo>=</mo><mn>128</mn><mo>+</mo><mn>13</mn></mrow></math> (<code>SIGPIPE</code>), no <code>Parent: done</code></td>
+</tr>
+</tbody>
+</table>
