@@ -1,0 +1,228 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>开车的能量去哪了</strong>：空气阻力、刹车、滚动阻力</li>
+<li>三项的<strong>功率</strong>和<strong>每公里能耗</strong>公式；合计</li>
+<li><strong>案例</strong>：市区 / 跨区隧道 / 高速（0.184 / 0.076 / 0.16 kWh/km）</li>
+<li><strong>主导损失</strong>：滚阻 vs 风阻的临界速度（~70 km/h）；刹车 vs 风阻的<strong>临界距离</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mi>c</mi></msub><mo>=</mo><msub><mi>m</mi><mi>c</mi></msub><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><mo stretchy="false">)</mo><mo>≈</mo><mn>2</mn></mrow></math> km</li>
+<li>实际油耗 vs 估算：只有 ~22% 用于运动；提高效率的方法；每人每日能耗</li>
+<li>电动车；船舶；<strong>货运效率</strong> kWh/(ton·km)：船 0.01、卡车 0.2</li>
+</ol>
+<blockquote>
+<p>必会计算：给参数算<strong>三项能耗和占比</strong>（市区例：463 + 48 + 150 = 661 J/m = 0.184 kWh/km）；<strong>临界速度、临界距离</strong>；每人每日开车能耗（20.9 kWh 汽油 / 12.5 kWh 混动）；<strong>船的 ton-km 效率</strong>（0.01）。概念：风阻 ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>2</mn></msup></mrow></math>（每公里）/ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math>（功率）；高速风阻主导、与车重无关（一个人打车和五个人打车一样）。</p>
+</blockquote>
+<h2>1 · 能量去哪了</h2>
+<ul>
+<li>克服<strong>空气阻力</strong>（drag coefficient <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub></mrow></math>）</li>
+<li>加速到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi></mrow></math>，然后<strong>刹车</strong>减速（每隔距离 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi></mrow></math> 一次）</li>
+<li>克服<strong>路面滚动阻力</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub></mrow></math>；快速行驶时常可忽略）</li>
+</ul>
+<p>（参考：MacKay《Without the Hot Air》第 3 章 Cars、附录 A Cars II。）</p>
+<h2>2 · 空气阻力</h2>
+<p>车在时间 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 内扫出一根「空气管」：</p>
+<ul>
+<li><strong>有效迎风面积</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><msub><mi>A</mi><mtext>tube</mtext></msub><mo>=</mo><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub></mrow></math> 取决于形状）</li>
+<li>管长 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>l</mi><mo>=</mo><mi>v</mi><mi>t</mi></mrow></math>，体积 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mi>v</mi><mi>t</mi></mrow></math>，质量 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>m</mi><mtext>air</mtext></msub><mo>=</mo><mi>ρ</mi><mi>A</mi><mi>v</mi><mi>t</mi></mrow></math></li>
+</ul>
+<p><strong>耗散的能量 = 车带动的空气的动能</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>E</mi><mtext>loss</mtext></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>m</mi><mtext>air</mtext></msub><msup><mi>v</mi><mn>2</mn></msup><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><mi>A</mi><mi>v</mi><mi>t</mi><mo>⋅</mo><msup><mi>v</mi><mn>2</mn></msup><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><mi>A</mi><msup><mi>v</mi><mn>3</mn></msup><mi>t</mi></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>P</mi><mtext>loss</mtext></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>3</mn></msup></mrow></mstyle></mstyle></mstyle></menclose><mtext> </mtext><mo stretchy="false">(</mo><mtext>W</mtext><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><msub><mi>E</mi><mtext>loss</mtext></msub><mi>l</mi></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>2</mn></msup></mrow></mstyle></mstyle></mstyle></menclose><mtext> </mtext><mo stretchy="false">(</mo><mtext>J/m</mtext><mo stretchy="false">)</mo></mrow></math></div><h2>3 · 刹车</h2>
+<p>每次刹车损失全部动能 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>m</mi><mi>c</mi></msub><msup><mi>v</mi><mn>2</mn></msup></mrow></math>；两次刹车间隔时间 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>d</mi><mi>v</mi></mfrac></mrow></math>（<strong>相邻刹车之间的时间</strong>，不是每次刹车的持续时间）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>P</mi><mtext>loss</mtext></msub><mo>=</mo><mfrac><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>m</mi><mi>c</mi></msub><msup><mi>v</mi><mn>2</mn></msup></mrow><mrow><mi>d</mi><mi mathvariant="normal">/</mi><mi>v</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>m</mi><mi>c</mi></msub><msup><mi>v</mi><mn>3</mn></msup></mrow><mi>d</mi></mfrac><mo separator="true">,</mo><mspace width="2em"/><mfrac><msub><mi>E</mi><mtext>loss</mtext></msub><mi>d</mi></mfrac><mo>=</mo><mfrac><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>m</mi><mi>c</mi></msub><msup><mi>v</mi><mn>2</mn></msup></mrow><mi>d</mi></mfrac></mrow></math></div><p>随速度<strong>强烈</strong>增大。</p>
+<h2>4 · 滚动阻力</h2>
+<p>来源：车轮不可能完全无滑滚动——轮胎（非弹性）形变、打滑、磨损橡胶、产生噪声。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>E</mi><mtext>loss</mtext></msub><mo>=</mo><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><mi>N</mi><mi>d</mi><mo>=</mo><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><mi>m</mi><mi>g</mi><mi>d</mi><mo separator="true">,</mo><mspace width="2em"/><msub><mi>P</mi><mtext>loss</mtext></msub><mo>=</mo><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><mi>m</mi><mi>g</mi><mi>v</mi><mo separator="true">,</mo><mspace width="2em"/><mfrac><msub><mi>E</mi><mtext>loss</mtext></msub><mi>d</mi></mfrac><mo>=</mo><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><mi>m</mi><mi>g</mi></mrow></math></div><table>
+<thead>
+<tr>
+<th>车轮</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>火车（钢轨上的钢轮）</td>
+<td>0.002</td>
+</tr>
+<tr>
+<td>自行车胎</td>
+<td>0.005</td>
+</tr>
+<tr>
+<td>卡车橡胶胎</td>
+<td>0.007</td>
+</tr>
+<tr>
+<td>汽车橡胶胎</td>
+<td>0.010</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · 合计</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><msub><mi>E</mi><mtext>loss</mtext></msub><mtext>time</mtext></mfrac><mo>=</mo><munder><munder><mfrac><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>m</mi><mi>c</mi></msub><msup><mi>v</mi><mn>3</mn></msup></mrow><mi>d</mi></mfrac><mo stretchy="true">⏟</mo></munder><mtext>braking</mtext></munder><mo>+</mo><munder><munder><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>3</mn></msup></mrow><mo stretchy="true">⏟</mo></munder><mtext>air drag</mtext></munder><mo>+</mo><munder><munder><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi><mi>v</mi></mrow><mo stretchy="true">⏟</mo></munder><mtext>rolling</mtext></munder><mtext>  W</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><msub><mi>E</mi><mtext>loss</mtext></msub><mtext>distance</mtext></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><msub><mi>m</mi><mi>c</mi></msub><mi>d</mi></mfrac><msup><mi>v</mi><mn>2</mn></msup><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>2</mn></msup><mo>+</mo><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi></mrow></mstyle></mstyle></mstyle></menclose><mtext>  J/m</mtext></mrow></math></div><h3>5.1 案例</h3>
+<p>典型轿车：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>1500</mn></mrow></math> kg，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><mo>=</mo><mn>0.01</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub><mo>=</mo><mn>0.3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mtext>car</mtext></msub><mo>=</mo><mn>2</mn></mrow></math> m²，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi><mo>=</mo><mn>1.3</mn></mrow></math> kg/m³，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>9.8</mn></mrow></math> m/s²：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><msub><mi>E</mi><mtext>loss</mtext></msub><mtext>distance</mtext></mfrac><mo>=</mo><mfrac><mrow><mn>750</mn><msup><mi>v</mi><mn>2</mn></msup></mrow><mi>d</mi></mfrac><mo>+</mo><mn>0.39</mn><msup><mi>v</mi><mn>2</mn></msup><mo>+</mo><mn>150</mn><mtext>  J/m</mtext></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>×</mo><mn>1500</mn><mo>=</mo><mn>750</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>×</mo><mn>1.3</mn><mo>×</mo><mn>0.3</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>0.39</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.01</mn><mo>×</mo><mn>1500</mn><mo>×</mo><mn>9.8</mn><mo>=</mo><mn>147</mn><mo>≈</mo><mn>150</mn></mrow></math>。）</p>
+<p><strong>市区</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>=</mo><mn>40</mn></mrow></math> km/h = 11.1 m/s，红绿灯间距 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>≈</mo><mn>200</mn></mrow></math> m（如弥敦道）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mi>E</mi><mi>d</mi></mfrac><mo>=</mo><mn>463.1</mn><mo>+</mo><mn>48.2</mn><mo>+</mo><mn>150</mn><mo>=</mo><mn>661.3</mn><mtext> J/m</mtext><mo>=</mo><mn>0.184</mn><mtext> kWh/km</mtext></mrow></math></div><table>
+<thead>
+<tr>
+<th>场景</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi></mrow></math></th>
+<th>刹车</th>
+<th>风阻</th>
+<th>滚阻</th>
+<th>kWh/km</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>City drive</strong></td>
+<td>40 km/h</td>
+<td>200 m</td>
+<td><strong>70.0%</strong></td>
+<td>7.3%</td>
+<td>22.7%</td>
+<td>0.184</td>
+</tr>
+<tr>
+<td>Inter-district（隧道）</td>
+<td>50 km/h</td>
+<td>3 km</td>
+<td>17.6%</td>
+<td>27.5%</td>
+<td><strong>54.9%</strong></td>
+<td>0.076</td>
+</tr>
+<tr>
+<td>Long highway</td>
+<td>110 km/h</td>
+<td>10 km</td>
+<td>11.9%</td>
+<td><strong>61.7%</strong></td>
+<td>26.4%</td>
+<td>0.16</td>
+</tr>
+</tbody>
+</table>
+<p>（python 复算：市区、跨区与课件一致；高速得 12.0 / 62.3 / 25.7%、0.162 kWh/km，与课件差在四舍五入。）</p>
+<blockquote>
+<p>每公里能耗<strong>既取决于速度，也取决于停车间距</strong>。</p>
+</blockquote>
+<h2>6 · 主导损失</h2>
+<h3>6.1 滚阻 vs 风阻</h3>
+<p>滚阻主导当 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>2</mn></msup><mo>&lt;</mo><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>v</mi><mo>&lt;</mo><msqrt><mfrac><mrow><mn>2</mn><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi></mrow><mrow><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub></mrow></mfrac></msqrt></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>典型轿车：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>&lt;</mo><mn>70.6</mn></mrow></math> km/h（课件值；用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>9.8</mn></mrow></math> 算得 69.9 km/h，用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>10</mn></mrow></math> 得 70.6）——<strong>滚阻主导</strong>。</p>
+<h3>6.2 刹车 vs 风阻：临界距离</h3>
+<p>忽略滚阻：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>P</mi><mtext>loss</mtext></msub><mo>=</mo><msup><mi>v</mi><mn>3</mn></msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><msub><mi>m</mi><mi>c</mi></msub><mi>d</mi></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>m</mi><mi>c</mi></msub><mi>d</mi></mfrac><mo>&gt;</mo><mi>ρ</mi><mi>A</mi></mrow></math>：能量主要花在<strong>刹车</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>m</mi><mi>c</mi></msub><mi>d</mi></mfrac><mo>&lt;</mo><mi>ρ</mi><mi>A</mi></mrow></math>：能量主要花在<strong>风阻</strong>（移动本身）</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>d</mi><mi>c</mi></msub><mo>=</mo><mfrac><msub><mi>m</mi><mi>c</mi></msub><mrow><mi>ρ</mi><mi>A</mi></mrow></mfrac><mo>=</mo><mfrac><msub><mi>m</mi><mi>c</mi></msub><mrow><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose><mo>=</mo><mfrac><mn>1500</mn><mrow><mn>1.3</mn><mo>×</mo><mn>0.3</mn><mo>×</mo><mn>2</mn></mrow></mfrac><mo>≈</mo><mn>1923</mn><mtext> m</mtext><mo>≈</mo><mn>2</mn><mtext> km</mtext></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>&lt;</mo><msub><mi>d</mi><mi>c</mi></msub></mrow></math>：刹车主导（市区停车间距 &lt; 2 km）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>&gt;</mo><msub><mi>d</mi><mi>c</mi></msub></mrow></math>：风阻主导</li>
+<li><strong>城市规划和高速设计影响能耗</strong></li>
+</ul>
+<p><strong>长途</strong>（停车间距 ≫ 2 km 且速度 &gt; 70 km/h）：风阻主导，功率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>3</mn></msup></mrow></math> <strong>与车重无关</strong> ⇒ <strong>一个乘客和五个乘客的出租车费一样</strong>（能耗几乎一样）。</p>
+<h2>7 · 实际能耗与效率</h2>
+<p>典型油耗 12 km/L，汽油能量密度 10 kWh/L：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mn>10</mn><mn>12</mn></mfrac><mo>=</mo><mn>0.833</mn><mtext> kWh/km</mtext><mo>=</mo><mn>4.5</mn><mo>×</mo><mtext>估算值</mtext></mrow></math></div><p><strong>只有约 22% 的燃料能量用于实际运动</strong>（其余是发动机热损失等）。</p>
+<p><strong>提高效率</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>针对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>热力学改进 / 更好的发动机</td>
+<td>&gt; 70% 的损失</td>
+</tr>
+<tr>
+<td>更好的保养（换机油）和车身设计减阻</td>
+<td>5% 的损失</td>
+</tr>
+<tr>
+<td>开慢点（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mtext>loss</mtext></msub><mo>∝</mo><msup><mi>v</mi><mn>3</mn></msup></mrow></math>）</td>
+<td></td>
+</tr>
+<tr>
+<td>刹车能量回收（regenerative braking）</td>
+<td>25% 的损失</td>
+</tr>
+</tbody>
+</table>
+<h3>7.1 每人每日开车能耗</h3>
+<p>油耗（用户报告）：汽油 10–14 km/L；混动 18–22 km/L。每人每天开 25 km（旺角到 HKUST 约 12 km）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Energy</mtext><mo>=</mo><mfrac><mtext>distance per day</mtext><mtext>distance per unit fuel</mtext></mfrac><mo>×</mo><mtext>energy density</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>汽油： </mtext><mfrac><mn>25</mn><mn>12</mn></mfrac><mo>×</mo><mn>10</mn><mo>≈</mo><mn>20.9</mn><mtext> kWh/(person⋅day)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>混动： </mtext><mfrac><mn>25</mn><mn>20</mn></mfrac><mo>×</mo><mn>10</mn><mo>=</mo><mn>12.5</mn><mtext> kWh/(person⋅day)</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><h2>8 · 电动车</h2>
+<ul>
+<li>用电代替汽油 / 柴油；电从插座经电缆进车，储存在电池中，驱动电动机</li>
+<li>优点：（<strong>本地</strong>）环保；<strong>再生制动</strong>；加速快</li>
+<li>缺点：续航有限；充电时间长（但不必去固定加油站）</li>
+<li>造一辆 EV 的排放比同类燃油车多约 <strong>80%</strong>；<strong>全生命周期</strong> CO₂ 可能比混动多或少，<strong>取决于电是怎么发的</strong></li>
+</ul>
+<h2>9 · 船舶与货运效率</h2>
+<p><strong>船的能量耗散</strong>：柴油机热损失；水的阻力；<strong>兴波阻力</strong>（造浪、船与波浪的相互作用——船在自己造的波上「爬坡」）。</p>
+<p>集装箱运输由 Malcom McLean 1956 年开创。例：<strong>OOCL Hong Kong</strong>：长 399.9 m、宽 58.8 m、吃水 16.0 m；MAN B&amp;W 11G95ME-C 75,570 kW 柴油机；21,413 TEU、197,317 DWT；最高 21 节（39 km/h）。</p>
+<p><strong>货运效率</strong>：单位 <strong>kWh/(ton·km)</strong>（每运 1 吨货 1 km 的能耗）。例：1 吨冰淇淋运 580 km = 580 t·km。</p>
+<p><strong>海运例</strong>：Maersk Mc-Kinney Møller（Triple-E）：19 节 = 35.2 km/h ⇒ 日航程 845 km；日耗油 150 t；载重 190,000 t；燃油约 11 kWh/kg：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mrow><mn>150,000</mn><mtext> kg</mtext><mo>×</mo><mn>11</mn><mtext> kWh/kg</mtext></mrow><mrow><mn>845</mn><mtext> km</mtext><mo>×</mo><mn>190,000</mn><mtext> t</mtext></mrow></mfrac><mo>≈</mo><mn>0.01</mn><mtext> kWh/(ton⋅km)</mtext></mrow></math></div><p><strong>陆运例</strong>：最高效的大卡车载 20 t，油耗约 40 L/100 km：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mrow><mn>40</mn><mtext> L</mtext></mrow><mrow><mn>20</mn><mtext> t</mtext><mo>×</mo><mn>100</mn><mtext> km</mtext></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>400</mn><mtext> kWh</mtext></mrow><mrow><mn>2000</mn><mtext> t⋅km</mtext></mrow></mfrac><mo>=</mo><mn>0.2</mn><mtext> kWh/(ton⋅km)</mtext></mrow></math></div><p>（实际：欧洲 8 国数据中公路货运约 0.8 kWh/(ton·km)。）</p>
+<blockquote>
+<p><strong>海运比公路货运高效约 20 倍</strong>。</p>
+</blockquote>
+<h2>10 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>三种损失</td>
+<td>来源；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mi mathvariant="normal">/</mi><mi>d</mi></mrow></math> 公式</td>
+</tr>
+<tr>
+<td>合计</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>750</mn><msup><mi>v</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>d</mi><mo>+</mo><mn>0.39</mn><msup><mi>v</mi><mn>2</mn></msup><mo>+</mo><mn>150</mn></mrow></math></td>
+</tr>
+<tr>
+<td>案例</td>
+<td>市区 0.184 kWh/km 及占比</td>
+</tr>
+<tr>
+<td>临界速度</td>
+<td>公式；~70 km/h</td>
+</tr>
+<tr>
+<td>临界距离</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>m</mi><mi>c</mi></msub><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi><mo stretchy="false">)</mo></mrow></math>；1923 m</td>
+</tr>
+<tr>
+<td>长途</td>
+<td>风阻主导、与质量无关</td>
+</tr>
+<tr>
+<td>实际</td>
+<td>0.833 kWh/km；22%</td>
+</tr>
+<tr>
+<td>每人每日</td>
+<td>20.9 / 12.5 kWh</td>
+</tr>
+<tr>
+<td>货运</td>
+<td>kWh/(t·km)；船 0.01、卡车 0.2</td>
+</tr>
+</tbody>
+</table>
+<h2>11 · 易错点</h2>
+<ul>
+<li>风阻<strong>每公里</strong>能耗 ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>2</mn></msup></mrow></math>，<strong>功率</strong> ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math>。</li>
+<li>刹车公式里的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi></mrow></math> 是<strong>相邻两次刹车间的距离</strong>。</li>
+<li>速度要换成 m/s（40 km/h = 11.1 m/s）。</li>
+<li>J/m → kWh/km：乘 1000 再除以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow></math>（661 J/m = 0.184 kWh/km）。</li>
+<li>有效面积是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mtext>car</mtext></msub></mrow></math>。</li>
+</ul>

@@ -1,0 +1,381 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Multi-Armed Bandits</strong>：问题设定（stateless，只有 action 和 reward）</li>
+<li><strong>Basic Concepts</strong>：action-value <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>、<strong>增量更新</strong>、exploration / exploitation、<strong>regret</strong></li>
+<li><strong>Action Selection</strong>：greedy、fixed exploration + greedy、<strong>ε-greedy</strong>、decaying ε-greedy</li>
+<li><strong>Upper Confidence Bounds</strong>（UCB）：由 Hoeffding 不等式推出</li>
+<li><strong>Gradient Bandits</strong>：policy-based 方法，softmax + 梯度</li>
+</ol>
+<blockquote>
+<p>必考：<strong>增量更新公式的推导</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>+</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">]</mo></mrow></math>；<strong>ε-greedy 选到 greedy action 的概率</strong>（两个 action、ε = 0.2 → 0.9）；<strong>regret 定义</strong>，greedy 和 ε-greedy 都是 <strong>linear regret</strong> 的原因；<strong>UCB 公式</strong>及由 Hoeffding 推出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msqrt><mfrac><mrow><mo>−</mo><mi>log</mi><mo>⁡</mo><mi>p</mi></mrow><mrow><mn>2</mn><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac></msqrt></mrow></math>；gradient bandit 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac><mo>=</mo><msub><mn>𝟙</mn><mrow><mi>a</mi><mo>=</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+</blockquote>
+<h2>1 · Multi-Armed Bandits</h2>
+<h3>1.1 动机</h3>
+<ul>
+<li><strong>A/B test</strong>：有多个选择（例如 Netflix 显示哪个封面），想选出最能吸引用户的那个</li>
+<li><strong>选餐厅</strong>：action = 去哪家餐厅；reward = 你的满意度</li>
+<li>正式说：<strong>在 non-sequential（single action / state）的设定下学会行动</strong>
+<ul>
+<li>每个 action 带来一个<strong>即时 reward</strong></li>
+<li>目标：选 action，使<strong>期望即时 reward 最大</strong></li>
+</ul>
+</li>
+<li><strong>Q：如果你和餐厅员工成了朋友、喜欢和他们聊天呢？</strong>——那就<strong>不是 stateless 了</strong>！如果 state 会因为你的 action 改变，就是 sequential 设定（下一讲 MDP）。</li>
+</ul>
+<h3>1.2 名字的由来</h3>
+<ul>
+<li><strong>One-armed bandit</strong> = slot machine（老虎机，英文俚语）</li>
+<li><strong>Multi-armed bandits</strong> = 多台老虎机，每次选一台拉</li>
+</ul>
+<p>序列：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub><mo separator="true">,</mo><mo>…</mo></mrow></math>——<strong>state 不变</strong>（a.k.a. <strong>stateless</strong>）</p>
+<h3>1.3 问题定义</h3>
+<ul>
+<li>每个 timestep <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>，agent 从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 个 arm 里选一个拉</li>
+<li>第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 个 arm 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 时刻被拉，产生 reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mrow><mi>k</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mrow><mi>k</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub></mrow></math> 来自分布 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mi>k</mi></msub><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow></math>，均值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mi>k</mi></msub></mrow></math></li>
+<li><strong>Agent 不知道</strong> reward 分布，也不知道均值</li>
+<li><strong>Objective：maximize cumulative rewards</strong></li>
+<li>如果知道哪个 arm 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mi>k</mi></msub></mrow></math> 最大，每次都拉它就行（但不知道是哪个）</li>
+</ul>
+<blockquote>
+<p><strong>Definition.</strong> The <strong>action-value function</strong> for action <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> is its mean reward：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math></div></p>
+</blockquote>
+<h3>1.4 两种常见 bandit</h3>
+<p><strong>背景</strong>：</p>
+<ul>
+<li><strong>Bernoulli</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Bern</mtext><mo stretchy="false">(</mo><mi>x</mi><mo>∣</mo><mi>μ</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>μ</mi><mi>x</mi></msup><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>μ</mi><msup><mo stretchy="false">)</mo><mrow><mn>1</mn><mo>−</mo><mi>x</mi></mrow></msup></mrow></math>，即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo>=</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mi>μ</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo>=</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mi>μ</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo><mo>=</mo><mi>μ</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>var</mtext><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo><mo>=</mo><mi>μ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>μ</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Gaussian</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Norm</mtext><mo stretchy="false">(</mo><mi>x</mi><mo>∣</mo><mi>μ</mi><mo separator="true">,</mo><mi>σ</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><msqrt><mrow><mn>2</mn><mi>π</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow></msqrt></mfrac></mstyle><mi>exp</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mo>−</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>−</mo><mi>μ</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><mn>2</mn><msup><mi>σ</mi><mn>2</mn></msup></mrow></mfrac></mstyle><mo fence="true">)</mo></mrow></mrow></math></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Bandit</th>
+<th>reward</th>
+<th>均值的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bernoulli bandits</strong></td>
+<td>成功 / 失败（0 / 1）</td>
+<td>成功概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>μ</mi><mi>k</mi></msub><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>（例：三台机器分别 0.6、0.4、0.45 的时间赢）</td>
+</tr>
+<tr>
+<td><strong>Gaussian bandits</strong></td>
+<td>实数</td>
+<td>arm <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 的平均 reward = 它的 Gaussian 的均值</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · Basic Concepts</h2>
+<h3>2.1 估计 action value</h3>
+<p>要估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>≈</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi></mrow></math>。先看一个 action：它收到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></math> 个 reward 之后的估计：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>Q</mi><mi>t</mi></msub><mo>:</mo><mo>=</mo><mfrac><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>+</mo><msub><mi>r</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>r</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow></math></div><p><strong>Q：弱点？</strong> A：每次都要存所有 reward 再重新求和——最好能<strong>增量地</strong>算。</p>
+<h3>2.2 增量更新（考试重点）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>Q</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>+</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>推导</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>Q</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>t</mi></munderover><msub><mi>r</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></munderover><msub><mi>r</mi><mi>i</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>⋅</mo><mfrac><mn>1</mn><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></munderover><msub><mi>r</mi><mi>i</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><msub><mi>Q</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>t</mi><msub><mi>Q</mi><mi>t</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>=</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>+</mo><mfrac><mn>1</mn><mi>t</mi></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>这是学习规则的通用形式</strong>（以后 TD、Q-learning 都长这样）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>NewEstimate</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>←</mo><mtext>OldEstimate</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mtext>StepSize</mtext><mtext> </mtext><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mtext>Target</mtext><mo>−</mo><mtext>OldEstimate</mtext><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Target</mtext><mo>−</mo><mtext>OldEstimate</mtext></mrow></math> 叫 <strong>error</strong></li>
+<li>直觉：估计偏低（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>&gt;</mo><msub><mi>Q</mi><mi>t</mi></msub></mrow></math>）就往上调，偏高就往下调；调多少由 step size 决定</li>
+<li>这里 step size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mfrac><mn>1</mn><mi>t</mi></mfrac></mrow></math>，越往后每个新样本的影响越小（因为是在求平均）</li>
+</ul>
+<h3>2.3 Exploration / Exploitation dilemma</h3>
+<p><strong>Greedy action</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msubsup><mi>a</mi><mi>t</mi><mo>∗</mo></msubsup><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><msubsup><mi>a</mi><mi>t</mi><mo>∗</mo></msubsup></mrow></math>：<strong>exploiting</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo mathvariant="normal">≠</mo><msubsup><mi>a</mi><mi>t</mi><mo>∗</mo></msubsup></mrow></math>：<strong>exploring</strong></li>
+<li><strong>You can't do both, but you need to do both</strong></li>
+</ul>
+<p>更一般地，online decision-making 的基本选择：</p>
+<ul>
+<li><strong>Exploitation</strong>：根据当前信息做最好的决定</li>
+<li><strong>Exploration</strong>：收集更多信息</li>
+<li>最好的长期策略可能需要<strong>短期牺牲</strong>；要收集足够的信息才能做出整体最好的决定</li>
+<li>这个两难不只是计算 RL 的问题，而是<strong>任何智能体决策</strong>的根本问题</li>
+<li><strong>High-level idea：You can never stop exploring, but maybe you should explore less over time.</strong></li>
+</ul>
+<h3>2.4 Evaluation metric：Regret</h3>
+<ul>
+<li>Action-value：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi><mo>∈</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>K</mi><mo stretchy="false">}</mo></mrow></math></li>
+<li><strong>Optimal value</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>a</mi><mo>∗</mo></msup><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Regret</strong>（一步的期望机会损失）：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>l</mi><mi>t</mi></msub><mo>=</mo><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msup><mi>V</mi><mo>∗</mo></msup><mo>−</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></div><ul>
+<li><strong>Total regret</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>L</mi><mi>T</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>T</mi></munderover><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msup><mi>V</mi><mo>∗</mo></msup><mo>−</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></div><ul>
+<li><strong>Maximize cumulative expected reward = minimize total regret</strong></li>
+</ul>
+<p><strong>补充（常用写法）</strong>：令 gap <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>a</mi></msub><mo>=</mo><msup><mi>V</mi><mo>∗</mo></msup><mo>−</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>T</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 步内选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 的次数，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>L</mi><mi>T</mi></msub><mo>=</mo><msub><mo>∑</mo><mi>a</mi></msub><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>N</mi><mi>T</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mtext> </mtext><msub><mi mathvariant="normal">Δ</mi><mi>a</mi></msub></mrow></math>。好算法要让 gap 大的 arm 被选得少。</p>
+<p><strong>Linear vs sublinear regret</strong>：如果每一步都有一个<strong>不趋于 0</strong> 的期望损失，total regret 随 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> <strong>线性</strong>增长——意味着算法一直在犯同样的错。好的算法 regret 增长得比 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 慢（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>log</mi><mo>⁡</mo><mi>T</mi></mrow></math>）。</p>
+<h2>3 · Action Selection</h2>
+<h3>3.1 Fixed Exploration Period + Greedy</h3>
+<ol>
+<li>先分配一段固定时间做 exploration：<strong>均匀随机</strong>地试所有 bandit</li>
+<li>估计所有 action 的平均 reward：</li>
+</ol>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></munderover><msub><mi>r</mi><mi>i</mi></msub><mo>⋅</mo><mn>𝟙</mn><mo stretchy="false">(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：之前选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 的次数；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟙</mn></mrow></math>：示性函数）</p>
+<ol start="3">
+<li>选估计最优的 action：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>GOTO 2（继续更新估计——但只更新被选中的那个）</li>
+</ol>
+<p><strong>例</strong>：exploration 结束后估计为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mn>0.3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mn>0.1</mn></mrow></math>。</p>
+<ul>
+<li><strong>Q1：greedy 会一直选第二个吗？</strong> 会选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>2</mn></msub></mrow></math>；之后只更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>2</mn></msub></mrow></math> 的估计。只要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></math> 不掉到 0.3 以下就一直选它；<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>3</mn></msub></mrow></math> 再也不会被试</strong>——哪怕它真实的均值其实最高（只是 exploration 期间运气不好）。</li>
+<li><strong>Q2：greedy 会永远锁定在次优 action 吗？</strong> 会。<strong>Greedy action selection has linear total regret.</strong></li>
+</ul>
+<h3>3.2 ε-Greedy</h3>
+<ul>
+<li>Greedy 总是 exploit；<strong>怎样保持 exploration？→ ε-greedy</strong></li>
+<li>通常 greedy，但<strong>以概率 ε 随机选一个 action</strong>（可能又选到 greedy action）</li>
+<li>平衡 exploration 和 exploitation 的最简单方法</li>
+</ul>
+<blockquote>
+<p><strong>A simple bandit algorithm</strong></p>
+<p>Initialize, for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow></math> to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mn>0</mn></mrow></math></p>
+<p>Repeat forever：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>←</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> with probability <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow></math>（breaking ties randomly）；a random action with probability <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>←</mo><mtext>bandit</mtext><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>←</mo><mi>N</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>1</mn><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mi>R</mi><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></li>
+</ul>
+</blockquote>
+<p><strong>课件 Q：两个 action、ε = 0.2，选到 greedy action 的概率？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>P</mi><mo stretchy="false">(</mo><mtext>greedy</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><munder><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>exploit</mtext></munder></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><munder><munder><mrow><mi>ε</mi><mo>⋅</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow><mo stretchy="true">⏟</mo></munder><mtext>随机时恰好选中</mtext></munder></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.8</mn><mo>+</mo><mn>0.1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.9</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p>一般地，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></math> 个 action：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mtext>greedy</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo>+</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mi>ε</mi><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></mfrac></mstyle></mrow></math>。</p>
+<p><strong>ε-greedy 的 regret</strong>：</p>
+<ul>
+<li>永远在 explore：以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow></math> 选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math> 随机选（与 Q 估计无关）</li>
+<li><strong>ε-greedy 也是 linear total regret！</strong> 常数 ε 时每步 regret：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>l</mi><mi>t</mi></msub><mo>≥</mo><mfrac><mi>ε</mi><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><msub><mi mathvariant="normal">Δ</mi><mi>a</mi></msub></mrow></math></div><p>（即使已经完全学会，每步仍有 ε 的概率随机乱选，平均损失一个固定量）</p>
+<h3>3.3 Gaussian bandits 实验（Sutton &amp; Barto 10-armed testbed）</h3>
+<ul>
+<li>采样 2000 个 10-armed bandit：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>∼</mo><mi>𝒩</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>∼</mo><mi>𝒩</mi><mo stretchy="false">(</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></li>
+<li>曲线：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>0.1</mn></mrow></math> 前期上升最快；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>0.01</mn></mrow></math> 慢一些但后期追上；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>0</mn></mrow></math>（greedy）很快停在低水平</li>
+<li><strong>Q1：无穷步之后谁的平均 reward 最大？</strong> —— <strong>ε = 0.01</strong>：两者都会找到最优 arm，但 ε = 0.01 只有 1% 的时间乱选（ε = 0.1 有 10%），greedy 可能锁死在次优</li>
+<li><strong>Q2：性能是否依赖 action value 估计的初始化？</strong> —— <strong>是</strong>。例如 <strong>optimistic initialization</strong>（初始 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 设得很高）：每个 action 试了之后估计都会下降，于是 greedy 也会被「逼着」轮流试所有 action，起到 exploration 的作用</li>
+</ul>
+<h3>3.4 Decaying ε-Greedy</h3>
+<ul>
+<li>永不 explore ⇒ linear regret（greedy）</li>
+<li>永远 explore ⇒ linear regret（ε-greedy）</li>
+<li><strong>Decaying ε-greedy</strong>：设计衰减序列 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ε</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>ε</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo></mrow></math>（早期多探索，后期少探索）</li>
+<li>但怎么衰减才好？→ <strong>需要考虑我们对 action 估计的不确定性！</strong></li>
+</ul>
+<h2>4 · Upper Confidence Bounds（UCB）</h2>
+<h3>4.1 不确定性指导 exploration</h3>
+<p><strong>问题</strong>：只用均值估计，没有考虑估计本身有多不确定。</p>
+<p>课件例：</p>
+<table>
+<thead>
+<tr>
+<th>arm</th>
+<th>拉的次数</th>
+<th>赢的次数</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>1</mn></msub></mrow></math></td>
+<td>1000</td>
+<td>600</td>
+<td>0.6</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>2</mn></msub></mrow></math></td>
+<td>1000</td>
+<td>400</td>
+<td>0.4</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>3</mn></msub></mrow></math></td>
+<td>10</td>
+<td>4</td>
+<td>0.4</td>
+</tr>
+</tbody>
+</table>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>2</mn></msub></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>3</mn></msub></mrow></math> 的估计都是 0.4，但 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>3</mn></msub></mrow></math> 只试了 10 次，<strong>真值可能远高于 0.4</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>2</mn></msub></mrow></math> 试了 1000 次，基本确定就是 0.4。</p>
+<ul>
+<li><strong>越不确定的 action，越值得 explore</strong>，因为它可能其实更好</li>
+</ul>
+<h3>4.2 UCB 思路</h3>
+<ul>
+<li>为每个 action 估计一个 upper confidence <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，使得<strong>以高概率</strong></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>≤</mo><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：估计的均值；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：估计的置信上界宽度）</p>
+<ul>
+<li>选 <strong>UCB 最大</strong>的 action：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 应依赖 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 被选过的次数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 小 ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 大（估计不确定）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 大 ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 小（估计准确）</li>
+</ul>
+</li>
+</ul>
+<p><strong>这就是「optimism in the face of uncertainty」</strong>：不确定时，按最乐观的可能去试。如果它真的好，赚到了；如果不好，试了之后 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math> 变小，自然就不选了。</p>
+<h3>4.3 Hoeffding's Inequality</h3>
+<blockquote>
+<p><strong>Theorem.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Z</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>Z</mi><mi>n</mi></msub></mrow></math> 独立、有界，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Z</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false">[</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">]</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi mathvariant="normal">∞</mi><mo>&lt;</mo><mi>a</mi><mo>≤</mo><mi>b</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>）。则对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>≥</mo><mn>0</mn></mrow></math>：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>p</mi><mrow><mo fence="true">(</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>Z</mi><mi>i</mi></msub><mo>−</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>Z</mi><mi>i</mi></msub><mo stretchy="false">]</mo><mo>≥</mo><mi>t</mi><mo fence="true">)</mo></mrow><mo>≤</mo><mi>exp</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mo>−</mo><mfrac><mrow><mn>2</mn><mi>n</mi><msup><mi>t</mi><mn>2</mn></msup></mrow><mrow><mo stretchy="false">(</mo><mi>b</mi><mo>−</mo><mi>a</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo fence="true">)</mo></mrow></mrow></math></div>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>p</mi><mrow><mo fence="true">(</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>Z</mi><mi>i</mi></msub><mo>−</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>Z</mi><mi>i</mi></msub><mo stretchy="false">]</mo><mo>≤</mo><mo>−</mo><mi>t</mi><mo fence="true">)</mo></mrow><mo>≤</mo><mi>exp</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mo>−</mo><mfrac><mrow><mn>2</mn><mi>n</mi><msup><mi>t</mi><mn>2</mn></msup></mrow><mrow><mo stretchy="false">(</mo><mi>b</mi><mo>−</mo><mi>a</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo fence="true">)</mo></mrow></mrow></math></div></p>
+</blockquote>
+<p><strong>含义</strong>：样本均值偏离真实均值超过 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 的概率，随样本数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> <strong>指数下降</strong>。</p>
+<p>对每个 action 的 rewards 用 Hoeffding（reward 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>−</mo><mi>a</mi><mo>=</mo><mn>1</mn></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>−</mo><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>≥</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>≤</mo><mi>c</mi><mo>⋅</mo><mi>exp</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo>−</mo><mn>2</mn><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>≤</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>≤</mo><mi>c</mi><mo>⋅</mo><mi>exp</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo>−</mo><mn>2</mn><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>：总共玩了多少次（任何 action）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 次中玩 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 的次数</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：让 margin 依赖于交互次数</li>
+</ul>
+<h3>4.4 解出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></h3>
+<p>令「上界失败」的概率等于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>p</mi><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msqrt><mfrac><mrow><mo>−</mo><mi>log</mi><mo>⁡</mo><mi>p</mi></mrow><mrow><mn>2</mn><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac></msqrt></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>随着玩得越多，<strong>减小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math></strong>，例如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><msup><mi>t</mi><mrow><mo>−</mo><mi>k</mi></mrow></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>log</mi><mo>⁡</mo><mi>p</mi><mo>=</mo><mn>2</mn><mi>log</mi><mo>⁡</mo><mi>t</mi></mrow></math></li>
+<li>这保证 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></math> 时选到最优 action</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msqrt><mfrac><mrow><mn>2</mn><mi>log</mi><mo>⁡</mo><mi>t</mi></mrow><mrow><mn>2</mn><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac></msqrt><mo>=</mo><msqrt><mfrac><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi></mrow><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac></msqrt></mrow></math></div><h3>4.5 UCB 算法</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><mrow><mo fence="true">[</mo><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>c</mi><msqrt><mfrac><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi></mrow><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac></msqrt><mo fence="true">]</mo></mrow></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>一个<strong>随时间逐渐减少 exploration</strong> 的聪明办法：估计真值的上界，选上界最大的</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi></mrow></math>：超参数，权衡 exploration 与 exploitation</li>
+<li><strong>置信项随总次数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 增长（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi></mrow></math>，很慢），随该 action 被试的次数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 缩小</strong></li>
+<li>保证<strong>每个 action 都会被试无穷多次</strong>（没被选的 action，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi></mrow></math> 一直涨，迟早会被选），但仍然平衡 exploration / exploitation</li>
+<li>课件图：UCB（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mn>2</mn></mrow></math>）的平均 reward 高于 ε-greedy（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>0.1</mn></mrow></math>）</li>
+</ul>
+<p><strong>补充算例</strong>（用 4.1 的表，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>2010</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi><mo>≈</mo><mn>7.61</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mn>1</mn></mrow></math>）：</p>
+<table>
+<thead>
+<tr>
+<th>arm</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi><mi mathvariant="normal">/</mi><msub><mi>N</mi><mi>t</mi></msub></mrow></msqrt></mrow></math></th>
+<th>UCB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>1</mn></msub></mrow></math></td>
+<td>0.6</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><mn>7.61</mn><mi mathvariant="normal">/</mi><mn>1000</mn></mrow></msqrt><mo>≈</mo><mn>0.087</mn></mrow></math></td>
+<td>0.687</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>2</mn></msub></mrow></math></td>
+<td>0.4</td>
+<td>0.087</td>
+<td>0.487</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>3</mn></msub></mrow></math></td>
+<td>0.4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><mn>7.61</mn><mi mathvariant="normal">/</mi><mn>10</mn></mrow></msqrt><mo>≈</mo><mn>0.872</mn></mrow></math></td>
+<td><strong>1.272</strong></td>
+</tr>
+</tbody>
+</table>
+<p>UCB 选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>3</mn></msub></mrow></math>：它只被试了 10 次，太不确定了，值得再试。</p>
+<h2>5 · Gradient Bandits</h2>
+<p><strong>Q：有没有 policy-based 的解法？</strong>（不估计 value，直接学选择概率）</p>
+<ul>
+<li>每个 action 一个 <strong>score 参数</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>a</mi></msub></mrow></math>（共 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 个，要优化）</li>
+<li>选择概率是 <strong>softmax</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><msup><mi>e</mi><msub><mi>s</mi><mi>a</mi></msub></msup><mrow><munder><mo>∑</mo><mrow><mi>b</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><msup><mi>e</mi><msub><mi>s</mi><mi>b</mi></msub></msup></mrow></mfrac><mo separator="true">,</mo><mspace width="1em"/><mi mathvariant="normal">∀</mi><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></math></div><ul>
+<li><strong>Expected reward objective</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>J</mi><mo stretchy="false">(</mo><msub><mi>s</mi><msub><mi>a</mi><mn>1</mn></msub></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>s</mi><msub><mi>a</mi><mi>m</mi></msub></msub><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>𝔼</mi><mo stretchy="false">[</mo><mi>r</mi><mo>∣</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math></div><h3>5.1 求梯度</h3>
+<p>对每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>J</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac></mrow></math>（求和变量记作 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>J</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mrow><mo fence="true">(</mo><munder><mo>∑</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mtext> </mtext><mi>𝔼</mi><mo stretchy="false">[</mo><mi>r</mi><mo>∣</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">]</mo><mo fence="true">)</mo></mrow></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac><mo>=</mo><munder><mo>∑</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>𝔼</mi><mo stretchy="false">[</mo><mi>r</mi><mo>∣</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">]</mo><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mtext> </mtext><mi>𝔼</mi><mo stretchy="false">[</mo><mi>r</mi><mo>∣</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">]</mo><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∼</mo><mi>π</mi><mo separator="true">,</mo><mtext> </mtext><mi>r</mi><mo>∼</mo><mi>r</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></msub><mrow><mo fence="true">[</mo><mi>r</mi><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>第二步用了 log-derivative trick</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>π</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>s</mi></mrow></mfrac><mo>=</mo><mi>π</mi><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>log</mi><mo>⁡</mo><mi>π</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>s</mi></mrow></mfrac></mrow></math>。这样能把求和变回<strong>对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 的期望</strong>，于是可以用<strong>采样</strong>来估计——这是以后 policy gradient（3.1）的核心技巧。</p>
+<h3>5.2 Softmax 的 log 导数</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mi mathvariant="normal">∂</mi><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac><mrow><mo fence="true">(</mo><msub><mi>s</mi><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mo>−</mo><mi>log</mi><mo>⁡</mo><munder><mo>∑</mo><mi>b</mi></munder><msup><mi>e</mi><msub><mi>s</mi><mi>b</mi></msub></msup><mo fence="true">)</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mn>𝟙</mn><mrow><mi>a</mi><mo>=</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（第一项对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>a</mi></msub></mrow></math> 求导：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 时为 1；第二项求导得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msup><mi>e</mi><msub><mi>s</mi><mi>a</mi></msub></msup><mrow><msub><mo>∑</mo><mi>b</mi></msub><msup><mi>e</mi><msub><mi>s</mi><mi>b</mi></msub></msup></mrow></mfrac><mo>=</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>。）</p>
+<p>所以</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>J</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mi>a</mi></msub></mrow></mfrac><mo>=</mo><msub><mi>𝔼</mi><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∼</mo><mi>π</mi><mo separator="true">,</mo><mtext> </mtext><mi>r</mi><mo>∼</mo><mi>r</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mi>r</mi><mo>⋅</mo><mo stretchy="false">(</mo><msub><mn>𝟙</mn><mrow><mi>a</mi><mo>=</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></div><p><strong>Gradient Bandits</strong>：每一步用一个样本 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 近似梯度：对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></math>，梯度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≈</mo><msub><mi>r</mi><mi>t</mi></msub><mo>⋅</mo><mo stretchy="false">(</mo><msub><mn>𝟙</mn><mrow><mi>a</mi><mo>=</mo><msub><mi>a</mi><mi>t</mi></msub></mrow></msub><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>。做梯度<strong>上升</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>s</mi><mi>a</mi></msub><mo>←</mo><msub><mi>s</mi><mi>a</mi></msub><mo>+</mo><mi>α</mi><mtext> </mtext><msub><mi>r</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mn>𝟙</mn><mrow><mi>a</mi><mo>=</mo><msub><mi>a</mi><mi>t</mi></msub></mrow></msub><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p><strong>直觉</strong>：选中的 action 得到正 reward，它的 score 上升（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>&gt;</mo><mn>0</mn></mrow></math>），其他 action 的 score 下降（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mn>0</mn></mrow></math>）。</p>
+<p><strong>补充算例</strong>：3 个 arm，初始 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo>=</mo><mo stretchy="false">(</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo separator="true">,</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo separator="true">,</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.1</mn></mrow></math>，选了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>1</mn></msub></mrow></math> 得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>1</mn></mrow></math>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><msub><mi>a</mi><mn>1</mn></msub></msub><mo>←</mo><mn>0</mn><mo>+</mo><mn>0.1</mn><mo>⋅</mo><mn>1</mn><mo>⋅</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo stretchy="false">)</mo><mo>=</mo><mn>0.067</mn></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><msub><mi>a</mi><mn>2</mn></msub></msub><mo separator="true">,</mo><msub><mi>s</mi><msub><mi>a</mi><mn>3</mn></msub></msub><mo>←</mo><mn>0</mn><mo>+</mo><mn>0.1</mn><mo>⋅</mo><mn>1</mn><mo>⋅</mo><mo stretchy="false">(</mo><mn>0</mn><mo>−</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>0.033</mn></mrow></math></li>
+<li>新的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo>≈</mo><mo stretchy="false">(</mo><mn>0.356</mn><mo separator="true">,</mo><mn>0.322</mn><mo separator="true">,</mo><mn>0.322</mn><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>1</mn></msub></mrow></math> 的概率上升</li>
+</ul>
+<p>（Sutton &amp; Barto 的版本把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub></mrow></math> 换成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>−</mo><msub><mover accent="true"><mi>r</mi><mo>ˉ</mo></mover><mi>t</mi></msub></mrow></math>，减去平均 reward 作为 <strong>baseline</strong>，减小方差；课件没讲，L3.1 policy gradient 会用到。）</p>
+<p><strong>Extra reading</strong>：Sutton &amp; Barto Ch 2；Bayesian Bandits and Thompson Sampling。</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bandit 设定</td>
+<td>stateless；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 个 arm；不知道分布；目标 cumulative reward</td>
+</tr>
+<tr>
+<td>何时不是 bandit</td>
+<td>state 随 action 改变 → sequential（MDP）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>定义；Bernoulli / Gaussian bandit</td>
+</tr>
+<tr>
+<td>增量更新</td>
+<td>公式 + 完整推导；通用形式 NewEstimate ← …</td>
+</tr>
+<tr>
+<td>Greedy action</td>
+<td>定义；exploit vs explore</td>
+</tr>
+<tr>
+<td>Regret</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>l</mi><mi>t</mi></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>L</mi><mi>T</mi></msub></mrow></math> 定义；与 cumulative reward 的关系；linear regret 的意义</td>
+</tr>
+<tr>
+<td>Greedy</td>
+<td>为什么会锁死；linear regret；课件 0.3 / 0.5 / 0.1 例</td>
+</tr>
+<tr>
+<td>ε-greedy</td>
+<td>算法框；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mtext>greedy</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo>+</mo><mi>ε</mi><mi mathvariant="normal">/</mi><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></math>（0.9）；为什么也是 linear regret</td>
+</tr>
+<tr>
+<td>10-armed testbed</td>
+<td>长期 ε = 0.01 最好；optimistic initialization</td>
+</tr>
+<tr>
+<td>Decaying ε</td>
+<td>动机</td>
+</tr>
+<tr>
+<td>UCB 思路</td>
+<td>不确定性；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo>≤</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>+</mo><msub><mi>U</mi><mi>t</mi></msub></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub></mrow></math> 的关系</td>
+</tr>
+<tr>
+<td>Hoeffding</td>
+<td>叙述；推出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>t</mi></msub><mo>=</mo><msqrt><mrow><mo>−</mo><mi>log</mi><mo>⁡</mo><mi>p</mi><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>2</mn><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></msqrt></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><msup><mi>t</mi><mrow><mo>−</mo><mn>2</mn></mrow></msup></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi><mi mathvariant="normal">/</mi><msub><mi>N</mi><mi>t</mi></msub></mrow></msqrt></mrow></math></td>
+</tr>
+<tr>
+<td>UCB 公式</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>arg</mi><mo>⁡</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">[</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>+</mo><mi>c</mi><msqrt><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi><mi mathvariant="normal">/</mi><msub><mi>N</mi><mi>t</mi></msub></mrow></msqrt><mo stretchy="false">]</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi></mrow></math> 的作用；每个 action 被试无穷次</td>
+</tr>
+<tr>
+<td>Gradient bandit</td>
+<td>softmax policy；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>J</mi></mrow></math>；log-derivative trick；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mn>𝟙</mn><mrow><mi>a</mi><mo>=</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub><mo>−</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>；更新式</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>增量更新的 step size 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mi>t</mi></mfrac></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> = 该 action 已收到的 reward 数），不是总步数。</li>
+<li>ε-greedy 随机时<strong>也可能选到 greedy action</strong>，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mtext>greedy</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo>+</mo><mi>ε</mi><mi mathvariant="normal">/</mi><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow></math>。</li>
+<li>Greedy 和常数 ε-greedy <strong>都是 linear regret</strong>，原因不同：前者可能永远锁死，后者永远在乱试。</li>
+<li>UCB 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>log</mi><mo>⁡</mo><mi>t</mi></mrow></math> 用的是<strong>总步数</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>，分母是<strong>该 action 的次数</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>。</li>
+<li>Gradient bandit 的梯度对<strong>所有</strong> action 都要更新，不只是选中的那个。</li>
+<li>Regret 是对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math>（真值）算的，不是对估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub></mrow></math>。</li>
+</ul>

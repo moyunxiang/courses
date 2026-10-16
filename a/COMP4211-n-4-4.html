@@ -1,0 +1,206 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>XOR 用一个 hidden unit 解决</strong></li>
+<li><strong>MLP 结构</strong>；用于分类（多类 argmax、二类一个输出）</li>
+<li><strong>为什么 hidden unit 必须非线性</strong>（线性层叠还是线性）；step 不可导 → <strong>sigmoid</strong>、tanh、<strong>RBF</strong>、<strong>ReLU</strong></li>
+<li><strong>Universal approximation</strong></li>
+<li><strong>Loss functions</strong>：0-1 / hinge 回顾；<strong>entropy</strong>、<strong>cross-entropy</strong>；softmax；cross-entropy loss</li>
+</ol>
+<blockquote>
+<p>必会计算：验证 XOR 网络；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>；<strong>entropy</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>9</mn><mo>+</mo><mo separator="true">,</mo><mn>5</mn><mo>−</mo><mo stretchy="false">]</mo></mrow></math> = 0.94）；编码期望长度（1.75 bits）；softmax；cross-entropy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>c</mi></msub></mrow></math>；二分类 cross-entropy 公式。必会概念：为什么线性 hidden units 没用；ReLU 的优点和「梯度可能为 0」；RBF 局部响应 vs sigmoid 全局响应。</p>
+</blockquote>
+<h2>1 · 回到 XOR</h2>
+<p>单个 perceptron 不能解 XOR，<strong>加一个 hidden unit</strong> 就可以：</p>
+<ul>
+<li>Hidden unit：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mn>3</mn></msub><mo>=</mo><mtext>step</mtext><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>1.5</mn><mo stretchy="false">)</mo></mrow></math>——就是 <strong>AND</strong></li>
+<li>Output：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mtext>step</mtext><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>2</mn><msub><mi>y</mi><mn>3</mn></msub><mo>−</mo><mn>0.5</mn><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>2</mn></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mn>3</mn></msub></mrow></math>（AND）</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>2</mn><msub><mi>y</mi><mn>3</mn></msub><mo>−</mo><mn>0.5</mn></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>（XOR）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.5</mn></mrow></math></td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0.5</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0.5</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.5</mn></mrow></math></td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>（输入同时直连 output；本质上「OR 但排除 AND」。）</p>
+<h2>2 · Multi-layer Feedforward Networks</h2>
+<p>Simple perceptron 的推广：<strong>input units <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mi>k</mi></msub></mrow></math></strong> →（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>k</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub></mrow></math>）→ <strong>hidden units <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>j</mi></msub></mrow></math></strong> →（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>j</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub></mrow></math>）→ <strong>output units <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>O</mi><mi>i</mi></msub></mrow></math></strong>。</p>
+<p><strong>用于分类</strong>：</p>
+<ul>
+<li><strong>多类</strong>：每类一个输出，分到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>arg</mi><mo>⁡</mo><msubsup><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></msubsup><msub><mi>y</mi><mi>i</mi></msub></mrow></math></li>
+<li><strong>二类</strong>：当多类处理；或只用一个输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>&gt;</mo><mn>0</mn></mrow></math> 归 yes 类，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>≤</mo><mn>0</mn></mrow></math> 归 no 类</li>
+</ul>
+<h2>3 · Hidden Unit 的激活函数</h2>
+<h3>3.1 为什么必须非线性</h3>
+<p>若 hidden units 都是线性的：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><msub><mi>W</mi><mn>2</mn></msub><msub><mi>W</mi><mn>1</mn></msub><msup><mi>x</mi><mrow><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mn>2</mn></msub><msub><mi>W</mi><mn>1</mn></msub><mo stretchy="false">)</mo><msup><mi>x</mi><mrow><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></msup></mrow></math></div><p>——等价于<strong>单层</strong>网络（权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>2</mn></msub><msub><mi>W</mi><mn>1</mn></msub></mrow></math>）。</p>
+<blockquote>
+<p>MLP 的能力<strong>来自 hidden units 的非线性</strong>。</p>
+</blockquote>
+<p>用 perceptron（step）当 hidden unit？——step <strong>不可导</strong>，不适合梯度下降。</p>
+<h3>3.2 Sigmoid</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"/><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mrow><mi>d</mi><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>像 perceptron，但用<strong>光滑、可导</strong>的阈值函数。（对比：step 输出 0/1，sign 输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>±</mo><mn>1</mn></mrow></math>，sigmoid 输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>。）<strong>tanh</strong> 有时代替 sigmoid。</p>
+<p><strong>导数推导（补充）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></mfrac><mo>⋅</mo><mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></mfrac><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+<h3>3.3 RBF（Radial Basis Function）network</h3>
+<p>例：Gaussian <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>exp</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mo>−</mo><mfrac><mrow><mo stretchy="false">(</mo><mi>𝐱</mi><mo>−</mo><msub><mi>𝐰</mi><mi>j</mi></msub><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup><mo stretchy="false">(</mo><mi>𝐱</mi><mo>−</mo><msub><mi>𝐰</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mn>2</mn><msubsup><mi>σ</mi><mi>j</mi><mn>2</mn></msubsup></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></math>——径向对称。</p>
+<ul>
+<li>每个 hidden unit 产生<strong>局部</strong>响应：只在输入落在一个小区域时才有显著非零输出</li>
+<li>对比 sigmoid：在<strong>无限大</strong>区域上非零</li>
+<li>有的问题 sigmoid 更高效，有的更适合 RBF</li>
+</ul>
+<h3>3.4 ReLU</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li>深度网络<strong>最流行</strong>的激活函数</li>
+<li>计算高效；梯度简单：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>0</mn></mrow></math> 时 1，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mn>0</mn></mrow></math> 时 0</li>
+<li><strong>Sparse activation</strong>（只有部分 hidden units 输出非零）</li>
+<li>⚠️ <strong>梯度可能为 0</strong>（输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mn>0</mn></mrow></math> 时）</li>
+</ul>
+<h2>4 · Universal Approximation</h2>
+<blockquote>
+<p><strong>只用一层</strong> sigmoid hidden units 就足以把任何 well-behaved function <strong>近似到任意精度</strong>。</p>
+</blockquote>
+<p>超过 2 层的网络也有 universal approximation 性质。</p>
+<h2>5 · Loss Functions</h2>
+<p>回顾（第 2 讲）：zero-one loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟏</mn><mo stretchy="false">[</mo><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi><mo>≤</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>；hinge loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mn>1</mn><mo>−</mo><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math>。</p>
+<p><strong>Cross-entropy loss</strong> 在分类中最常用——先简单介绍信息论。</p>
+<h3>5.1 Entropy：直觉</h3>
+<p>衡量 <strong>impurity / uncertainty / irregularity / surprise</strong>。两类样本集 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mo>⊕</mo></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mo>⊖</mo></msub></mrow></math> 是正 / 负样本比例：</p>
+<ul>
+<li><strong>最纯</strong>（不确定性 0）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mo>⊕</mo></msub><mo>=</mo><mn>1</mn></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mo>⊕</mo></msub><mo>=</mo><mn>0</mn></mrow></math></li>
+<li><strong>最不纯</strong>（最大不确定性）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mo>⊕</mo></msub><mo>=</mo><msub><mi>p</mi><mo>⊖</mo></msub><mo>=</mo><mn>0.5</mn></mrow></math></li>
+</ul>
+<h3>5.2 Entropy：定义</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mi>𝒳</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>b</mi></msub><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mn>0</mn><mo>⋅</mo><mi>log</mi><mo>⁡</mo><mn>0</mn><mo>=</mo><mn>0</mn></mrow></math></div><p>两类：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo>=</mo><mo>−</mo><msub><mi>p</mi><mo>⊕</mo></msub><mi>log</mi><mo>⁡</mo><msub><mi>p</mi><mo>⊕</mo></msub><mo>−</mo><msub><mi>p</mi><mo>⊖</mo></msub><mi>log</mi><mo>⁡</mo><msub><mi>p</mi><mo>⊖</mo></msub></mrow></math>。</p>
+<p><strong>例</strong>：14 个样本，9 正 5 负</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Entropy</mtext><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>9</mn><mo>+</mo><mo separator="true">,</mo><mn>5</mn><mo>−</mo><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mfrac><mn>9</mn><mn>14</mn></mfrac><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mfrac><mn>9</mn><mn>14</mn></mfrac><mo>−</mo><mfrac><mn>5</mn><mn>14</mn></mfrac><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mfrac><mn>5</mn><mn>14</mn></mfrac><mo>=</mo><mn>0.94</mn></mrow></math></div><ul>
+<li>全同类 ⇒ 0；正负相等 ⇒ 1；否则在 0 和 1 之间</li>
+</ul>
+<p><strong>单位</strong>：取决于底 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math>——<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mi>e</mi></mrow></math>：nats；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mn>2</mn></mrow></math>：<strong>bits</strong>（本课采用）。换底：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>H</mi><mi>b</mi></msub><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>b</mi></msub><mi>a</mi><mo stretchy="false">)</mo><msub><mi>H</mi><mi>a</mi></msub><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+<p><strong>不同分布可以有相同 entropy</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mo stretchy="false">{</mo><mn>.5</mn><mo separator="true">,</mo><mn>.25</mn><mo separator="true">,</mo><mn>.25</mn><mo stretchy="false">}</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mo stretchy="false">{</mo><mn>.48</mn><mo separator="true">,</mo><mn>.32</mn><mo separator="true">,</mo><mn>.2</mn><mo stretchy="false">}</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1.5</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo><mo>≈</mo><mn>1.4987</mn><mo>≈</mo><mn>1.5</mn></mrow></math>（课件写作相等，实为近似）。</p>
+<p><strong>界</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 取 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 个值时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>H</mi><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo><mo>≤</mo><mi>log</mi><mo>⁡</mo><mi>n</mi></mrow></math>；均匀分布取上界；某个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></math> 时取 0。</p>
+<h3>5.3 与编码的关系</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mfrac><mn>1</mn><mn>8</mn></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mfrac><mn>1</mn><mn>8</mn></mfrac></mrow></math></p>
+<ul>
+<li>定长码 00 / 01 / 10 / 11：期望长度 <strong>2 bits</strong></li>
+<li>变长码 0 / 10 / 110 / 111：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>⋅</mo><mn>2</mn><mo>+</mo><mfrac><mn>1</mn><mn>8</mn></mfrac><mo>⋅</mo><mn>3</mn><mo>+</mo><mfrac><mn>1</mn><mn>8</mn></mfrac><mo>⋅</mo><mn>3</mn><mo>=</mo><mn>1.75</mn></mrow></math> <strong>bits</strong>（= <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></math>）</li>
+</ul>
+<blockquote>
+<p>最优码给概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 的消息分配 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>p</mi></mrow></math> bits。<strong>Entropy(S) = 用最优最短码编码一个随机成员的类别所需的期望 bits 数</strong>。最坏情况（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mo>⊕</mo></msub><mo>=</mo><mn>0.5</mn></mrow></math>）每个样本 1 bit；不确定性小（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mo>⊕</mo></msub><mo>=</mo><mn>0.8</mn></mrow></math>）可以少于 1 bit。</p>
+</blockquote>
+<h3>5.4 Cross-entropy</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>p</mi><mi>i</mi></msub><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>i</mi></msub></mrow></math></div><ul>
+<li>用<strong>另一个模型 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math></strong> 编码来自源分布 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 的消息所需的平均 bits</li>
+<li><strong>不对称</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>H</mi><mo stretchy="false">(</mo><mi>q</mi><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo><mo>=</mo><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h3>5.5 用于神经网络</h3>
+<ul>
+<li><strong>Target</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>：<strong>one-hot</strong>（正确类位置为 1，其余 0）</li>
+<li><strong>Model</strong> 预测分布 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math>（属于各类的概率）</li>
+<li>分类网络最后一层通常是 linear（无非线性），输出不一定在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> ⇒ <strong>softmax</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="false">(</mo><msub><mi>α</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>α</mi><mi>C</mi></msub><mo stretchy="false">)</mo><mo>→</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><msup><mi>e</mi><msub><mi>α</mi><mn>1</mn></msub></msup><mrow><munder><mo>∑</mo><mi>i</mi></munder><msup><mi>e</mi><msub><mi>α</mi><mi>i</mi></msub></msup></mrow></mfrac><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mfrac><msup><mi>e</mi><msub><mi>α</mi><mi>C</mi></msub></msup><mrow><munder><mo>∑</mo><mi>i</mi></munder><msup><mi>e</mi><msub><mi>α</mi><mi>i</mi></msub></msup></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></math></div><p><strong>Cross-entropy loss</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>p</mi><mi>i</mi></msub><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>c</mi></msub></mrow></mstyle></mstyle></mstyle></menclose><mo separator="true">,</mo><mspace width="1em"/><mi>c</mi><mo>=</mo><mtext>真实类</mtext></mrow></math></div><ul>
+<li>模型给真实类<strong>高概率</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>q</mi><mi>c</mi></msub><mo>≈</mo><mn>1</mn></mrow></math>）⇒ loss <strong>小</strong></li>
+<li>给真实类<strong>低概率</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>q</mi><mi>c</mi></msub><mo>≈</mo><mn>0</mn></mrow></math>）⇒ loss <strong>大</strong></li>
+</ul>
+<p><strong>二分类</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo>−</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>t</mi><mi>i</mi></msub><mi>log</mi><mo>⁡</mo><mi>f</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo separator="true">;</mo><mi>w</mi><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>t</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>f</mi><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo separator="true">;</mo><mi>w</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p><strong>补充算例</strong>：logits <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>，真实类 1：softmax <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mfrac><mrow><mo stretchy="false">(</mo><msup><mi>e</mi><mn>2</mn></msup><mo separator="true">,</mo><msup><mi>e</mi><mn>1</mn></msup><mo separator="true">,</mo><msup><mi>e</mi><mn>0</mn></msup><mo stretchy="false">)</mo></mrow><mrow><msup><mi>e</mi><mn>2</mn></msup><mo>+</mo><mi>e</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mo>≈</mo><mo stretchy="false">(</mo><mn>0.665</mn><mo separator="true">,</mo><mn>0.245</mn><mo separator="true">,</mo><mn>0.090</mn><mo stretchy="false">)</mo></mrow></math>；loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo>−</mo><mi>ln</mi><mo>⁡</mo><mn>0.665</mn><mo>≈</mo><mn>0.41</mn></mrow></math> nats。</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XOR</td>
+<td>课件网络（1.5、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn></mrow></math>、0.5）及验证表</td>
+</tr>
+<tr>
+<td>分类输出</td>
+<td>argmax；二类单输出阈值 0</td>
+</tr>
+<tr>
+<td>非线性</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>2</mn></msub><msub><mi>W</mi><mn>1</mn></msub></mrow></math> 论证；step 不可导</td>
+</tr>
+<tr>
+<td>Sigmoid</td>
+<td>公式、导数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>RBF</td>
+<td>局部 vs 全局</td>
+</tr>
+<tr>
+<td>ReLU</td>
+<td>优点；梯度可能 0</td>
+</tr>
+<tr>
+<td>Universal approx.</td>
+<td>一层 sigmoid 足够</td>
+</tr>
+<tr>
+<td>Entropy</td>
+<td>定义；0.94；单位；界</td>
+</tr>
+<tr>
+<td>编码</td>
+<td>2 vs 1.75 bits；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mi>p</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Cross-entropy</td>
+<td>定义；不对称；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo><mo>=</mo><mi>H</mi><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Softmax / CE loss</td>
+<td>公式；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>c</mi></msub></mrow></math>；二分类形式</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>线性 hidden units 叠多少层都等价于一层。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>。</li>
+<li>Entropy 的 log 默认底 2（bits）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mi>log</mi><mo>⁡</mo><mn>0</mn><mo>=</mo><mn>0</mn></mrow></math>。</li>
+<li>Cross-entropy 不对称：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 是 target，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> 是 model。</li>
+<li>One-hot target 下 cross-entropy 只剩 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>c</mi></msub></mrow></math>。</li>
+<li>Softmax 是对 logits 做指数归一化，不是直接除以和。</li>
+</ul>

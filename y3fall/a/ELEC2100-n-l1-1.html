@@ -1,0 +1,472 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Chapter 1 的大纲：1 Basic concepts → 2 Description and classification of signals → 3 Continuous-time signals → 4 Unit step &amp; unit impulse → 5 Decomposition → 6 Discrete-time signals → 7 System。本讲（1.1）覆盖前三部分：</p>
+<ol>
+<li><strong>信号与系统的基本概念</strong>、学习方法</li>
+<li><strong>信号的描述与分类</strong>：确定 / 随机、连续 / 离散、<strong>周期 / 非周期</strong>、<strong>能量 / 功率</strong>、一维 / 多维</li>
+<li><strong>典型连续信号</strong>：指数、正弦（Euler 公式）、复指数、<strong>Sa / sinc</strong>、Gaussian</li>
+<li><strong>连续信号的运算</strong>：加、乘、微分、积分；<strong>平移、反转、尺度变换</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ol>
+<blockquote>
+<p>必考计算：<strong>判断周期性并求基波周期</strong>（两个正弦之和）；<strong>判断能量信号 / 功率信号并算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math></strong>；<strong>画 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math> 的波形</strong>（先平移再压缩，或换元找新坐标）。概念：连续 / 离散 / 数字信号的区别；复指数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi>s</mi><mi>t</mi></mrow></msup></mrow></math> 中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math> 的符号决定增长 / 衰减。</p>
+</blockquote>
+<h2>1 · 基本概念</h2>
+<h3>1.1 Signal 与 System</h3>
+<ul>
+<li><strong>Message</strong>：通信系统中，语音、文字、图像、数据统称消息</li>
+<li><strong>Signal</strong>：消息的<strong>表示形式和传输载体</strong>（消息是信号要传递的实际内容）</li>
+<li><strong>System</strong>：由多个相互作用、相互依赖的部分组成、具有稳定功能的整体</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>⟶</mo><mtext>  </mtext><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mtext>System</mtext></mstyle></mstyle></mstyle></menclose><mtext>  </mtext><mo>⟶</mo><mtext>  </mtext><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi></mrow></math>：<strong>excitation</strong>（激励，输入），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>：<strong>response</strong>（响应，输出）。</p>
+<ul>
+<li>系统的基本功能：<strong>把输入信号处理、变换成需要的输出信号</strong></li>
+<li>Analog：模拟信号 → <strong>analog signal processor</strong> → 模拟信号</li>
+<li>Digital：模拟信号 → <strong>ADC</strong> → <strong>digital signal processor</strong> → <strong>DAC</strong> → 模拟信号</li>
+<li>例：RC 电路把方波输入变成指数上升 / 下降的输出——输入经过系统会不会失真？系统怎样影响信号的传输？能否达到想要的处理效果？</li>
+</ul>
+<h3>1.2 信号与系统理论</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>研究什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Signal analysis</strong></td>
+<td>信号的<strong>描述和性质</strong></td>
+</tr>
+<tr>
+<td><strong>System analysis</strong></td>
+<td>给定系统，研究它对输入产生的<strong>输出</strong></td>
+</tr>
+<tr>
+<td><strong>System synthesis</strong></td>
+<td>按给定要求<strong>设计</strong>系统</td>
+</tr>
+</tbody>
+</table>
+<p>应用：signal transmission、signal processing。</p>
+<p><strong>通信系统</strong>：Information source → Transmitter → Channel（+ Noise）→ Receiver → Destination。发送端把消息变成信号，接收端把信号还原成消息。历史：1844 Morse 第一封电报；1876 Bell 发明电话；之后有线、微波、光纤、卫星、移动通信（1G 模拟 → 2G TDMA / GSM → 3G CDMA → 4G OFDMA、MIMO → 5G massive MIMO、NOMA → 6G）。</p>
+<p><strong>Signal processing 例</strong>：带噪声的音乐，经过<strong>滤波</strong>降噪——目的是把信号变成便于分析识别的形式，高效地估计和选择特征参数。</p>
+<h3>1.3 学习方法（课件建议）</h3>
+<ul>
+<li>注意<strong>物理概念与数学分析的对应</strong>，不要盲目计算</li>
+<li>注意分析结果的<strong>物理解释</strong>、参数变化时的物理意义和后果</li>
+<li>同一问题可能有多种解法，找最简单合理的，比较各方法的优缺点</li>
+<li>课程结束很久以后仍要反复学习基本概念</li>
+</ul>
+<h2>2 · 信号的描述与分类</h2>
+<p><strong>描述方法</strong>：信号可表示为一个或多个自变量的函数——<strong>函数式</strong>（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math>）、<strong>波形图</strong>、<strong>表格</strong>。</p>
+<h3>2.1 Deterministic vs Random</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>定义</th>
+<th>例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deterministic</strong></td>
+<td>任一时刻 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>，信号值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> <strong>确定</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Random</strong></td>
+<td>有不可预知的不确定性，瞬时值事先不能确定</td>
+<td>鼠脑电图信号</td>
+</tr>
+</tbody>
+</table>
+<h3>2.2 Continuous vs Discrete</h3>
+<ul>
+<li><strong>Continuous-time signal</strong>：在信号存在的时间范围内，<strong>除有限个间断点外每一时刻都有定义</strong>；用连续变量 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>，记 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Discrete-time signal</strong>：只在某些<strong>不连续的离散时刻</strong>有定义，其他时刻<strong>无定义</strong>；用离散变量 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>，记 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+<p><strong>连续 → 采样 → 量化</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>时间</th>
+<th>幅值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Continuous signal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>连续</td>
+<td>连续</td>
+</tr>
+<tr>
+<td>Sampled signal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>（<strong>采样</strong>后）</td>
+<td><strong>离散</strong></td>
+<td>连续</td>
+</tr>
+<tr>
+<td><strong>Digital signal</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>（再<strong>量化</strong>后）</td>
+<td>离散</td>
+<td><strong>离散</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>例 1</strong>：三个波形——连续波形是 continuous signal；只在整数点有值、幅值任意的是 discrete signal；只在整数点有值且<strong>幅值只取 1、2、3</strong> 的是 discrete signal <strong>且</strong>是 <strong>digital signal</strong>。</p>
+<blockquote>
+<p>判断套路：先看<strong>时间</strong>是否离散（discrete vs continuous），再看<strong>幅值</strong>是否只取有限个值（digital）。</p>
+</blockquote>
+<h3>2.3 Periodic vs Aperiodic</h3>
+<p><strong>周期信号</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mi>n</mi><mi>T</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="1em"/><mi>n</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mo>±</mo><mn>1</mn><mo separator="true">,</mo><mo>±</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo></mrow></math></div><ul>
+<li><strong>基波周期 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></strong>：满足上式的<strong>最小正</strong>值（单位 s）</li>
+<li><strong>基波频率</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mn>0</mn></msub><mo>=</mo><mfrac><mn>1</mn><mi>T</mi></mfrac></mrow></math>（Hz）</li>
+<li><strong>基波角频率</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>T</mi></mfrac></mrow></math>（rad/s）</li>
+<li><strong>正弦周期信号</strong>（harmonic signal）：单一频率；<strong>复杂周期信号</strong>（方波、三角波等）：可以用 <strong>Fourier series</strong>（一组谐波相关的正弦之和）表示</li>
+</ul>
+<p><strong>两个周期信号之和的周期性</strong>（必考）：</p>
+<blockquote>
+<p>和是周期的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> 两个周期之比 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>T</mi><mn>1</mn></msub><msub><mi>T</mi><mn>2</mn></msub></mfrac></mrow></math> 是<strong>有理数</strong>。此时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><msub><mi>k</mi><mn>1</mn></msub><msub><mi>T</mi><mn>1</mn></msub><mo>=</mo><msub><mi>k</mi><mn>2</mn></msub><msub><mi>T</mi><mn>2</mn></msub></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>k</mi><mn>2</mn></msub></mrow></math> 正整数），取最小的那个。</p>
+</blockquote>
+<p><strong>例 2</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>cos</mi><mo>⁡</mo><mn>10</mn><mi>t</mi><mo>+</mo><mi>cos</mi><mo>⁡</mo><mn>30</mn><mi>t</mi></mrow></math> 是否周期？</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo><mn>10</mn><mi>t</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>10</mn></mfrac></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo><mn>30</mn><mi>t</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>2</mn></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>30</mn></mfrac></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>T</mi><mn>1</mn></msub><msub><mi>T</mi><mn>2</mn></msub></mfrac><mo>=</mo><mfrac><msub><mi>k</mi><mn>2</mn></msub><msub><mi>k</mi><mn>1</mn></msub></mfrac><mo>=</mo><mn>3</mn></mrow></math>，<strong>有理数</strong> ⇒ 周期</li>
+<li>最小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mn>2</mn></msub><mo>=</mo><mn>3</mn></mrow></math>）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><msub><mi>k</mi><mn>1</mn></msub><msub><mi>T</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>10</mn></mfrac><mo>=</mo><mfrac><mi>π</mi><mn>5</mn></mfrac></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>T</mi></mfrac><mo>=</mo><mn>10</mn></mrow></math> rad/s</li>
+</ul>
+<p><strong>快速法（补充）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ω</mi><mn>0</mn></msub></mrow></math> 是 10 和 30 的<strong>最大公约数</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>10</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi mathvariant="normal">/</mi><msub><mi>ω</mi><mn>0</mn></msub></mrow></math>。</p>
+<p><strong>非周期信号</strong>：</p>
+<ul>
+<li><strong>Transient signals</strong>：脉冲、衰减函数</li>
+<li><strong>Quasi-periodic signals</strong>：由周期信号组成但周期之比是<strong>无理数</strong>，整体不周期——如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>T</mi><mn>1</mn></msub><msub><mi>T</mi><mn>2</mn></msub></mfrac><mo>=</mo><mfrac><mn>2</mn><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mi>π</mi></mfrac></mrow></math>，无理）</li>
+</ul>
+<h3>2.4 Energy vs Power（必考）</h3>
+<p>把信号 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 看成加在 <strong>1 Ω 电阻</strong>上的电压（或电流）：</p>
+<ul>
+<li><strong>Normalized instantaneous power</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">∣</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup></mrow></math></li>
+<li><strong>Normalized energy</strong>（signal energy）：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>E</mi><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></msubsup><mo stretchy="false">∣</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup><mtext> </mtext><mi>d</mi><mi>t</mi></mrow></math></div><ul>
+<li><strong>Average power</strong>（整个时间轴上的平均）：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>P</mi><mo>=</mo><munder><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>T</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></munder><mfrac><mn>1</mn><mi>T</mi></mfrac><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>T</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow><mrow><mi>T</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msubsup><mo stretchy="false">∣</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup><mtext> </mtext><mi>d</mi><mi>t</mi></mrow></math></div><table>
+<thead>
+<tr>
+<th></th>
+<th>能量 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math></th>
+<th>功率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math></th>
+<th>典型例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Energy signal</strong></td>
+<td><strong>有限</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>E</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>）</td>
+<td><strong>0</strong></td>
+<td>大多数<strong>时限</strong>信号</td>
+</tr>
+<tr>
+<td><strong>Power signal</strong></td>
+<td><strong>无穷</strong></td>
+<td><strong>有限</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>P</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>）</td>
+<td><strong>周期信号</strong>、step function、signum function</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么能量有限 ⇒ 功率为 0？</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mi>lim</mi><mo>⁡</mo><mfrac><msub><mi>E</mi><mi>T</mi></msub><mi>T</mi></mfrac></mrow></math>，分子有界、分母 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></math>。反之功率有限且非零，能量一定无穷。</p>
+<p><strong>例 3</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo><mn>2</mn></mrow></math>），否则 0：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>E</mi><mn>1</mn></msub><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mn>2</mn></msubsup><msup><mn>1</mn><mn>2</mn></msup><mtext> </mtext><mi>d</mi><mi>t</mi><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mspace width="1em"/><mn>0</mn><mo>&lt;</mo><msub><mi>E</mi><mn>1</mn></msub><mo>&lt;</mo><mi mathvariant="normal">∞</mi><mo separator="true">,</mo><mspace width="1em"/><msub><mi>P</mi><mn>1</mn></msub><mo>=</mo><mn>0</mn><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mtext>energy signal</mtext></mrow></math></div><p><strong>例 4</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 是周期为 2、每周期在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 上为 1 的方波（无限延续）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>P</mi><mn>2</mn></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><msup><mn>1</mn><mn>2</mn></msup><mtext> </mtext><mi>d</mi><mi>t</mi><mo>=</mo><mn>0.5</mn><mo separator="true">,</mo><mspace width="1em"/><mn>0</mn><mo>&lt;</mo><msub><mi>P</mi><mn>2</mn></msub><mo>&lt;</mo><mi mathvariant="normal">∞</mi><mo separator="true">,</mo><mspace width="1em"/><msub><mi>E</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">∞</mi><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mtext>power signal</mtext></mrow></math></div><blockquote>
+<p><strong>周期信号的平均功率 = 一个周期内的平均</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mfrac><mn>1</mn><mi>T</mi></mfrac><msubsup><mo>∫</mo><mn>0</mn><mi>T</mi></msubsup><mo stretchy="false">∣</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup><mi>d</mi><mi>t</mi></mrow></math>。
+有的信号<strong>既不是</strong>能量信号<strong>也不是</strong>功率信号（例如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mi>t</mi></msup></mrow></math> 在整个时间轴上，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math> 都无穷）。</p>
+</blockquote>
+<h3>2.5 One-dimensional vs Multidimensional</h3>
+<ul>
+<li><strong>一维</strong>：一个自变量（时间或空间），如音频（waveform、spectrum）</li>
+<li><strong>多维</strong>：需要多个自变量，如<strong>图像</strong>（Lenna 图，双边滤波）、电磁场分布、Wi-Fi 信号强度的可视化</li>
+</ul>
+<h2>3 · 典型连续信号</h2>
+<h3>3.1 指数信号</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>A</mi><msup><mi>e</mi><mrow><mi>α</mi><mi>t</mi></mrow></msup></mrow></math></div><table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math></th>
+<th>波形</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow></math></td>
+<td>常数（DC）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>&lt;</mo><mn>0</mn></mrow></math></td>
+<td>指数<strong>衰减</strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+<td>指数<strong>增长</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>关键性质</strong>：对时间<strong>求导、积分仍是指数形式</strong></li>
+</ul>
+<p><strong>单边指数信号</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi><mi mathvariant="normal">/</mi><mi>τ</mi></mrow></msup></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>&gt;</mo><mn>0</mn></mrow></math>）</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi></mrow></math>：<strong>time constant</strong>，有时间的量纲，表示<strong>衰减速度</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>τ</mi></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mi>e</mi></mfrac><mo>≈</mo><mn>0.368</mn></mrow></math>（衰减到初值的 36.8%）</li>
+</ul>
+<h3>3.2 正弦信号</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>A</mi><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo>+</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li><strong>Amplitude</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>；<strong>angular frequency</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ω</mi></mrow></math>；<strong>initial phase</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mfrac><mi>ω</mi><mrow><mn>2</mn><mi>π</mi></mrow></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mfrac><mn>1</mn><mi>f</mi></mfrac><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>ω</mi></mfrac></mrow></math></li>
+</ul>
+<p><strong>Euler's formula</strong>（「数学的桥梁」）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>e</mi><mrow><mi>j</mi><mi>θ</mi></mrow></msup><mo>=</mo><mi>cos</mi><mo>⁡</mo><mi>θ</mi><mo>+</mo><mi>j</mi><mi>sin</mi><mo>⁡</mo><mi>θ</mi><mo separator="true">,</mo><mspace width="2em"/><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mi>θ</mi></mrow></msup><mo>=</mo><mi>cos</mi><mo>⁡</mo><mi>θ</mi><mo>−</mo><mi>j</mi><mi>sin</mi><mo>⁡</mo><mi>θ</mi></mrow></math></div><ul>
+<li>复平面上，从原点到单位圆上、与实轴夹角 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math> 的点：<strong>polar form</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">∠</mi><mi>θ</mi><mo>=</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>θ</mi></mrow></msup></mrow></math>；<strong>rectangular form</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo><mi>θ</mi><mo>+</mo><mi>j</mi><mi>sin</mi><mo>⁡</mo><mi>θ</mi></mrow></math></li>
+<li>特殊值：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mo>=</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>π</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>=</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>π</mi></mrow></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>j</mi><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mi>π</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup></mrow></math>；<strong>Euler's identity</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi>j</mi><mi>π</mi></mrow></msup><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math></li>
+<li>电子工程里虚数单位常写作 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi></mrow></math></li>
+</ul>
+<p>令 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi><mo>=</mo><mi>ω</mi><mi>t</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>ω</mi><mi>t</mi></mrow></msup><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mi>ω</mi><mi>t</mi></mrow></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>j</mi></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>ω</mi><mi>t</mi></mrow></msup><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mi>ω</mi><mi>t</mi></mrow></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p>（复指数与三角函数的桥梁——Fourier 分析的基础。）</p>
+<p><strong>单边衰减正弦</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>K</mi><msup><mi>e</mi><mrow><mo>−</mo><mi>α</mi><mi>t</mi></mrow></msup><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>t</mi><mo>≥</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>t</mi><mo>&lt;</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow><mspace width="1em"/><mo stretchy="false">(</mo><mi>α</mi><mo>&gt;</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></div><h3>3.3 复指数信号</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>K</mi><msup><mi>e</mi><mrow><mi>s</mi><mi>t</mi></mrow></msup><mo separator="true">,</mo><mspace width="1em"/><mo>−</mo><mi mathvariant="normal">∞</mi><mo>&lt;</mo><mi>t</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo>=</mo><mi>σ</mi><mo>+</mo><mi>j</mi><mi>ω</mi></mrow></math> 是复数，叫 <strong>complex frequency</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ω</mi></mrow></math> 都是常数</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math> 的量纲是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mtext>s</mtext></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ω</mi></mrow></math> 的量纲是 rad/s</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ω</mi><mo>=</mo><mn>0</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>K</mi><msup><mi>e</mi><mrow><mi>σ</mi><mi>t</mi></mrow></msup></mrow></math>，就是<strong>实指数信号</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ω</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>K</mi><msup><mi>e</mi><mrow><mo stretchy="false">(</mo><mi>σ</mi><mo>+</mo><mi>j</mi><mi>ω</mi><mo stretchy="false">)</mo><mi>t</mi></mrow></msup><mo>=</mo><mi>K</mi><msup><mi>e</mi><mrow><mi>σ</mi><mi>t</mi></mrow></msup><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>j</mi><mi>K</mi><msup><mi>e</mi><mrow><mi>σ</mi><mi>t</mi></mrow></msup><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><p>实部和虚部都是振荡：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math></th>
+<th>振荡</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo>=</mo><mn>0</mn></mrow></math></td>
+<td><strong>等幅</strong>（constant-amplitude）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+<td><strong>增幅</strong>（amplifying）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo>&lt;</mo><mn>0</mn></mrow></math></td>
+<td><strong>衰减</strong>（decaying）</td>
+</tr>
+</tbody>
+</table>
+<p>（复指数一个式子就概括了 DC、指数、正弦、衰减 / 增长正弦——所以它是 Laplace 变换的基本信号。）</p>
+<h3>3.4 Sampling signal：Sa 与 sinc</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>sin</mi><mo>⁡</mo><mi>t</mi></mrow><mi>t</mi></mfrac></mrow></math></div><ul>
+<li><strong>偶函数</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Sa</mtext><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>t</mi><mo>→</mo><mn>0</mn></mrow></msub><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></math></li>
+<li><strong>零点</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math> 于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mo>±</mo><mi>n</mi><mi>π</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mo>…</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>t</mi><mo>→</mo><mo>±</mo><mi mathvariant="normal">∞</mi></mrow></msub><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></li>
+<li>中间 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mi>π</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">]</mo></mrow></math> 是 <strong>main lobe</strong>（主瓣），两边是 <strong>side lobes</strong>（旁瓣）</li>
+<li><strong>积分</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msubsup><mo>∫</mo><mn>0</mn><mi mathvariant="normal">∞</mi></msubsup><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>t</mi><mo>=</mo><mfrac><mi>π</mi><mn>2</mn></mfrac><mo separator="true">,</mo><mspace width="2em"/><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></msubsup><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>t</mi><mo>=</mo><mi>π</mi></mrow></math></div><p>（正好等于主瓣的「内接三角形」面积：底 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>π</mi></mrow></math>、高 1，面积 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>sinc</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>π</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mtext>Sa</mtext><mo stretchy="false">(</mo><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><p>零点在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mo>±</mo><mn>1</mn><mo separator="true">,</mo><mo>±</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo></mrow></math></p>
+<p>（Sa / sinc 在 Ch3 中是矩形脉冲的 Fourier transform，非常重要。）</p>
+<h3>3.5 Gaussian pulse</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>E</mi><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mi mathvariant="normal">/</mi><mi>τ</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></msup></mrow></math></div><ul>
+<li>钟形，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math> 时最大值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>τ</mi></mrow></math> 时降到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>E</mi><mi>e</mi></mfrac></mrow></math></li>
+</ul>
+<h2>4 · 连续信号的运算</h2>
+<h3>4.1 因变量的运算</h3>
+<ul>
+<li><strong>相加 / 相乘</strong>：同一时刻的值相加 / 相乘（例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>8</mn><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 是慢变化上叠加快振荡；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>8</mn><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 是快振荡被慢包络调制）</li>
+<li><strong>微分</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>d</mi><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mstyle></mrow></math></li>
+<li><strong>积分</strong>（running integral）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="true"><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>t</mi></msubsup><mi>f</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>τ</mi></mstyle></mrow></math></li>
+</ul>
+<p><strong>课件例</strong>（宽 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi></mrow></math> 的脉冲，在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math> 之间）：</p>
+<ul>
+<li>梯形（从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math> 到 0 线性上升到 1，然后保持 1 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math>，再跳回 0）求导：上升段导数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mi>τ</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></mfrac><mo>=</mo><mfrac><mn>2</mn><mi>τ</mi></mfrac></mrow></math>，平段为 0，在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math> 的<strong>跳变</strong>（下降 1）处产生一个强度 <strong>−1 的冲激</strong></li>
+<li>矩形脉冲（高 1，从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math>）的 running integral：从 0 <strong>线性上升</strong>到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi></mrow></math>（在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mfrac><mi>τ</mi><mn>2</mn></mfrac></mrow></math>），之后保持 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi></mrow></math></li>
+</ul>
+<blockquote>
+<p><strong>信号有跳变时，导数在跳变处是一个冲激，强度 = 跳变量</strong>（向上跳 +，向下跳 −）——1.2 讲 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 时会严格讲。</p>
+</blockquote>
+<h3>4.2 自变量的变换：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math></h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math>：函数（映射）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi></mrow></math>：<strong>argument</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>：自变量</li>
+<li>变换后，波形的横坐标仍是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></li>
+<li><strong>所有变换都作用在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>（自变量）上！</strong></li>
+</ul>
+<h3>4.3 平移（shifting）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi><mo>&gt;</mo><mn>0</mn></mrow></math>：<strong>右移</strong>（delay，延迟）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi><mo>&lt;</mo><mn>0</mn></mrow></math>：<strong>左移</strong>（advance，超前）</li>
+</ul>
+<p><strong>例 1</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 上（从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math> 线性升到 1 于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math>，再保持 1 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow></math>），画 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>：<strong>整体右移 1</strong>，变成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math>。</p>
+<ul>
+<li>「<strong>幅值不变、函数值相同、移动时间坐标</strong>」：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math> 时为 1 ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math> 即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow></math> 时为 1</li>
+</ul>
+<p><strong>例：多径传输</strong>（信号延迟）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>a</mi><mn>1</mn></msub><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>τ</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>+</mo><msub><mi>a</mi><mn>2</mn></msub><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>τ</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>+</mo><msub><mi>a</mi><mn>3</mn></msub><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>τ</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo>+</mo><msub><mi>a</mi><mn>4</mn></msub><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>τ</mi><mn>4</mn></msub><mo stretchy="false">)</mo></mrow></math></div><p>接收到的是同一信号经不同路径延迟、衰减后的叠加。</p>
+<h3>4.4 反转（reversal）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>f</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li>沿<strong>纵轴</strong>翻折，过去和未来对调（例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math>）</li>
+<li>现实中<strong>没有物理器件</strong>能实现（要用到未来的值）；但在数字信号处理中可以实现，例如用后进先出（<strong>LIFO</strong>）栈</li>
+</ul>
+<h3>4.5 尺度变换（scaling）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="1em"/><mi>a</mi><mtext> 是实数</mtext></mrow></math></div><table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math></th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>&gt;</mo><mn>1</mn></mrow></math></td>
+<td><strong>压缩</strong>（compression）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>a</mi><mo>&lt;</mo><mn>1</mn></mrow></math></td>
+<td><strong>扩展</strong>（expansion）</td>
+</tr>
+</tbody>
+</table>
+<p>（时间变量乘系数 = 改变观察的时间尺度。）</p>
+<p><strong>例 2</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mi>T</mi><mo stretchy="false">]</mo></mrow></math> 上从 1 线性升到 2。</p>
+<p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math></strong>——「同样的 argument，同样的函数值，找新坐标」：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th>→</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>t</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>1</td>
+<td></td>
+<td>0</td>
+<td>1</td>
+<td></td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></td>
+<td>2</td>
+<td></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></td>
+<td>2</td>
+<td></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></math></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mfrac><mi>T</mi><mn>2</mn></mfrac><mo stretchy="false">]</mo></mrow></math> 上：<strong>压缩</strong>一半。</p>
+<p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mfrac><mi>t</mi><mn>2</mn></mfrac><mo stretchy="false">)</mo></mrow></math></strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>t</mi><mn>2</mn></mfrac><mo>=</mo><mi>T</mi></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>2</mn><mi>T</mi></mrow></math> ⇒ 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mi>T</mi><mo stretchy="false">]</mo></mrow></math> 上：<strong>扩展</strong>一倍。</p>
+<h3>4.6 一般形式 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math>（必考）</h3>
+<p><strong>例 3</strong>：已知 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>（在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 上），画 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>3</mn><mi>t</mi><mo>+</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math>。</p>
+<p><strong>方法 1（先平移后压缩）</strong>：</p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>→</mo><mi>t</mi><mo>+</mo><mn>5</mn></mrow></math>：<strong>左移 5</strong>，得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math>，在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>6</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo stretchy="false">]</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>→</mo><mn>3</mn><mi>t</mi></mrow></math>：<strong>压缩 3 倍</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>5</mn><mo stretchy="false">)</mo><mo>→</mo><mi>f</mi><mo stretchy="false">(</mo><mn>3</mn><mi>t</mi><mo>+</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math>，每个点的横坐标除以 3），得在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mo>−</mo><mfrac><mn>4</mn><mn>3</mn></mfrac><mo stretchy="false">]</mo></mrow></math></li>
+</ol>
+<p><strong>方法 2（先压缩后平移）</strong>：</p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>→</mo><mn>3</mn><mi>t</mi></mrow></math>：压缩，得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>3</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math>，在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo separator="true">,</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>注意</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>3</mn><mi>t</mi><mo>+</mo><mn>5</mn><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>3</mn><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mfrac><mn>5</mn><mn>3</mn></mfrac><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math>，所以要<strong>左移 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>5</mn><mn>3</mn></mfrac></mrow></math></strong>（不是 5！），得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>−</mo><mfrac><mn>5</mn><mn>3</mn></mfrac><mo separator="true">,</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>−</mo><mfrac><mn>5</mn><mn>3</mn></mfrac><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mo>−</mo><mfrac><mn>4</mn><mn>3</mn></mfrac><mo stretchy="false">]</mo></mrow></math></li>
+</ol>
+<p><strong>方法 3（找端点，最可靠）</strong>：令 argument 等于原来的端点：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mn>3</mn><mi>t</mi><mo>+</mo><mn>5</mn><mo>=</mo><mo>−</mo><mn>1</mn><mo>⇒</mo><mi>t</mi><mo>=</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mspace width="2em"/><mn>3</mn><mi>t</mi><mo>+</mo><mn>5</mn><mo>=</mo><mn>1</mn><mo>⇒</mo><mi>t</mi><mo>=</mo><mo>−</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></math></div><blockquote>
+<p>解题套路：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math> 的点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 对应原信号的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi></mrow></math>。<strong>求新横坐标</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mfrac><mrow><msub><mi>t</mi><mtext>old</mtext></msub><mo>−</mo><mi>b</mi></mrow><mi>a</mi></mfrac></mrow></math>。先压缩再平移时，平移量是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>b</mi><mi>a</mi></mfrac></mrow></math>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>&lt;</mo><mn>0</mn></mrow></math> 时还要<strong>反转</strong>。</p>
+</blockquote>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Signal / system / message</td>
+<td>定义；excitation / response</td>
+</tr>
+<tr>
+<td>系统研究的三方面</td>
+<td>signal analysis、system analysis、system synthesis</td>
+</tr>
+<tr>
+<td>连续 / 离散 / 数字</td>
+<td>时间是否离散、幅值是否离散；例 1</td>
+</tr>
+<tr>
+<td>周期</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mi>n</mi><mi>T</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mn>0</mn></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ω</mi><mn>0</mn></msub></mrow></math></td>
+</tr>
+<tr>
+<td>两正弦之和</td>
+<td>周期比有理 ⇒ 周期；例 2：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mi>π</mi><mi mathvariant="normal">/</mi><mn>5</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>10</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Quasi-periodic</td>
+<td>周期比无理</td>
+</tr>
+<tr>
+<td>能量 / 功率</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math> 公式；分类表；例 3（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><mn>2</mn></mrow></math>）、例 4（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mn>0.5</mn></mrow></math>）</td>
+</tr>
+<tr>
+<td>指数</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 的符号；time constant，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>τ</mi></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>e</mi></mrow></math></td>
+</tr>
+<tr>
+<td>正弦 / Euler</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ω</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math>；Euler 公式；cos / sin 的指数表示</td>
+</tr>
+<tr>
+<td>复指数</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo>=</mo><mi>σ</mi><mo>+</mo><mi>j</mi><mi>ω</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math> 的符号决定等幅 / 增 / 减</td>
+</tr>
+<tr>
+<td>Sa / sinc</td>
+<td>定义；偶；零点；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∫</mo><mo>=</mo><mi>π</mi></mrow></math></td>
+</tr>
+<tr>
+<td>微分 / 积分</td>
+<td>跳变处冲激；running integral</td>
+</tr>
+<tr>
+<td>平移 / 反转 / 尺度</td>
+<td>方向；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>&gt;</mo><mn>1</mn></mrow></math> 压缩</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>例 3 三种方法；先压缩再平移时移 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mi mathvariant="normal">/</mi><mi>a</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 易错点</h2>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi><mo>&gt;</mo><mn>0</mn></mrow></math> 是<strong>右移</strong>（延迟）。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 是<strong>压缩</strong>，不是扩展。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>3</mn><mi>t</mi><mo>+</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math> 先压缩时，平移量是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>5</mn><mn>3</mn></mfrac></mrow></math> 而不是 5。</li>
+<li>两正弦之和：周期比<strong>有理</strong>才周期；基波周期取<strong>最小公倍</strong>的那个。</li>
+<li>能量信号的功率<strong>为 0</strong>；功率信号的能量<strong>无穷</strong>；有的信号两者都不是。</li>
+<li>周期信号是<strong>功率</strong>信号。</li>
+<li>Sa 的零点是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>±</mo><mi>n</mi><mi>π</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>），sinc 的零点是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>±</mo><mi>n</mi></mrow></math>。</li>
+<li>数字信号要求时间<strong>和</strong>幅值都离散。</li>
+</ul>

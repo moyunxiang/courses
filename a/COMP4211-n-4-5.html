@@ -1,0 +1,113 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Back-propagation 的想法</strong> = gradient descent：算 loss 对权重的梯度，往反方向走</li>
+<li><strong>链式法则</strong>；<strong>一个 sigmoid unit 的梯度推导</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>E</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><msub><mi>x</mi><mi>i</mi></msub></mrow></math></li>
+<li><strong>In short</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo>=</mo><mi>w</mi><mi>x</mi><mo>+</mo><mi>b</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>y</mi><mo>−</mo><mi>t</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math> 的逐级求导</li>
+<li><strong>Computation graph 上的 backprop</strong>：forward pass（拓扑序）/ backward pass（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>i</mi></msub><mo>=</mo><msub><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mtext>Ch</mtext><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></msub><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>j</mi></msub><mfrac><mrow><mi mathvariant="normal">∂</mi><msub><mi>v</mi><mi>j</mi></msub></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>v</mi><mi>i</mi></msub></mrow></mfrac></mrow></math>）</li>
+<li><strong>实践细节</strong>：初始化、何时停止、加速（<strong>momentum</strong>）、<strong>局部最小</strong></li>
+</ol>
+<blockquote>
+<p>必会推导：sigmoid unit 的梯度（每一步用了什么）；「In short」四个导数。必会概念：backward pass 公式里为什么要对 children <strong>求和</strong>；三种停止准则；momentum 公式与作用；GD 只保证收敛到局部最小。</p>
+</blockquote>
+<h2>1 · 回顾与动机</h2>
+<ul>
+<li>单个 perceptron 能表示 ⟺ 线性可分；多层足够多 perceptrons 能表示任意 Boolean function</li>
+<li><strong>非线性激活 + 多层</strong> ⇒ 需要更复杂的学习算法 → <strong>Back-propagation</strong></li>
+</ul>
+<p><strong>想法：gradient descent</strong></p>
+<ol>
+<li>给 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 一个初值</li>
+<li>repeat until convergence：算当前 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 下 error（loss）函数的<strong>梯度向量</strong>；往<strong>相反方向</strong>移动</li>
+</ol>
+<p>（梯度例：hinge loss 的梯度，见第 2 讲：margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mn>1</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></math>，否则 0。）</p>
+<h2>2 · MLP 中的梯度</h2>
+<ul>
+<li>定义一个对网络输出<strong>可导</strong>的 error function</li>
+<li>网络用<strong>可导</strong>的激活函数 ⇒ 输出是输入和权重（及 bias）的可导函数 ⇒ <strong>error 是权重的可导函数</strong></li>
+</ul>
+<p><strong>链式法则</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>→</mo><mi>u</mi><mo>→</mo><mi>y</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>u</mi></mrow></mfrac><mfrac><mrow><mi>d</mi><mi>u</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></mrow></math>。</p>
+<h2>3 · 一个 Sigmoid Unit 的梯度</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>net</mtext><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></msubsup><msub><mi>w</mi><mi>i</mi></msub><msub><mi>x</mi><mi>i</mi></msub></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math>），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>o</mi><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mtext>net</mtext><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mtext>net</mtext></mrow></msup></mrow></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math>。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>E</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mi mathvariant="normal">∂</mi><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>2</mn><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mfrac><mi mathvariant="normal">∂</mi><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mo>−</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>o</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>o</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mtext>net</mtext></mrow></mfrac><mfrac><mrow><mi mathvariant="normal">∂</mi><mtext>net</mtext></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac></mrow></mstyle></mtd></mtr></mtable></math></div><p>其中</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>o</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mtext>net</mtext></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>σ</mi><mo stretchy="false">(</mo><mtext>net</mtext><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><mtext>net</mtext></mrow></mfrac><mo>=</mo><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mtext>net</mtext></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mo stretchy="false">(</mo><msup><mi>𝐰</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mi>𝐱</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>=</mo><msub><mi>x</mi><mi>i</mi></msub></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>E</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mtext> </mtext><msub><mi>x</mi><mi>i</mi></msub></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>更新：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>i</mi></msub><mo>←</mo><msub><mi>w</mi><mi>i</mi></msub><mo>−</mo><mi>η</mi><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>E</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>=</mo><msub><mi>w</mi><mi>i</mi></msub><mo>+</mo><mi>η</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><msub><mi>x</mi><mi>i</mi></msub></mrow></math>。</p>
+<p><strong>补充算例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>（含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow></math>），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>net</mtext><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>o</mi><mo>=</mo><mn>0.5</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>E</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><mn>0.5</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>0.5</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>0.5</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>0.125</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>1</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>←</mo><mo stretchy="false">(</mo><mn>0.125</mn><mo separator="true">,</mo><mn>0.125</mn><mo stretchy="false">)</mo></mrow></math>。</p>
+<h2>4 · In Short（课件）</h2>
+<p><strong>计算 loss</strong>（forward）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>z</mi><mo>=</mo><mi>w</mi><mi>x</mi><mo>+</mo><mi>b</mi><mo separator="true">,</mo><mspace width="2em"/><mi>y</mi><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>ℒ</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>y</mi><mo>−</mo><mi>t</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math></div><p><strong>计算导数</strong>（backward，从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi></mrow></math> 往回）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>d</mi><mi>ℒ</mi></mrow><mrow><mi>d</mi><mi>y</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>y</mi><mo>−</mo><mi>t</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>d</mi><mi>ℒ</mi></mrow><mrow><mi>d</mi><mi>z</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mi>d</mi><mi>ℒ</mi></mrow><mrow><mi>d</mi><mi>y</mi></mrow></mfrac><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>ℒ</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>w</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mi>d</mi><mi>ℒ</mi></mrow><mrow><mi>d</mi><mi>z</mi></mrow></mfrac><mi>x</mi><mo separator="true">,</mo><mspace width="2em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>ℒ</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>b</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>d</mi><mi>ℒ</mi></mrow><mrow><mi>d</mi><mi>z</mi></mrow></mfrac></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>多变量链式法则</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mfrac><mrow><mi>d</mi><mi>x</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math>——一个变量通过多条路径影响输出时，<strong>各路径贡献相加</strong>。</p>
+<h2>5 · Backprop on a Computation Graph</h2>
+<ul>
+<li>Activity <strong>forward</strong>（输入 → 输出）；error <strong>backward</strong>（输出 → 输入）——「propagate error back」</li>
+</ul>
+<p><strong>记号</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>v</mi><mi>N</mi></msub></mrow></math> 是计算图的<strong>拓扑序</strong>（父节点在子节点之前）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>N</mi></msub></mrow></math> 是要求导的变量（如 loss）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>i</mi></msub></mrow></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>N</mi></msub></mrow></math> 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>i</mi></msub></mrow></math> 的梯度。</p>
+<p><strong>Forward pass</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>For </mtext><mi>i</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>N</mi><mo>:</mo><mspace width="1em"/><mtext>compute </mtext><msub><mi>v</mi><mi>i</mi></msub><mtext> as a function of Pa</mtext><mo stretchy="false">(</mo><msub><mi>v</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></math></div><p><strong>Backward pass</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>N</mi></msub><mo>=</mo><mn>1</mn><mo separator="true">;</mo><mspace width="2em"/><mtext>For </mtext><mi>i</mi><mo>=</mo><mi>N</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>1</mn><mo>:</mo><mspace width="1em"/><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>i</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mtext>Ch</mtext><mo stretchy="false">(</mo><msub><mi>v</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></munder><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>j</mi></msub><mfrac><mrow><mi mathvariant="normal">∂</mi><msub><mi>v</mi><mi>j</mi></msub></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>v</mi><mi>i</mi></msub></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Pa</mtext></mrow></math> = parents，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Ch</mtext></mrow></math> = children；求和 = 多变量链式法则。具体算例见 4.6。）</p>
+<h2>6 · 实践细节</h2>
+<p><strong>怎么初始化</strong>？——<strong>小的随机值</strong>。</p>
+<p><strong>何时停止训练</strong>？</p>
+<ol>
+<li>固定迭代次数之后</li>
+<li>training error 低于某个阈值</li>
+<li>在 <strong>validation set 误差的最小值</strong>处停止（early stopping）</li>
+</ol>
+<p><strong>速度</strong>：测试很快；多 hidden layers 的网络<strong>训练可能很慢</strong>。加速方法：</p>
+<ol>
+<li><strong>Momentum</strong>：给每个权重一点惯性</li>
+</ol>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>w</mi><mrow><mi>j</mi><mi>i</mi></mrow></msub><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mi>η</mi><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>E</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mrow><mi>j</mi><mi>i</mi></mrow></msub></mrow></mfrac><mo>+</mo><mi>α</mi><mi mathvariant="normal">Δ</mi><msub><mi>w</mi><mrow><mi>j</mi><mi>i</mi></mrow></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose><mo separator="true">,</mo><mspace width="1em"/><mn>0</mn><mo>&lt;</mo><mi>α</mi><mo>&lt;</mo><mn>1</mn><mtext> </mtext><mo stretchy="false">(</mo><mtext>如 </mtext><mn>0.9</mn><mo stretchy="false">)</mo></mrow></math></div><ol start="2">
+<li>动态调整 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math></li>
+<li>利用误差面的<strong>高阶信息</strong></li>
+<li>更复杂的优化算法</li>
+</ol>
+<p><strong>局部最小</strong>：误差面可能有<strong>多个局部最小</strong>；GD 只保证收敛到<strong>某个局部最小</strong>，不一定是全局最小。怎么逃出局部最优？（课件图：多个降落伞从不同位置出发 → 多次随机初始化；momentum 也有助于冲过浅的局部最小。）</p>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BP 思想</td>
+<td>= GD；梯度反方向</td>
+</tr>
+<tr>
+<td>可导性链条</td>
+<td>激活可导 → 输出可导 → error 可导</td>
+</tr>
+<tr>
+<td>Sigmoid unit 梯度</td>
+<td>完整推导；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mi>o</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><msub><mi>x</mi><mi>i</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>In short</td>
+<td>四个导数</td>
+</tr>
+<tr>
+<td>计算图</td>
+<td>拓扑序；forward / backward 公式；对 children 求和</td>
+</tr>
+<tr>
+<td>初始化 / 停止</td>
+<td>小随机值；三种停止准则</td>
+</tr>
+<tr>
+<td>Momentum</td>
+<td>公式；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>≈</mo><mn>0.9</mn></mrow></math></td>
+</tr>
+<tr>
+<td>局部最小</td>
+<td>GD 只保证局部</td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math> 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math> 是为了约掉求导出来的 2。</li>
+<li>梯度有<strong>负号</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mo>⋯</mo></mrow></math>；更新时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>−</mo><mi>η</mi><mi mathvariant="normal">∇</mi></mrow></math> 变成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mi>η</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>o</mi><mo stretchy="false">)</mo><mo>⋯</mo></mrow></math>。</li>
+<li>Backward pass 对<strong>所有 children</strong> 求和（一个节点被多处使用时梯度相加）。</li>
+<li>Momentum 里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 乘的是<strong>上一步的更新量</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>w</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>，不是上一步的梯度。</li>
+</ul>
