@@ -1,0 +1,296 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>ML 任务类型</strong>：binary / multiclass classification、regression、structured prediction</li>
+<li><strong>三个设计决策</strong>：hypothesis class、loss function、optimization algorithm</li>
+<li><strong>Linear regression</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>；squared loss；gradient descent</li>
+<li><strong>Linear classification</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>sign</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>；<strong>score</strong>、<strong>margin</strong>；zero-one / <strong>hinge</strong> / <strong>logistic</strong> loss 及其梯度</li>
+</ol>
+<blockquote>
+<p>必会计算（课件原例）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒟</mi><mo>=</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0.57</mn><mo stretchy="false">]</mo></mrow></math> 的 TrainLoss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≈</mo><mn>0.38</mn></mrow></math>；一步 gradient descent；分类例 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 三个点的 score、margin、0-1 loss（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow></math>）、hinge loss（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.83</mn></mrow></math>）及梯度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>0.33</mn><mo stretchy="false">]</mo></mrow></math>；decision boundary。概念：为什么 0-1 loss 不能用梯度下降。</p>
+</blockquote>
+<h2>1 · 任务类型</h2>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>输出</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Binary classification</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>∈</mo><mo stretchy="false">{</mo><mo>+</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math></td>
+<td>信用卡欺诈；有毒评论；Higgs boson（decay event / background）</td>
+</tr>
+<tr>
+<td><strong>Multiclass</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>∈</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>K</mi><mo stretchy="false">}</mo></mrow></math></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Regression</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>∈</mo><mi>ℝ</mi></mrow></math></td>
+<td>卫星图 → 财富指数（poverty mapping）；房价；到达时间</td>
+</tr>
+<tr>
+<td><strong>Structured prediction</strong></td>
+<td>结构化对象</td>
+<td>机器翻译、对话、image captioning、image segmentation</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · 三个设计决策</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>名称</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>哪些 predictor 是可能的？</td>
+<td><strong>Hypothesis class</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℱ</mi></mrow></math></td>
+</tr>
+<tr>
+<td>predictor 有多好？</td>
+<td><strong>Loss function</strong></td>
+</tr>
+<tr>
+<td>怎么算出最好的 predictor？</td>
+<td><strong>Optimization algorithm</strong></td>
+</tr>
+</tbody>
+</table>
+<h2>3 · Linear Regression</h2>
+<h3>3.1 Hypothesis class</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></div><p>weight vector <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>w</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>2</mn></msub><mo stretchy="false">]</mo></mrow></math>，feature vector <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math>。</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 叫 <strong>score</strong>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℱ</mi><mo>=</mo><mo stretchy="false">{</mo><msub><mi>f</mi><mi>𝐰</mi></msub><mo>:</mo><mi>𝐰</mi><mo>∈</mo><msup><mi>ℝ</mi><mn>2</mn></msup><mo stretchy="false">}</mo></mrow></math>。</p>
+<p>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mn>3</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0.57</mn><mo stretchy="false">]</mo><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn><mo>+</mo><mn>1.71</mn><mo>=</mo><mn>2.71</mn></mrow></math>。</p>
+<h3>3.2 Loss function</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Loss</mtext><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mspace width="1em"/><mtext>（squared loss；</mtext><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi><mtext> 叫 residual）</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>∈</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub></mrow></munder><mtext>Loss</mtext><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></div><p><strong>课件例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo>=</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0.57</mn><mo stretchy="false">]</mo></mrow></math></p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th>residual</th>
+<th>loss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1.57</td>
+<td>0.57</td>
+<td>0.3249</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3</td>
+<td>2.14</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.86</mn></mrow></math></td>
+<td>0.7396</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3</td>
+<td>3.28</td>
+<td>0.28</td>
+<td>0.0784</td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0.57</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mn>0.3249</mn><mo>+</mo><mn>0.7396</mn><mo>+</mo><mn>0.0784</mn></mrow><mn>3</mn></mfrac><mo>=</mo><mfrac><mn>1.1429</mn><mn>3</mn></mfrac><mo>≈</mo><mn>0.38</mn></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0.57</mn><mo stretchy="false">]</mo></mrow></math> 接近最小二乘解 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mfrac><mn>4</mn><mn>7</mn></mfrac><mo stretchy="false">]</mo></mrow></math>。）</p>
+<h3>3.3 Optimization：gradient descent</h3>
+<blockquote>
+<p><strong>Gradient</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>：让 training loss <strong>增加最快</strong>的方向。所以往<strong>反方向</strong>走。</p>
+</blockquote>
+<p>链式法则：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><msub><mi>𝒟</mi><mtext>train</mtext></msub><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></munder><mn>2</mn><munder><munder><mrow><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mrow><mtext>prediction</mtext><mo>−</mo><mtext>target</mtext></mrow></munder><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>−</mo><mi>η</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mtext>TrainLoss</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose><mo separator="true">,</mo><mspace width="1em"/><mi>η</mi><mo>&gt;</mo><mn>0</mn><mtext>（step size）</mtext></mrow></math></div><p><strong>算例</strong>：同样的数据，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mn>0</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>0.1</mn></mrow></math>。每个 residual <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo>−</mo><mi>y</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi mathvariant="normal">∇</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>2</mn><mn>3</mn></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo>−</mo><mn>1</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo>−</mo><mn>3</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo><mo>−</mo><mn>3</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">]</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>2</mn><mn>3</mn></mfrac><mo stretchy="false">[</mo><mo>−</mo><mn>7</mn><mo separator="true">,</mo><mo>−</mo><mn>19</mn><mo stretchy="false">]</mo><mo>≈</mo><mo stretchy="false">[</mo><mo>−</mo><mn>4.667</mn><mo separator="true">,</mo><mo>−</mo><mn>12.667</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>𝐰</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo>−</mo><mn>0.1</mn><mo>⋅</mo><mo stretchy="false">[</mo><mo>−</mo><mn>4.667</mn><mo separator="true">,</mo><mo>−</mo><mn>12.667</mn><mo stretchy="false">]</mo><mo>≈</mo><mo stretchy="false">[</mo><mn>0.467</mn><mo separator="true">,</mo><mn>1.267</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><h3>3.4 小结</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Regression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hypothesis class</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℱ</mi><mo>=</mo><mo stretchy="false">{</mo><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>squared loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>−</mo><mi>y</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math>（也可用 absolute deviation）</td>
+</tr>
+<tr>
+<td>Algorithm</td>
+<td>gradient descent</td>
+</tr>
+</tbody>
+</table>
+<h2>4 · Linear Classification</h2>
+<h3>4.1 Hypothesis class</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>sign</mtext><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>ℱ</mi><mo>=</mo><mo stretchy="false">{</mo><msub><mi>f</mi><mi>𝐰</mi></msub><mo>:</mo><mi>𝐰</mi><mo>∈</mo><msup><mi>ℝ</mi><mn>2</mn></msup><mo stretchy="false">}</mo></mrow></math></div><p><strong>Decision boundary</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>x</mi><mo>:</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math>（与 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 垂直；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 指向 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math> 一侧）。</p>
+<p><strong>课件例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mo>−</mo><mn>0.6</mn><mo separator="true">,</mo><mn>0.6</mn><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">]</mo></mrow></math></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mtext>sign</mtext><mo stretchy="false">(</mo><mn>1.2</mn><mo stretchy="false">)</mo><mo>=</mo><mo>+</mo><mn>1</mn></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mtext>sign</mtext><mo stretchy="false">(</mo><mn>1.2</mn><mo stretchy="false">)</mo><mo>=</mo><mo>+</mo><mn>1</mn></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mtext>sign</mtext><mo stretchy="false">(</mo><mo>−</mo><mn>1.2</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math></li>
+<li>边界：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.6</mn><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><mn>0.6</mn><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>0</mn><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><msub><mi>x</mi><mn>1</mn></msub></mrow></math></li>
+</ul>
+<h3>4.2 Score 与 margin</h3>
+<blockquote>
+<p><strong>Score</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>：多有信心预测 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math>。</p>
+<p><strong>Margin</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mtext> </mtext><mi>y</mi></mrow></math>：<strong>预测得多正确</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>0</mn></mrow></math> 分对，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mn>0</mn></mrow></math> 分错）。</p>
+</blockquote>
+<h3>4.3 Zero-one loss</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>Loss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mn>𝟏</mn><mo stretchy="false">[</mo><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>y</mi><mo stretchy="false">]</mo><mo>=</mo><mn>𝟏</mn><mo stretchy="false">[</mo><munder><munder><mrow><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi></mrow><mo stretchy="true">⏟</mo></munder><mtext>margin</mtext></munder><mo>≤</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math></div><p><strong>问题</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><msub><mtext>Loss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo>=</mo><mi mathvariant="normal">∇</mi><mn>𝟏</mn><mo stretchy="false">[</mo><mo>⋅</mo><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math> <strong>几乎处处</strong>（阶梯函数）——<strong>梯度下降无法使用</strong>。</p>
+<h3>4.4 Hinge loss</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>Loss</mtext><mtext>hinge</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mn>1</mn><mo>−</mo><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo stretchy="false">}</mo></mrow></math></div><ul>
+<li>是 0-1 loss 的<strong>上界</strong>（margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mn>0</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>1</mn></mrow></math>；margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>0</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>0</mn></mrow></math>）</li>
+<li>margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>1</mn></mrow></math> 时 loss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0</mn></mrow></math></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">∇</mi><msub><mtext>Loss</mtext><mtext>hinge</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>if </mtext><mn>1</mn><mo>−</mo><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi><mo>&gt;</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>otherwise</mtext></mstyle></mtd></mtr></mtable></mrow></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>4.5 Logistic loss（digression：logistic regression）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>Loss</mtext><mtext>logistic</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mi>log</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi></mrow></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p><strong>直觉</strong>：即使 margin 已经超过 1，<strong>仍继续增大 margin</strong>（loss 永远 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>0</mn></mrow></math>）。</p>
+<p>梯度（补充）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi><mo>=</mo><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi><mo>⋅</mo><mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi></mrow></msup></mrow></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> = margin。</p>
+<h3>4.6 课件算例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></h3>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math></th>
+<th>score</th>
+<th>margin</th>
+<th>0-1</th>
+<th>hinge</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi></mrow></math> hinge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td>1</td>
+<td>2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.5</mn></mrow></math></td>
+<td>0.5</td>
+<td>0</td>
+<td>0.5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mtext>TrainLoss</mtext><mrow><mn>0</mn><mtext>-</mtext><mn>1</mn></mrow></msub><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo>≈</mo><mn>0.33</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mtext>TrainLoss</mtext><mtext>hinge</mtext></msub><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>0.5</mn></mrow><mn>3</mn></mfrac></mstyle><mo>≈</mo><mn>0.83</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">∇</mi><msub><mtext>TrainLoss</mtext><mtext>hinge</mtext></msub><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>0.5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo>+</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo>+</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>0.33</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（第 3 个点分对了（margin 0.5 &gt; 0），但 margin &lt; 1，hinge 仍有 loss 和梯度。）</p>
+<h2>5 · 总结表（课件 Summary）</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Regression</th>
+<th>Classification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prediction <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>score</td>
+<td>sign(score)</td>
+</tr>
+<tr>
+<td>与 target <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math> 的关系</td>
+<td>residual（score <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>y</mi></mrow></math>）</td>
+<td>margin（score <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⋅</mo><mi>y</mi></mrow></math>）</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>squared、absolute deviation</td>
+<td>zero-one、hinge、logistic</td>
+</tr>
+<tr>
+<td>Algorithm</td>
+<td>gradient descent</td>
+<td>gradient descent</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任务类型</td>
+<td>四类各举例</td>
+</tr>
+<tr>
+<td>三个设计决策</td>
+<td>名称与含义</td>
+</tr>
+<tr>
+<td>TrainLoss</td>
+<td>课件例 0.38（平均！）</td>
+</tr>
+<tr>
+<td>梯度</td>
+<td>推导；因子 2；GD 一步</td>
+</tr>
+<tr>
+<td>Score / margin</td>
+<td>定义；margin 的符号含义</td>
+</tr>
+<tr>
+<td>0-1 loss</td>
+<td>用 margin 写；梯度几乎处处 0</td>
+</tr>
+<tr>
+<td>Hinge</td>
+<td>公式、梯度（条件是 margin &lt; 1）；上界性质</td>
+</tr>
+<tr>
+<td>Logistic</td>
+<td>公式；直觉</td>
+</tr>
+<tr>
+<td>分类算例</td>
+<td>0.33 / 0.83 / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>0.33</mn><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Decision boundary</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>TrainLoss 是<strong>平均</strong>（除以样本数）。</li>
+<li>Squared loss 的梯度有因子 <strong>2</strong>。</li>
+<li>Margin = score × <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>，不是 score；margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0</mn></mrow></math> 时 0-1 loss 算错（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mn>0</mn></mrow></math>）。</li>
+<li>Hinge 梯度在 margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mn>1</mn></mrow></math> 时就非零（不只是分错时），且带<strong>负号</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></math>。</li>
+<li>Gradient descent 是<strong>减</strong>梯度。</li>
+</ul>

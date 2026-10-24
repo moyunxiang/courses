@@ -1,0 +1,591 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>前两讲的 MC / TD / SARSA / Q-learning 都是 <strong>tabular</strong>：每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 一格。状态一多就存不下、学不完。这一讲把表换成<strong>带参数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 的函数</strong>。</p>
+<ol>
+<li><strong>Function approximation</strong>：为什么要近似；选什么函数；linear vs 可微（神经网络）；RL 数据的特殊性</li>
+<li><strong>Gradient-based algorithms</strong>：SGD 目标；<strong>linear VFA 更新 = 步长 × 预测误差 × 特征</strong>；MC / TD(0) / TD(λ) 的 target；<strong>semi-gradient</strong>；control；action-in vs action-out</li>
+<li><strong>Convergence and divergence</strong>：MC、TD 的不动点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mrow><mi>V</mi><mi>E</mi></mrow><mo stretchy="true">‾</mo></mover></mrow></math> 定理；<strong>发散的例子</strong>；<strong>deadly triad</strong>；收敛表</li>
+<li><strong>DQN</strong>：深度学习和 RL 的三点区别；Atari 上的 DQN；用 TD 训练 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>；<strong>两个缺点</strong>（浪费经验、更新相关）</li>
+</ol>
+<blockquote>
+<p>期中范围到 2.3 为止（10/08 公告：Ch 1.1–2.3）。DQN 的 experience replay、target network 在 2.4，<strong>不考</strong>；这一讲只讲到「为什么需要它们」。</p>
+<p>必考：linear VFA 的 MC / TD(0) 更新式（会代数算一步）；为什么叫 <strong>semi-gradient</strong>；MC target 无偏、TD target 有偏；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub></mrow></math> 的推导；<strong>发散例子里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mn>2</mn><mi>γ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">)</mo><msub><mi>w</mi><mi>t</mi></msub></mrow></math></strong>；deadly triad 三个要素以及去掉任何一个为什么就不发散；收敛表；DQN 的 TD target 和 loss；两个缺点。</p>
+</blockquote>
+<h2>1 · Function Approximation</h2>
+<h3>1.1 为什么要近似</h3>
+<ul>
+<li>到目前为止，value function 是一张 <strong>lookup table</strong>：每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 有一格 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>，或每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 有一格 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>真实问题状态极多：Backgammon <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mn>20</mn></msup></mrow></math>；Go <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mn>170</mn></msup></mrow></math>；直升机是<strong>连续</strong>状态空间；机器人在真实世界里</li>
+<li>大 MDP 的两个问题：
+<ul>
+<li>状态 / 动作<strong>太多，内存存不下</strong></li>
+<li><strong>每个状态单独学太慢</strong>——没见过的状态完全没有估计</li>
+</ul>
+</li>
+<li>所以要<strong>近似</strong>：policy、value function、model、agent state update 本质上都是<strong>函数</strong>，都可以近似</li>
+</ul>
+<h3>1.2 选哪种函数</h3>
+<p>可选：特征的<strong>线性组合</strong>、神经网络、决策树、最近邻、Fourier / wavelet 基……</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>理论</th>
+<th>实践</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tabular</td>
+<td>理论好</td>
+<td>不能 scale、不能<strong>泛化</strong></td>
+</tr>
+<tr>
+<td>Linear</td>
+<td>理论较好</td>
+<td>依赖<strong>好的特征</strong>（往往手工设计）</td>
+</tr>
+<tr>
+<td>Non-linear（神经网络）</td>
+<td>理解得少</td>
+<td>scale 得好；不太依赖手工特征</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>用（深度）神经网络表示这些函数，就叫 <strong>deep reinforcement learning</strong></li>
+</ul>
+<h3>1.3 Linear function approximation</h3>
+<ul>
+<li>先固定 agent state update（最简单是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mi>t</mi></msub></mrow></math>）</li>
+<li>固定的<strong>特征映射</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo>:</mo><mi>s</mi><mo>→</mo><msup><mi>ℝ</mi><mi>n</mi></msup></mrow></math></li>
+<li>value 是特征的线性函数：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h3>1.4 一般的可微近似</h3>
+<ul>
+<li>用参数化函数估计：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>≈</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mspace width="1em"/><mtext>或</mtext><mspace width="1em"/><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>≈</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li><strong>从见过的状态泛化到没见过的状态</strong></li>
+<li>用 MC 或 TD learning 更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 的<strong>可微</strong>函数，可以是非线性的，例如输入像素的 CNN</li>
+<li>另一种理解：<strong>特征不再固定，而是学出来的</strong></li>
+</ul>
+<h3>1.5 RL 里做函数近似的特殊困难</h3>
+<p>原则上任何近似器都能用，但 RL 数据有自己的性质：</p>
+<ul>
+<li><strong>经验不是 i.i.d.</strong>：相邻时间步强相关</li>
+<li><strong>agent 的 policy 影响它收到的数据</strong></li>
+<li><strong>回归目标不平稳（non-stationary）</strong>，因为：
+<ul>
+<li>policy 在变（target 和数据都会变）</li>
+<li><strong>bootstrapping</strong>（target 里含有正在学的估计）</li>
+<li>环境动态不平稳（比如还有别的学习 agent）</li>
+<li>世界太大，几乎不会两次处在同一状态</li>
+</ul>
+</li>
+</ul>
+<p><strong>和监督学习的对比</strong>：监督学习的 label 是固定的、样本独立同分布；RL 里这两条都不成立。这一讲后面的 semi-gradient、发散、DQN 的两个缺点，都是这几条的后果。</p>
+<h3>1.6 VFA 和 policy approximation 的样子</h3>
+<ul>
+<li><strong>VFA</strong>：表换成参数化形式。输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>；或输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>关键区别</strong>：更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 时，<strong>很多状态的值同时改变</strong>（表格只改一格）</li>
+<li><strong>Policy approximation</strong>：输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>（3.x 讲）</li>
+</ul>
+<h3>1.7 例子</h3>
+<ul>
+<li>图像分类：图片 → 类别（cat / dog / …），在<strong>像素空间</strong>里用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>W</mi><mi>x</mi></mrow></math> 打分</li>
+<li><strong>CNN</strong> 处理图像输入；<strong>RNN</strong> 处理序列：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>f</mi><mi>W</mi></msub><mo stretchy="false">(</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>，每步用同一组参数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></li>
+</ul>
+<h3>1.8 Agent state update</h3>
+<ul>
+<li>环境状态不完全可观测时（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mrow><mi>e</mi><mi>n</mi><mi>v</mi></mrow></msubsup><mo mathvariant="normal">≠</mo><msub><mi>o</mi><mi>t</mi></msub></mrow></math>），用带参数的 agent state：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>U</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>o</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li>以后 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow></math> 都指 <strong>agent state</strong>：可以是 agent 内部的一个向量（如 RNN 隐状态），最简单就是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mi>t</mi></msub></mrow></math></li>
+</ul>
+<h2>2 · Gradient-based Algorithms</h2>
+<h3>2.1 Gradient descent 回顾</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 可微，梯度</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mn>1</mn></msub></mrow></mfrac></mstyle></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mi>n</mi></msub></mrow></mfrac></mstyle></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><ul>
+<li>沿负梯度走找局部最小：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi><mo>=</mo><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>α</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 是步长；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle></mrow></math> 只是为了消掉平方求导出来的 2）</li>
+<li>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mn>0</mn></msub></mrow></math> 出发得到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>𝐰</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo></mrow></math>，步长合适时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>J</mi><mo stretchy="false">(</mo><msub><mi>𝐰</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>≥</mo><mi>J</mi><mo stretchy="false">(</mo><msub><mi>𝐰</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>≥</mo><mi>J</mi><mo stretchy="false">(</mo><msub><mi>𝐰</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>≥</mo><mo>…</mo></mrow></math></li>
+</ul>
+<h3>2.2 VFA 的目标函数</h3>
+<ul>
+<li>目标：最小化真值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math> 与近似 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 之间的<strong>均方误差</strong></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>s</mi><mo>∼</mo><mi>d</mi></mrow></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi></mrow></math> 是状态分布（由 policy 和环境动态决定）——<strong>误差按访问频率加权</strong>，常去的状态更重要</p>
+<ul>
+<li>梯度下降：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>α</mi><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mtext> </mtext><msub><mi>𝔼</mi><mi>d</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo>−</mo><mi>V</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math> 求导得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn><mo stretchy="false">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo><mi mathvariant="normal">∇</mi><mi>V</mi></mrow></math>，乘 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>α</mi></mrow></math> 正好是上式）</p>
+<ul>
+<li>记号：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">∣</mo><mrow><mi>𝐰</mi><mo>=</mo><msub><mi>𝐰</mi><mi>t</mi></msub></mrow></msub></mrow></math> 的简写</li>
+</ul>
+<h3>2.3 Feature vector</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>x</mi><mi>n</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo>:</mo><mi>s</mi><mo>→</mo><msup><mi>ℝ</mi><mi>n</mi></msup></mrow></math> 是从 state（如 observation）到特征的<strong>固定</strong>映射；简写 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐱</mi><mi>t</mi></msub><mo>=</mo><mi>𝐱</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h3>2.4 Linear VFA（关键）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup><mi>𝐰</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>x</mi><mi>j</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi>w</mi><mi>j</mi></msub></mrow></math></div><ul>
+<li>目标函数对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 是<strong>二次的</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>s</mi><mo>∼</mo><mi>d</mi></mrow></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mo stretchy="false">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>−</mo><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup><mi>𝐰</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math>——凸的，只有一个全局最优</li>
+<li>梯度就是特征本身：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝐱</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝐱</mi><mi>t</mi></msub></mrow></math></li>
+<li>SGD 更新：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi><mo>=</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi>𝐱</mi><mi>t</mi></msub></mrow></math></div><blockquote>
+<p><strong>Update = step-size × prediction error × feature value</strong></p>
+</blockquote>
+<p><strong>Tabular 是 linear 的特例</strong>（课件 Deadly Triad 一页用到）：特征取 one-hot，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></math>（第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 位是 1）。那么 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>w</mi><mi>s</mi></msub></mrow></math>，更新只改 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>s</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>s</mi></msub><mo>←</mo><msub><mi>w</mi><mi>s</mi></msub><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mtext>target</mtext><mo>−</mo><msub><mi>w</mi><mi>s</mi></msub><mo stretchy="false">)</mo></mrow></math>，正是表格更新。</p>
+<h3>2.5 用 target 代替真值</h3>
+<ul>
+<li>上面假设监督者给出了真值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>——<strong>RL 里没有监督者，只有 reward</strong></li>
+<li>实际做法：用一个 <strong>target</strong> 代替 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>SGD 每次只用一个样本估计梯度：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi><mo>=</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li>MC return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 的<strong>样本</strong>，所以<strong>期望更新等于完整梯度更新</strong></li>
+</ul>
+<h3>2.6 Incremental prediction：三种 target</h3>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>target</th>
+<th>更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MC</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>TD(0)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>TD(λ)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>λ-return 的递归形式：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>+</mo><mi>λ</mi><msubsup><mi>G</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>λ</mi></msubsup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow></math> 就是 TD(0) target；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow></math> 展开后是 MC return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math>。）</p>
+<h3>2.7 MC with VFA</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 的<strong>无偏</strong>、有噪声的样本</li>
+<li>所以可以直接当监督学习，训练数据是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>G</mi><mn>1</mn></msub><mo stretchy="false">⟩</mo><mo separator="true">,</mo><mo stretchy="false">⟨</mo><msub><mi>s</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>G</mi><mn>2</mn></msub><mo stretchy="false">⟩</mo><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mo stretchy="false">⟨</mo><msub><mi>s</mi><mi>T</mi></msub><mo separator="true">,</mo><msub><mi>G</mi><mi>T</mi></msub><mo stretchy="false">⟩</mo></mrow></math></li>
+<li>Linear MC policy evaluation：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi><mo>=</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi>𝐱</mi><mi>t</mi></msub></mrow></math></div><ul>
+<li>Linear MC 收敛到（全局 = 局部）最优；<strong>非线性 VFA 也收敛</strong>，但可能是局部最优——因为它就是真正的 SGD</li>
+</ul>
+<blockquote>
+<p><strong>Gradient Monte Carlo Algorithm for Estimating <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo>≈</mo><msub><mi>v</mi><mi>π</mi></msub></mrow></math></strong></p>
+<p>输入：要评估的 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>；可微函数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo>:</mo><mi>𝒮</mi><mo>×</mo><msup><mi>ℝ</mi><mi>d</mi></msup><mo>→</mo><mi>ℝ</mi></mrow></math>；步长 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn></mrow></math></p>
+<p>任意初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>d</mi></msup></mrow></math>（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mn>𝟎</mn></mrow></math>）</p>
+<p>Loop forever（for each episode）：</p>
+<ul>
+<li>按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 生成 episode <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>R</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>S</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>R</mi><mi>T</mi></msub><mo separator="true">,</mo><msub><mi>S</mi><mi>T</mi></msub></mrow></math></li>
+<li>Loop <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>T</mi><mo>−</mo><mn>1</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mi mathvariant="normal">∇</mi><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</blockquote>
+<h3>2.8 TD with VFA 与 semi-gradient（关键）</h3>
+<ul>
+<li>TD target <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 的<strong>有偏</strong>样本（用的是估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>，不是真值）</li>
+<li>仍然可以当监督学习，训练数据是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo stretchy="false">⟩</mo></mrow></math></li>
+<li>Linear TD(0)：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mtext> </mtext><msub><mi>δ</mi><mi>t</mi></msub><mtext> </mtext><msub><mi>𝐱</mi><mi>t</mi></msub></mrow></mstyle></mtd></mtr></mtable></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 是 <strong>TD error</strong></p>
+<ul>
+<li>像一个<strong>不平稳的回归</strong>问题；但更特别：<strong>target 本身依赖于我们要学的参数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math></strong></li>
+<li><strong>我们忽略 target 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 的依赖</strong>，只对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 求导——所以叫 <strong>semi-gradient</strong> method</li>
+</ul>
+<p><strong>为什么说只是「半个」梯度？</strong> 若对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math> 求<strong>完整</strong>梯度，会多出一项 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mi mathvariant="normal">∇</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mo>=</mo><mo>−</mo><msub><mi>δ</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi mathvariant="normal">∇</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>−</mo><mi>γ</mi><mi mathvariant="normal">∇</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p>semi-gradient 把 target 当成固定的 label，只保留 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>。代价：<strong>它不是任何目标函数的真梯度</strong>，所以 SGD 的收敛保证不能直接套用（第 3 节的发散就来自这里）；好处：简单、快、能在线学。</p>
+<blockquote>
+<p><strong>Semi-gradient TD(0) for estimating <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo>≈</mo><msub><mi>v</mi><mi>π</mi></msub></mrow></math></strong></p>
+<p>输入：要评估的 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>；可微函数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo>:</mo><msup><mi>𝒮</mi><mo>+</mo></msup><mo>×</mo><msup><mi>ℝ</mi><mi>d</mi></msup><mo>→</mo><mi>ℝ</mi></mrow></math>，且 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mtext>terminal</mtext><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>；步长 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn></mrow></math></p>
+<p>任意初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>d</mi></msup></mrow></math>（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mn>𝟎</mn></mrow></math>）</p>
+<p>Loop for each episode：初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math>；Loop for each step：</p>
+<ul>
+<li>选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo><mi>π</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo>∣</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math>；执行 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>，观察 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>−</mo><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mi mathvariant="normal">∇</mi><mover accent="true"><mi>v</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>←</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>；until <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> is terminal</li>
+</ul>
+</blockquote>
+<h3>2.9 Control with VFA</h3>
+<p>和 tabular 一样走 generalized policy iteration，只是 evaluation 是近似的：</p>
+<ul>
+<li><strong>Policy evaluation</strong>：<strong>近似</strong> policy evaluation，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>≈</mo><msub><mi>Q</mi><mi>π</mi></msub></mrow></math></li>
+<li><strong>Policy improvement</strong>：ε-greedy policy improvement</li>
+</ul>
+<p>课件的图：从初始 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math> 出发，在「<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>θ</mi></msub><mo>≈</mo><msub><mi>Q</mi><mi>π</mi></msub></mrow></math>」和「<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo>=</mo><mi>ε</mi><mtext>-greedy</mtext><mo stretchy="false">(</mo><msub><mi>Q</mi><mi>θ</mi></msub><mo stretchy="false">)</mo></mrow></math>」两条线之间来回折，逼近 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>θ</mi></msub><mo>≈</mo><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math>。每次 evaluation 不必做完。</p>
+<h3>2.10 Action-value 的两种结构</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>形式</th>
+<th>适合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Action-in</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>𝐰</mi><mi mathvariant="normal">⊤</mi></msup><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：特征里包含 action</td>
+<td><strong>连续</strong> action 更容易（后面的讲）</td>
+</tr>
+<tr>
+<td><strong>Action-out</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mi>W</mi><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo stretchy="false">[</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math>：一次输出所有 action 的值</td>
+<td><strong>（小的）离散</strong> action 空间常用，如 <strong>DQN</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>一般情况下哪个更好<strong>没有定论</strong></li>
+<li>action-out 的好处：一次前向就得到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，Q-learning 的 target 很便宜</li>
+</ul>
+<h2>3 · Convergence and Divergence</h2>
+<h3>3.1 要问的问题</h3>
+<ul>
+<li>incremental prediction 算法什么时候收敛？用 bootstrapping（TD）时？用（如线性）VFA 时？用 off-policy learning 时？</li>
+<li>理想：所有情况都收敛；退而求其次：<strong>搞清楚什么时候收敛、什么时候不收敛</strong></li>
+</ul>
+<h3>3.2 MC 的不动点</h3>
+<p>用线性函数（步长适当衰减），MC 收敛到</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>𝐰</mi></munder><msub><mi>𝔼</mi><mi>π</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mo stretchy="false">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><msub><mi>V</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>𝐱</mi><mi>t</mi></msub><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><msup><mo stretchy="false">]</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">]</mo></mrow></math></div><p>（状态分布隐含依赖 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>。）<strong>推导</strong>：令梯度为 0（这就是最小二乘的 normal equation）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi>𝐰</mi></msub><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mo stretchy="false">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><msub><mi>V</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mo>=</mo><mn>0</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mo stretchy="false">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub><mo stretchy="false">)</mo><msub><mi>𝐱</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>G</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo>−</mo><msub><mi>𝐱</mi><mi>t</mi></msub><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>𝐱</mi><mi>t</mi></msub><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><mo stretchy="false">]</mo><mtext> </mtext><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>agent state 不必是 Markov</strong>：不动点只依赖观测到的数据（和特征）。这和 2.1 讲「MC 对非 Markov 稳健」是同一回事</li>
+</ul>
+<h3>3.3 TD 的不动点</h3>
+<p>用线性函数，TD 收敛到（continuing 问题，固定 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>&lt;</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>α</mi><mi>t</mi></msub><mo>→</mo><mn>0</mn></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub><mo>=</mo><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">(</mo><msub><mi>𝐱</mi><mi>t</mi></msub><mo>−</mo><mi>γ</mi><msub><mi>𝐱</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup><msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">]</mo></mrow></math></div><p><strong>推导</strong>：不动点就是<strong>期望更新为 0</strong> 的点（假设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>α</mi><mi>t</mi></msub></mrow></math> 与 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>𝐱</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>𝐱</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math> 不相关）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><mi mathvariant="normal">Δ</mi><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>α</mi><mi>t</mi></msub><mo stretchy="false">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msubsup><mi>𝐱</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi mathvariant="normal">⊤</mi></msubsup><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub><mo>−</mo><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub><mo stretchy="false">)</mo><msub><mi>𝐱</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>α</mi><mi>t</mi></msub><msub><mi>r</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>α</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>γ</mi><msubsup><mi>𝐱</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi mathvariant="normal">⊤</mi></msubsup><mo>−</mo><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>α</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">(</mo><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><mo>−</mo><mi>γ</mi><msubsup><mi>𝐱</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi mathvariant="normal">⊤</mi></msubsup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>α</mi><mi>t</mi></msub><msub><mi>r</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">(</mo><msubsup><mi>𝐱</mi><mi>t</mi><mi mathvariant="normal">⊤</mi></msubsup><mo>−</mo><mi>γ</mi><msubsup><mi>𝐱</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi mathvariant="normal">⊤</mi></msubsup><mo stretchy="false">)</mo><msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><msub><mi>𝐱</mi><mi>t</mi></msub><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（最后一步 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>α</mi><mi>t</mi></msub></mrow></math> 和期望无关，两边约掉。）</p>
+<p><strong>对比 MC</strong>：MC 是「令一个目标函数的梯度为 0」；TD 是「令 semi-gradient 更新的<strong>期望</strong>为 0」——<strong>不是任何目标函数的最小点</strong>。</p>
+<ul>
+<li>这个解<strong>和 MC 的解不同</strong></li>
+<li>渐近来看，<strong>通常 MC 的解更好</strong>（预测误差最小）</li>
+<li>但 <strong>TD 往往收敛更快</strong>（特别是中间的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>∈</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi mathvariant="normal">∞</mi><mo stretchy="false">}</mo></mrow></math>）</li>
+</ul>
+<h3>3.4 TD vs MC 的误差界（*）</h3>
+<ul>
+<li><strong>value error</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mrow><mi>V</mi><mi>E</mi></mrow><mo stretchy="true">‾</mo></mover><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">∥</mo><msub><mi>V</mi><mi>π</mi></msub><mo>−</mo><msub><mi>V</mi><mi>𝐰</mi></msub><msub><mo stretchy="false">∥</mo><msub><mi>d</mi><mi>π</mi></msub></msub><mo>=</mo><munder><mo>∑</mo><mi>s</mi></munder><msub><mi>d</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>−</mo><msub><mi>V</mi><mi>𝐰</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mn>2</mn></msup></mrow></math></div><ul>
+<li>MC 的解最小化 value error</li>
+</ul>
+<blockquote>
+<p><strong>Theorem.</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mrow><mi>V</mi><mi>E</mi></mrow><mo stretchy="true">‾</mo></mover><mo stretchy="false">(</mo><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub><mo stretchy="false">)</mo><mo>≤</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><mi>γ</mi></mrow></mfrac><mover accent="true"><mrow><mi>V</mi><mi>E</mi></mrow><mo stretchy="true">‾</mo></mover><mo stretchy="false">(</mo><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><mi>γ</mi></mrow></mfrac><munder><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>𝐰</mi></munder><mover accent="true"><mrow><mi>V</mi><mi>E</mi></mrow><mo stretchy="true">‾</mo></mover><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></div></blockquote>
+<p><strong>怎么读</strong>：TD 的误差最多是最优误差的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><mi>γ</mi></mrow></mfrac></mrow></math> 倍。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math> 接近 1 时这个倍数很大（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.9</mn></mrow></math> 时是 10 倍）——这就是「渐近 MC 更好」的量化版本。如果特征能精确表示 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>（最优误差为 0），TD 也是 0。</p>
+<h3>3.5 发散的例子（必会）</h3>
+<p>两个状态，<strong>一维特征</strong>：左边 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mi>w</mi></mrow></math>），右边 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mn>2</mn><mi>w</mi></mrow></math>），左 → 右 reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>0</mn></mrow></math>。</p>
+<p><strong>问：只在这一条转移上做 TD，会怎样？</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>w</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>w</mi><mi>t</mi></msub><mo>+</mo><msub><mi>α</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mi mathvariant="normal">∇</mi><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>w</mi><mi>t</mi></msub><mo>+</mo><msub><mi>α</mi><mi>t</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mi>x</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>w</mi><mi>t</mi></msub><mo>+</mo><msub><mi>α</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mi>γ</mi><mo>⋅</mo><mn>2</mn><msub><mi>w</mi><mi>t</mi></msub><mo>−</mo><msub><mi>w</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>w</mi><mi>t</mi></msub><mo>+</mo><msub><mi>α</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mn>2</mn><mi>γ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><msub><mi>w</mi><mi>t</mi></msub></mrow></mstyle></mtd></mtr></mtable></math></div><p>设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>t</mi></msub><mo>&gt;</mo><mn>0</mn></mrow></math>。<strong>若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>&gt;</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle></mrow></math>，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>&gt;</mo><msub><mi>w</mi><mi>t</mi></msub></mrow></math></strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>t</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></msub><msub><mi>w</mi><mi>t</mi></msub><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></math>。</p>
+<p><strong>数字</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.9</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math>：每步乘 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mn>0.1</mn><mo>×</mo><mn>0.8</mn><mo>=</mo><mn>1.08</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>=</mo><mn>1.08</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.1664</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.2597</mn><mo separator="true">,</mo><mo>⋯</mo><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></math>。</p>
+<p><strong>直觉</strong>：真值是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>=</mo><mn>0</mn></mrow></math>（reward 全是 0）。但每次把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi></mrow></math> 往 target <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>γ</mi><mi>w</mi></mrow></math> 拉，而 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math> 增大时 target 涨得更快（右边特征是 2）；右边状态自己<strong>从来不被更新</strong>，没人把它拉回来。</p>
+<h3>3.6 Deadly triad</h3>
+<p>同时具备以下三者的算法<strong>可能发散</strong>：</p>
+<ol>
+<li><strong>Bootstrapping</strong></li>
+<li><strong>Off-policy learning</strong></li>
+<li><strong>Function approximation</strong></li>
+</ol>
+<p>这叫 <strong>deadly triad</strong>。上面的例子三者全占：TD（bootstrap）、只更新一条转移（相当于 off-policy 的状态分布）、两个状态共享一个参数（FA）。下面三页课件依次<strong>去掉一个</strong>，看到都不发散。</p>
+<h3>3.7 去掉 off-policy：按 on-policy 采样</h3>
+<p>在右边加一个终止状态（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mn>0</mn></mrow></math>，reward 0）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>1</mn><mo>→</mo><mi>x</mi><mo>=</mo><mn>2</mn><mo>→</mo><mtext>terminal</mtext></mrow></math>。<strong>按 on-policy 走完一整个 episode</strong>，两条转移都更新：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><mi>w</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mi>γ</mi><mo>⋅</mo><mn>2</mn><mi>w</mi><mo>−</mo><mi>w</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mi>γ</mi><mo>⋅</mo><mn>0</mn><mo>−</mo><mn>2</mn><mi>w</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo stretchy="false">(</mo><mn>2</mn><mi>γ</mi><mo>−</mo><mn>3</mn><mo stretchy="false">)</mo><mi>w</mi></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>乘子<strong>对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 都为负</strong> ⇒ <strong>收敛</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>→</mo><mn>0</mn></mrow></math>，这里正好最优）</li>
+<li>关键：右边状态也被更新了，它的误差 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn><mi>w</mi></mrow></math> 把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math> 往回拉</li>
+</ul>
+<blockquote>
+<p>课件第二项没乘特征 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn></mrow></math>。严格按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>w</mi><mo>=</mo><mi>α</mi><mtext> </mtext><mi>δ</mi><mtext> </mtext><mi>x</mi></mrow></math> 算，第二项是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo stretchy="false">(</mo><mn>0</mn><mo>−</mo><mn>2</mn><mi>w</mi><mo stretchy="false">)</mo><mo>⋅</mo><mn>2</mn></mrow></math>，合计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo stretchy="false">(</mo><mn>2</mn><mi>γ</mi><mo>−</mo><mn>5</mn><mo stretchy="false">)</mo><mi>w</mi></mrow></math>。结论一样：对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 都为负。考试照课件写 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mi>γ</mi><mo>−</mo><mn>3</mn><mo stretchy="false">)</mo><mi>w</mi></mrow></math>，必要时注明。</p>
+</blockquote>
+<h3>3.8 去掉 function approximation：用 tabular 特征</h3>
+<p>特征换成 one-hot：左边 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>，右边 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>，即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>：</p>
+<ul>
+<li>这就是普通的回归，答案可能不好，但<strong>不会发散</strong></li>
+<li>若只更新左边状态：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math> 收敛到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> <strong>停在初始值</strong></li>
+<li>关键：两个状态<strong>不共享参数</strong>，更新左边不会改变右边的值</li>
+</ul>
+<h3>3.9 去掉（一部分）bootstrapping：multi-step return</h3>
+<p>仍然只更新左边状态，但 target 换成 λ-return：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><mi>λ</mi><msubsup><mi>G</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>λ</mi></msubsup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo separator="true">,</mo><mspace width="2em"/><msubsup><mi>G</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>λ</mi></msubsup><mo>=</mo><msup><mi>r</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><mi>w</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msubsup><mi>G</mi><mi>t</mi><mi>λ</mi></msubsup><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><mi>λ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msup><mi>r</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>2</mn><mi>γ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mo>−</mo><mn>1</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mi>w</mi><mspace width="2em"/><mo stretchy="false">(</mo><mi>r</mi><mo>=</mo><msup><mi>r</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>乘子为负 ⇔ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>γ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mn>1</mn></mrow></math> ⇔ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>&gt;</mo><mn>1</mn><mo>−</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><mrow><mn>2</mn><mi>γ</mi></mrow></mfrac></mstyle></mrow></math></li>
+<li>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.9</mn></mrow></math> 时要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>&gt;</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mn>1.8</mn></mfrac><mo>=</mo><mfrac><mn>4</mn><mn>9</mn></mfrac><mo>≈</mo><mn>0.45</mn></mrow></math></li>
+<li>关键：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> 越大越接近 MC，bootstrap 的成分 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></math> 越小；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow></math>（MC）时乘子是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>，一定收敛</li>
+</ul>
+<blockquote>
+<p>课件这一页前两行把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math> 写成了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math>、漏了几个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math>；上面是按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>G</mi><mi>λ</mi></msup></mrow></math> 定义补全的式子，最后一行和课件一致。</p>
+</blockquote>
+<h3>3.10 收敛表</h3>
+<table>
+<thead>
+<tr>
+<th>On/Off-policy</th>
+<th>算法</th>
+<th>Table Lookup</th>
+<th>Linear</th>
+<th>Non-Linear</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>On-policy</td>
+<td>MC</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>On-policy</td>
+<td>TD</td>
+<td>✓</td>
+<td>✓</td>
+<td>×</td>
+</tr>
+<tr>
+<td>Off-policy</td>
+<td>MC</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Off-policy</td>
+<td>TD</td>
+<td>✓</td>
+<td>×</td>
+<td>×</td>
+</tr>
+</tbody>
+</table>
+<p><strong>怎么记</strong>：MC 一行全 ✓（真正的 SGD）；table 一列全 ✓（没有泛化）；TD 越往右越差，off-policy TD 只剩 table。</p>
+<ul>
+<li>tabular control 算法（如 Q-learning）可以推广到 FA（如 <strong>DQN</strong>）</li>
+<li>control + FA 的理论<strong>还不完善</strong></li>
+</ul>
+<h3>3.11 收敛一定重要吗？Tracking</h3>
+<ul>
+<li>实践中常常<strong>更想要 tracking</strong>（持续调整 policy），而不是收敛到一个固定 policy</li>
+<li>真实环境很少静止。只追求收敛的 agent 会找到一个固定的「最优」policy 然后停止学习；环境一变，这个 policy 就过时</li>
+<li><strong>Tracking</strong>：把学习当作持续过程，policy 一直调整，「追踪」环境当前的最优行为</li>
+<li>要做到这一点，算法必须保持 <strong>plasticity</strong>（持续学习和改变的能力），而不是固化</li>
+</ul>
+<h2>4 · Deep Q Network（DQN）</h2>
+<h3>4.1 Deep RL：DL 和 RL 的三点区别</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Deep Learning</th>
+<th>Reinforcement Learning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>监督信号</td>
+<td>大量<strong>人工标注</strong>的数据</td>
+<td>标量 reward：<strong>稀疏、有噪声、有延迟</strong></td>
+</tr>
+<tr>
+<td>样本独立性</td>
+<td>假设样本<strong>独立</strong></td>
+<td>状态序列<strong>高度相关</strong></td>
+</tr>
+<tr>
+<td>数据分布</td>
+<td>假设<strong>固定</strong>分布</td>
+<td>算法学到新行为后<strong>分布会变</strong></td>
+</tr>
+</tbody>
+</table>
+<p>（<em>Playing Atari with Deep Reinforcement Learning</em>，NIPS workshop 2013）</p>
+<h3>4.2 DQN in Atari</h3>
+<ul>
+<li>从<strong>像素</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 端到端学 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>输入 state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>：<strong>最近 4 帧</strong>原始像素叠在一起（单帧看不出速度和方向，叠帧让状态更接近 Markov）</li>
+<li>输出：<strong>18 个</strong>摇杆 / 按钮位置各自的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>——<strong>action-out</strong> 结构</li>
+<li>Reward：这一步<strong>分数的变化</strong></li>
+<li><strong>所有游戏用同一个网络结构和同一组超参数</strong></li>
+</ul>
+<h3>4.3 网络</h3>
+<ul>
+<li>用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 近似<strong>最优</strong> action-value function（课件写 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math>，指的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math>）</li>
+<li>结构：卷积 → 卷积 → 全连接 → 全连接（输出层每个 action 一个值），中间用非线性激活</li>
+<li>例：输入游戏画面 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mtext>&quot;left&quot;</mtext><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mtext>&quot;right&quot;</mtext><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mtext>&quot;up&quot;</mtext><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h3>4.4 结果</h3>
+<ul>
+<li>柱状图的纵轴是归一化分数</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mn>100</mn><mo>×</mo><mfrac><mrow><mtext>DQN score</mtext><mo>−</mo><mtext>random play score</mtext></mrow><mrow><mtext>human score</mtext><mo>−</mo><mtext>random play score</mtext></mrow></mfrac></mrow></math></div><p>100% 表示达到人类水平；在很多游戏上超过人类，少数游戏（需要长期规划的）很差</p>
+<h3>4.5 用 TD learning 训练 DQN</h3>
+<ul>
+<li>观察 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow></math>，执行 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub></mrow></math>；环境给出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub></mrow></math></li>
+<li><strong>TD target</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mi>a</mi><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>TD error</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>−</mo><msub><mi>y</mi><mi>t</mi></msub></mrow></math>，其中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub><mo>=</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>目标：让 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub></mrow></math> 对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 都接近 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>t</mi></msub></mrow></math>（等价地让 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>δ</mi><mi>t</mi><mn>2</mn></msubsup></mrow></math> 小）</li>
+<li>对照 tabular Q-learning：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></li>
+</ul>
+<p><strong>训练过程</strong>：</p>
+<ul>
+<li><strong>TD learning</strong>：最小化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><mi>T</mi></mfrac></mstyle><msubsup><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>T</mi></msubsup><mstyle scriptlevel="0" displaystyle="true"><mfrac><msubsup><mi>δ</mi><mi>t</mi><mn>2</mn></msubsup><mn>2</mn></mfrac></mstyle></mrow></math></li>
+<li><strong>Online gradient descent</strong>：
+<ul>
+<li>观察 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math>，算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub></mrow></math></li>
+<li>梯度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐠</mi><mi>t</mi></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mo stretchy="false">(</mo><msubsup><mi>δ</mi><mi>t</mi><mn>2</mn></msubsup><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><mi>𝐰</mi></mrow></mfrac></mstyle><mo>=</mo><msub><mi>δ</mi><mi>t</mi></msub><mo>⋅</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">∂</mi><mi>𝐰</mi></mrow></mfrac></mstyle></mrow></math></li>
+<li>梯度下降 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>−</mo><mi>α</mi><mtext> </mtext><msub><mi>𝐠</mi><mi>t</mi></msub></mrow></math></li>
+<li><strong>用完就丢掉</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</li>
+</ul>
+<p><strong>注意符号</strong>：这里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>−</mo><msub><mi>y</mi><mi>t</mi></msub></mrow></math>，和第 2 节的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><mtext>target</mtext><mo>−</mo><mi>V</mi></mrow></math> <strong>反号</strong>，所以这里是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>−</mo><mi>α</mi><msub><mi>𝐠</mi><mi>t</mi></msub></mrow></math>。展开后 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">∇</mi><mi>Q</mi></mrow></math>，和 2.8 一样。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐠</mi><mi>t</mi></msub></mrow></math> 只对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>t</mi></msub></mrow></math> 求导、把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>t</mi></msub></mrow></math> 当常数，同样是 <strong>semi-gradient</strong>。</p>
+<p><strong>这已经是 deadly triad</strong>：bootstrap（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>t</mi></msub></mrow></math> 用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>）+ off-policy（Q-learning）+ 非线性 FA，所以原始版本不稳定。</p>
+<h3>4.6 两个缺点</h3>
+<p><strong>Shortcoming 1：浪费经验</strong></p>
+<ul>
+<li>一个 transition：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math>；experience：所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo></mrow></math> 的 transition</li>
+<li>之前用一次就丢，<strong>是浪费</strong></li>
+</ul>
+<p><strong>Shortcoming 2：更新相关</strong></p>
+<ul>
+<li>之前按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo></mrow></math> <strong>顺序</strong>用 transition 更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math></li>
+<li>相邻状态 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math> <strong>强相关</strong>（这不好）</li>
+<li>违反了随机梯度下降常用的<strong>独立样本</strong>假设（和 continual learning 的问题类似）</li>
+</ul>
+<p>（怎么解决——experience replay、target network——是 2.4 的内容，不在期中范围。）</p>
+<p><strong>Extra reading</strong>：<em>Playing Atari with Deep Reinforcement Learning</em>（NIPS workshop 2013）；<em>Human-level Control through Deep Reinforcement Learning</em>（Nature 2015）。</p>
+<h2>5 · 算例：一步 linear VFA 更新</h2>
+<p>设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>0.5</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.9</mn></mrow></math>，观察到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo>→</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>1</mn></mrow></math>。</p>
+<p><strong>先算值</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>=</mo><mn>1.5</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn><mo>+</mo><mn>0.5</mn><mo>=</mo><mn>2.5</mn></mrow></math>。</p>
+<p><strong>TD(0)</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>target</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>+</mo><mn>0.9</mn><mo>×</mo><mn>2.5</mn><mo>=</mo><mn>3.25</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>δ</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>3.25</mn><mo>−</mo><mn>1.5</mn><mo>=</mo><mn>1.75</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mtext> </mtext><mi>δ</mi><mtext> </mtext><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.175</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>𝐰</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mn>1.175</mn><mo separator="true">,</mo><mtext> </mtext><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><mn>0.675</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>MC</strong>（假设这一步之后的 return 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>=</mo><mn>2</mn></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo stretchy="false">(</mo><mi>G</mi><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mtext> </mtext><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.1</mn><mo>×</mo><mn>0.5</mn><mo>×</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>𝐰</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mn>1.05</mn><mo separator="true">,</mo><mtext> </mtext><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><mn>0.55</mn><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>观察（泛化）</strong>：TD 更新后 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1.85</mn></mrow></math>，同时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn><mo>+</mo><mn>0.675</mn><mo>=</mo><mn>2.675</mn></mrow></math> <strong>也变了</strong>——因为两个状态共享第 3 个特征。表格方法只会改 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>。这也是 3.5 发散例子的根源：改 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 时连带改了 target 里的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>。</p>
+<p><strong>做题套路</strong>：① 算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup><mi>𝐰</mi></mrow></math> 和 target 里要用的值；② target − 预测 = 误差；③ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi><mo>=</mo><mi>α</mi><mo>×</mo><mtext>误差</mtext><mo>×</mo><mi>𝐱</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>（<strong>乘的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 的特征</strong>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 的）；④ 题目问哪个值就用新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 重新算。</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>为什么要 FA</td>
+<td>内存、学得慢、泛化；Go <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mn>170</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>FA 种类</td>
+<td>tabular / linear / non-linear 的取舍</td>
+</tr>
+<tr>
+<td>RL 数据的特殊性</td>
+<td>非 i.i.d.；policy 影响数据；target 不平稳（三个原因）</td>
+</tr>
+<tr>
+<td>VFA 的关键性质</td>
+<td>改 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 会同时改很多状态的值</td>
+</tr>
+<tr>
+<td>目标函数</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝔼</mi><mi>d</mi></msub><mo stretchy="false">[</mo><mo stretchy="false">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo>−</mo><mi>V</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">]</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>𝐰</mi><mo>=</mo><mi>α</mi><mi>𝔼</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><msub><mi>V</mi><mi>π</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo><mi mathvariant="normal">∇</mi><mi>V</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Linear VFA</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi><mi>V</mi><mo>=</mo><mi>𝐱</mi></mrow></math>；step × error × feature；tabular 是 one-hot 特例</td>
+</tr>
+<tr>
+<td>三种 target</td>
+<td>MC <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math>、TD(0)、TD(λ) 的更新式</td>
+</tr>
+<tr>
+<td>无偏 / 有偏</td>
+<td>MC target 无偏；TD target 有偏</td>
+</tr>
+<tr>
+<td>Semi-gradient</td>
+<td>忽略 target 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi></mrow></math> 的依赖；漏掉的那一项</td>
+</tr>
+<tr>
+<td>两个算法框</td>
+<td>Gradient MC；semi-gradient TD(0)</td>
+</tr>
+<tr>
+<td>Control with VFA</td>
+<td>近似 evaluation + ε-greedy improvement</td>
+</tr>
+<tr>
+<td>Action-in / out</td>
+<td>定义；连续 vs 离散；DQN 是 action-out</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><mi>𝐱</mi><msup><mi>𝐱</mi><mi mathvariant="normal">⊤</mi></msup><msup><mo stretchy="false">]</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝔼</mi><mo stretchy="false">[</mo><mi>G</mi><mi>𝐱</mi><mo stretchy="false">]</mo></mrow></math> 的推导；不要求 Markov</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><mi>𝐱</mi><mo stretchy="false">(</mo><mi>𝐱</mi><mo>−</mo><mi>γ</mi><msup><mi>𝐱</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><msup><mo stretchy="false">)</mo><mi mathvariant="normal">⊤</mi></msup><msup><mo stretchy="false">]</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝔼</mi><mo stretchy="false">[</mo><mi>r</mi><mi>𝐱</mi><mo stretchy="false">]</mo></mrow></math> 的推导</td>
+</tr>
+<tr>
+<td>MC vs TD</td>
+<td>解不同；MC 误差小；TD 快；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><mi>γ</mi></mrow></mfrac></mrow></math> 界</td>
+</tr>
+<tr>
+<td>发散例子</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mn>2</mn><mi>γ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">)</mo><msub><mi>w</mi><mi>t</mi></msub></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>&gt;</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math> 发散</td>
+</tr>
+<tr>
+<td>Deadly triad</td>
+<td>三要素；分别去掉一个的三个例子（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>γ</mi><mo>−</mo><mn>3</mn></mrow></math>；one-hot；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>&gt;</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>γ</mi></mrow></mfrac></mrow></math>）</td>
+</tr>
+<tr>
+<td>收敛表</td>
+<td>4×3，能默写</td>
+</tr>
+<tr>
+<td>Tracking</td>
+<td>vs convergence；plasticity</td>
+</tr>
+<tr>
+<td>DL vs RL</td>
+<td>三点区别</td>
+</tr>
+<tr>
+<td>DQN Atari</td>
+<td>4 帧、18 个 action、reward = 分数变化、同一结构和超参数</td>
+</tr>
+<tr>
+<td>DQN 训练</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>t</mi></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐠</mi><mi>t</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>两个缺点</td>
+<td>浪费经验；相邻样本相关</td>
+</tr>
+<tr>
+<td>算例</td>
+<td>一步 linear MC / TD(0) 更新</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>linear VFA 的更新乘的是 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></strong>（被更新的那个状态的特征），不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐱</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math>。</li>
+<li>semi-gradient 的「半」：<strong>只对预测 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">;</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 求导</strong>，target 当常数；它不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>J</mi><mo stretchy="false">(</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math> 的真梯度。</li>
+<li>MC with VFA 是真正的 SGD，非线性也收敛（可能到局部最优）；TD 只在 on-policy + linear 时有保证。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mrow><mi>T</mi><mi>D</mi></mrow></msub><mo mathvariant="normal">≠</mo><msub><mi>𝐰</mi><mrow><mi>M</mi><mi>C</mi></mrow></msub></mrow></math>；MC 的 value error 更小，但 TD 通常学得更快。</li>
+<li>发散例子的条件是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>&gt;</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle></mrow></math>，和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 大小无关（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 只影响发散速度）。</li>
+<li>Deadly triad 要<strong>三个同时</strong>出现才「可能」发散；线性特征下任意两个都收敛（on-policy TD + linear ✓；off-policy MC + FA ✓；off-policy TD + table ✓）。但收敛表里 on-policy TD + <strong>非线性</strong> 也是 ×（没有收敛保证），别说成「只要不凑齐三个就一定收敛」。</li>
+<li>DQN 一节 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>−</mo><msub><mi>y</mi><mi>t</mi></msub></mrow></math>（反号），所以是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>−</mo><mi>α</mi><msub><mi>𝐠</mi><mi>t</mi></msub></mrow></math>；别把符号弄反。</li>
+<li>DQN 近似的是 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math></strong>（Q-learning 的 target 有 max）；课件写成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math> 是笔误。</li>
+<li>Experience replay、target network、Double DQN 是 <strong>2.4</strong>，期中不考；2.3 只要求说出两个缺点。</li>
+</ul>

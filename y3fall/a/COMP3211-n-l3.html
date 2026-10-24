@@ -1,0 +1,345 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap：</p>
+<ol>
+<li><strong>Image Classification Pipeline</strong>：问题是什么、难在哪</li>
+<li><strong>K Nearest Neighbor Classifier</strong>：不用训练、直接「找最像的」</li>
+<li><strong>Linear Classifier for Image Classification</strong>：把 L2 的线性分类推广到图像、多类，并推出 logistic loss 的 gradient</li>
+<li><strong>Non-linear Features</strong>：只改 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 就能得到非线性 predictor</li>
+</ol>
+<blockquote>
+<p>主线：K-NN 要存全部数据、测试慢 → 能不能把训练数据「压缩」成一组可学习的权重？→ linear classifier → 线性不够用 → non-linear features → 下一讲 neural network 自动学 features。</p>
+</blockquote>
+<h2>1 · Image Classification</h2>
+<h3>1.1 问题</h3>
+<ul>
+<li><strong>Input</strong>：一张图是一个 <strong>tensor</strong>，例如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn><mo>×</mo><mn>500</mn><mo>×</mo><mn>3</mn></mrow></math>（高 × 宽 × RGB 三通道），每个像素值在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>255</mn><mo stretchy="false">]</mo></mrow></math>。</li>
+<li><strong>Output</strong>：预测这张图的<strong>类别 label</strong>。</li>
+</ul>
+<h3>1.2 难点（Challenges）</h3>
+<ul>
+<li><strong>Viewpoint variation</strong>：相机一动，所有像素值都变了，但还是同一个物体。</li>
+<li><strong>Illumination changes</strong>：光照不同，像素值差很多。</li>
+<li><strong>Intraclass variation</strong>：同一类物体长得很不一样（例：不同口味的巧克力包装，还有归类模糊的 ambiguous category）。</li>
+</ul>
+<blockquote>
+<p>所以不能靠「手写规则」判断像素，必须<strong>从数据里学</strong>。</p>
+</blockquote>
+<h3>1.3 Pipeline（data-driven approach）</h3>
+<ol>
+<li>收集<strong>图片和 label</strong> 组成的数据集</li>
+<li>用 machine learning <strong>训练</strong>分类器：<code>train(images, labels) → model</code></li>
+<li>在<strong>新图片</strong>上评估：<code>predict(model, test_images) → test_labels</code></li>
+</ol>
+<h2>2 · Nearest Neighbor</h2>
+<h3>2.1 两个设计问题</h3>
+<ol>
+<li>图片用什么<strong>表示</strong>（representation）？</li>
+<li>用什么 <strong>distance metric</strong> 比较两张图？</li>
+</ol>
+<h3>2.2 L1 distance（逐像素绝对差之和）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>D</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msub><mi>I</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>I</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>p</mi></munder><mo stretchy="false">∣</mo><msubsup><mi>I</mi><mn>1</mn><mi>p</mi></msubsup><mo>−</mo><msubsup><mi>I</mi><mn>2</mn><mi>p</mi></msubsup><mo stretchy="false">∣</mo></mrow></math></div><p><strong>课件例子</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>×</mo><mn>4</mn></mrow></math> 图）：test image 与 training image 逐像素相减取绝对值，得到</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>46</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>12</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>14</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>82</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>13</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>39</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>33</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>12</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>10</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>30</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>32</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>22</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>108</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mtext> </mtext><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mtext>全部相加</mtext></mpadded></mover><mtext> </mtext><mn>456</mn></mrow></math></div><p>（逐行和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>73</mn><mo>+</mo><mn>167</mn><mo>+</mo><mn>52</mn><mo>+</mo><mn>164</mn><mo>=</mo><mn>456</mn></mrow></math>。）</p>
+<h3>2.3 Supervised learning 的设置</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>：output label，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math>：classifier，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math>：input image</p>
+</li>
+<li>
+<p><strong>Training</strong>（learning）：给定带 label 的训练集 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mi>N</mi></msub><mo separator="true">,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mrow></math>，训练出 predictor <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math></p>
+</li>
+<li>
+<p><strong>Testing</strong>（inference）：对新的 test example <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></p>
+</li>
+</ul>
+<h3>2.4 Nearest Neighbor classifier</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> = <strong>离 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 最近的那个训练样本的 label</strong>（用 distance metric 算距离）</li>
+<li>「训练」= <strong>把所有训练数据存起来</strong>；每次测试都要<strong>搜索全部数据</strong>。</li>
+</ul>
+<h3>2.5 K-Nearest Neighbor（K-NN）</h3>
+<ul>
+<li><strong>问题</strong>：只看 1 个最近邻，遇到 <strong>outlier</strong>（离群点）就会错。</li>
+<li><strong>K-NN</strong>：找最近的 <strong>K 个</strong>样本，按它们 label 的<strong>多数投票</strong>（majority voting）决定。</li>
+</ul>
+<p><strong>实际步骤</strong>：</p>
+<ol>
+<li>提取每张训练图的 feature，记下 label</li>
+<li>给定测试图，提取 feature，算它和<strong>整个训练集</strong>的距离</li>
+<li>选出距离最小的 top-K 个邻居，拿到它们的 label</li>
+<li>测试图分到 K 个邻居中<strong>最多的那一类</strong></li>
+</ol>
+<p><strong>性质</strong>：</p>
+<ul>
+<li>K-NN 能画出类别之间清晰的边界（课件 5-NN 的图）</li>
+<li><strong>K 越大，对 outlier 越 robust</strong>（单个离群点投票被淹没）</li>
+</ul>
+<h3>2.6 超参数：K 和 distance metric</h3>
+<ul>
+<li>最好的 K 是多少？用哪种距离？</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>L1 (Manhattan)</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><msub><mi>D</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msub><mi>I</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>I</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>p</mi></munder><mo stretchy="false">∣</mo><msubsup><mi>I</mi><mn>1</mn><mi>p</mi></msubsup><mo>−</mo><msubsup><mi>I</mi><mn>2</mn><mi>p</mi></msubsup><mo stretchy="false">∣</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>L2 (Euclidean)</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><msub><mi>D</mi><mn>2</mn></msub><mo stretchy="false">(</mo><msub><mi>I</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>I</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>=</mo><msqrt><mrow><munder><mo>∑</mo><mi>p</mi></munder><mo stretchy="false">(</mo><msubsup><mi>I</mi><mn>1</mn><mi>p</mi></msubsup><mo>−</mo><msubsup><mi>I</mi><mn>2</mn><mi>p</mi></msubsup><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></msqrt></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>很依赖具体问题 / 数据集</strong>，只能都试一试，看哪个效果好。</li>
+<li><strong>怎么试</strong>：把数据分成 <strong>train / validation / test</strong>：
+<ul>
+<li>在 <strong>train</strong> 上「训练」（K-NN 就是存起来）</li>
+<li>在 <strong>validation</strong> 上<strong>选超参数</strong>（K、距离）</li>
+<li>最后只在 <strong>test</strong> 上<strong>评估一次</strong></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>为什么不能直接在 test 上调参？</strong> 那样 test 就被「用过了」，报告出来的准确率会偏乐观，不代表在真正新数据上的表现。</p>
+</blockquote>
+<h3>2.7 K-NN 的优缺点</h3>
+<p><strong>Pros</strong></p>
+<ul>
+<li><strong>不需要复杂训练</strong>：没有可学习参数，只有超参数</li>
+<li>简单，对 outlier 比较 robust</li>
+</ul>
+<p><strong>Cons</strong></p>
+<ul>
+<li><strong>Storage</strong>：要存下整个数据集</li>
+<li><strong>Time</strong>：每次预测都要和每个训练样本比，<strong>推理时间随训练数据量线性增长</strong></li>
+</ul>
+<blockquote>
+<p>引出问题：<strong>能不能把训练样本「压缩」成一组可学习的权重？</strong> → linear classifier。</p>
+</blockquote>
+<h2>3 · Linear Classifier for Image Classification</h2>
+<h3>3.1 回顾 L2</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>；decision boundary <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></li>
+<li>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>=</mo><mo stretchy="false">[</mo><mo>−</mo><mn>0.6</mn><mo separator="true">,</mo><mn>0.6</mn><mo stretchy="false">]</mo></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mo>+</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mo>+</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math></li>
+</ul>
+<h3>3.2 加上 bias term</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><msub><mi>x</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>w</mi><mi>d</mi></msub><msub><mi>x</mi><mi>d</mi></msub><mo>+</mo><mi>b</mi><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><mi>b</mi></mrow></math></div><ul>
+<li>没有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> 的话，boundary 必须<strong>过原点</strong>；加了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> 可以平移。</li>
+<li>二分类时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>∈</mo><mi>ℝ</mi></mrow></math>，只是<strong>一个数</strong>。</li>
+<li>（和 L2 里把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> 放进 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 是同一件事的两种写法。）</li>
+</ul>
+<h3>3.3 多类：每类一组权重</h3>
+<ul>
+<li>一条 boundary 只能分两类 → 需要<strong>多个 boundary = 多个二分类器</strong>。</li>
+<li><strong>每个类别学一个 weight vector</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>car</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><msub><mi>f</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>b</mi><mn>1</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>deer</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><msub><mi>f</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>w</mi><mn>2</mn></msub><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>b</mi><mn>2</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>airplane</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><msub><mi>f</mi><mn>3</mn></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>w</mi><mn>3</mn></msub><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>b</mi><mn>3</mn></msub></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>预测：选 score 最大的那一类</strong>。</li>
+</ul>
+<h3>3.4 例：4 个像素、3 个类别（dog / cat / ship）</h3>
+<p>把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math> 的图 <strong>flatten</strong> 成向量 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>56</mn><mo separator="true">,</mo><mn>231</mn><mo separator="true">,</mo><mn>24</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math>。写成矩阵：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>W</mi><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><mi>b</mi></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mn>3</mn><mo>×</mo><mn>4</mn></mrow></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>∈</mo><msup><mi>ℝ</mi><mn>3</mn></msup></mrow></math>，Score <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∈</mo><msup><mi>ℝ</mi><mn>3</mn></msup></mrow></math></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>W</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>0.5</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1.5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1.3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2.1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.25</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>0.3</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mspace width="2em"/><mi>b</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1.1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3.2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1.2</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math></div><p>逐行算：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>dog</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>0.2</mn><mo stretchy="false">(</mo><mn>56</mn><mo stretchy="false">)</mo><mo>−</mo><mn>0.5</mn><mo stretchy="false">(</mo><mn>231</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.1</mn><mo stretchy="false">(</mo><mn>24</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mo>+</mo><mn>2</mn><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>+</mo><mn>1.1</mn><mo>=</mo><mo>−</mo><mn>96.8</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>cat</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>1.5</mn><mo stretchy="false">(</mo><mn>56</mn><mo stretchy="false">)</mo><mo>+</mo><mn>1.3</mn><mo stretchy="false">(</mo><mn>231</mn><mo stretchy="false">)</mo><mo>+</mo><mn>2.1</mn><mo stretchy="false">(</mo><mn>24</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mo>+</mo><mn>0</mn><mo>+</mo><mn>3.2</mn><mo>=</mo><mn>437.9</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>ship</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>0.25</mn><mo stretchy="false">(</mo><mn>231</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.2</mn><mo stretchy="false">(</mo><mn>24</mn><mo stretchy="false">)</mo><mo>−</mo><mn>0.3</mn><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mo>−</mo><mn>1.2</mn><mo>=</mo><mn>60.75</mn></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>最大是 <strong>cat（437.9）</strong> → 预测为 cat。</li>
+<li>⚠️ 课件写的 ship score 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>61.95</mn></mrow></math>，那是<strong>没加 bias <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1.2</mn></mrow></math></strong> 的值；加上 bias 应为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>60.75</mn></mrow></math>。不影响结论，考试照课件思路算即可。</li>
+<li>真实图像：CIFAR 图 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>32</mn><mo>×</mo><mn>32</mn><mo>×</mo><mn>3</mn></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>∈</mo><msup><mi>ℝ</mi><mn>3072</mn></msup></mrow></math>。</li>
+</ul>
+<p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> 的每一行可以看成一个「模板」</strong>：把 10 个类别的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>i</mi></msub></mrow></math> reshape 回图像大小显示，就像每一类的平均模样（课件 “Visualizing <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> in 10 different classes”）。Score = 图像和模板的 dot product = 匹配程度。</p>
+<h3>3.5 怎么学这些权重？Logistic loss 的 gradient（推导必会）</h3>
+<p>回顾 L2：hinge loss 在 margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>1</mn></mrow></math> 后 gradient 为 0；<strong>logistic loss 处处可导、gradient 非零</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>Loss</mtext><mtext>logistic</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>w</mi><mo stretchy="false">)</mo><mo>=</mo><mi>log</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>y</mi></mrow></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p>目标：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>w</mi></msub><msub><mtext>Loss</mtext><mtext>logistic</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>w</mi><mo stretchy="false">)</mo></mrow></math>。要做 gradient descent，就要算 gradient。</p>
+<p><strong>关键：认出 sigmoid function</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>z</mi></mrow></msup></mrow></mfrac><mspace width="2em"/><mo stretchy="false">(</mo><mtext>把实数压到 </mtext><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mtext>，S 形曲线</mtext><mo stretchy="false">)</mo></mrow></math></div><p>于是</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>log</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></msup></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>两条求导规则</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="false">[</mo><mi>log</mi><mo>⁡</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">]</mo><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mfrac><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>：因为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup></mrow></mfrac><mo>=</mo><mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><msup><mi>e</mi><mi>t</mi></msup><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></math>。）</p>
+<p><strong>Chain rule</strong>，令 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></math>，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi>w</mi></msub><mi>t</mi><mo>=</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">∇</mi><mi>w</mi></msub><msub><mtext>Loss</mtext><mtext>logistic</mtext></msub></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><msub><mi mathvariant="normal">∇</mi><mi>w</mi></msub><mi>log</mi><mo>⁡</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mfrac><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mfrac><mtext> </mtext><msub><mi mathvariant="normal">∇</mi><mi>w</mi></msub><mi>t</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>y</mi></mrow></mstyle></mstyle></mstyle></menclose></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>直觉</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></math> 是一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> 之间的权重：</p>
+<ul>
+<li>margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 很大（分得很对）→ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><mo>≈</mo><mn>0</mn></mrow></math> → 几乎不更新</li>
+<li>margin 很小或为负（分错）→ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><mo>≈</mo><mn>1</mn></mrow></math> → 接近 hinge 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></math>，大力更新</li>
+<li>永远不会正好为 0 → 这就是「margin 超过 1 也继续推大」的来源</li>
+</ul>
+<p><strong>更新</strong>（对所有训练样本的 gradient 取平均）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>w</mi><mo>←</mo><mi>w</mi><mo>−</mo><mi>η</mi><mtext> </mtext><munder><munder><mrow><msub><mi mathvariant="normal">∇</mi><mi>w</mi></msub><msub><mtext>Loss</mtext><mtext>logistic</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>w</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>average gradient from all training samples</mtext></munder></mrow></math></div><h3>3.6 K-NN vs Linear Classifier（常考对比）</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>K-NN</th>
+<th>Linear classifier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>训练</td>
+<td><strong>不需要训练</strong></td>
+<td><strong>需要训练</strong></td>
+</tr>
+<tr>
+<td>测试时间</td>
+<td><strong>慢</strong>（要和所有数据比）</td>
+<td><strong>快</strong>（一次矩阵乘法）</td>
+</tr>
+<tr>
+<td>模型类型</td>
+<td><strong>Non-parametric</strong>，显式搜索数据</td>
+<td><strong>Parametric</strong>，用参数「记住」数据集</td>
+</tr>
+<tr>
+<td>Outlier</td>
+<td>K 大时更 robust</td>
+<td>可能对 outlier 敏感</td>
+</tr>
+</tbody>
+</table>
+<h2>4 · Non-linear Features</h2>
+<h3>4.1 Feature extraction + learning</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>ℱ</mi><mo>=</mo><mo stretchy="false">{</mo><msub><mi>f</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>:</mo><mtext> </mtext><mi>w</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>d</mi></msup><mo stretchy="false">}</mo></mrow></math></div><ul>
+<li><strong>Feature extraction</strong>：根据<strong>领域知识</strong>选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi></mrow></math>，也就决定了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℱ</mi></mrow></math>（所有 predictor 里的一个子集）</li>
+<li><strong>Learning</strong>：根据数据在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℱ</mi></mrow></math> 里选一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>w</mi></msub></mrow></math></li>
+</ul>
+<blockquote>
+<p>两步分工：<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi></mrow></math> 决定「能表达什么」，learning 决定「选哪个」</strong>。</p>
+</blockquote>
+<h3>4.2 线性不够用</h3>
+<ul>
+<li>线性回归：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>0.57</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>0.2</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>……预测和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 是<strong>线性关系</strong>。</li>
+<li>数据可能是非线性的（课件里的散点先升后降），<strong>直线拟合不了</strong>。</li>
+</ul>
+<h3>4.3 Quadratic predictors</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo separator="true">,</mo><msup><mi>x</mi><mn>2</mn></msup><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="2em"/><mtext>例：</mtext><mi>ϕ</mi><mo stretchy="false">(</mo><mn>3</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>9</mn><mo stretchy="false">]</mo></mrow></math></div><ul>
+<li>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>0.2</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>4</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0.1</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>（最后一个其实是直线）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℱ</mi><mo>=</mo><mo stretchy="false">{</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>:</mo><mi>w</mi><mo>∈</mo><msup><mi>ℝ</mi><mn>3</mn></msup><mo stretchy="false">}</mo></mrow></math></li>
+<li><strong>只改 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi></mrow></math> 就得到非线性 predictor</strong></li>
+</ul>
+<h3>4.4 Periodicity structure</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo separator="true">,</mo><msup><mi>x</mi><mn>2</mn></msup><mo separator="true">,</mo><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>3</mn><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math></div><ul>
+<li>
+<p>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mi>cos</mi><mo>⁡</mo><mn>6</mn><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>0.96</mn><mo stretchy="false">]</mo></mrow></math></p>
+</li>
+<li>
+<p>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>0.1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>3</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0.1</mn><mo separator="true">,</mo><mn>0.5</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℱ</mi><mo>⊂</mo><mo stretchy="false">{</mo><mi>w</mi><mo>∈</mo><msup><mi>ℝ</mi><mn>4</mn></msup><mo stretchy="false">}</mo></mrow></math></p>
+</li>
+<li>
+<p><strong>“Just throw in any features you want”</strong>：</p>
+<ul>
+<li>某个 feature 没用 → 学习算法会给它一个<strong>接近 0 的权重</strong></li>
+<li>但 <strong>feature 越多，学习越难</strong></li>
+</ul>
+</li>
+</ul>
+<h3>4.5 Linear in what?（核心概念）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></div><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>答案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linear in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math>？</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Linear in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>？</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>Linear in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math>？</td>
+<td><strong>No!</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 本身对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 是非线性的，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 也是非线性的。</li>
+</ul>
+<p><strong>Key idea: non-linearity of features</strong></p>
+<ul>
+<li><strong>Expressiveness</strong>：score <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 可以是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 的<strong>非线性</strong>函数 → 表达能力强</li>
+<li><strong>Efficiency</strong>：score 永远是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math> 的<strong>线性</strong>函数 → 优化还是一样简单（gradient 好算）</li>
+</ul>
+<h3>4.6 Quadratic classifier：圆形 decision boundary</h3>
+<ul>
+<li>线性 feature <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mo>−</mo><mn>0.6</mn><mo separator="true">,</mo><mn>0.6</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math> → boundary 是<strong>直线</strong>。</li>
+<li>非线性 feature：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><mtext> </mtext><msubsup><mi>x</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup><mo stretchy="false">]</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo stretchy="false">(</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></div><p><strong>推导等价形式</strong>（配方）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><mn>2</mn><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><msubsup><mi>x</mi><mn>1</mn><mn>2</mn></msubsup><mo>−</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><mo>−</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>所以</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>+</mo><mn>1</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>&lt;</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo stretchy="false">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>otherwise</mtext></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><ul>
+<li>Decision boundary 是<strong>圆心 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>、半径 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mn>2</mn></msqrt></mrow></math> 的圆</strong>：圆内 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math>，圆外 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>。</li>
+</ul>
+<h3>4.7 在 feature space 里看</h3>
+<ul>
+<li><strong>Input space</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">]</mo></mrow></math>：boundary 是<strong>圆</strong>（非线性）</li>
+<li><strong>Feature space</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msubsup><mi>x</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>x</mi><mn>2</mn><mn>2</mn></msubsup><mo stretchy="false">]</mo></mrow></math>：boundary 是一个<strong>超平面</strong>（hyperplane，线性）</li>
+<li>也就是：把数据「抬」到更高维的 feature space，原来要用曲线分的，现在一个平面就能分开。</li>
+</ul>
+<h3>4.8 小结</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>：对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 线性，对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 非线性</li>
+<li>Regression → 非线性 predictor；classification → 非线性 decision boundary</li>
+<li>常见非线性 feature：quadratic、periodic 等</li>
+<li>怎么得到<strong>更强的非线性 feature</strong>？→ <strong>Deep neural network 自动学习紧凑、分层的非线性 feature</strong>（下一讲）</li>
+</ul>
+<h2>5 · 总结 &amp; 考点</h2>
+<h3>5.1 Overall summary</h3>
+<ul>
+<li><strong>K-NN</strong>：non-parametric（超参数 K 和距离），推理开销大</li>
+<li><strong>Linear classifier</strong>：parametric（可学习权重），loss 有 zero-one / hinge / logistic，推理高效</li>
+<li><strong>Non-linear features</strong>：对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math> 线性、对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 非线性，能建复杂模型</li>
+</ul>
+<h3>5.2 考点清单</h3>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>图像分类难点</td>
+<td>viewpoint、illumination、intraclass variation</td>
+</tr>
+<tr>
+<td>L1 / L2 distance</td>
+<td>公式；会手算 L1（例：456）</td>
+</tr>
+<tr>
+<td>K-NN 步骤</td>
+<td>4 步；K 大更抗 outlier</td>
+</tr>
+<tr>
+<td>超参数怎么选</td>
+<td>train / validation / test；在 validation 上选，test 只评估一次</td>
+</tr>
+<tr>
+<td>K-NN 优缺点</td>
+<td>不用训练；存储大、推理慢（线性增长）</td>
+</tr>
+<tr>
+<td>Bias term</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><mi>b</mi></mrow></math>，让 boundary 不必过原点</td>
+</tr>
+<tr>
+<td>多类线性分类</td>
+<td>每类一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>i</mi></msub></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><mi>b</mi></mrow></math>；选最大 score；会手算</td>
+</tr>
+<tr>
+<td>Logistic gradient</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi><mo stretchy="false">)</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>y</mi></mrow></math>，会推导（sigmoid + chain rule）</td>
+</tr>
+<tr>
+<td>K-NN vs linear</td>
+<td>训练 / 测试时间、parametric 与否、outlier</td>
+</tr>
+<tr>
+<td>Linear in what</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math> 是，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 是，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 不是；expressiveness vs efficiency</td>
+</tr>
+<tr>
+<td>Quadratic classifier</td>
+<td>会配方推出圆形 boundary</td>
+</tr>
+</tbody>
+</table>
+<h3>5.3 易错点</h3>
+<ul>
+<li>K-NN <strong>测试</strong>慢、<strong>训练</strong>快（几乎不用训练），别反过来。</li>
+<li>超参数在 <strong>validation</strong> 上选，不是 test。</li>
+<li>多类预测取 <strong>argmax score</strong>，不是 sign。</li>
+<li>「linear classifier」的 linear 指对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math> 线性；加了非线性 feature 后对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 就不是线性的。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>。</li>
+</ul>

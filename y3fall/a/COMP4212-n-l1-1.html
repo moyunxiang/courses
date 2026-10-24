@@ -1,0 +1,605 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>四部分：</p>
+<ol>
+<li><strong>Course Logistics</strong>（课程安排、评分）</li>
+<li><strong>RL Background</strong>（RL 是什么、为什么要 RL、发展）</li>
+<li><strong>Basic RL Concept</strong>（agent / environment、history / state、Markov、policy / value / model、learning vs planning、exploration vs exploitation）</li>
+<li><strong>Comparisons with Other ML Methods</strong></li>
+</ol>
+<blockquote>
+<p>这一讲概念为主。可能考：<strong>RL 和 supervised learning 的区别</strong>；<strong>history、state、Markov state 的定义</strong>；<strong>fully vs partially observable</strong>（MDP vs POMDP）；<strong>RL agent 的三个组成部分</strong>及 value-based / policy-based / actor-critic / model-free / model-based 的分类；<strong>learning vs planning</strong>；<strong>exploration vs exploitation</strong>；对比表。</p>
+</blockquote>
+<h2>1 · Course Logistics</h2>
+<ul>
+<li>讲师 Dr. Long Chen；本课从 2024 Fall 开始（旧编号 COMP 4901Z）；邮件主题以 <strong>[COMP4212]</strong> 开头</li>
+<li>需要的背景：Python / PyTorch；线性代数（逆、范数）；概率（期望、方差、采样、Bernoulli / Gaussian）；微积分（导数、Taylor 展开、Lagrange multiplier）；ML / DL（监督学习、loss、梯度下降、神经网络）</li>
+<li>课程主页 zjuchenlong.github.io/Teaching/26Fall_COMP4212/；slides 课前发，录像课后发（Canvas）</li>
+<li>参考：Sutton &amp; Barto <em>Reinforcement Learning: An Introduction</em>；DeepMind、Berkeley CS285、Stanford CS234、CMU 10-403 等</li>
+</ul>
+<h3>1.1 Syllabus</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RL Basics</strong></td>
+<td>1.1 Course and RL Introduction；1.2 Multi-armed Bandit；1.3 Markov Decision Processes；1.4 Planning by Dynamic Programming</td>
+</tr>
+<tr>
+<td><strong>Value-based RL</strong></td>
+<td>2.1 Model-free Prediction；2.2 Model-free Control；2.3 Value Function Approximation；2.4 Advanced Tricks for DQNs</td>
+</tr>
+<tr>
+<td><strong>Policy-based RL</strong></td>
+<td>3.1 Policy Gradient；3.2 Actor Critic；3.3 Advanced Policy Gradient；3.4 Continuous Control</td>
+</tr>
+<tr>
+<td><strong>Offline-RL &amp; Model-based RL</strong></td>
+<td>4.1 Imitation Learning；4.2 Advanced Offline RL；4.3 Model-based RL</td>
+</tr>
+<tr>
+<td>More?</td>
+<td>视时间而定</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 Grading</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>占比</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Assignment</td>
+<td>25%</td>
+<td>约 3–4 次 Python / PyTorch</td>
+</tr>
+<tr>
+<td>Midterm</td>
+<td>25%</td>
+<td>约 10/23（或 10/21）；<strong>可能并入 final</strong>（final 变 75%）</td>
+</tr>
+<tr>
+<td>Final</td>
+<td>50%</td>
+<td></td>
+</tr>
+<tr>
+<td>Bonus</td>
+<td>最多 5%</td>
+<td>最后一节课（11/27）10 分钟小组展示（2–5 人）+ 3 页 survey（1–3 篇近期 SOTA RL 论文）；DDL 10 月底交 survey pdf 和草稿 slides</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · RL Background</h2>
+<h3>2.1 什么是 RL</h3>
+<p>三类 machine learning：supervised、unsupervised、reinforcement。</p>
+<blockquote>
+<p><strong>Reinforcement Learning</strong>：Learning through experience / data to make good decisions under uncertainty（<strong>Trial-and-Error Learning</strong>）</p>
+<p>Mathematical paradigm for <strong>learning to act via trial and error</strong>.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Supervised Learning</th>
+<th>Reinforcement Learning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>给定数据集，找出能预测 label 的规律</td>
+<td><strong>Sequential decision-making</strong>：观察世界 → 行动 → 观察 → 行动 → …</td>
+</tr>
+<tr>
+<td>一般假设数据 <strong>i.i.d.</strong></td>
+<td>数据<strong>不是 i.i.d.</strong></td>
+</tr>
+<tr>
+<td>之前的预测<strong>不影响</strong>其他预测</td>
+<td>之前的 action <strong>决定</strong>以后的问题有多难</td>
+</tr>
+<tr>
+<td>通常是<strong>一步</strong>的问题</td>
+<td>多步、序列</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么「数据不是 i.i.d.」很关键？</strong> RL 里 agent 自己的行为决定了它接下来看到什么数据（走到哪里就只能看到哪里）。数据分布随 policy 改变，这让学习和评估都更难。</p>
+<h3>2.2 Why RL：standard ML models the data</h3>
+<p>普通 ML 是对数据建模（预测）；本课目标是 <strong>Learning to Act</strong>：</p>
+<ul>
+<li>构建能在<strong>动态环境</strong>中学会行动、完成目标的 agent</li>
+<li>而不是在<strong>静态环境</strong>里执行预先编好行为的 agent</li>
+</ul>
+<h3>2.3 RL 从哪来</h3>
+<ul>
+<li>哲学问题：行为是怎样形成的？由 reinforcement 还是 free will？</li>
+<li><strong>B.F. Skinner</strong>：带来奖赏 / 愉悦的行为倾向于重复；带来惩罚 / 痛苦的行为倾向于消失</li>
+</ul>
+<h3>2.4 SL vs RL：反馈的类型</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Supervised learning</th>
+<th>Reinforcement learning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学什么</td>
+<td>从 <strong>expert demonstrations</strong> 学：专家直接告诉你<strong>正确的 action</strong></td>
+<td>从 <strong>rewards</strong> 学：环境给出 <strong>evaluative feedback</strong>（这个 action 好还是不好）</td>
+</tr>
+<tr>
+<td>导师比喻</td>
+<td>导师直接告诉你哪些 idea 值得做</td>
+<td>导师只告诉你你的 idea 值不值得做（不告诉你别的 idea）</td>
+</tr>
+<tr>
+<td>跳高比喻</td>
+<td>Fosbury 示范了背越式轨迹后，运动员很快学会</td>
+<td>只说「跳得越高越好」，花了很多年才发现背越式</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键区别</strong>：SL 的反馈是 <strong>instructive</strong>（告诉你正确答案），RL 的反馈是 <strong>evaluative</strong>（只告诉你好坏），所以 RL 必须自己去试。</p>
+<h3>2.5 RL 的代表性成果</h3>
+<ul>
+<li><strong>Go</strong>：<em>Mastering the Game of Go without Human Knowledge</em>（Nature 2017），超越人类</li>
+<li><strong>ChatGPT</strong>（RLHF）</li>
+<li>兴趣暴涨（<em>Deep RL that Matters</em>，AAAI 2018），但也有争议</li>
+<li><strong>RL in 2025</strong>：DeepSeek-R1-Zero（纯大规模 RL、不先做 SFT 就有很强的推理能力）；Google DeepMind 在 IMO 拿到 35/42 金牌分；Pi 的咖啡机器人</li>
+</ul>
+<h2>3 · Basic RL Concepts</h2>
+<h3>3.1 Sequential decision making</h3>
+<ul>
+<li><strong>Goal</strong>：选择 action，最大化<strong>总的期望未来 reward</strong>（total expected future reward）</li>
+<li>可能要在<strong>短期</strong>和<strong>长期</strong> reward 之间权衡（为了以后更多 reward，现在可能要牺牲一点）</li>
+</ul>
+<h3>3.2 Agent 与 Environment</h3>
+<p>每一步 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>：</p>
+<table>
+<thead>
+<tr>
+<th>Agent</th>
+<th>Environment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>收到 observation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>o</mi><mi>t</mi></msub></mrow></math></td>
+<td>收到 action <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>收到 scalar reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></math></td>
+<td>发出 observation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>o</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math></td>
+</tr>
+<tr>
+<td>执行 action <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub></mrow></math></td>
+<td>发出 scalar reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 在环境走一步时加 1。</p>
+<h3>3.3 History 与 State</h3>
+<blockquote>
+<p><strong>History</strong> 是 observations、actions、rewards 的序列：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>r</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>o</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mi>t</mi></msub></mrow></math></div>
+即到时刻 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 为止的全部可观测变量。</p>
+</blockquote>
+<ul>
+<li>接下来发生什么取决于 history：agent 选 action，environment 选 observation / reward</li>
+<li><strong>State</strong> 是用来决定下一步发生什么的信息</li>
+<li>形式上，state 是 history 的函数：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><msub><mi>h</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<p><strong>为什么不直接用 history？</strong> History 随时间无限变长，不方便存储和计算；state 是对它的压缩。</p>
+<h3>3.4 Environment state vs Agent state</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Environment state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>e</mi></msubsup></mrow></math></th>
+<th>Agent state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>a</mi></msubsup></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是什么</td>
+<td>环境的<strong>私有</strong>表示：环境用来产生下一个 observation 和 reward 的数据</td>
+<td>agent 的<strong>内部</strong>表示：agent 用来选下一个 action 的信息</td>
+</tr>
+<tr>
+<td>可见吗</td>
+<td>通常<strong>看不到</strong>；即使看得到也可能有很多无关信息</td>
+<td>就是 RL 算法用的信息</td>
+</tr>
+<tr>
+<td>形式</td>
+<td></td>
+<td>可以是 history 的任意函数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>a</mi></msubsup><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><msub><mi>h</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>3.5 Rewards</h3>
+<ul>
+<li><strong>RL</strong>：通过与世界交互，学习<strong>最大化 reward function</strong> 的 policy</li>
+<li><strong>Reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub></mrow></math> 是一个 scalar feedback signal</strong>，表示 agent 在第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 步做得怎样</li>
+<li>Agent 的任务是<strong>最大化 cumulative reward</strong></li>
+</ul>
+<blockquote>
+<p><strong>Reward hypothesis</strong>（课件标「Arguable?」，有争议）：All goals can be described by the maximization of expected cumulative reward.</p>
+</blockquote>
+<h3>3.6 Markov State</h3>
+<blockquote>
+<p><strong>Definition.</strong> A state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow></math> is <strong>Markov</strong> if and only if
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></div></p>
+</blockquote>
+<ul>
+<li>Markov state 包含 history 中<strong>所有有用的信息</strong></li>
+<li><strong>「The future is independent of the past given the present.」</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mrow><mn>1</mn><mo>:</mo><mi>t</mi></mrow></msub><mo>→</mo><msub><mi>s</mi><mi>t</mi></msub><mo>→</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi mathvariant="normal">∞</mi></mrow></msub></mrow></math>：一旦知道 state，history 就可以丢掉</li>
+<li>即 state 是未来的 <strong>sufficient statistic</strong></li>
+<li><strong>环境 state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>e</mi></msubsup></mrow></math> 是 Markov 的；history <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow></math> 也是 Markov 的</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow></math> 包含一切，当然足够）</li>
+</ul>
+<p><strong>为什么 Markov 假设这么流行？</strong></p>
+<ul>
+<li>简单；把一部分 history 放进 state 通常就能满足</li>
+<li>实践中常假设<strong>最近一次 observation</strong> 就是 history 的 sufficient statistic：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mi>t</mi></msub></mrow></math></li>
+<li>State 表示的选择对三件事影响很大：<strong>computational complexity、data required、resulting performance</strong></li>
+</ul>
+<p>（例：Atari 游戏只看一帧画面不知道球往哪飞，通常把<strong>最近几帧叠起来</strong>当作 state。）</p>
+<h3>3.7 Fully vs Partially Observable</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Fully observable</th>
+<th>Partially observable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>观测</td>
+<td>agent <strong>直接</strong>观测到环境 state</td>
+<td>agent <strong>间接</strong>观测</td>
+</tr>
+<tr>
+<td>关系</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>a</mi></msubsup><mo>=</mo><msubsup><mi>s</mi><mi>t</mi><mi>e</mi></msubsup></mrow></math>（agent state = environment state）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>a</mi></msubsup><mo mathvariant="normal">≠</mo><msubsup><mi>s</mi><mi>t</mi><mi>e</mi></msubsup></mrow></math></td>
+</tr>
+<tr>
+<td>形式化</td>
+<td><strong>MDP</strong>（Markov decision process）</td>
+<td><strong>POMDP</strong>（partially observable MDP）</td>
+</tr>
+<tr>
+<td>agent state</td>
+<td>就是环境 state</td>
+<td>必须<strong>自己构造</strong>，如完整 history <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>a</mi></msubsup><mo>=</mo><msub><mi>h</mi><mi>t</mi></msub></mrow></math>，或 RNN <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>s</mi><mi>t</mi><mi>a</mi></msubsup><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><msubsup><mi>s</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>a</mi></msubsup><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><msub><mi>o</mi><mi>t</mi></msub><msub><mi>W</mi><mi>o</mi></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>（例：扑克牌只能看到自己的牌，是 partially observable；下棋看得到整个棋盘，是 fully observable。）</p>
+<h3>3.8 Maze 例子</h3>
+<ul>
+<li><strong>Action</strong>：N、E、S、W；<strong>Reward</strong>：每走一步 −1；<strong>State</strong>：agent 的位置</li>
+<li>Q：full 还是 partial observability？——state 是 agent 的位置，如果 agent 知道自己在哪，就是 <strong>fully observable</strong>（每步 −1 意味着要尽快走出迷宫）</li>
+<li><strong>Policy</strong>：图中每个格子画一个箭头，表示 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Value function</strong>：每个格子写一个数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>（离出口越远越负，例如出口旁边是 −1）</li>
+<li><strong>Model</strong>：agent 内部对环境的模型——dynamics（action 怎样改变 state）、rewards（每个 state 给多少 reward）；<strong>模型可能不完美</strong></li>
+</ul>
+<h3>3.9 RL agent 的三个主要组成部分</h3>
+<blockquote>
+<p>An RL agent may include one or more of these components：</p>
+<ul>
+<li><strong>Policy</strong>：agent 的 behavior function</li>
+<li><strong>Value function</strong>：每个 state 和 / 或 action 有多好</li>
+<li><strong>Model</strong>：agent 对环境的表示</li>
+</ul>
+</blockquote>
+<p><strong>Policy</strong></p>
+<ul>
+<li>policy 是 agent 的行为，是从 state 到 action 的映射</li>
+<li><strong>Deterministic policy</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Stochastic policy</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>（Q：为什么要 deep RL？——state 空间太大时，没法用表格存 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>，要用神经网络近似）</li>
+</ul>
+<p><strong>Value function</strong></p>
+<ul>
+<li>对<strong>未来 reward 的预测</strong>，用来评价 state 的好坏，进而在 action 之间做选择：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mtext> </mtext><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">∣</mo><mtext> </mtext><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math> 是 <strong>discount factor</strong></li>
+</ul>
+<p><strong>Model</strong></p>
+<ul>
+<li>预测环境下一步会做什么：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒫</mi></mrow></math> 预测下一个 state，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow></math> 预测下一个（immediate）reward：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>𝒫</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><h3>3.10 RL agent 的分类</h3>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>Policy</th>
+<th>Value Function</th>
+<th>Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Value-based</strong></td>
+<td>无（implicit，由 value 推出）</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Policy-based</strong></td>
+<td>✓</td>
+<td>无</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Actor-critic</strong></td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Model-free</strong></td>
+<td>policy 和 / 或 value</td>
+<td></td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><strong>Model-based</strong></td>
+<td>policy 和 / 或 value</td>
+<td></td>
+<td><strong>✓</strong></td>
+</tr>
+</tbody>
+</table>
+<p>（value-based / policy-based / actor-critic 看「有没有 policy、有没有 value」；model-free / model-based 看「有没有 model」，两种分法是正交的。）</p>
+<h3>3.11 Learning vs Planning</h3>
+<p>序列决策的两个基本问题：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Reinforcement Learning</th>
+<th>Planning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>环境</td>
+<td>一开始<strong>未知</strong></td>
+<td>环境的 <strong>model 已知</strong></td>
+</tr>
+<tr>
+<td>做法</td>
+<td>agent 与环境<strong>交互</strong></td>
+<td>agent 用 model <strong>计算</strong>（不需要外部交互）</td>
+</tr>
+<tr>
+<td>结果</td>
+<td>改进 policy</td>
+<td>改进 policy</td>
+</tr>
+<tr>
+<td>Atari 例子</td>
+<td>游戏规则未知；直接从交互中学；按摇杆、看像素和分数</td>
+<td>规则已知；可以查询模拟器（脑中有完美模型）；「在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 做 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>，下一个 state 和分数是什么？」；提前规划出最优 policy（如 tree search）</td>
+</tr>
+</tbody>
+</table>
+<h3>3.12 Exploration vs Exploitation</h3>
+<ul>
+<li>RL 像 trial-and-error learning：agent 要从对环境的经验中发现好的 policy</li>
+<li><strong>Exploration</strong>：找到更多关于环境的信息</li>
+<li><strong>Exploitation</strong>：利用已知信息来最大化 reward</li>
+<li><strong>通常两者都重要</strong></li>
+</ul>
+<p>（例：去常去的餐厅 = exploitation；试一家新餐厅 = exploration。只 exploit 可能永远发现不了更好的；只 explore 浪费太多。下一讲的 multi-armed bandit 专门研究这个权衡。）</p>
+<h2>4 · 与其他 ML 方法比较</h2>
+<h3>4.1 RL 的特点</h3>
+<ul>
+<li><strong>没有显式 / 密集的 supervision</strong>，只有 reward signal</li>
+<li><strong>反馈是延迟的</strong>，不是即时的</li>
+<li><strong>时间很重要</strong>（序列、非 i.i.d. 数据）</li>
+<li><strong>Agent 的 action 影响它之后接收到的数据</strong></li>
+<li><strong>Active learning</strong>（自己收集数据）</li>
+</ul>
+<h3>4.2 对比表（考试重点）</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Plan</th>
+<th>SL</th>
+<th>UL</th>
+<th>RL</th>
+<th>IL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Policy Optimization</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Learning from Experience</td>
+<td></td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Generalization</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Delayed Consequences</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Exploration</td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>✓</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>（Plan = AI Planning，SL = Supervised，UL = Unsupervised，IL = Imitation Learning）</p>
+<ul>
+<li><strong>AI planning</strong> 假设已经有「决策如何影响环境」的 model（所以不需要从经验中学，也不需要探索）</li>
+<li><strong>Supervised learning</strong> 能拿到正确的 labels</li>
+<li><strong>Unsupervised learning</strong> 没有 labels</li>
+<li><strong>Imitation learning</strong> 通常假设输入是好 policy 的示范；<strong>IL 把 RL 化归为 SL</strong>，因为很多原因 IL 很流行</li>
+<li><strong>只有 RL 需要 exploration</strong>——这是 RL 最独特的地方</li>
+</ul>
+<h3>4.3 RL 的局限</h3>
+<ul>
+<li>Agent 必须有机会<strong>试很多次（而且失败）</strong>
+<ul>
+<li>episode 太长时不可能（reward =「拿到一个好 PhD」）</li>
+<li>安全攸关时不可能（不能在真实世界用 RL 学开车，失败不可容忍）</li>
+</ul>
+</li>
+</ul>
+<h3>4.4 AlphaGo 的世界 vs 真实世界</h3>
+<table>
+<thead>
+<tr>
+<th>AlphaGo</th>
+<th>真实世界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>已知环境（已知实体和动态）</td>
+<td>未知环境</td>
+</tr>
+<tr>
+<td></td>
+<td>行为要能在多样的环境变化间<strong>迁移</strong></td>
+</tr>
+<tr>
+<td>一个目标</td>
+<td>多个目标</td>
+</tr>
+<tr>
+<td>reward 由 oracle 环境自动给出</td>
+<td>reward 需要自己<strong>检测</strong></td>
+</tr>
+<tr>
+<td></td>
+<td>交互需要时间：真的需要<strong>聪明的 exploration</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Extra reading</strong>：Sutton &amp; Barto Ch 1；Linda Smith 2005 <em>The Development of Embodied Cognition: Six Lessons from Babies</em>。</p>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RL 定义</td>
+<td>trial-and-error；sequential decision making；maximize expected cumulative reward</td>
+</tr>
+<tr>
+<td>SL vs RL</td>
+<td>i.i.d.、一步 vs 多步；instructive vs evaluative feedback；两个比喻</td>
+</tr>
+<tr>
+<td>Agent–environment 循环</td>
+<td>每步谁收什么、发什么</td>
+</tr>
+<tr>
+<td>History、state</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow></math> 定义；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><msub><mi>h</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>；environment vs agent state</td>
+</tr>
+<tr>
+<td>Reward</td>
+<td>scalar；reward hypothesis</td>
+</tr>
+<tr>
+<td>Markov state</td>
+<td>定义式；sufficient statistic；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mi>e</mi></msup></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow></math> 都是 Markov</td>
+</tr>
+<tr>
+<td>Markov 假设</td>
+<td>为什么流行；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mi>t</mi></msub></mrow></math>；影响计算、数据、性能</td>
+</tr>
+<tr>
+<td>Fully vs partially observable</td>
+<td>MDP vs POMDP；agent 怎么构造 state</td>
+</tr>
+<tr>
+<td>三个组成部分</td>
+<td>policy（deterministic / stochastic）、value（含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math> 的式子）、model（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒫</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>）</td>
+</tr>
+<tr>
+<td>Agent 分类</td>
+<td>value-based、policy-based、actor-critic；model-free / model-based</td>
+</tr>
+<tr>
+<td>Learning vs planning</td>
+<td>环境已知与否；Atari 两种设定</td>
+</tr>
+<tr>
+<td>Exploration vs exploitation</td>
+<td>定义；为什么都要</td>
+</tr>
+<tr>
+<td>RL 特点</td>
+<td>五条</td>
+</tr>
+<tr>
+<td>对比表</td>
+<td>五列五行，特别是只有 RL 有 exploration</td>
+</tr>
+<tr>
+<td>局限</td>
+<td>要能大量试错；安全</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 易错点</h2>
+<ul>
+<li>Agent 在第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 步收到的 reward 记作 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></math>（上一个 action 的结果），环境在第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 步发出的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub></mrow></math>。</li>
+<li>History 是 Markov 的，但通常不实用；Markov 性说的是「<strong>给定当前 state</strong>，未来与过去无关」，不是「未来与过去无关」。</li>
+<li>Fully observable 对应 MDP；partially observable 对应 POMDP，此时 agent state ≠ environment state。</li>
+<li>Value-based 方法<strong>没有显式 policy</strong>（由 value 取 argmax 得到）；policy-based 方法<strong>没有 value function</strong>。</li>
+<li>Model-free / model-based 是另一个维度，和 value / policy 的分法不冲突。</li>
+<li>AI planning 不需要 exploration，因为 model 已知；imitation learning 也不 explore，因为有示范。</li>
+</ul>

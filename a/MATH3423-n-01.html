@@ -1,0 +1,179 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Statistical inference 是什么</strong>：用数据（data）对一个 random variable <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 的分布下结论</li>
+<li><strong>Parametric model</strong>：分布形式已知、参数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math> 未知</li>
+<li><strong>Random sample</strong>：i.i.d. copies；联合 pdf / pmf = 乘积</li>
+<li><strong>Statistic / estimator / estimate</strong> 的区别</li>
+<li>整门课的路线图：点估计（MME、MLE）→ 性质（有限样本 / 大样本）→ 区间估计 → 假设检验</li>
+</ol>
+<blockquote>
+<p>必会：判断某个式子<strong>是不是 statistic</strong>（含未知参数就不是）；estimator（随机变量）vs estimate（数）；写出 random sample 的联合 pdf；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover></mrow></math> 在正态 / Binomial 下的精确分布。</p>
+</blockquote>
+<h2>1 · 什么是 Statistical Inference</h2>
+<ul>
+<li><strong>Statistical</strong> = data；<strong>Inference</strong> = 从已知证据得出关于「某个东西」的结论</li>
+<li>「某个东西」= random variable <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math>——在做随机试验之前不可预测（uncertainty），例如抛硬币</li>
+<li>怎么描述 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math>？用 <strong>probability distribution</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>离散</td>
+<td>Poisson、Binomial、discrete uniform、multinomial、geometric（negative binomial 的特例）、hypergeometric</td>
+</tr>
+<tr>
+<td>连续</td>
+<td>normal、continuous uniform、exponential（gamma 的特例）、beta、chi-square（gamma 的特例）、Cauchy（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 的特例）、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>这些都叫 <strong>parametric distributions</strong>。</p>
+<p><strong>Mission</strong>：用数据的信息去估计目标 random variable 的 parametric distribution 的<strong>参数</strong>。</p>
+<p>（手写笔记的例子：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>∼</mo><mi>N</mi><mo stretchy="false">(</mo><mi>μ</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi></mrow></math> 未知——要通过 (i) parameter estimation、(ii) hypothesis testing 去了解 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi></mrow></math>。如果 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi></mrow></math> 已知，比如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>∼</mo><mi>N</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>10</mn><mo stretchy="false">)</mo></mrow></math>，那 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>X</mi><mo>&gt;</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn></mrow></math> 之类直接算就行，<strong>不需要</strong>推断。）</p>
+<h2>2 · Data 与 Parametric Model</h2>
+<p><strong>Data</strong>：目标 rv <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 的<strong>实际值</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 的分布<strong>没有被完全确定</strong>。</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 个 observations / data / realizations</li>
+<li>抽样之后它们都是<strong>已知的数</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fully unspecified</strong></td>
+<td>pdf / pmf 没有显式形式 → <strong>non-parametric model</strong></td>
+</tr>
+<tr>
+<td><strong>Not fully specified / partially specified</strong></td>
+<td>pdf / pmf 的函数形式已知，但由未知参数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math> 决定 → <strong>parametric model</strong>（本课先学这个）</td>
+</tr>
+</tbody>
+</table>
+<p>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>μ</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi><mo>∈</mo><mi>ℝ</mi></mrow></math> 未知。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math> 通常表示参数（可以是向量，如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi><mo>=</mo><mo stretchy="false">(</mo><mi>μ</mi><mo separator="true">,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></math>）。</p>
+<h2>3 · Random Sample</h2>
+<p><strong>除非另有说明</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>X</mi><mi>n</mi></msub></mrow></math> 假设 <strong>i.i.d.</strong>（independent and identically distributed）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mi>i</mi></msub></mrow></math> 是第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> 个 copy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mi>i</mi></msub></mrow></math> 的实际值。</p>
+<blockquote>
+<p><strong>Random sample（rs）</strong> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math> 的一组 i.i.d. copies。</p>
+</blockquote>
+<p><strong>联合 pdf</strong>（连续）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mrow><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>X</mi><mi>n</mi></msub></mrow></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub><mo>∣</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>f</mi><mi>X</mi></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>∣</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow></math></div><p><strong>联合 pmf</strong>（离散）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mrow><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>X</mi><mi>n</mi></msub></mrow></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub><mo>∣</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msub><mi>p</mi><mi>X</mi></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>∣</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow></math></p>
+<p>（第一个等号用 independence 拆成各自边际的乘积，第二步用 identically distributed 把每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><msub><mi>X</mi><mi>i</mi></msub></msub></mrow></math> 换成同一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>X</mi></msub></mrow></math>。）</p>
+<h2>4 · Statistic、Estimator、Estimate</h2>
+<p><strong>Statistic</strong>：random sample 的函数，<strong>不含未知参数</strong>。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>X</mi><mi>i</mi></msub><mo separator="true">,</mo><mspace width="2em"/><msubsup><mi>S</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><mn>2</mn></msubsup><mo>=</mo><mfrac><mn>1</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mo stretchy="false">(</mo><msub><mi>X</mi><mi>i</mi></msub><mo>−</mo><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mspace width="1em"/><mtext>都是 statistic</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mo stretchy="false">(</mo><msub><mi>X</mi><mi>i</mi></msub><mo>−</mo><mi>μ</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mspace width="1em"/><mtext>不是 statistic（除非 </mtext><mi>μ</mi><mtext> 已知）</mtext></mrow></math></div><table>
+<thead>
+<tr>
+<th>名词</th>
+<th>是什么</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(Point) estimator</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>𝐗</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>用来估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math> 的 statistic——<strong>随机变量</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Estimate</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>𝐱</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>代入数据后的<strong>实际值</strong>——一个数</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>θ</mi><mo>^</mo></mover></mrow></math></td>
+<td>两者都常用这个记号</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>（手写：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>X</mi><mi>n</mi></msub></mrow></math> 取平均 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover></mrow></math>，随机变量；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub></mrow></math> 取平均 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover></mrow></math>，一个数。）</p>
+<h2>5 · 拿到 estimator 之后做什么（课程路线图）</h2>
+<ol>
+<li><strong>研究 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 的性质</strong>：unbiasedness（有限样本）、convergence（大样本）</li>
+<li><strong>区间估计</strong>：构造一个区间而不是一个点</li>
+<li><strong>假设检验</strong>：对参数的取值构造统计检验</li>
+</ol>
+<p><strong>估计方法</strong>：</p>
+<ul>
+<li>总体均值 / 方差 → 样本均值 / 方差</li>
+<li>一般参数 → 系统方法：<strong>(i) Method of Moment Estimation</strong>、<strong>(ii) Maximum Likelihood Estimation</strong></li>
+</ul>
+<p><strong>性质的工具</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>大样本</th>
+<th>非大样本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WLLN、CLT、convergence in probability / distribution、Slutsky's lemma、delta method、continuous mapping theorem</td>
+<td>Bootstrapping（对手上这一组数据重抽样）</td>
+</tr>
+</tbody>
+</table>
+<p>区间估计和假设检验都需要先知道 estimator 的<strong>精确或近似分布</strong>。</p>
+<h2>6 · 例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover></mrow></math> 的分布（手写笔记 p.2）</h2>
+<p><strong>独立 Binomial 之和</strong>：若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mi>i</mi></msub><mo>∼</mo><mtext>Binomial</mtext><mo stretchy="false">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math> 独立，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msub><mi>X</mi><mi>i</mi></msub><mo>∼</mo><mtext>Binomial</mtext><mo stretchy="false">(</mo><mo>∑</mo><msub><mi>m</mi><mi>i</mi></msub><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>∼</mo><mtext>Binomial</mtext><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math> 的 rs：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>X</mi><mn>1</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>X</mi><mi>n</mi></msub><mo>∼</mo><mtext>Binomial</mtext><mo stretchy="false">(</mo><mi>m</mi><mi>n</mi><mo separator="true">,</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<p><strong>独立正态之和</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>∼</mo><mi>N</mi><mo stretchy="false">(</mo><mi>μ</mi><mo separator="true">,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></math> 的 rs：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>X</mi><mn>1</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>X</mi><mi>n</mi></msub><mo>∼</mo><mi>N</mi><mo stretchy="false">(</mo><mi>n</mi><mi>μ</mi><mo separator="true">,</mo><mi>n</mi><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false">)</mo><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover><mo>∼</mo><mi>N</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mi>μ</mi><mo separator="true">,</mo><mfrac><msup><mi>σ</mi><mn>2</mn></msup><mi>n</mi></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></math></div><p>（方差：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Var</mtext><mo stretchy="false">(</mo><mo>∑</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mo>∑</mo><mtext>Var</mtext><mo stretchy="false">(</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></math> 用了<strong>独立</strong>。）</p>
+<ul>
+<li>一般分布没有这么好的精确结果 → <strong>CLT</strong> 给大 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover></mrow></math> 分布的<strong>近似</strong></li>
+</ul>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是不是 statistic</td>
+<td>含未知参数就不是</td>
+</tr>
+<tr>
+<td>estimator vs estimate</td>
+<td>随机变量 vs 数</td>
+</tr>
+<tr>
+<td>parametric vs non-parametric</td>
+<td>函数形式是否已知</td>
+</tr>
+<tr>
+<td>random sample</td>
+<td>i.i.d.；联合 pdf = 乘积（说明每一步用了哪个假设）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover></mrow></math> 的精确分布</td>
+<td>正态 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>μ</mi><mo separator="true">,</mo><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>n</mi><mo stretchy="false">)</mo></mrow></math>；Binomial 之和</td>
+</tr>
+<tr>
+<td>路线图</td>
+<td>MME / MLE；有限 / 大样本性质；CI；检验</td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><mo>∑</mo><mo stretchy="false">(</mo><msub><mi>X</mi><mi>i</mi></msub><mo>−</mo><mi>μ</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi></mrow></math> 未知时<strong>不是</strong> statistic。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover></mrow></math> 是随机变量，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover></mrow></math> 是数；写 CI 时先有随机区间，代入数据才得到 CI（见 02-1）。</li>
+<li>联合 pdf 拆成乘积要<strong>同时</strong>用 independence 和 identically distributed。</li>
+<li>只估计<strong>未知</strong>参数；已知的参数不用估。</li>
+</ul>

@@ -1,0 +1,579 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>6.1 典型离散信号</strong>：表示方法；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mi>N</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>、ramp、指数、<strong>正弦序列（周期性判断）</strong>、复指数</li>
+<li><strong>6.2 离散信号运算</strong>：加、乘、平移、反转、差分、累加、<strong>抽取 / 内插</strong>、能量、功率</li>
+<li><strong>7.1 系统特性</strong>：连续 / 离散、即时 / 动态、集总 / 分布、可逆、<strong>线性</strong>、<strong>时不变</strong>、<strong>因果</strong>、<strong>稳定</strong></li>
+<li><strong>7.2 LTI 系统的表示</strong>：微分方程（RLC 例）、方框图；差分方程、离散方框图</li>
+<li><strong>7.3 LTI 分析方法概览</strong></li>
+</ol>
+<blockquote>
+<p>必考：<strong>判断离散正弦是否周期并求周期</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac></mrow></math> 是整数 / 有理数 / 无理数三种情况）；<strong>判断系统是否线性、时不变、因果、稳定</strong>（标准方法：先组合再过系统 vs 先过系统再组合；先移位再过系统 vs 先过系统再移位）；从方框图写差分方程；从电路写微分方程；用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 表示任意序列。</p>
+</blockquote>
+<h2>1 · 典型离散信号</h2>
+<h3>1.1 表示方法</h3>
+<ul>
+<li>对连续信号等间隔 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>s</mi></msub></mrow></math> 采样：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>x</mi><mo stretchy="false">(</mo><mi>n</mi><msub><mi>T</mi><mi>s</mi></msub><mo stretchy="false">)</mo></mrow></math>，记作 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mo>±</mo><mn>1</mn><mo separator="true">,</mo><mo>±</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo></mrow></math></li>
+<li><strong>序列形式</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mn>9</mn><mo separator="true">,</mo><mi><munder><mo><mn>8</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math>——箭头标出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math> 的位置</li>
+<li><strong>波形</strong>：每根竖线的长度表示对应序列值的大小</li>
+</ul>
+<p><strong>例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msup><mn>2</mn><mi>n</mi></msup><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>≥</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>&lt;</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mi><munder><mo><mn>1</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>8</mn><mo separator="true">,</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">}</mo></mrow></math></p>
+<p><strong>按长度分类</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 的范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-sided（单边）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>≥</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Two-sided（双边）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi mathvariant="normal">∞</mi><mo>&lt;</mo><mi>n</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Finite-length（有限长）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mn>1</mn></msub><mo>≤</mo><mi>n</mi><mo>≤</mo><msub><mi>n</mi><mn>2</mn></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 Unit sample sequence <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>（Kronecker delta）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p><strong>和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 不同</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math> 的值就是 <strong>1</strong>（有限、确定的），不需要极限或广义函数。</p>
+<ul>
+<li><strong>Time-shifting</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>j</mi><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn></mrow></math> 当 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mi>j</mi></mrow></math>，否则 0</li>
+<li><strong>Scaling</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>j</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>Sampling</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>f</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+<p><strong>用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 表示任意序列</strong>（Ch2 卷积的基础）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math> 是<strong>权重</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math> 指定<strong>位置</strong>。）</p>
+<p><strong>例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mi><munder><mo><mn>1.5</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">}</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math> 处为 1，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math> 处为 1.5，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>2</mn></mrow></math> 处为 −3）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mn>1.5</mn><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>3</mn><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math></div><h3>1.3 Unit step sequence <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>≥</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>&lt;</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p>（注意 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn></mrow></math>，确定，不像 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math> 无定义。）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mo>⋯</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></munderover><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>k</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（离散里「求导」变成<strong>差分</strong>，「积分」变成<strong>累加</strong>。）</p>
+<h3>1.4 Rectangular sequence <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mi>N</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>R</mi><mi>N</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo>≤</mo><mi>n</mi><mo>≤</mo><mi>N</mi><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>n</mi><mo>&lt;</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mo>≥</mo><mi>N</mi></mrow></mstyle></mtd></mtr></mtable></mrow><mo>=</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></math></div><p>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>3</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math>（<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 个点</strong>：0 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></math>）</p>
+<h3>1.5 Ramp、单边指数</h3>
+<ul>
+<li><strong>Ramp</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>n</mi><mtext> </mtext><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>单边指数</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msup><mi>a</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math></th>
+<th>波形</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>&gt;</mo><mn>1</mn></mrow></math></td>
+<td>单调增长</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>a</mi><mo>&lt;</mo><mn>1</mn></mrow></math></td>
+<td>单调衰减</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>&lt;</mo><mo>−</mo><mn>1</mn></mrow></math></td>
+<td>正负交替、幅度增长</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>&lt;</mo><mi>a</mi><mo>&lt;</mo><mn>0</mn></mrow></math></td>
+<td>正负交替、幅度衰减</td>
+</tr>
+</tbody>
+</table>
+<h3>1.6 Sinusoidal sequence（周期性必考）</h3>
+<p>对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mi>a</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ω</mi><mn>0</mn></msub><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 以采样间隔 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>s</mi></msub></mrow></math>（采样频率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>s</mi></msub><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><msub><mi>T</mi><mi>s</mi></msub></mrow></math>）采样：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>x</mi><mi>a</mi></msub><mo stretchy="false">(</mo><msub><mi>T</mi><mi>s</mi></msub><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ω</mi><mn>0</mn></msub><msub><mi>T</mi><mi>s</mi></msub><mi>n</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mi>n</mi><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mo>=</mo><msub><mi>ω</mi><mn>0</mn></msub><msub><mi>T</mi><mi>s</mi></msub><mo>=</mo><mfrac><msub><mi>ω</mi><mn>0</mn></msub><msub><mi>f</mi><mi>s</mi></msub></mfrac><mo>=</mo><mn>2</mn><mi>π</mi><mfrac><msub><mi>f</mi><mn>0</mn></msub><msub><mi>f</mi><mi>s</mi></msub></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（<strong>digital angular frequency</strong>，单位 radians / sample）</p>
+<p><strong>周期性</strong>：要求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mi>N</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>，<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 必须是正整数</strong>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mo stretchy="false">(</mo><mi>n</mi><mo>+</mo><mi>N</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mi>n</mi><mo>+</mo><mi>N</mi><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math>，需要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>m</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 整数）。看 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac></mrow></math>：</p>
+<table>
+<thead>
+<tr>
+<th>情况</th>
+<th>结论</th>
+<th>周期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac></mrow></math> 是<strong>正整数</strong></td>
+<td>周期</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td>② <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac><mo>=</mo><mfrac><mi>N</mi><mi>m</mi></mfrac></mrow></math> 是<strong>有理数</strong>（既约分数）</td>
+<td>周期</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mi>m</mi><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac></mrow></math>（即分子 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math>）</td>
+</tr>
+<tr>
+<td>③ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac></mrow></math> 是<strong>无理数</strong></td>
+<td><strong>非周期</strong></td>
+<td>——</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例 1</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0.2</mn><mi>π</mi><mi>n</mi><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mrow><mn>0.2</mn><mi>π</mi></mrow></mfrac><mo>=</mo><mn>10</mn></mrow></math>（整数）⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>10</mn></mrow></math></strong>；每 10 个样本重复，包络正弦走 1 个完整周期。</p>
+<p><strong>例 2</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mfrac><mrow><mn>4</mn><mi>π</mi></mrow><mn>11</mn></mfrac><mi>n</mi><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mrow><mn>4</mn><mi>π</mi><mi mathvariant="normal">/</mi><mn>11</mn></mrow></mfrac><mo>=</mo><mfrac><mn>11</mn><mn>2</mn></mfrac></mrow></math>（有理数，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>11</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>2</mn></mrow></math>）⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>11</mn></mrow></math></strong>；每 11 个样本重复，包络正弦走 <strong>2</strong> 个完整周期。</p>
+<p><strong>例 3</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0.4</mn><mi>n</mi><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>0.4</mn></mfrac><mo>=</mo><mn>5</mn><mi>π</mi></mrow></math>（<strong>无理数</strong>）⇒ <strong>非周期</strong>。</p>
+<blockquote>
+<p><strong>和连续的区别</strong>：连续正弦 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 对<strong>任何</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ω</mi></mrow></math> 都是周期的；离散正弦<strong>不一定</strong>周期——因为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 必须是整数。只有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 的有理倍数时才周期。</p>
+</blockquote>
+<h3>1.7 Complex exponential sequence</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msup><mi>e</mi><mrow><mi>j</mi><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mi>n</mi></mrow></msup><mo>=</mo><mi>cos</mi><mo>⁡</mo><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mi>n</mi><mo>+</mo><mi>j</mi><mi>sin</mi><mo>⁡</mo><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mi>n</mi></mrow></math></div><p>极坐标形式：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">∣</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo stretchy="false">∣</mo><msup><mi>e</mi><mrow><mi>j</mi><mi>arg</mi><mo>⁡</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></msup></mrow></math>，其中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo stretchy="false">∣</mo><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>arg</mi><mo>⁡</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mi>n</mi></mrow></math>。</p>
+<h2>2 · 离散信号的运算</h2>
+<h3>2.1 加、乘、数乘</h3>
+<ul>
+<li><strong>Summation</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>（<strong>对齐同一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></strong> 再相加）</li>
+<li><strong>Multiplication</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>⋅</mo><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>Scaling</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>a</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+<p><strong>例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mi><munder><mo><mn>1</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">}</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mi><munder><mo><mn>1</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math>（都从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math> 开始）：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mo stretchy="false">{</mo><mi><munder><mo><mn>2</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">}</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>⋅</mo><mi>y</mi><mo>=</mo><mo stretchy="false">{</mo><mi><munder><mo><mn>1</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>3</mn></mrow></math> 处 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mn>0</mn></mrow></math>）</li>
+</ul>
+<h3>2.2 平移、反转</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>&gt;</mo><mn>0</mn></mrow></math> <strong>右移</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>&gt;</mo><mn>0</mn></mrow></math> <strong>左移</strong></li>
+<li>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn></mrow></math> 上为 1、2、3 ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn></mrow></math> 上为 1、2、3</li>
+<li><strong>Reversal</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mo>−</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+<h3>2.3 差分（离散的「导数」）</h3>
+<ul>
+<li><strong>Forward difference</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mo>−</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>Backward difference</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∇</mi><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+<h3>2.4 累加（Running sum，离散的「积分」）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>z</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>n</mi></munderover><mi>x</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo></mrow></math></div><p><strong>例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>n</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>n</mi><mo>≤</mo><mn>4</mn></mrow></math>），否则 0：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>4</mn></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>6</td>
+<td>10</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h3>2.5 Reshaping：抽取与内插</h3>
+<ul>
+<li><strong>Decimation（抽取 / 压缩）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>→</mo><mi>x</mi><mo stretchy="false">[</mo><mi>N</mi><mi>n</mi><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 正整数——<strong>只保留每 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 个中的一个</strong>，其余丢掉</li>
+<li><strong>Interpolation（内插 / 扩展）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>→</mo><mi>x</mi><mo stretchy="false">[</mo><mfrac><mi>n</mi><mi>N</mi></mfrac><mo stretchy="false">]</mo></mrow></math>——<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>n</mi><mi>N</mi></mfrac></mrow></math> 不是整数的位置<strong>补 0</strong>（或按需插值）</li>
+</ul>
+<p>（名字来自罗马军团的 decimation：十人抽一。）</p>
+<p><strong>例 5</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>n</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>≤</mo><mi>n</mi><mo>≤</mo><mn>6</mn></mrow></math>）：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mn>2</mn><mi>n</mi><mo stretchy="false">]</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn></mrow></math> 处为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mn>2</mn><mo stretchy="false">]</mo><mo>=</mo><mn>2</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mn>4</mn><mo stretchy="false">]</mo><mo>=</mo><mn>4</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mn>6</mn><mo stretchy="false">]</mo><mo>=</mo><mn>6</mn></mrow></math>（奇数位的值<strong>丢失</strong>）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><mo stretchy="false">]</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>12</mn></mrow></math> 处为 1、2、…、6，<strong>奇数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 处为 0</strong></li>
+</ul>
+<p><strong>和连续的区别</strong>：连续的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 不丢信息；离散的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mn>2</mn><mi>n</mi><mo stretchy="false">]</mo></mrow></math> <strong>会丢信息</strong>（只取偶数点）。</p>
+<h3>2.6 能量和功率</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>E</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mo stretchy="false">∣</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>E</mi><mi>K</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mo>−</mo><mi>K</mi></mrow><mi>K</mi></munderover><mo stretchy="false">∣</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>例 6</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">}</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1..4</mn></mrow></math>）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><msup><mn>1</mn><mn>2</mn></msup><mo>+</mo><msup><mn>2</mn><mn>2</mn></msup><mo>+</mo><msup><mn>3</mn><mn>2</mn></msup><mo>+</mo><msup><mn>4</mn><mn>2</mn></msup><mo>=</mo><mn>30</mn></mrow></math></p>
+<p><strong>平均功率</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>P</mi><mo>=</mo><munder><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>K</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></munder><mfrac><mn>1</mn><mrow><mn>2</mn><mi>K</mi><mo>+</mo><mn>1</mn></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mo>−</mo><mi>K</mi></mrow><mi>K</mi></munderover><mo stretchy="false">∣</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>（非周期）</mtext></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>P</mi><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></munderover><mo stretchy="false">∣</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><msup><mo stretchy="false">∣</mo><mn>2</mn></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>（周期 </mtext><mi>N</mi><mtext>）</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><p>（注意离散里区间 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mi>K</mi><mo separator="true">,</mo><mi>K</mi><mo stretchy="false">]</mo></mrow></math> 有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>K</mi><mo>+</mo><mn>1</mn></mrow></math> 个点。）</p>
+<h2>3 · 系统特性（必考）</h2>
+<p><strong>重点</strong>：在确定性信号激励下，研究**集总参数、线性、时不变（LTI）**系统。</p>
+<h3>3.1 连续 / 离散</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>H</mi><mo stretchy="false">[</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>H</mi><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo stretchy="false">]</mo></mrow></math>。</p>
+<h3>3.2 Instantaneous（memoryless）vs Dynamic</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>方程</th>
+<th>例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Instantaneous</strong>（即时 / 无记忆）</td>
+<td><strong>代数方程</strong>：输出只取决于<strong>同一时刻</strong>的输入</td>
+<td>电阻 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>R</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>R</mi><msub><mi>i</mi><mi>R</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Dynamic</strong>（有记忆）</td>
+<td><strong>微分 / 差分方程</strong>：输出取决于<strong>过去</strong>的输入</td>
+<td>电容 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mi>C</mi></mfrac><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>t</mi></msubsup><msub><mi>i</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 Lumped vs Distributed</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>方程</th>
+<th>例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lumped-parameter</strong></td>
+<td><strong>常微分方程</strong>（只依赖时间 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>）</td>
+<td>低频电路（RLC）</td>
+</tr>
+<tr>
+<td><strong>Distributed-parameter</strong></td>
+<td><strong>偏微分方程</strong>（依赖 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo separator="true">,</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>z</mi></mrow></math>）</td>
+<td>波导、传输线</td>
+</tr>
+</tbody>
+</table>
+<h3>3.4 Invertible vs Non-invertible</h3>
+<ul>
+<li><strong>Invertible</strong>：<strong>不同激励产生不同响应</strong>——能从输出唯一确定输入（例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>α</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>α</mi><mo>&lt;</mo><mn>1</mn></mrow></math>）
+<ul>
+<li>应用：用<strong>逆系统</strong>做系统补偿</li>
+</ul>
+</li>
+<li><strong>Non-invertible</strong>：不同输入产生相同输出——例如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 产生相同输出（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>），无法唯一确定输入</li>
+</ul>
+<h3>3.5 Linear systems</h3>
+<p><strong>线性 = 齐次性 + 叠加性</strong>：</p>
+<ul>
+<li><strong>Homogeneity</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>K</mi><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Superposition</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>→</mo><msub><mi>r</mi><mn>1</mn></msub></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>2</mn></msub><mo>→</mo><msub><mi>r</mi><mn>2</mn></msub></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>e</mi><mn>2</mn></msub><mo>→</mo><msub><mi>r</mi><mn>1</mn></msub><mo>+</mo><msub><mi>r</mi><mn>2</mn></msub></mrow></math></li>
+</ul>
+<p>合起来（连续 / 离散同理）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>c</mi><mn>1</mn></msub><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>⟶</mo><mtext>  </mtext><msub><mi>c</mi><mn>1</mn></msub><msub><mi>r</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub><msub><mi>r</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><blockquote>
+<p><strong>判断方法</strong>：「<strong>先线性组合再过系统</strong> = <strong>先过系统再线性组合</strong>」
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>H</mi><mo stretchy="false">[</mo><msub><mi>C</mi><mn>1</mn></msub><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>C</mi><mn>2</mn></msub><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mo><mover><mo><mo>=</mo></mo><mo stretchy="false" lspace="0em" rspace="0em">?</mo></mover></mo><msub><mi>C</mi><mn>1</mn></msub><mi>H</mi><mo stretchy="false">[</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mo>+</mo><msub><mi>C</mi><mn>2</mn></msub><mi>H</mi><mo stretchy="false">[</mo><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math></div>
+相等则线性，否则非线性。
+<strong>注意</strong>：外部激励和系统的<strong>非零初始状态</strong>要分开处理（有初始状态时，看 zero-state response 是否线性）。</p>
+</blockquote>
+<p><strong>例 1</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 线性吗？</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>→</mo><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><msubsup><mi>e</mi><mn>1</mn><mn>2</mn></msubsup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>2</mn></msub><mo>→</mo><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><msubsup><mi>e</mi><mn>2</mn><mn>2</mn></msubsup></mrow></math></li>
+<li>先组合再过系统：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">[</mo><msub><mi>C</mi><mn>1</mn></msub><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>C</mi><mn>2</mn></msub><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">(</mo><msub><mi>C</mi><mn>1</mn></msub><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>C</mi><mn>2</mn></msub><msub><mi>e</mi><mn>2</mn></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo><msubsup><mi>C</mi><mn>1</mn><mn>2</mn></msubsup><msubsup><mi>e</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>C</mi><mn>2</mn><mn>2</mn></msubsup><msubsup><mi>e</mi><mn>2</mn><mn>2</mn></msubsup><mo>+</mo><mn>2</mn><msub><mi>C</mi><mn>1</mn></msub><msub><mi>C</mi><mn>2</mn></msub><msub><mi>e</mi><mn>1</mn></msub><msub><mi>e</mi><mn>2</mn></msub></mrow></math></li>
+<li>先过系统再组合：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mn>1</mn></msub><msub><mi>r</mi><mn>1</mn></msub><mo>+</mo><msub><mi>C</mi><mn>2</mn></msub><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><msub><mi>C</mi><mn>1</mn></msub><msubsup><mi>e</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msub><mi>C</mi><mn>2</mn></msub><msubsup><mi>e</mi><mn>2</mn><mn>2</mn></msubsup></mrow></math></li>
+<li><strong>不相等 ⇒ 非线性</strong></li>
+</ul>
+<h3>3.6 Time-invariant systems</h3>
+<blockquote>
+<p><strong>定义</strong>：零初始条件下，输出与输入<strong>施加的时刻无关</strong>——<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>→</mo><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math>。否则 time-varying。</p>
+</blockquote>
+<ul>
+<li>电路角度：元件参数是否随时间变化；方程角度：<strong>系数</strong>是否随时间变化</li>
+</ul>
+<blockquote>
+<p><strong>判断方法</strong>：「<strong>先时移再过系统</strong> = <strong>先过系统再时移</strong>」
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>H</mi><mo stretchy="false">[</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mo><mover><mo><mo>=</mo></mo><mo stretchy="false" lspace="0em" rspace="0em">?</mo></mover></mo><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow></math></div></p>
+</blockquote>
+<p><strong>例 2</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math></p>
+<ul>
+<li>(1) 先时移：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math> → 系统 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math></li>
+<li>(2) 先过系统：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math>，再时移（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>→</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math>）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math></li>
+<li><strong>相同 ⇒ 时不变</strong></li>
+</ul>
+<p><strong>例 3</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ω</mi><mn>0</mn></msub><mi>t</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>（<strong>调幅系统</strong>）</p>
+<ul>
+<li>(1) 先时移再过系统：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ω</mi><mn>0</mn></msub><mi>t</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math></li>
+<li>(2) 先过系统再时移：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ω</mi><mn>0</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mtext> </mtext><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>不同 ⇒ 时变</strong></li>
+</ul>
+<blockquote>
+<p><strong>常见陷阱</strong>：时移只作用在<strong>输入</strong>上时，系统里显式的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo><msub><mi>ω</mi><mn>0</mn></msub><mi>t</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mtext> </mtext><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>）<strong>不跟着变</strong>；先过系统再时移时，<strong>所有的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 都要换成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math></strong>。</p>
+</blockquote>
+<p><strong>补充练习</strong>（同样方法）：</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>线性？</th>
+<th>时不变？</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>t</mi><mtext> </mtext><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>✓</td>
+<td>✗</td>
+<td>系数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 随时间变</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></math></td>
+<td>✗</td>
+<td>✓</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>=</mo><mn>0</mn></mrow></math> 时输出不为 0</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>✓</td>
+<td>✗</td>
+<td>先移位：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math>；先过系统：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>离散时不变</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>→</mo><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo><mo>→</mo><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></math>。</p>
+<h3>3.7 LTI 系统的微分 / 积分特性</h3>
+<p>LTI 系统 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>，则</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>→</mo><mfrac><mrow><mi>d</mi><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>t</mi></msubsup><mi>e</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi><mo>→</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>t</mi></msubsup><mi>r</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>证明</strong>（用线性和时不变）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><munder><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>→</mo><mn>0</mn></mrow></munder><mfrac><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi mathvariant="normal">Δ</mi><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></mfrac></mrow></math></div><ul>
+<li>时不变：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi mathvariant="normal">Δ</mi><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi mathvariant="normal">Δ</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>线性：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi mathvariant="normal">Δ</mi><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></mfrac><mo>→</mo><mfrac><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi mathvariant="normal">Δ</mi><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></mfrac></mrow></math></li>
+<li>取极限得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>d</mi><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math> ✓（可推广到高阶）</li>
+</ul>
+<p>（用处：知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 的响应，求导就得到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 的响应——Ch2。）</p>
+<h3>3.8 Causal systems</h3>
+<blockquote>
+<p><strong>因果系统</strong>：<strong>只有输入激励时才产生响应</strong>——输出<strong>不会超前于</strong>输入。
+<strong>判断</strong>：看输出是否依赖<strong>未来</strong>的输入。</p>
+</blockquote>
+<p><strong>例 4</strong>：</p>
+<ul>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math>：当前响应 = 当前激励 + <strong>过去</strong>激励 ⇒ <strong>因果</strong></p>
+</li>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math>：包含<strong>未来</strong>激励 ⇒ <strong>非因果</strong></p>
+</li>
+<li>
+<p><strong>实时系统的实现要求因果</strong></p>
+</li>
+<li>
+<p>非因果系统也有实际意义：信号压缩 / 扩展、语音信号处理（录好后处理，可以「看到未来」）</p>
+</li>
+<li>
+<p><strong>因果信号</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>，等价于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>&lt;</mo><mn>0</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></p>
+</li>
+</ul>
+<p>（补充：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 是非因果的——<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow></math> 时要用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 也非因果。）</p>
+<h3>3.9 Stable systems</h3>
+<blockquote>
+<p><strong>BIBO（bounded input bounded output）stable</strong>：对<strong>任何有界输入</strong>都只产生<strong>有界输出</strong>。</p>
+</blockquote>
+<ul>
+<li>工程上至关重要：输入不发散，输出也不发散</li>
+<li>（补充：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>t</mi></msubsup><mi>e</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi></mrow></math> <strong>不稳定</strong>——输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 有界，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mtext> </mtext><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 无界。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 稳定。）</li>
+</ul>
+<p><strong>总结</strong>：LTI 系统，从实现角度希望它<strong>因果且稳定</strong>。</p>
+<h2>4 · LTI 系统的表示</h2>
+<h3>4.1 连续系统：微分方程</h3>
+<ul>
+<li>根据实际系统的物理特性写出微分方程；给定激励和初始状态求响应；分析后回到物理实际</li>
+<li>也可以用结构图（方框图、信号流图）</li>
+<li>求响应的途径：电路 → 微分方程 / 单位冲激响应 / 系统函数（Laplace）/ 结构图</li>
+</ul>
+<p><strong>例 1（RLC 电路）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 串联 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi></mrow></math>，再接 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>∥</mo><mi>C</mi></mrow></math>，求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 的微分方程。</p>
+<p>元件约束（关联参考方向）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>i</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>C</mi><mfrac><mrow><mi>d</mi><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>v</mi><mi>L</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>L</mi><mfrac><mrow><mi>d</mi><msub><mi>i</mi><mi>L</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></mstyle></mtd></mtr></mtable></math></div><p>网络拓扑约束：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left right left" columnspacing="0em 1em 0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>KVL:</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>L</mi><mfrac><mrow><mi>d</mi><msub><mi>i</mi><mi>L</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>KCL（节点 a）:</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><msub><mi>i</mi><mi>L</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mi>R</mi></mfrac><mo>+</mo><mi>C</mi><mfrac><mrow><mi>d</mi><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>消去 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>i</mi><mi>L</mi></msub></mrow></math>：把 (2) 代入 (1)：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>L</mi><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mfrac><mrow><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mi>R</mi></mfrac><mo>+</mo><mi>C</mi><mfrac><mrow><mi>d</mi><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo><mo>+</mo><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><p>整理（两边除以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi><mi>C</mi></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>+</mo><mfrac><mn>1</mn><mrow><mi>R</mi><mi>C</mi></mrow></mfrac><mfrac><mrow><mi>d</mi><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><mn>1</mn><mrow><mi>L</mi><mi>C</mi></mrow></mfrac><msub><mi>v</mi><mi>C</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi>L</mi><mi>C</mi></mrow></mfrac><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>方程<strong>没有非线性项</strong>（如相乘）⇒ <strong>线性</strong></li>
+<li>所有<strong>系数是常数</strong> ⇒ <strong>时不变</strong></li>
+<li><strong>微分方程的阶数 = 系统的阶数</strong>（两个储能元件 ⇒ 二阶）</li>
+</ul>
+<h3>4.2 连续系统方框图</h3>
+<table>
+<thead>
+<tr>
+<th>元件</th>
+<th>关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Adder</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Multiplier</strong>（非线性运算）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>⋅</mo><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Scalar multiplier</strong>（系数乘法器）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>a</mi><mtext> </mtext><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Differentiator</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>d</mi><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Integrator</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>t</mi></msubsup><mi>e</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Time-delay</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 离散系统：差分方程与方框图</h3>
+<ul>
+<li><strong>Scalar multiplier</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>→</mo><mi>a</mi><mtext> </mtext><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>Unit delay element</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>z</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>→</mo><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>（本质上是一个<strong>移位寄存器</strong>：推出旧值、移入新值）</li>
+</ul>
+<p><strong>例 2</strong>（无反馈）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></div><p>（两点平均——一个简单的低通滤波器。）</p>
+<p><strong>例 3</strong>（有反馈）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>a</mi><mtext> </mtext><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mspace width="1em"/><mtext>（一阶后向差分方程）</mtext></mrow></math></div><p>另一种画法得到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>a</mi><mtext> </mtext><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>（一阶<strong>前向</strong>差分方程）。<strong>本课用后向差分方程。</strong></p>
+<p><strong>例 4</strong>（二阶）：从方框图读出</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>3</mn><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mn>5</mn><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>−</mo><mn>6</mn><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math></div><p>即</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>5</mn><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mn>6</mn><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>3</mn><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math></div><ul>
+<li>二阶系统可以有多种结构图，但<strong>至少需要两个延迟单元</strong></li>
+</ul>
+<blockquote>
+<p>读方框图的套路：从输出端的加法器写起，每经过一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>z</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> 下标减 1，每经过一个系数就乘上它；加法器的「−」号别漏。</p>
+</blockquote>
+<p><strong>一般形式</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi>N</mi></munderover><msub><mi>a</mi><mi>k</mi></msub><mtext> </mtext><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>k</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>r</mi><mo>=</mo><mn>0</mn></mrow><mi>M</mi></munderover><msub><mi>b</mi><mi>r</mi></msub><mtext> </mtext><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>r</mi><mo stretchy="false">]</mo></mrow></math></div><ul>
+<li><strong>差分方程的阶</strong>：未知序列（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>）<strong>自变量的最高值与最低值之差</strong>（例 4：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 与 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>−</mo><mn>2</mn></mrow></math>，阶数 2）</li>
+</ul>
+<h2>5 · LTI 系统分析方法概览</h2>
+<ul>
+<li><strong>研究目标</strong>：LTI 系统的基本分析方法，应用于通信中的信号传输与处理</li>
+<li><strong>步骤</strong>：(1) <strong>建立数学模型</strong>（写方程）；(2) <strong>求响应</strong>（给定输入求输出）</li>
+</ul>
+<p><strong>两种建模方法</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Input-output description</th>
+<th>State-variable analysis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>关注</td>
+<td>只关心激励与响应的关系，不管内部变量</td>
+<td>能求出响应<strong>和</strong>内部变量（电容电压、电感电流）</td>
+</tr>
+<tr>
+<td>适用</td>
+<td>SISO</td>
+<td><strong>MIMO</strong></td>
+</tr>
+<tr>
+<td>方程</td>
+<td>一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 阶常微分方程</td>
+<td>一组耦合的<strong>一阶</strong>微分方程</td>
+</tr>
+</tbody>
+</table>
+<p><strong>求解方法</strong>：</p>
+<ol>
+<li><strong>时域</strong>：连续系统——微分方程（经典解法）；离散系统——差分方程；<strong>卷积积分 / 卷积和</strong>（Ch2）</li>
+<li><strong>变换域</strong>：Fourier transform（Ch3–4）、Laplace transform（Ch5）、Z transform、DFT</li>
+</ol>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>序列表示</td>
+<td>箭头标 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math>；单边 / 双边 / 有限长</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mi>N</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td>定义；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mi>N</mi></msub><mo>=</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>任意序列</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo>∑</mo><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math>；会写例子</td>
+</tr>
+<tr>
+<td>单边指数</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 的四种情况</td>
+</tr>
+<tr>
+<td>数字角频率</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mo>=</mo><msub><mi>ω</mi><mn>0</mn></msub><msub><mi>T</mi><mi>s</mi></msub><mo>=</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mi mathvariant="normal">/</mi><msub><mi>f</mi><mi>s</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>离散正弦周期</td>
+<td>三种情况；例 1（10）、例 2（11）、例 3（非周期）</td>
+</tr>
+<tr>
+<td>运算</td>
+<td>加乘对齐 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>；平移方向；差分；累加例</td>
+</tr>
+<tr>
+<td>抽取 / 内插</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mn>2</mn><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 丢点；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">]</mo></mrow></math> 补 0</td>
+</tr>
+<tr>
+<td>能量 / 功率</td>
+<td>公式；例 6 = 30；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>K</mi><mo>+</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>系统分类</td>
+<td>即时 / 动态、集总 / 分布、可逆</td>
+</tr>
+<tr>
+<td>线性</td>
+<td>判断方法；例 1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mn>2</mn></msup></mrow></math> 非线性</td>
+</tr>
+<tr>
+<td>时不变</td>
+<td>判断方法；例 2 微分时不变；例 3 调幅时变</td>
+</tr>
+<tr>
+<td>LTI 微积分特性</td>
+<td>证明思路</td>
+</tr>
+<tr>
+<td>因果</td>
+<td>是否依赖未来；例 4</td>
+</tr>
+<tr>
+<td>稳定</td>
+<td>BIBO</td>
+</tr>
+<tr>
+<td>RLC 方程</td>
+<td>KVL + KCL 消元；二阶</td>
+</tr>
+<tr>
+<td>方框图</td>
+<td>连续六种元件；离散 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>z</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>；例 4 写差分方程</td>
+</tr>
+<tr>
+<td>差分方程阶</td>
+<td>最高与最低自变量之差</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>离散正弦<strong>不一定</strong>周期；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac></mrow></math> 是无理数（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub><mo>=</mo><mn>0.4</mn></mrow></math>）就不周期。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><msub><mi mathvariant="normal">Ω</mi><mn>0</mn></msub></mfrac><mo>=</mo><mfrac><mn>11</mn><mn>2</mn></mfrac></mrow></math> 时周期是 <strong>11</strong>，不是 5.5。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn></mrow></math>（不是无穷）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn></mrow></math>。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mi>N</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 有 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math></strong> 个点（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></math>）。</li>
+<li>判断时不变：先过系统再时移时，<strong>系统里显式的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 也要替换</strong>。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></math> <strong>不是</strong>线性系统（齐次性不满足）。</li>
+<li>微分系统<strong>时不变</strong>；调幅 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ω</mi><mn>0</mn></msub><mi>t</mi><mo stretchy="false">)</mo><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> <strong>时变</strong>。</li>
+<li>因果看「是否用到<strong>未来</strong>输入」，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> 是过去（因果），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> 是未来（非因果）。</li>
+<li>方框图读差分方程时注意 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>z</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> 的个数和加法器的正负号。</li>
+</ul>

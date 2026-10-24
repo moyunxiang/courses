@@ -1,0 +1,1437 @@
+<h2>Scope</h2>
+<ul>
+<li><strong>Thu 2026-10-29, 20:00–22:00</strong>, L2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <strong>LSKG012</strong> (announcement 09-21; moved from 19:00–21:00, no venue).</li>
+<li>⚠️ Official syllabus not announced; inferred scope:</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>S26 midterm</mtext><mo>=</mo><mtext>Ch1–Ch6 (last MC cites slide 6.19)</mtext><mo separator="true">,</mo><mspace width="1em"/><mtext>S26 final starts at Ch7</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mtext>split</mtext><mo>=</mo><mtext>Ch6</mtext><mo>∣</mo><mtext>Ch7</mtext><mo separator="true">;</mo><mspace width="1em"/><mtext>F26: Ch1–4 slides out by 9/17, exam in Week 9</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mtext>revise Ch1–Ch6</mtext></mstyle></mstyle></mstyle></menclose><mtext> </mtext><mo stretchy="false">(</mo><mtext>if Ch6 unfinished: only what was taught</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>⚠️ F26 Ch5/Ch6 slides not out yet; Ch5/6 content + slide numbers below follow the S26 paper and the 10th-ed. textbook.</li>
+<li>S26 format (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>100</mn></mrow></math> marks; open-book, open-notes, calculator allowed; no scratch paper):</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Marks</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q1 MC</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>25</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>25</mn><mo>×</mo><mn>1</mn></mrow></math>, 3–5 per chapter; incl. fork count, Amdahl, semaphore output</td>
+</tr>
+<tr>
+<td>Q2 Short</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn></mrow></math></td>
+<td>race-condition def., caching, judging a scheduling policy (I/O-bound? starvation?), <code>swap</code> spinlock</td>
+</tr>
+<tr>
+<td>Q3 Process/Thread</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>24</mn></mrow></math></td>
+<td>fork tree + general formula, all outputs of fork/exec/wait, pipe + <code>dup</code> fill-in</td>
+</tr>
+<tr>
+<td>Q4 CPU Scheduling</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>27</mn></mrow></math></td>
+<td>MLFQ Gantt + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>R</mi><mo>ˉ</mo></mover></mrow></math>, RM + EDF Gantt + #misses, dynamic priority</td>
+</tr>
+<tr>
+<td>Q5 Synchronization</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn></mrow></math></td>
+<td>enforce execution order with <code>wait/signal</code> (fill-in)</td>
+</tr>
+</tbody>
+</table>
+<h2>Formula Sheet</h2>
+<h3>Ch1 Introduction</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Avg access time</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mrow><mi>a</mi><mi>v</mi><mi>g</mi></mrow></msub><mo>=</mo><mi>h</mi><mtext> </mtext><msub><mi>T</mi><mrow><mi>h</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>h</mi><mo stretchy="false">)</mo><mtext> </mtext><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>s</mi><mi>s</mi></mrow></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Caching</td>
+<td>small fast copy of large slow store; judge by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mrow><mi>a</mi><mi>v</mi><mi>g</mi></mrow></msub></mrow></math>, not <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> alone</td>
+</tr>
+<tr>
+<td>Interrupt</td>
+<td>sources: HW or SW (trap/exception); prioritized; kernel handles</td>
+</tr>
+<tr>
+<td>DMA</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> interrupt / block; CPU <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∥</mo></mrow></math> DMA</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>register <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo></mrow></math> cache <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo></mrow></math> RAM (volatile, byte-addressable) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo></mrow></math> SSD <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo></mrow></math> HDD</td>
+</tr>
+<tr>
+<td>von Neumann</td>
+<td>instructions + data in one memory, accessed by address</td>
+</tr>
+<tr>
+<td>Dual mode</td>
+<td>mode bit <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>=</mo></mrow></math> kernel, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>=</mo></mrow></math> user; privileged instr. at mode <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> trap</td>
+</tr>
+<tr>
+<td>Multiprog. vs time sharing</td>
+<td>switch on I/O wait <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> utilization<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↑</mo></mrow></math> vs timer-forced switch every <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> response time<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↓</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>Ch2 OS Structures</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API vs syscall</td>
+<td><code>printf()</code> (lib) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>write()</code> (syscall) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> kernel; API = convenient + portable, <strong>not</strong> faster, cannot bypass protection</td>
+</tr>
+<tr>
+<td>Param passing</td>
+<td>registers · memory block (pass address) · stack</td>
+</tr>
+<tr>
+<td>Monolithic</td>
+<td>fast; hard to maintain</td>
+</tr>
+<tr>
+<td>Layered</td>
+<td>layer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> calls only layer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></math>; clean; overhead; not mainstream</td>
+</tr>
+<tr>
+<td>Microkernel</td>
+<td>services in user space; extensible, portable, reliable; message passing <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>slower</strong></td>
+</tr>
+<tr>
+<td>LKM</td>
+<td>loaded at run time; no recompile/reboot</td>
+</tr>
+<tr>
+<td>Hybrid</td>
+<td>Linux, Windows, macOS</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch3 Processes</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>States</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>new</mtext><mo>→</mo><mtext>ready</mtext><mo>⇄</mo><mtext>running</mtext><mo>→</mo><mtext>terminated</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>running</mtext><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mtext>I/O/event</mtext></mpadded></mover><mtext>waiting</mtext><mo>→</mo><mtext>ready</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>running</mtext><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mtext>interrupt</mtext><mi mathvariant="normal">/</mi><mi>q</mi></mrow></mpadded></mover><mtext>ready</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>PCB</td>
+<td>state, PC, registers, sched. info, memory info, accounting, I/O status</td>
+</tr>
+<tr>
+<td>Context switch</td>
+<td>save old <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> PCB, load new; pure overhead; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo></mrow></math> user <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> kernel mode switch</td>
+</tr>
+<tr>
+<td><code>fork()</code></td>
+<td>returns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>child</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>PID</mtext><mo>&gt;</mo><mn>0</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>parent</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>fail</mtext></mstyle></mtd></mtr></mtable></mrow></math>; address space copied (COW) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> variables independent</td>
+</tr>
+<tr>
+<td><code>exec()</code></td>
+<td>success: image replaced, <strong>never returns</strong>; fail: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>, continues next line</td>
+</tr>
+<tr>
+<td><code>wait()</code></td>
+<td>parent blocks until a child ends; reaps status</td>
+</tr>
+<tr>
+<td>Zombie / orphan</td>
+<td>zombie: done, not yet <code>wait</code>ed; orphan: parent ended first <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> adopted by init/systemd</td>
+</tr>
+<tr>
+<td>Circular buffer</td>
+<td>empty: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi><mi>n</mi><mo>=</mo><mi>o</mi><mi>u</mi><mi>t</mi></mrow></math>; full: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>i</mi><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mtext> </mtext><mo lspace="0.22em" rspace="0.22em"><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow></mo><mtext> </mtext><mi>N</mi><mo>=</mo><mi>o</mi><mi>u</mi><mi>t</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> capacity <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Ordinary pipe</td>
+<td>one-way; <code>fd[0]</code> read, <code>fd[1]</code> write; related processes only; gone with processes</td>
+</tr>
+<tr>
+<td>Named pipe</td>
+<td>FS object; any process; explicit delete</td>
+</tr>
+<tr>
+<td><code>dup(fd)</code></td>
+<td>copies to <strong>lowest free fd</strong>; <code>close(0); dup(fin);</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> stdin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>←</mo></mrow></math> <code>fin</code></td>
+</tr>
+</tbody>
+</table>
+<h3>Ch4 Threads</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Per-thread vs shared</td>
+<td>own: PC, registers, stack; shared: code, data, heap, open files</td>
+</tr>
+<tr>
+<td>Benefits</td>
+<td>responsiveness, resource sharing, economy, scalability</td>
+</tr>
+<tr>
+<td>Concurrency vs parallelism</td>
+<td>1 core time-sliced vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>2</mn></mrow></math> cores simultaneously</td>
+</tr>
+<tr>
+<td>Amdahl</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>speedup</mtext><mo>≤</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><mrow><mi>S</mi><mo>+</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>S</mi></mrow><mi>N</mi></mfrac></mrow></mfrac></mstyle><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mi>N</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></mpadded></mover><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><mi>S</mi></mfrac></mstyle></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo></mrow></math> serial fraction</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>many-to-one (1 block <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> all block; no parallelism) · one-to-one (mainstream) · many-to-many · two-level</td>
+</tr>
+<tr>
+<td><code>fork</code>/<code>exec</code></td>
+<td>two forks (all threads / caller only); <code>fork</code> then <code>exec</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> caller only suffices; <code>exec</code> replaces whole process</td>
+</tr>
+<tr>
+<td>Signals</td>
+<td>sync (bad memory access, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>÷</mo><mn>0</mn></mrow></math>) / async (Ctrl-C); custom handlers; delivered to: the thread / all / some / designated — <strong>not necessarily all</strong></td>
+</tr>
+<tr>
+<td>Cancellation</td>
+<td>asynchronous (immediate) vs deferred (at cancellation points)</td>
+</tr>
+<tr>
+<td>Other</td>
+<td>thread pool, TLS, implicit threading (OpenMP, fork-join)</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch5 CPU Scheduling</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>T</mi><mtext>turnaround</mtext></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>T</mi><mtext>finish</mtext></msub><mo>−</mo><msub><mi>T</mi><mtext>arrival</mtext></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>T</mi><mtext>waiting</mtext></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>T</mi><mtext>turnaround</mtext></msub><mo>−</mo><msub><mi>T</mi><mtext>burst</mtext></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mo>∑</mo><mtext>time in ready queue</mtext></mstyle></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>T</mi><mtext>response</mtext></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>T</mi><mtext>end of 1st run</mtext></msub><mo>−</mo><msub><mi>T</mi><mtext>arrival</mtext></msub><mspace width="1em"/><mo stretchy="false">(</mo><mtext>S26 convention; see Common Mistakes</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>throughput</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">#</mi><mtext>jobs done</mtext><mi mathvariant="normal">/</mi><mtext>time</mtext><mspace width="1em"/><mo stretchy="false">(</mo><mo mathvariant="normal">≠</mo><mtext>utilization</mtext><mo>=</mo><mtext>busy fraction</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>τ</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mtext> </mtext><msub><mi>t</mi><mi>n</mi></msub><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo><mtext> </mtext><msub><mi>τ</mi><mi>n</mi></msub><mspace width="1em"/><mo stretchy="false">(</mo><mtext>SJF prediction</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>RM: </mtext><mi>U</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><msub><mo>∑</mo><mi>i</mi></msub><mfrac><msub><mi>C</mi><mi>i</mi></msub><msub><mi>T</mi><mi>i</mi></msub></mfrac><mo>≤</mo><mi>n</mi><mtext> </mtext><mo stretchy="false">(</mo><msup><mn>2</mn><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>n</mi></mrow></msup><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mtext>  </mtext><mo stretchy="false">(</mo><mi>n</mi><mo>=</mo><mn>2</mn><mo>:</mo><mn>0.828</mn><mo separator="true">;</mo><mtext> </mtext><mi>n</mi><mo>→</mo><mi mathvariant="normal">∞</mi><mo>:</mo><mi>ln</mi><mo>⁡</mo><mn>2</mn><mo>≈</mo><mn>0.693</mn><mo stretchy="false">)</mo><mtext>  sufficient</mtext></mstyle></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>EDF </mtext><mo stretchy="false">(</mo><msub><mi>D</mi><mi>i</mi></msub><mo>=</mo><msub><mi>T</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext>schedulable</mtext><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>U</mi><mo>≤</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable></math></div><table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Preemptive</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FCFS</td>
+<td>No</td>
+<td>convoy effect</td>
+</tr>
+<tr>
+<td>SJF</td>
+<td>No</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>min</mi><mo>⁡</mo><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover></mrow></math> among non-preemptive; needs burst prediction</td>
+</tr>
+<tr>
+<td>SRTF</td>
+<td>Yes</td>
+<td>new arrival with shorter remaining preempts</td>
+</tr>
+<tr>
+<td>RR</td>
+<td>Yes</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>→</mo><mi mathvariant="normal">∞</mi><mo>⇒</mo></mrow></math> FCFS; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> small <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> many switches</td>
+</tr>
+<tr>
+<td>Priority</td>
+<td>Either</td>
+<td>starvation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> aging</td>
+</tr>
+<tr>
+<td>MLFQ</td>
+<td>Yes</td>
+<td>full quantum used <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> demote; per-level algorithm; no burst knowledge needed</td>
+</tr>
+<tr>
+<td>RM</td>
+<td>Yes</td>
+<td>static: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>i</mi></msub><mo>↓</mo><mo>⇒</mo></mrow></math> priority<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↑</mo></mrow></math></td>
+</tr>
+<tr>
+<td>EDF</td>
+<td>Yes</td>
+<td>dynamic: absolute deadline<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↓</mo><mo>⇒</mo></mrow></math> priority<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↑</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Multiprocessor: AMP (master bottleneck) · SMP · affinity (soft/hard; cache warmth) · load balancing (push/pull). Multicore motivated by power + performance, <strong>not</strong> simpler schedulers.</li>
+</ul>
+<h3>Ch6 Synchronization Tools</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Race condition</td>
+<td>concurrent access to shared data; result depends on execution order</td>
+</tr>
+<tr>
+<td>CS requirements</td>
+<td>mutual exclusion · progress · bounded waiting</td>
+</tr>
+<tr>
+<td>Peterson</td>
+<td><code>flag[i]=true; turn=j; while(flag[j] &amp;&amp; turn==j);</code></td>
+</tr>
+<tr>
+<td><code>test_and_set</code></td>
+<td>atomic: return old, set <code>true</code>; <code>while (test_and_set(&amp;lock));</code></td>
+</tr>
+<tr>
+<td><code>compare_and_swap</code></td>
+<td><code>while (compare_and_swap(&amp;lock, 0, 1) != 0);</code></td>
+</tr>
+<tr>
+<td>Mutex</td>
+<td><code>acquire()</code> / <code>release()</code>; busy-wait version = spinlock</td>
+</tr>
+<tr>
+<td>Semaphore</td>
+<td><code>wait(S)</code>: wait while <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>≤</mo><mn>0</mn></mrow></math> (or sleep), then <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>←</mo><mi>S</mi><mo>−</mo><mn>1</mn></mrow></math>; <code>signal(S)</code>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>←</mo><mi>S</mi><mo>+</mo><mn>1</mn></mrow></math>, wake one</td>
+</tr>
+<tr>
+<td>Spinlock</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math> no context switch (short waits); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo></mrow></math> busy waiting wastes CPU</td>
+</tr>
+</tbody>
+</table>
+<h2>Question Types → Templates</h2>
+<h3>T1 Counting forks / process trees</h3>
+<p>Steps: tree one <code>fork</code> at a time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> each process follows its own return branch <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> count; loops <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> recurrence.</p>
+<p>Example 1:</p>
+<pre><code class="language-c">fork();
+if (fork() == 0) fork();
+printf(&quot;A&quot;);
+</code></pre>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>after fork 1</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>per process: fork 2</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mo stretchy="false">{</mo><mtext>parent</mtext><mo separator="true">,</mo><mtext>child</mtext><mo stretchy="false">}</mo><mo separator="true">,</mo><mtext> child only runs fork 3</mtext><mo>⇒</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>total</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><mo>×</mo><mn>3</mn><mo>=</mo><mn>6</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>6</mn><mtext> processes, A printed </mtext><mn>6</mn><mtext> times</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Example 2: <code>fork() &amp;&amp; fork() || fork();</code>, forks <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo separator="true">,</mo><mi>B</mi><mo separator="true">,</mo><mi>C</mi></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mtext> child </mtext><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mi mathvariant="normal">&amp;</mi><mi mathvariant="normal">&amp;</mi><mtext> false</mtext><mo>⇒</mo><mtext>runs </mtext><mi>C</mi><mo>⇒</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mtext> parent</mtext><mo>→</mo><mi>B</mi><mtext> parent </mtext><mo stretchy="false">(</mo><mo mathvariant="normal">≠</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mtext>true</mtext><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal">∥</mi><mtext> short-circuits</mtext><mo>⇒</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>B</mi><mtext> child </mtext><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mtext>runs </mtext><mi>C</mi><mo>⇒</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>total</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>5</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mn>5</mn></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>S26 Q3.1 (<code>for</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> iterations: <code>if (fork()) fork(); else break;</code>): per active process, 1st child breaks, parent + 2nd child continue.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>A</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><msub><mi>A</mi><mi>k</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>A</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo>⇒</mo><msub><mi>A</mi><mi>n</mi></msub><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mspace width="1em"/><mo stretchy="false">(</mo><mtext>finish loop</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>stopped</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><msubsup><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>A</mi><mi>k</mi></msub><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>1</mn></mstyle></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mo>+</mo><mo stretchy="false">(</mo><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mn>2</mn><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow></mstyle></mstyle></mstyle></menclose><mspace width="1em"/><mo stretchy="false">(</mo><mi>n</mi><mo>=</mo><mn>2</mn><mo>:</mo><mn>7</mn><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mo>=</mo><mn>3</mn><mo>:</mo><mn>15</mn><mo stretchy="false">)</mo></mrow></math></div><h3>T2 All outputs of fork / exec / wait</h3>
+<p>Cases: fork fails · fork ok + exec ok · fork ok + exec fails; then order within each by <code>wait</code>.</p>
+<p>S26 Q3.2:</p>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fork fails (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>)</td>
+<td><code>Hello4</code></td>
+</tr>
+<tr>
+<td>fork ok, exec ok</td>
+<td><code>Hello1</code>, <code>Hello3</code> (exec never returns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> no <code>Hello2</code>)</td>
+</tr>
+<tr>
+<td>fork ok, exec fails</td>
+<td><code>Hello1</code>, <code>Hello2</code>, <code>Hello3</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>With <code>wait(NULL)</code>: child output <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≺</mo></mrow></math> parent's <code>Hello3</code>. Without: list all interleavings.</li>
+</ul>
+<h3>T3 pipe + dup fill-in</h3>
+<pre><code class="language-c">int fd[2]; pipe(fd);          // pipe before fork: shared
+pid_t pid = fork();
+int fin = open(name, O_RDONLY);
+close(0); dup(fin);           // stdin &lt;- file (lowest free fd = 0)
+/* ... compute cnt ... */
+if (pid == 0) { close(fd[0]); write(fd[1], &amp;cnt, sizeof(int)); exit(0); }
+waitpid(pid, &amp;status, 0);
+close(fd[1]); read(fd[0], &amp;child_cnt, sizeof(int));
+</code></pre>
+<ul>
+<li>Read <code>fd[0]</code>, write <code>fd[1]</code>, close unused end first; 2nd arg of <code>read/write</code> = <strong>address</strong> (<code>&amp;cnt</code>).</li>
+</ul>
+<h3>T4 Amdahl</h3>
+<p>Example <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>0.25</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>4</mn></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>speedup</mtext><mo>=</mo><mfrac><mn>1</mn><mrow><mn>0.25</mn><mo>+</mo><mfrac><mn>0.75</mn><mn>4</mn></mfrac></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>0.4375</mn></mfrac><mo>≈</mo><mn>2.29</mn><mo separator="true">,</mo><mspace width="2em"/><munder><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>N</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></munder><mo>=</mo><mfrac><mn>1</mn><mn>0.25</mn></mfrac><mo>=</mo><mn>4</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>2.29</mn><mo separator="true">,</mo><mtext> bound </mtext><mn>4</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>S26 MC17 (percent = parallel fraction <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>1</mn><mo>−</mo><mi>p</mi></mrow></math>; target <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.6</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.7</mn></mrow></math>):</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mn>81</mn><mi mathvariant="normal">%</mi><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mrow><mn>0.19</mn><mo>+</mo><mn>0.81</mn><mi mathvariant="normal">/</mi><mn>3</mn></mrow></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>0.46</mn></mfrac></mstyle><mo>=</mo><mn>2.17</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mn>81</mn><mi mathvariant="normal">%</mi><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mrow><mn>0.19</mn><mo>+</mo><mn>0.81</mn><mi mathvariant="normal">/</mi><mn>5</mn></mrow></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>0.352</mn></mfrac></mstyle><mo>=</mo><mn>2.84</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mn>61</mn><mi mathvariant="normal">%</mi><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mrow><mn>0.39</mn><mo>+</mo><mn>0.61</mn><mi mathvariant="normal">/</mi><mn>3</mn></mrow></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>0.5933</mn></mfrac></mstyle><mo>=</mo><mn>1.69</mn><mtext> </mtext><mi mathvariant="normal">✓</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mn>61</mn><mi mathvariant="normal">%</mi><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mrow><mn>0.39</mn><mo>+</mo><mn>0.61</mn><mi mathvariant="normal">/</mi><mn>5</mn></mrow></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>0.512</mn></mfrac></mstyle><mo>=</mo><mn>1.95</mn></mrow></mstyle></mtd></mtr></mtable></math></div><h3>T5 Cache average access time</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>0.95</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mrow><mi>h</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>=</mo><mn>1</mn></mrow></math> ns, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>s</mi><mi>s</mi></mrow></msub><mo>=</mo><mn>100</mn></mrow></math> ns:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>T</mi><mrow><mi>a</mi><mi>v</mi><mi>g</mi></mrow></msub><mo>=</mo><mn>0.95</mn><mo>×</mo><mn>1</mn><mo>+</mo><mn>0.05</mn><mo>×</mo><mn>100</mn><mo>=</mo><mn>0.95</mn><mo>+</mo><mn>5</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>5.95</mn><mtext> ns</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T6 Basic scheduling: FCFS / SJF / SRTF / RR / Priority</h3>
+<p>Steps: Gantt <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mtext>finish</mtext></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><msub><mi>T</mi><mi>i</mi></msub><mo>=</mo><msub><mi>T</mi><mrow><mtext>finish</mtext><mo separator="true">,</mo><mi>i</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mtext>arr</mtext><mo separator="true">,</mo><mi>i</mi></mrow></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mi>i</mi></msub><mo>=</mo><mi>T</mi><mi>A</mi><msub><mi>T</mi><mi>i</mi></msub><mo>−</mo><msub><mi>B</mi><mi>i</mi></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> average.</p>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mtext>arr</mtext></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi></mrow></math></th>
+<th>priority (smaller = higher)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FCFS</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5.75</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9.5</mn></mrow></math></td>
+</tr>
+<tr>
+<td>SJF</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4.75</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8.5</mn></mrow></math></td>
+</tr>
+<tr>
+<td>SRTF</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟐.𝟕𝟓</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6.5</mn></mrow></math></td>
+</tr>
+<tr>
+<td>RR <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5.75</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9.5</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Priority, preemptive</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8.75</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Priority, non-preemptive</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6.25</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>FCFS</strong> (arrival order):</p>
+<table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P2</th>
+<th>P3</th>
+<th>P4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mtext>–</mtext><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mtext>–</mtext><mn>12</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>6</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>9</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>8</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>9</mn><mo>+</mo><mn>8</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>23</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>5.75</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>7</mn><mo>+</mo><mn>10</mn><mo>+</mo><mn>10</mn><mo>+</mo><mn>11</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>38</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>9.5</mn></mrow></math></div><p><strong>SJF</strong> (non-preemptive): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math>: only P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo><mn>7</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>7</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>B</mi><mn>3</mn></msub><mo>=</mo><mn>1</mn><mo>&lt;</mo><msub><mi>B</mi><mn>4</mn></msub><mo>=</mo><mn>3</mn><mo>&lt;</mo><msub><mi>B</mi><mn>2</mn></msub><mo>=</mo><mn>4</mn></mrow></math>.</p>
+<table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P3</th>
+<th>P4</th>
+<th>P2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mtext>–</mtext><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mtext>–</mtext><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>6</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>5</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>4</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>10</mn><mo>+</mo><mn>5</mn><mo>+</mo><mn>4</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>19</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>4.75</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>7</mn><mo>+</mo><mn>14</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>7</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>34</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>8.5</mn></mrow></math></div><p><strong>SRTF</strong> (remaining time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math> at each event):</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></th>
+<th>Event</th>
+<th>Comparison</th>
+<th>Run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td>P2 arrives</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><mn>4</mn><mo>&lt;</mo><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>6</mn></mrow></math></td>
+<td>P2</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td>P3 arrives</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>3</mn></msub><mo>=</mo><mn>1</mn><mo>&lt;</mo><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><mn>3</mn></mrow></math></td>
+<td>P3</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math></td>
+<td>P3 done</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><mn>3</mn><mo>&lt;</mo><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>6</mn></mrow></math></td>
+<td>P2</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math></td>
+<td>P4 arrives</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>4</mn></msub><mo>=</mo><mn>3</mn><mo>&gt;</mo><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><mn>2</mn></mrow></math></td>
+<td>P2</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math></td>
+<td>P2 done</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>4</mn></msub><mo>=</mo><mn>3</mn><mo>&lt;</mo><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>6</mn></mrow></math></td>
+<td>P4</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn></mrow></math></td>
+<td>P4 done</td>
+<td>—</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P2</th>
+<th>P3</th>
+<th>P2</th>
+<th>P4</th>
+<th>P1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext>–</mtext><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mtext>–</mtext><mn>3</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mtext>–</mtext><mn>6</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mtext>–</mtext><mn>9</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>8</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>2</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>8</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>0</mn><mo>+</mo><mn>2</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>11</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>2.75</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>15</mn><mo>+</mo><mn>5</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>5</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>26</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>6.5</mn></mrow></math></div><p><strong>RR, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>2</mn></mrow></math></strong> (arrival at the same instant as quantum expiry joins queue <strong>before</strong> the preempted process):</p>
+<table>
+<thead>
+<tr>
+<th>Slice</th>
+<th>Runs</th>
+<th>Remaining</th>
+<th>Queue after (head first)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>2</mn></mrow></math></td>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>5</mn></mrow></math></td>
+<td>P2, P3, P1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mtext>–</mtext><mn>4</mn></mrow></math></td>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><mn>2</mn></mrow></math></td>
+<td>P3, P1, P4, P2</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mtext>–</mtext><mn>5</mn></mrow></math></td>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td>P1, P4, P2</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mtext>–</mtext><mn>7</mn></mrow></math></td>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>3</mn></mrow></math></td>
+<td>P4, P2, P1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mtext>–</mtext><mn>9</mn></mrow></math></td>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>4</mn></msub><mo>=</mo><mn>1</mn></mrow></math></td>
+<td>P2, P1, P4</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn><mtext>–</mtext><mn>11</mn></mrow></math></td>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td>P1, P4</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mtext>–</mtext><mn>13</mn></mrow></math></td>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></mrow></math></td>
+<td>P4, P1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn><mtext>–</mtext><mn>14</mn></mrow></math></td>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td>P1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>8</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>6</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>3</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>8</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>7</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>23</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>5.75</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>15</mn><mo>+</mo><mn>10</mn><mo>+</mo><mn>3</mn><mo>+</mo><mn>10</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>38</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>9.5</mn></mrow></math></div><p><strong>Priority, preemptive</strong>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo>:</mo><msub><mtext>pr</mtext><mn>2</mn></msub><mo>=</mo><mn>1</mn><mo>&lt;</mo><msub><mtext>pr</mtext><mn>1</mn></msub><mo>=</mo><mn>3</mn><mo>⇒</mo><mtext>P2</mtext><mo separator="true">;</mo><mspace width="1em"/><mi>t</mi><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo>:</mo><msub><mtext>pr</mtext><mn>3</mn></msub><mo>=</mo><mn>4</mn><mo separator="true">,</mo><mtext> </mtext><msub><mtext>pr</mtext><mn>4</mn></msub><mo>=</mo><mn>2</mn><mo>&gt;</mo><mn>1</mn><mo>⇒</mo><mtext>P2 to </mtext><mn>5</mn><mo separator="true">;</mo><mspace width="1em"/><mi>t</mi><mo>=</mo><mn>5</mn><mo>:</mo><msub><mtext>pr</mtext><mn>4</mn></msub><mo>&lt;</mo><msub><mtext>pr</mtext><mn>1</mn></msub><mo>&lt;</mo><msub><mtext>pr</mtext><mn>3</mn></msub></mrow></math></div><table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P2</th>
+<th>P4</th>
+<th>P1</th>
+<th>P3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext>–</mtext><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mtext>–</mtext><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mtext>–</mtext><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>4</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>13</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>12</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>4</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>1</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>7</mn><mo>+</mo><mn>0</mn><mo>+</mo><mn>12</mn><mo>+</mo><mn>1</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>20</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>5</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>14</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>13</mn><mo>+</mo><mn>4</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>35</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>8.75</mn></mrow></math></div><p><strong>Priority, non-preemptive</strong>: P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>7</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>7</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>pr</mtext><mn>2</mn></msub><mo>=</mo><mn>1</mn><mo>&lt;</mo><msub><mtext>pr</mtext><mn>4</mn></msub><mo>=</mo><mn>2</mn><mo>&lt;</mo><msub><mtext>pr</mtext><mn>3</mn></msub><mo>=</mo><mn>4</mn></mrow></math>.</p>
+<table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P2</th>
+<th>P4</th>
+<th>P3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mtext>–</mtext><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mtext>–</mtext><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>6</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>13</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>12</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>12</mn><mo>+</mo><mn>7</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>25</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>6.25</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>7</mn><mo>+</mo><mn>10</mn><mo>+</mo><mn>13</mn><mo>+</mo><mn>10</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>40</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>10</mn></mrow></math></div><h3>T7 MLFQ</h3>
+<p>Rules: run head of highest non-empty queue; full quantum <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> demote; preempted by new Q0 arrival <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> back to <strong>head of own queue</strong>, no demotion.</p>
+<p>Example: Q0 RR <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>2</mn></mrow></math>, Q1 RR <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>4</mn></mrow></math>, Q2 FCFS; P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>8</mn><mo stretchy="false">)</mo></mrow></math>, P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math>, P3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">)</mo></mrow></math>.</p>
+<table>
+<thead>
+<tr>
+<th>Slice</th>
+<th>Runs (queue)</th>
+<th>Why</th>
+<th>After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>2</mn></mrow></math></td>
+<td>P1 (Q0)</td>
+<td>only process</td>
+<td>full <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> Q1, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>6</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mtext>–</mtext><mn>4</mn></mrow></math></td>
+<td>P2 (Q0)</td>
+<td>Q0 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≻</mo></mrow></math> Q1</td>
+<td>full <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> Q1, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>2</mn></msub><mo>=</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mtext>–</mtext><mn>6</mn></mrow></math></td>
+<td>P3 (Q0)</td>
+<td>arrived at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math></td>
+<td>full <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> Q1, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>3</mn></msub><mo>=</mo><mn>4</mn></mrow></math>; Q1 = P1, P2, P3</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mtext>–</mtext><mn>10</mn></mrow></math></td>
+<td>P1 (Q1)</td>
+<td>Q0 empty</td>
+<td>full <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> Q2, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mn>1</mn></msub><mo>=</mo><mn>2</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mtext>–</mtext><mn>11</mn></mrow></math></td>
+<td>P2 (Q1)</td>
+<td>head of Q1</td>
+<td>done</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+<td>P3 (Q1)</td>
+<td>head of Q1</td>
+<td>done (exactly <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math>)</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mtext>–</mtext><mn>17</mn></mrow></math></td>
+<td>P1 (Q2)</td>
+<td>only left</td>
+<td>done</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>17</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn><mo>−</mo><mn>8</mn><mo>=</mo><mn>9</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn><mo>−</mo><mn>6</mn><mo>=</mo><mn>5</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>9</mn><mo>+</mo><mn>7</mn><mo>+</mo><mn>5</mn></mrow><mn>3</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>21</mn><mn>3</mn></mfrac></mstyle><mo>=</mo><mn>7</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow><mo stretchy="true">‾</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>17</mn><mo>+</mo><mn>10</mn><mo>+</mo><mn>11</mn></mrow><mn>3</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>38</mn><mn>3</mn></mfrac></mstyle><mo>≈</mo><mn>12.67</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mn>7</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>S26 Q4.1 (Q0 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>4</mn></mrow></math>, Q1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>8</mn></mrow></math>, Q2 FCFS; P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>9</mn><mo stretchy="false">)</mo></mrow></math>, P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>25</mn><mo stretchy="false">)</mo></mrow></math>, P3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>6</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">)</mo></mrow></math>, P4 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>14</mn><mo separator="true">,</mo><mn>18</mn><mo stretchy="false">)</mo></mrow></math>, P5 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>45</mn><mo separator="true">,</mo><mn>15</mn><mo stretchy="false">)</mo></mrow></math>, P6 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>58</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">)</mo></mrow></math>); same rules reproduce the official chart:</p>
+<table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P2</th>
+<th>P3</th>
+<th>P1</th>
+<th>P4</th>
+<th>P1</th>
+<th>P2</th>
+<th>P3</th>
+<th>P4</th>
+<th>P2</th>
+<th>P5</th>
+<th>P2</th>
+<th>P6</th>
+<th>P2</th>
+<th>P4</th>
+<th>P5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>4</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mtext>–</mtext><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mtext>–</mtext><mn>12</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn><mtext>–</mtext><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mtext>–</mtext><mn>18</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>18</mn><mtext>–</mtext><mn>21</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>21</mn><mtext>–</mtext><mn>29</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>29</mn><mtext>–</mtext><mn>32</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>32</mn><mtext>–</mtext><mn>40</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>40</mn><mtext>–</mtext><mn>45</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>45</mn><mtext>–</mtext><mn>57</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>57</mn><mtext>–</mtext><mn>58</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>58</mn><mtext>–</mtext><mn>64</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>64</mn><mtext>–</mtext><mn>71</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>71</mn><mtext>–</mtext><mn>77</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>77</mn><mtext>–</mtext><mn>80</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>(Official chart splits P5 as <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>45</mn><mtext>–</mtext><mn>49</mn><mo separator="true">,</mo><mtext> </mtext><mn>49</mn><mtext>–</mtext><mn>57</mn></mrow></math> and P6 as <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>58</mn><mtext>–</mtext><mn>62</mn><mo separator="true">,</mo><mtext> </mtext><mn>62</mn><mtext>–</mtext><mn>64</mn></mrow></math>.)</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left right left" columnspacing="0em 1em 0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>W</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>21</mn><mo>−</mo><mn>0</mn><mo>−</mo><mn>9</mn><mo>=</mo><mn>12</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>W</mi><mn>2</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>71</mn><mo>−</mo><mn>2</mn><mo>−</mo><mn>25</mn><mo>=</mo><mn>44</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>W</mi><mn>3</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>32</mn><mo>−</mo><mn>6</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>19</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>W</mi><mn>4</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>77</mn><mo>−</mo><mn>14</mn><mo>−</mo><mn>18</mn><mo>=</mo><mn>45</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>W</mi><mn>5</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>80</mn><mo>−</mo><mn>45</mn><mo>−</mo><mn>15</mn><mo>=</mo><mn>20</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>W</mi><mn>6</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>64</mn><mo>−</mo><mn>58</mn><mo>−</mo><mn>6</mn><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>12</mn><mo>+</mo><mn>44</mn><mo>+</mo><mn>19</mn><mo>+</mo><mn>45</mn><mo>+</mo><mn>20</mn><mo>+</mo><mn>0</mn></mrow><mn>6</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>140</mn><mn>6</mn></mfrac></mstyle><mo>≈</mo><mn>23.33</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Response (official convention <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>=</mo><mtext>end of 1st run</mtext><mo>−</mo><msub><mi>T</mi><mtext>arr</mtext></msub></mrow></math>):</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>R</mi><mn>1</mn></msub><mo>=</mo><mn>4</mn><mo>−</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>R</mi><mn>2</mn></msub><mo>=</mo><mn>8</mn><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>R</mi><mn>3</mn></msub><mo>=</mo><mn>12</mn><mo>−</mo><mn>6</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>R</mi><mn>4</mn></msub><mo>=</mo><mn>18</mn><mo>−</mo><mn>14</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>R</mi><mn>5</mn></msub><mo>=</mo><mn>49</mn><mo>−</mo><mn>45</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>R</mi><mn>6</mn></msub><mo>=</mo><mn>62</mn><mo>−</mo><mn>58</mn><mo>⇒</mo><mover accent="true"><mi>R</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>4</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>4</mn></mrow><mn>6</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>28</mn><mn>6</mn></mfrac></mstyle><mo>≈</mo><mn>4.67</mn></mrow></math></div><h3>T8 RM / EDF (periodic real-time)</h3>
+<p>Steps: releases <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><msub><mi>T</mi><mi>i</mi></msub></mrow></math>, deadlines <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><msub><mi>T</mi><mi>i</mi></msub><mo>+</mo><msub><mi>D</mi><mi>i</mi></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> each unit: RM runs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>min</mi><mo>⁡</mo><msub><mi>T</mi><mi>i</mi></msub></mrow></math>, EDF runs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>min</mi><mo>⁡</mo></mrow></math> absolute deadline <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> count misses.</p>
+<p>Example: P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>C</mi><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mi>T</mi><mo>=</mo><mi>D</mi><mo>=</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math>, P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>C</mi><mo>=</mo><mn>4</mn><mo separator="true">,</mo><mi>T</mi><mo>=</mo><mi>D</mi><mo>=</mo><mn>7</mn><mo stretchy="false">)</mo></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>U</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>5</mn></mfrac></mstyle><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>4</mn><mn>7</mn></mfrac></mstyle><mo>=</mo><mn>0.4</mn><mo>+</mo><mn>0.571</mn><mo>=</mo><mn>0.971</mn><mtext> </mtext><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>&gt;</mo><mn>2</mn><mo stretchy="false">(</mo><msqrt><mn>2</mn></msqrt><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.828</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>⇒</mo><mtext>RM not guaranteed</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>≤</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>⇒</mo><mtext>EDF schedulable</mtext></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p><strong>RM</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub><mo>&lt;</mo><msub><mi>T</mi><mn>2</mn></msub><mo>⇒</mo></mrow></math> P1 always higher):</p>
+<table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P2</th>
+<th>P1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mtext>–</mtext><mn>5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mtext>–</mtext><mn>7</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>t</mi><mo>=</mo><mn>7</mn><mo>:</mo><mtext> P2 job 1 ran </mtext><mn>3</mn><mo>&lt;</mo><msub><mi>C</mi><mn>2</mn></msub><mo>=</mo><mn>4</mn><mtext> by </mtext><mi>D</mi><mo>=</mo><mn>7</mn><mo>⇒</mo><mtext>𝐦𝐢𝐬𝐬</mtext></mrow></math></div><p><strong>EDF</strong> over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">lcm</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>5</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">)</mo><mo>=</mo><mn>35</mn></mrow></math> (ties <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> smaller ID):</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mn>1</mn></msub><mo>=</mo><mn>5</mn><mo>&lt;</mo><msub><mi>d</mi><mn>2</mn></msub><mo>=</mo><mn>7</mn><mo>⇒</mo></mrow></math> P1 (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>2</mn></mrow></math>), then P2</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math></td>
+<td>P1#2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mn>10</mn><mo>&gt;</mo><mn>7</mn><mo>⇒</mo></mrow></math> P2 continues, done at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math>; P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mtext>–</mtext><mn>8</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math></td>
+<td>P2#2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mn>14</mn></mrow></math>; P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mtext>–</mtext><mn>12</mn></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>10</mn></mrow></math>: P1#3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mn>15</mn><mo>&gt;</mo><mn>14</mn></mrow></math>); P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn><mtext>–</mtext><mn>14</mn></mrow></math></td>
+</tr>
+<tr>
+<td>…</td>
+<td>same rule to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>35</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P1</th>
+<th>P2</th>
+<th>P1</th>
+<th>P2</th>
+<th>P1</th>
+<th>P2</th>
+<th>P1</th>
+<th>P2</th>
+<th>P1</th>
+<th>P2</th>
+<th>P1</th>
+<th>P2</th>
+<th>P1</th>
+<th>P2</th>
+<th>idle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mtext>–</mtext><mn>6</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mtext>–</mtext><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mtext>–</mtext><mn>12</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn><mtext>–</mtext><mn>14</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn><mtext>–</mtext><mn>15</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mtext>–</mtext><mn>17</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn><mtext>–</mtext><mn>20</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>20</mn><mtext>–</mtext><mn>22</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>22</mn><mtext>–</mtext><mn>26</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>26</mn><mtext>–</mtext><mn>28</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>28</mn><mtext>–</mtext><mn>30</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>30</mn><mtext>–</mtext><mn>32</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>32</mn><mtext>–</mtext><mn>34</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>34</mn><mtext>–</mtext><mn>35</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Job</th>
+<th>release</th>
+<th>deadline</th>
+<th>finish</th>
+<th>met?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1 #1–#7</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>10</mn><mo separator="true">,</mo><mn>15</mn><mo separator="true">,</mo><mn>20</mn><mo separator="true">,</mo><mn>25</mn><mo separator="true">,</mo><mn>30</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo separator="true">,</mo><mn>10</mn><mo separator="true">,</mo><mn>15</mn><mo separator="true">,</mo><mn>20</mn><mo separator="true">,</mo><mn>25</mn><mo separator="true">,</mo><mn>30</mn><mo separator="true">,</mo><mn>35</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo separator="true">,</mo><mn>8</mn><mo separator="true">,</mo><mn>14</mn><mo separator="true">,</mo><mn>17</mn><mo separator="true">,</mo><mn>22</mn><mo separator="true">,</mo><mn>28</mn><mo separator="true">,</mo><mn>32</mn></mrow></math></td>
+<td>all ✓</td>
+</tr>
+<tr>
+<td>P2 #1–#5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo separator="true">,</mo><mn>7</mn><mo separator="true">,</mo><mn>14</mn><mo separator="true">,</mo><mn>21</mn><mo separator="true">,</mo><mn>28</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo separator="true">,</mo><mn>14</mn><mo separator="true">,</mo><mn>21</mn><mo separator="true">,</mo><mn>28</mn><mo separator="true">,</mo><mn>35</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mo separator="true">,</mo><mn>12</mn><mo separator="true">,</mo><mn>20</mn><mo separator="true">,</mo><mn>26</mn><mo separator="true">,</mo><mn>34</mn></mrow></math></td>
+<td>all ✓</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Schedule repeats every <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>35</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> never a miss.</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>RM misses at </mtext><mi>t</mi><mo>=</mo><mn>7</mn><mo separator="true">;</mo><mtext> EDF: no miss</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>S26 Q4.2 (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>D</mi><mo mathvariant="normal">≠</mo><mi>T</mi></mrow></math>; P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math>, P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math>, P3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>6</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">)</mo></mrow></math>, P4 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>8</mn><mo stretchy="false">)</mo></mrow></math> as <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>C</mi><mo separator="true">,</mo><mi>D</mi><mo separator="true">,</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></math>; ties <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> smaller ID):</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>U</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>5</mn></mfrac></mstyle><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>7</mn></mfrac></mstyle><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>8</mn></mfrac></mstyle><mo>=</mo><mn>0.25</mn><mo>+</mo><mn>0.4</mn><mo>+</mo><mn>0.286</mn><mo>+</mo><mn>0.125</mn><mo>=</mo><mn>1.061</mn><mo>&gt;</mo><mn>1</mn></mrow></math></div><p>Rule: a missed job keeps running until done. Over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>16</mn></mrow></math>:</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Gantt</th>
+<th>Misses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RM (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>: P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≻</mo></mrow></math> P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≻</mo></mrow></math> P3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≻</mo></mrow></math> P4)</td>
+<td><code>0 P1 1 P2 3 P3 4 P1 5 P2 7 P3 8 P1 9 P3 10 P2 12 P1 13 P3 15 P2 16</code></td>
+<td>P4 @ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo separator="true">,</mo><mn>13</mn></mrow></math> (never runs); P3 @ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mo separator="true">,</mo><mn>13</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo><mn>𝟒</mn></mrow></math> ✓ official</td>
+</tr>
+<tr>
+<td>EDF</td>
+<td><code>0 P1 1 P2 3 P4 4 P3 6 P1 7 P2 9 P1 10 P3 12 P4 13 P2 15 P1 16</code></td>
+<td>P2 @ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>14</mn></mrow></math> (rel. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn></mrow></math>); P1 @ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math> (rel. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn></mrow></math>) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo><mn>𝟐</mn></mrow></math> ✓ official</td>
+</tr>
+</tbody>
+</table>
+<h3>T9 SJF burst prediction</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.5</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>τ</mi><mn>0</mn></msub><mo>=</mo><mn>10</mn></mrow></math>, bursts <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>6</mn><mo separator="true">,</mo><mn>4</mn></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>τ</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mn>6</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>10</mn><mo>=</mo><mn>8</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>τ</mi><mn>2</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mn>4</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>8</mn><mo>=</mo><mn>6</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>τ</mi><mn>3</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mn>6</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>6</mn><mo>=</mo><mn>6</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>τ</mi><mn>4</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mn>4</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>6</mn><mo>=</mo><mn>5</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>8</mn><mo separator="true">,</mo><mtext> </mtext><mn>6</mn><mo separator="true">,</mo><mtext> </mtext><mn>6</mn><mo separator="true">,</mo><mtext> </mtext><mn>5</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T10 Dynamic priority (S26 Q4.3 type)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>pr</mtext><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>pr</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>waiting</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>pr</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>β</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>running</mtext></mstyle></mtd></mtr></mtable></mrow><mspace width="2em"/><mtext>pick </mtext><mi>max</mi><mo>⁡</mo><mtext>pr </mtext><mo stretchy="false">(</mo><mtext>watch: check every </mtext><mi>k</mi><mtext> units; tie-break</mtext><mo stretchy="false">)</mo></mrow></math></div><p>Example (S26 (a)): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mi>β</mi><mo>=</mo><mn>3</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>pr</mtext><mn>0</mn></msub><mo>=</mo><mn>0</mn></mrow></math>, ties <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> larger ID; P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">)</mo></mrow></math>, P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math>, P3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>6</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">)</mo></mrow></math>, P4 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>9</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>α</mi><mo>=</mo><mn>0</mn><mo>⇒</mo><mtext>waiters stay </mtext><mn>0</mn><mo separator="true">;</mo><mtext>  </mtext><mi>β</mi><mo>&gt;</mo><mn>0</mn><mo>⇒</mo><mtext>runner</mtext><mo>↑</mo><mo>⇒</mo><mtext>runs to completion</mtext></mrow></math></div><table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></th>
+<th>Ready (pr)</th>
+<th>Pick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td>P1 (0)</td>
+<td>P1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>7</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math></td>
+<td>P2 (0), P3 (0)</td>
+<td>tie <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> P3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mtext>–</mtext><mn>13</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn></mrow></math></td>
+<td>P2 (0), P4 (0)</td>
+<td>tie <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> P4 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn><mtext>–</mtext><mn>17</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn></mrow></math></td>
+<td>P2</td>
+<td>P2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn><mtext>–</mtext><mn>22</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>finish</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>A</mi><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>0</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>7</mn><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>22</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>22</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>19</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>19</mn><mo>−</mo><mn>5</mn><mo>=</mo><mn>14</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn><mo>−</mo><mn>6</mn><mo>=</mo><mn>7</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn><mo>−</mo><mn>6</mn><mo>=</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>17</mn><mo>−</mo><mn>9</mn><mo>=</mo><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>4</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mover accent="true"><mi>W</mi><mo>ˉ</mo></mover><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mn>0</mn><mo>+</mo><mn>14</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>4</mn></mrow><mn>4</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>19</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>4.75</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>β</mi><mo>&gt;</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mi>α</mi><mo>=</mo><mn>0</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>⇒</mo><mtext>FCFS-like</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mi>β</mi><mo>&lt;</mo><mn>0</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>⇒</mo><mtext>RR-like</mtext></mrow></mstyle></mtd></mtr></mtable></mrow></math></div><h3>T11 Race condition: results of <code>x++</code></h3>
+<p><code>x++</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≡</mo></mrow></math> <code>r = x; r = r + 1; x = r;</code> (switch possible between any two).</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mn>0</mn></mrow></math>, two threads each <code>x++</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> times (brute-force enumeration):</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></th>
+<th>Possible final <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>n</mi><mo>≥</mo><mn>2</mn><mo>:</mo><mtext> </mtext><mi>x</mi><mo>∈</mo><mo stretchy="false">{</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>2</mn><mi>n</mi><mo stretchy="false">}</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Minimum <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>2</mn></mrow></math> (not <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>):</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>A reads <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>2</td>
+<td>B runs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></math> full iterations</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>3</td>
+<td>A writes <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>+</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>4</td>
+<td>B reads <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> (last iteration)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>5</td>
+<td>A runs its remaining <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></math> iterations</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></td>
+</tr>
+<tr>
+<td>6</td>
+<td>B writes <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>T12 Enforcing execution order with semaphores</h3>
+<p>Each dependency <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>→</mo><mi>Y</mi></mrow></math>: semaphore <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>0</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi></mrow></math>: <code>signal(S)</code> after; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Y</mi></mrow></math>: <code>wait(S)</code> before.</p>
+<p>Order <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>→</mo><mi>B</mi><mo>→</mo><mi>C</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>1</mn></msub><mo>=</mo><msub><mi>S</mi><mn>2</mn></msub><mo>=</mo><mn>0</mn></mrow></math>:</p>
+<table>
+<thead>
+<tr>
+<th>Thread</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td><code>print A; signal(&amp;S1);</code></td>
+</tr>
+<tr>
+<td>B</td>
+<td><code>wait(&amp;S1); print B; signal(&amp;S2);</code></td>
+</tr>
+<tr>
+<td>C</td>
+<td><code>wait(&amp;S2); print C;</code></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>print A</mtext><mo>≺</mo><mtext mathvariant="monospace">signal</mtext><mo stretchy="false">(</mo><msub><mi>S</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>≺</mo><mtext mathvariant="monospace">wait</mtext><mo stretchy="false">(</mo><msub><mi>S</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mtext> returns</mtext><mo>≺</mo><mtext>print B</mtext><mo>≺</mo><mtext mathvariant="monospace">signal</mtext><mo stretchy="false">(</mo><msub><mi>S</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>≺</mo><mtext mathvariant="monospace">wait</mtext><mo stretchy="false">(</mo><msub><mi>S</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>≺</mo><mtext>print C</mtext><mspace width="1em"/><mi mathvariant="normal">∀</mi><mtext> start orders</mtext></mrow></math></div><ul>
+<li>S26 Q5 (order <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo>→</mo><mi>B</mi><mo>→</mo><mi>A</mi></mrow></math>): BLANK1 <code>wait(&amp;s2)</code> · BLANK2 <code>wait(&amp;s0)</code> · BLANK3 <code>/* Nothing */</code> · BLANK4 <code>signal(&amp;s0)</code>.</li>
+<li>S26 MC23 type (mutex + semaphore init <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math>): <code>worker2</code> blocks on <code>sem_wait</code> until <code>worker1</code> posts <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> A first; <code>counter</code>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>→</mo><mn>0</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>2</mn><mo>→</mo><mn>2</mn><mo>+</mo><mn>3</mn><mo>=</mo><mn>5</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <code>A 2;B 5;</code>.</li>
+</ul>
+<h3>T13 Locks from atomic instructions</h3>
+<pre><code class="language-c">// test_and_set
+while (test_and_set(&amp;lock)) ;   /* CS */   lock = false;
+// compare_and_swap
+while (compare_and_swap(&amp;lock, 0, 1) != 0) ;   /* CS */   lock = 0;
+// swap(x, v): atomically x = v, return old x   (S26 Q2.4)
+while (swap(locked, 1) == 1) ;
+</code></pre>
+<p>Bounded-waiting TAS (slide 6.19), exit section of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mi>i</mi></msub></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>j</mi><mo>=</mo><mtext>first </mtext><mi>k</mi><mtext> in </mtext><mo stretchy="false">(</mo><mi>i</mi><mo>+</mo><mn>1</mn><mo separator="true">,</mo><mi>i</mi><mo>+</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>i</mi><mo>+</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mtext> </mtext><mo lspace="0.22em" rspace="0.22em"><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow></mo><mtext> </mtext><mi>n</mi><mtext> with </mtext><mtext mathvariant="monospace">waiting</mtext><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><mtext> </mtext><mo>⇒</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext mathvariant="monospace">waiting</mtext><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>←</mo><mtext>false</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">(</mo><mtext>lock passed directly to </mtext><mi>j</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext mathvariant="monospace">lock</mtext><mo>←</mo><mtext>false</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">(</mo><mtext>no </mtext><mi>j</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo>⇒</mo><mtext> wait</mtext><mo>≤</mo><mi>n</mi><mo>−</mo><mn>1</mn><mtext> turns</mtext><mo separator="true">;</mo><mspace width="1em"/><mrow><mtext>𝐥𝐨𝐜𝐤</mtext><mtext> </mtext><mtext>𝐧𝐨𝐭</mtext><mtext> </mtext><mtext>𝐫𝐞𝐥𝐞𝐚𝐬𝐞𝐝</mtext><mtext> </mtext><mtext>𝐛𝐲</mtext><mtext> </mtext></mrow><mtext mathvariant="monospace">test_and_set</mtext><mtext> </mtext><mo stretchy="false">(</mo><mtext>MC25</mtext><mo stretchy="false">)</mo></mrow></math></div><h3>T14 Judging a scheduling policy (S26 Q2.3 type)</h3>
+<p>Steps: how does priority vary with burst <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>i</mi></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> short burst (I/O-bound) favoured? <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> aging? (none <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> starvation possible)</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>a</mi><mo>+</mo><mi>b</mi><mtext> </mtext><msub><mi>c</mi><mi>i</mi></msub></mrow></mfrac><mo separator="true">,</mo><mtext> </mtext><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo>&gt;</mo><mn>0</mn><mo>:</mo><mspace width="1em"/><msub><mi>c</mi><mi>i</mi></msub><mo>↓</mo><mo>⇒</mo><msub><mi>f</mi><mi>i</mi></msub><mo>↑</mo><mo>⇒</mo><mrow><mtext>𝐟𝐚𝐯𝐨𝐮𝐫𝐬</mtext><mtext> </mtext><mtext>𝐈/𝐎-𝐛𝐨𝐮𝐧𝐝</mtext></mrow><mo separator="true">;</mo><mtext>  steady I/O-bound arrivals</mtext><mo>⇒</mo><mtext>CPU-bound </mtext><mrow><mtext>𝐜𝐚𝐧</mtext><mtext> </mtext><mtext>𝐬𝐭𝐚𝐫𝐯𝐞</mtext></mrow></mrow></math></div><h2>Common Mistakes</h2>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>=</mo><mi>T</mi><mi>A</mi><mi>T</mi><mo>−</mo><mi>B</mi></mrow></math>, <strong>not</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mtext>first run</mtext></msub><mo>−</mo><msub><mi>T</mi><mtext>arr</mtext></msub></mrow></math> (that is response); gap method: first gap from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mtext>arr</mtext></msub></mrow></math>.</li>
+<li>⚠️ <strong>Response convention</strong>: S26 official uses <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>=</mo><mtext>end of 1st run</mtext><mo>−</mo><msub><mi>T</mi><mtext>arr</mtext></msub></mrow></math> (MLFQ: P1 runs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mtext>–</mtext><mn>4</mn><mo>⇒</mo><msub><mi>R</mi><mn>1</mn></msub><mo>=</mo><mn>4</mn></mrow></math>); textbook uses <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mtext>first run</mtext></msub><mo>−</mo><msub><mi>T</mi><mtext>arr</mtext></msub></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>1</mn></msub><mo>=</mo><mn>0</mn></mrow></math>). Check the question / slide 5.13; state your convention if in doubt.</li>
+<li>RR: new arrival and quantum expiry at the same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> new arrival enqueued first.</li>
+<li>MLFQ: preempted <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo></mrow></math> full quantum <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>no demotion</strong>, back to <strong>head</strong> of own queue. ⚠️ Quantum reset vs resume after returning to head: not tested; read the question.</li>
+<li>RM / EDF (S26 convention): missed job <strong>keeps running until done</strong>; RM priority by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>i</mi></msub></mrow></math>, not <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mi>i</mi></msub></mrow></math>.</li>
+<li>Tie-breaks vary (paper had both &quot;smaller ID first&quot; and &quot;larger ID first&quot;).</li>
+<li>Circular buffer capacity <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>N</mi><mo>−</mo><mn>1</mn></mrow></math>; ordinary pipe <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇏</mo></mrow></math> unrelated processes.</li>
+<li>Code after successful <code>exec</code> never runs; <code>fork</code> fails <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> parent takes <code>else</code> branch.</li>
+<li>⚠️ <code>printf</code> without <code>\n</code> before <code>fork</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> stdout buffer copied <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> may print twice; past questions used <code>\n</code> or excluded it — check assumptions.</li>
+<li>Microkernel <strong>slower</strong>; API <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;̸</mo></mrow></math> syscall speed; multicore <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo></mrow></math> simpler scheduling.</li>
+</ul>
+<h2>Past Papers / Homework Mapping</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S26 Mid MC1–MC9</td>
+<td>Ch1–2 concepts (interrupts, DMA, storage, von Neumann, OS services, API, microkernel, printf/write, layered)</td>
+</tr>
+<tr>
+<td>S26 Mid MC10</td>
+<td>T1: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math> processes, X <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mn>6</mn></mrow></math>, Y <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>S26 Mid MC11–MC14</td>
+<td>Ch3 (context switch, pipe, zombie, state transitions)</td>
+</tr>
+<tr>
+<td>S26 Mid MC15–MC18</td>
+<td>Ch4: threads, concurrency vs parallelism, T4 Amdahl, signals</td>
+</tr>
+<tr>
+<td>S26 Mid MC19–MC22</td>
+<td>Ch5: criteria, MLFQ, EDF, multiprocessor</td>
+</tr>
+<tr>
+<td>S26 Mid MC23–MC25</td>
+<td>T12 / T13</td>
+</tr>
+<tr>
+<td>S26 Mid Q2.1 / Q2.2</td>
+<td>race-condition def. + example · T5</td>
+</tr>
+<tr>
+<td>S26 Mid Q2.3 / Q2.4</td>
+<td>T14 · T13 swap spinlock + pros/cons</td>
+</tr>
+<tr>
+<td>S26 Mid Q3.1 / Q3.2 / Q3.3</td>
+<td>T1 general formula · T2 · T3</td>
+</tr>
+<tr>
+<td>S26 Mid Q4.1 / Q4.2 / Q4.3</td>
+<td>T7 · T8 · T10</td>
+</tr>
+<tr>
+<td>S26 Mid Q5</td>
+<td>T12</td>
+</tr>
+<tr>
+<td>F26 HW1 MC1–MC10</td>
+<td>Ch1–3 concepts (<code>solutions/hw1.md</code>)</td>
+</tr>
+<tr>
+<td>F26 HW1 Q2(1)</td>
+<td>T5</td>
+</tr>
+<tr>
+<td>F26 HW1 Q2(3) / Q2(5)</td>
+<td>process states + PCB · pipe</td>
+</tr>
+<tr>
+<td>F26 HW1 Q3(1)(2)</td>
+<td>T1 + T2 (<code>execlp</code> + two-level fork)</td>
+</tr>
+<tr>
+<td>F26 HW1 Q3(3)</td>
+<td>T3: integer through a pipe</td>
+</tr>
+<tr>
+<td>Lab 3 / PA1</td>
+<td><code>fork / exec / wait / pipe / dup</code> in practice; T2 / T3</td>
+</tr>
+</tbody>
+</table>
