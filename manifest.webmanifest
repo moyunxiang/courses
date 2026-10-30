@@ -1,0 +1,14 @@
+{
+  "name": "课程 Dashboard",
+  "short_name": "课程",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#f6f5f1",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-32.png", "sizes": "32x32", "type": "image/png" }
+  ]
+}

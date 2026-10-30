@@ -1,0 +1,364 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Prime movers</strong>：Otto（汽车）、Diesel（货运船）、jet（航空）、steam（发电）</li>
+<li><strong>Otto 汽油机</strong>：四冲程；理想 Otto 循环（2 绝热 + 2 等容）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">(</mo><msub><mi>V</mi><mn>1</mn></msub><mi mathvariant="normal">/</mi><msub><mi>V</mi><mn>2</mn></msub><msup><mo stretchy="false">)</mo><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></mfrac></mrow></math>（γ = 1.4、压缩比 8 → 56%）；实际 ~20%</li>
+<li><strong>Diesel 发动机</strong>：压燃；高压缩比 15–20；效率 &gt;50%（大型船用）；四冲程；Diesel 循环效率</li>
+<li><strong>Diesel vs Otto 对比表</strong></li>
+<li><strong>Jet engine</strong>：连续进行；推力条件 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>&gt;</mo><mi>u</mi></mrow></math>；compressor / combustor / turbine；<strong>Brayton 循环</strong></li>
+</ol>
+<blockquote>
+<p>必会计算：<strong>Otto 效率</strong>（给压缩比和 γ）；判断提高效率的方向（<strong>增大</strong>压缩比）。必会概念：Otto 循环四段过程；Diesel 与 Otto 的区别（点火方式、压缩比、燃料、效率）；jet 与活塞发动机的区别；Brayton 循环四段。</p>
+</blockquote>
+<h2>1 · Prime Movers</h2>
+<blockquote>
+<p><strong>Prime mover</strong>：把燃料转化为有用功的发动机——推进和发电的<strong>原动力</strong>。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>发动机</th>
+<th>支撑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Otto</strong></td>
+<td>汽车交通</td>
+</tr>
+<tr>
+<td><strong>Diesel</strong></td>
+<td>货运航运（世界经济和全球化）</td>
+</tr>
+<tr>
+<td><strong>Jet</strong></td>
+<td>航空运输</td>
+</tr>
+<tr>
+<td><strong>Steam</strong></td>
+<td>发电</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · Otto 汽油机</h2>
+<p><strong>四冲程</strong>：(a) intake、(b) compression、(c) power、(d) exhaust。</p>
+<h3>2.1 理想 Otto 循环</h3>
+<p><strong>等容 + 绝热</strong>过程的组合：</p>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>过程</th>
+<th>对应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>绝热压缩</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mn>1</mn></msub><mo>→</mo><msub><mi>V</mi><mn>2</mn></msub></mrow></math></td>
+<td>compression stroke</td>
+</tr>
+<tr>
+<td>等容加热</td>
+<td>火花点燃、燃烧吸热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>h</mi></msub></mrow></math></td>
+<td>点火瞬间</td>
+</tr>
+<tr>
+<td>绝热膨胀</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mn>2</mn></msub><mo>→</mo><msub><mi>V</mi><mn>1</mn></msub></mrow></math></td>
+<td>power stroke</td>
+</tr>
+<tr>
+<td>等容放热</td>
+<td>排气放热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>c</mi></msub></mrow></math></td>
+<td>exhaust</td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>e</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">(</mo><msub><mi>V</mi><mn>1</mn></msub><mi mathvariant="normal">/</mi><msub><mi>V</mi><mn>2</mn></msub><msup><mo stretchy="false">)</mo><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>γ</mi><mo>=</mo><mfrac><msub><mi>C</mi><mi>P</mi></msub><msub><mi>C</mi><mi>V</mi></msub></mfrac><mo>&gt;</mo><mn>1</mn><mo separator="true">,</mo><mspace width="1em"/><mtext>compression ratio</mtext><mo>=</mo><mfrac><msub><mi>V</mi><mn>1</mn></msub><msub><mi>V</mi><mn>2</mn></msub></mfrac><mo>&gt;</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p>典型 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>≈</mo><mn>1.4</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>V</mi><mn>1</mn></msub><msub><mi>V</mi><mn>2</mn></msub></mfrac><mo>≈</mo><mn>8</mn></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>e</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><msup><mn>8</mn><mn>0.4</mn></msup></mfrac><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mn>2.30</mn></mfrac><mo>≈</mo><mn>56</mn><mi mathvariant="normal">%</mi></mrow></math></div><p><strong>推导（补充）</strong>：两段绝热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>b</mi></msub><msubsup><mi>V</mi><mn>2</mn><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mo>=</mo><msub><mi>T</mi><mi>c</mi></msub><msubsup><mi>V</mi><mn>1</mn><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msubsup></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>a</mi></msub><msubsup><mi>V</mi><mn>2</mn><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mo>=</mo><msub><mi>T</mi><mi>d</mi></msub><msubsup><mi>V</mi><mn>1</mn><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msubsup></mrow></math>；等容热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>h</mi></msub><mo>=</mo><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mo stretchy="false">(</mo><msub><mi>T</mi><mi>b</mi></msub><mo>−</mo><msub><mi>T</mi><mi>a</mi></msub><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>c</mi></msub><mo>=</mo><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mo stretchy="false">(</mo><msub><mi>T</mi><mi>c</mi></msub><mo>−</mo><msub><mi>T</mi><mi>d</mi></msub><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac><mo>=</mo><mfrac><mrow><msub><mi>T</mi><mi>c</mi></msub><mo>−</mo><msub><mi>T</mi><mi>d</mi></msub></mrow><mrow><msub><mi>T</mi><mi>b</mi></msub><mo>−</mo><msub><mi>T</mi><mi>a</mi></msub></mrow></mfrac><mo>=</mo><mo stretchy="false">(</mo><msub><mi>V</mi><mn>2</mn></msub><mi mathvariant="normal">/</mi><msub><mi>V</mi><mn>1</mn></msub><msup><mo stretchy="false">)</mo><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>。</p>
+<p><strong>实际效率 ~20%</strong>：摩擦、热损失、燃烧不完全。</p>
+<h3>2.2 怎么提高 Otto 效率</h3>
+<p><strong>(b) 增大压缩比 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mn>1</mn></msub><mi mathvariant="normal">/</mi><msub><mi>V</mi><mn>2</mn></msub></mrow></math></strong>——分母 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>V</mi><mn>1</mn></msub><mi mathvariant="normal">/</mi><msub><mi>V</mi><mn>2</mn></msub><msup><mo stretchy="false">)</mo><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> 变大，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>0</mn></msub></mrow></math> 增大。（但汽油压缩比受<strong>爆震 / 自燃</strong>限制，见对比表。）</p>
+<p><strong>补充</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mn>1</mn></msub><mi mathvariant="normal">/</mi><msub><mi>V</mi><mn>2</mn></msub><mo>=</mo><mn>10</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn><mo>−</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>0.4</mn></mrow></msup><mo>≈</mo><mn>60</mn><mi mathvariant="normal">%</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>12</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≈</mo><mn>63</mn><mi mathvariant="normal">%</mi></mrow></math>。</p>
+<h2>3 · Diesel 发动机（Rudolf Diesel, 1858–1913；1897 年造出）</h2>
+<blockquote>
+<p><strong>内燃机</strong>，利用<strong>压缩产生的热</strong>点燃燃料–空气混合物（<strong>压燃</strong>，不需火花塞）。</p>
+</blockquote>
+<ul>
+<li><strong>热效率高 &gt; 50%</strong>：空气压缩比 <strong>15–20</strong></li>
+<li><strong>寿命长</strong>：废热少；约为 Otto 的 2 倍</li>
+<li>历史：1897 年首台效率 25%，1911 年 41%，如今大型船用 diesel 超过 50%</li>
+<li>质量 / 功率比高 → 最早用于固定场合（发电机）和水运；1945 年后主导海运（油轮、集装箱船、干散货船）；1930 年代用于汽车、火车；2007 年后欧洲约 40% 新车是 diesel</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>转速</th>
+<th>应用</th>
+<th>缸径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High speed</td>
+<td>≥ 1000 rpm，四冲程小型</td>
+<td>卡车、巴士、拖拉机、汽车、压缩机、泵、小发电机</td>
+<td>7.5 cm</td>
+</tr>
+<tr>
+<td>Medium speed</td>
+<td>300–1000 rpm</td>
+<td>大型发电机、船舶推进、大型压缩机 / 泵</td>
+<td>20–50 cm</td>
+</tr>
+<tr>
+<td>Slow speed</td>
+<td>60–200 rpm，<strong>二冲程</strong>，超大型</td>
+<td>主要用于船舶</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>例：Wärtsilä-Sulzer RTA96-C / 14RT Flex96-C（集装箱船主机，直接驱动螺旋桨轴）。</p>
+<h3>3.1 四冲程（五步）</h3>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intake</td>
+<td>空气进入燃烧室</td>
+</tr>
+<tr>
+<td>Compression</td>
+<td>所有气门关闭，活塞上行压缩空气，温度、压强升高</td>
+</tr>
+<tr>
+<td>Injection</td>
+<td>压缩后高压喷入燃料</td>
+</tr>
+<tr>
+<td>Expansion</td>
+<td>燃料接触热空气自燃；燃烧混合物膨胀把机械能传给曲轴</td>
+</tr>
+<tr>
+<td>Exhaust</td>
+<td>燃烧后热气从排气门离开</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 Diesel 循环效率</h3>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>过程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a → b</td>
+<td>绝热压缩</td>
+</tr>
+<tr>
+<td>b → c</td>
+<td><strong>等压</strong>喷油燃烧（吸热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub><mo>=</mo><mi>n</mi><msub><mi>C</mi><mi>P</mi></msub><mo stretchy="false">(</mo><msub><mi>T</mi><mi>c</mi></msub><mo>−</mo><msub><mi>T</mi><mi>b</mi></msub><mo stretchy="false">)</mo></mrow></math>）</td>
+</tr>
+<tr>
+<td>c → d</td>
+<td>绝热膨胀（power stroke）</td>
+</tr>
+<tr>
+<td>d → a</td>
+<td>等容放热（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub><mo>=</mo><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mo stretchy="false">(</mo><msub><mi>T</mi><mi>d</mi></msub><mo>−</mo><msub><mi>T</mi><mi>a</mi></msub><mo stretchy="false">)</mo></mrow></math>）</td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>e</mi><mi>D</mi></msub><mo>=</mo><mfrac><mi>W</mi><msub><mi>Q</mi><mn>1</mn></msub></mfrac><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>Q</mi><mn>2</mn></msub><msub><mi>Q</mi><mn>1</mn></msub></mfrac><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mi>γ</mi></mfrac><mo>⋅</mo><mfrac><mrow><msub><mi>T</mi><mi>d</mi></msub><mo>−</mo><msub><mi>T</mi><mi>a</mi></msub></mrow><mrow><msub><mi>T</mi><mi>c</mi></msub><mo>−</mo><msub><mi>T</mi><mi>b</mi></msub></mrow></mfrac><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mi>α</mi><msub><mi>T</mi><mi>a</mi></msub></mrow><mrow><mi>γ</mi><msub><mi>T</mi><mi>b</mi></msub></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"/><mi>α</mi><mo>=</mo><mfrac><mrow><msub><mi>T</mi><mi>d</mi></msub><mi mathvariant="normal">/</mi><msub><mi>T</mi><mi>a</mi></msub><mo>−</mo><mn>1</mn></mrow><mrow><msub><mi>T</mi><mi>c</mi></msub><mi mathvariant="normal">/</mi><msub><mi>T</mi><mi>b</mi></msub><mo>−</mo><mn>1</mn></mrow></mfrac></mrow></math></div><p>（和 Otto 的关键区别：燃烧是<strong>等压</strong>而不是等容。）</p>
+<h2>4 · Diesel vs Otto 对比</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Diesel</th>
+<th>Petrol（Otto）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>进气</td>
+<td>空气</td>
+<td>空气 + 燃料</td>
+</tr>
+<tr>
+<td>燃烧</td>
+<td>缸内高温高压<strong>自燃</strong>（&lt; 256 °C 自燃）</td>
+<td><strong>火花点火</strong>（自燃点 280 °C）</td>
+</tr>
+<tr>
+<td>燃料</td>
+<td>要易蒸发、易自燃（<strong>高 cetane 值</strong>，燃烧快）</td>
+<td>要抗自燃（<strong>高 octane 值</strong>，允许高压缩比）</td>
+</tr>
+<tr>
+<td>压缩比</td>
+<td>尽量高（<strong>15–24</strong>）</td>
+<td>受燃料限制（<strong>9–12</strong>）</td>
+</tr>
+<tr>
+<td>效率</td>
+<td>约 <strong>35–50%</strong></td>
+<td><strong>&lt; 30%</strong></td>
+</tr>
+<tr>
+<td>涡轮增压</td>
+<td>尽量用：提高效率、改善燃烧</td>
+<td>不常见，但越来越流行</td>
+</tr>
+<tr>
+<td>油耗</td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td>油价（HK）</td>
+<td>~HK$38.43 / L（Euro V diesel 免税）</td>
+<td>~HK$34.62 / L（税 HK$6.06 / L）</td>
+</tr>
+<tr>
+<td>重量</td>
+<td>较重</td>
+<td>较轻、紧凑</td>
+</tr>
+<tr>
+<td>启动</td>
+<td>几乎即时</td>
+<td>即时</td>
+</tr>
+<tr>
+<td>振动噪声</td>
+<td>大</td>
+<td>小</td>
+</tr>
+<tr>
+<td>转速</td>
+<td>受循环和燃料特性限制</td>
+<td>高</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · Jet Engine</h2>
+<p>例：<strong>GE90-115B</strong>（Boeing 777）：航空煤油（kerosene）；高涵道比涡扇；长 7.3 m、直径 3.43 m、风扇直径 3.25 m、重 8.3 t；最大推力 513 kN；功率 <strong>83 MW = 111,305 hp</strong>。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Otto / Diesel</th>
+<th>Jet（gas turbine）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工作方式</td>
+<td>进气、压缩、点火、燃烧、排气在<strong>四个不同冲程</strong>中</td>
+<td>这些步骤在机器<strong>不同部位同时、连续</strong>进行</td>
+</tr>
+</tbody>
+</table>
+<p><strong>推力</strong>：进气速度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi></mrow></math>，出气速度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>；<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>&gt;</mo><mi>u</mi></mrow></math> 时产生推力</strong>（动量变化）。</p>
+<p><strong>结构</strong>：</p>
+<ul>
+<li><strong>Compressor</strong>：多排叶片吸入并压缩空气，温度压强剧增（压强可增 <strong>40 倍</strong>）</li>
+<li><strong>Combustor</strong>：喷油与压缩空气混合点燃；膨胀的废气高速冲向后方</li>
+<li><strong>Turbine</strong>：废气推动涡轮叶片旋转，涡轮通过轴带动压气机，吸入更多空气——循环往复</li>
+</ul>
+<h3>5.1 Brayton 循环（理想 jet engine）</h3>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>过程</th>
+<th>对应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 → 2</td>
+<td><strong>绝热压缩</strong></td>
+<td>压气机压缩进气</td>
+</tr>
+<tr>
+<td>2 → 3</td>
+<td><strong>等压膨胀</strong>（吸热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mtext>in</mtext></msub></mrow></math>）</td>
+<td>燃烧</td>
+</tr>
+<tr>
+<td>3 → 4</td>
+<td><strong>绝热膨胀</strong></td>
+<td>气体对涡轮做功</td>
+</tr>
+<tr>
+<td>4 → 1</td>
+<td><strong>等压压缩</strong>（放热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mtext>out</mtext></msub></mrow></math>）</td>
+<td>热气冷却</td>
+</tr>
+</tbody>
+</table>
+<p>（补充：理想 Brayton 效率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>=</mo><mn>1</mn><mo>−</mo><mo stretchy="false">(</mo><msub><mi>p</mi><mn>1</mn></msub><mi mathvariant="normal">/</mi><msub><mi>p</mi><mn>2</mn></msub><msup><mo stretchy="false">)</mo><mrow><mo stretchy="false">(</mo><mi>γ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>γ</mi></mrow></msup></mrow></math>，压比越大越高效。）</p>
+<p>jet 发动机热效率逐年提高（NAS 2016 报告）。</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prime movers</td>
+<td>四种及用途</td>
+</tr>
+<tr>
+<td>Otto 四冲程</td>
+<td>名称与循环对应</td>
+</tr>
+<tr>
+<td>Otto 效率</td>
+<td>公式；8 与 1.4 → 56%；实际 20% 的原因</td>
+</tr>
+<tr>
+<td>提效</td>
+<td>增大压缩比</td>
+</tr>
+<tr>
+<td>Diesel</td>
+<td>压燃；15–20；&gt;50%；四冲程五步；等压燃烧</td>
+</tr>
+<tr>
+<td>对比表</td>
+<td>点火、燃料指标、压缩比、效率</td>
+</tr>
+<tr>
+<td>Jet</td>
+<td>连续工作；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>&gt;</mo><mi>u</mi></mrow></math>；三大部件</td>
+</tr>
+<tr>
+<td>Brayton</td>
+<td>2 绝热 + 2 等压</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>Otto 效率指数是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></math>（= 0.4），不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math>。</li>
+<li>Otto 燃烧是<strong>等容</strong>，Diesel 是<strong>等压</strong>，Brayton 是<strong>等压</strong>。</li>
+<li>Diesel 用 <strong>cetane</strong>（易自燃），汽油用 <strong>octane</strong>（抗自燃）——别反。</li>
+<li>Diesel 压缩比<strong>高于</strong> Otto，所以效率更高。</li>
+<li>理想效率（56%）≠ 实际效率（~20%）。</li>
+</ul>

@@ -1,0 +1,285 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Agenda 三个问题：</p>
+<ol>
+<li><strong>What is artificial intelligence?</strong></li>
+<li><strong>Where are we and how did we get here?</strong>（AI 发展史）</li>
+<li><strong>What is covered in this course?</strong>（课程内容和规则）</li>
+</ol>
+<blockquote>
+<p>这一讲概念为主，没有计算。可能考的是 <strong>AI 的四种定义</strong>、<strong>发展史的关键年份 / 事件</strong>，以及「某个任务需要哪些 AI 能力」这类简答。</p>
+</blockquote>
+<h2>1 · What is AI?</h2>
+<p>AI = 让机器做到以下某一种的科学。课件把它分成<strong>四种</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>像人（human-like）</th>
+<th>理性（rational）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>思考（think）</strong></td>
+<td><strong>Think like people</strong></td>
+<td><strong>Think rationally</strong></td>
+</tr>
+<tr>
+<td><strong>行动（act）</strong></td>
+<td><strong>Act like people</strong></td>
+<td><strong>Act rationally</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>1.1 Think like people</h3>
+<ul>
+<li>从 <strong>cognitive science、neuroscience</strong> 出发</li>
+<li><strong>模拟大脑的机制</strong>（simulate brain's mechanisms）</li>
+</ul>
+<h3>1.2 Act like people：Turing Test</h3>
+<ul>
+<li>由<strong>人类审问者</strong>（human interrogator）和机器对话，判断对面是人还是机器；分不出来就算通过。</li>
+<li>要通过 Turing Test，机器需要这些能力：
+<ul>
+<li><strong>Natural language understanding</strong>（自然语言理解）</li>
+<li><strong>Reasoning</strong>（推理）</li>
+<li><strong>Learning to adapt</strong>（学习、适应）</li>
+<li><strong>Perception &amp; manipulation</strong>（感知和操作物体）</li>
+</ul>
+</li>
+</ul>
+<h3>1.3 Think rationally</h3>
+<ul>
+<li>让计算机「想得对」（make computers think right）</li>
+<li>靠 <strong>logic reasoning systems</strong>（逻辑推理系统）实现</li>
+</ul>
+<h3>1.4 Act rationally</h3>
+<ul>
+<li>有<strong>预先定义的目标</strong>（predefined goals）</li>
+<li><strong>Agent</strong> 采取行动以达到<strong>最好的结果</strong>（best outcome）</li>
+<li>这是现代 AI（也是这门课）主要采用的视角：搜索、MDP、RL 都是「agent 为目标选最优行动」。</li>
+</ul>
+<p><strong>怎么区分</strong>：</p>
+<ul>
+<li>「像人」看的是像不像人，「理性」看的是对不对、好不好。</li>
+<li>「思考」关心内部过程，「行动」只看外部行为。</li>
+</ul>
+<h2>2 · A (Short) History of AI</h2>
+<table>
+<thead>
+<tr>
+<th>时期</th>
+<th>阶段</th>
+<th>关键事件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1940–1950</strong></td>
+<td>Early days</td>
+<td><strong>1943</strong> McCulloch &amp; Pitts：大脑的 <strong>Boolean circuit model</strong>（人工神经元的起源）；<strong>1950</strong> Turing 发表 <em>Computing Machinery and Intelligence</em></td>
+</tr>
+<tr>
+<td><strong>1950–70</strong></td>
+<td>Excitement</td>
+<td>1950s 早期 AI 程序：Samuel 的 checkers（跳棋）程序、Newell &amp; Simon 的 <strong>Logic Theorist</strong>、Gelernter 的 Geometry Engine；<strong>1956 Dartmouth meeting</strong>：正式采用 <strong>“Artificial Intelligence”</strong> 这个名字；<strong>1965</strong> Robinson 的逻辑推理<strong>完备算法</strong></td>
+</tr>
+<tr>
+<td><strong>1970–90</strong></td>
+<td>Knowledge-based approaches</td>
+<td>1969–79 knowledge-based systems 起步；<strong>1980–88 expert systems 产业繁荣</strong>；<strong>1988–93 产业崩溃 → “AI Winter”</strong></td>
+</tr>
+<tr>
+<td><strong>1990–2000</strong></td>
+<td>Statistical approaches</td>
+<td><strong>概率和决策论</strong>胜出，重点转向 <strong>uncertainty</strong>；machine learning 接管 vision、NLP 等子领域；agents 和 learning systems → <strong>“AI Spring”</strong></td>
+</tr>
+<tr>
+<td><strong>2000–</strong></td>
+<td>Where are we now?</td>
+<td>深度学习、大模型等（见第 3 节）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>记忆线索</strong>：神经元模型（1943）→ Turing（1950）→ 命名（1956 Dartmouth）→ 专家系统兴衰 / AI Winter（80 年代末）→ 统计方法 / ML（90 年代）→ 深度学习（2000 年后）。</p>
+<h2>3 · What Can AI Do?</h2>
+<h3>3.1 任务 → 需要的能力（简答题思路）</h3>
+<p>课件列出 AI 现在能做的事：打乒乓球、在城市街道安全驾驶、做外科手术、收碗叠衣服、实时把中文语音翻译成英文语音。</p>
+<p><strong>这些系统需要什么能力？</strong></p>
+<ul>
+<li><strong>Visual perception</strong>：detection、localization、tracking；2D / 3D 场景理解（物体、部件、深度、定位）</li>
+<li><strong>Control and planning</strong>：运动和路径规划、决策</li>
+<li>实时语音翻译还需要语音识别、机器翻译、语音合成</li>
+</ul>
+<blockquote>
+<p>答题套路：把任务拆成「感知（看 / 听）→ 理解 / 推理 → 规划 / 决策 → 执行」。</p>
+</blockquote>
+<h3>3.2 AI 的重要领域</h3>
+<ol>
+<li><strong>Visual understanding in 2D and 3D</strong></li>
+<li><strong>Natural Language Processing</strong></li>
+<li><strong>Vision-Language Modeling</strong></li>
+<li><strong>Decision and Reasoning</strong></li>
+</ol>
+<h3>3.3 Vision</h3>
+<ul>
+<li><strong>2D</strong>：object detection、image classification、semantic segmentation</li>
+<li><strong>3D</strong>：3D reconstruction、Visual SLAM、novel-view synthesis
+<ul>
+<li>例：Waymo 基于 <strong>NeRF</strong> 的大规模 3D 城市场景建模；场景重建与生成的结合</li>
+</ul>
+</li>
+<li><strong>Spatial reasoning</strong>：代表模型 GPT-4o、Gemini-2.5-pro、Qwen-3-VL</li>
+</ul>
+<h3>3.4 Natural Language Understanding</h3>
+<ul>
+<li><strong>Speech</strong>（例 Siri）：automatic speech recognition（<strong>ASR</strong>）、text-to-speech（<strong>TTS</strong>）、dialog systems</li>
+<li><strong>Language processing</strong>：question answering、machine translation、web search、text classification、spam filtering</li>
+<li>例：IBM Watson 在 Jeopardy! 上击败人类</li>
+</ul>
+<h3>3.5 Vision-Language Modeling：CLIP</h3>
+<ul>
+<li>OpenAI 发布并开源</li>
+<li>用 <strong>4 亿对 image-text pairs</strong> 训练（对比：ImageNet 只有 120 万张图）</li>
+<li><strong>Open-world understanding</strong>：ImageNet 模型只能认固定的 <strong>1000 类</strong>，CLIP 不受这个限制</li>
+</ul>
+<h3>3.6 Text-driven visual generation</h3>
+<ul>
+<li>Text-to-video（例：“Turtle swimming in the ocean”）</li>
+<li>Text-to-3D（例：Google 的 DreamFusion）</li>
+</ul>
+<h3>3.7 Robotics</h3>
+<ul>
+<li>一半机械工程、一半 AI；<strong>现实比仿真难得多</strong></li>
+<li>应用：自动驾驶、救援机器人、足球机器人、各种自动化</li>
+<li>这门课里涉及的是 <strong>planning and decision</strong> 的技术</li>
+</ul>
+<h3>3.8 AI 在学术界和工业界都很热</h3>
+<ul>
+<li>学术：CVPR、ICCV、ECCV、NeurIPS、ICLR 等顶会</li>
+<li>工业：大量公司投入 R&amp;D</li>
+</ul>
+<h2>4 · About the Course</h2>
+<h3>4.1 课程内容（六部分）</h3>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>主题</th>
+<th>具体内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I</td>
+<td><strong>Machine Learning</strong></td>
+<td>neural networks、deep learning 基础；generalization、cross-validation；unsupervised learning</td>
+</tr>
+<tr>
+<td>II</td>
+<td><strong>Problem-solving by Search</strong></td>
+<td>uninformed / informed search；constraint satisfaction problems</td>
+</tr>
+<tr>
+<td>III</td>
+<td><strong>Decision Process</strong></td>
+<td>Markov decision process；reinforcement learning</td>
+</tr>
+<tr>
+<td>IV</td>
+<td><strong>Reasoning under Uncertainty</strong></td>
+<td>uncertainty representation、Bayes inference</td>
+</tr>
+<tr>
+<td>V</td>
+<td><strong>Logic Reasoning</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>VI</td>
+<td><strong>AI Applications</strong></td>
+<td>vision、NLP、visual-language modeling、robotic location 等</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 先修与目标</h3>
+<ul>
+<li><strong>没有严格先修</strong>。有 CS 基础（如 COMP1021）更好；COMP2211 列为先修但可以申请 waiver。</li>
+<li>作业用 <strong>Python</strong>，需要 OOP 和数据结构基础（如 COMP2012）。</li>
+<li>课程目标：掌握 AI 基本概念和技术（ML、搜索、决策过程、不确定性下的概率推理、应用）；能用它们解决实际问题；了解前沿研究（UROP、COMP4971）。</li>
+</ul>
+<h3>4.3 上课与考试</h3>
+<ul>
+<li>周三、周五 15:00–16:20，<strong>不点名</strong></li>
+<li><strong>Midterm</strong>：约 100 分钟（slides 写的）；时间 <strong>10/28 19:00–22:00</strong>，<strong>closed-book、closed-notes</strong></li>
+<li><strong>Final</strong>：3 小时，时间待公布；同样闭卷</li>
+<li>考试内容就是课上讲的内容</li>
+</ul>
+<h3>4.4 评分与规则</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3 个 individual assignments</td>
+<td>20%</td>
+</tr>
+<tr>
+<td>Midterm</td>
+<td>25%</td>
+</tr>
+<tr>
+<td>Final</td>
+<td>55%</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>总分 100 排名后给 letter grade；按学校指引，老师会尽量扩大 A、B 的比例。</li>
+<li><strong>迟交</strong>：每迟一天扣 <strong>10%</strong>；每份作业最多延 <strong>3 天</strong>，所有作业合计最多 <strong>7 天</strong>；真需要延期要提前说、有正当理由才批。</li>
+<li><strong>Academic integrity</strong>：作业必须自己做；发现高度相似的提交，<strong>所有人都 0 分</strong>。</li>
+</ul>
+<h3>4.5 Tutorial</h3>
+<ul>
+<li>每周五 14:00–14:50，Rm 2407（lift 17–18）</li>
+<li>答疑：给老师或 TA 发邮件约时间</li>
+</ul>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI 的四种定义</td>
+<td>think / act × like people / rationally，各举一个特征</td>
+</tr>
+<tr>
+<td>Turing Test</td>
+<td>人类审问者；需要的四种能力（NLU、reasoning、learning、perception &amp; manipulation）</td>
+</tr>
+<tr>
+<td>Act rationally</td>
+<td>agent 为预定目标选最好结果</td>
+</tr>
+<tr>
+<td>发展史</td>
+<td>1943 McCulloch &amp; Pitts、1950 Turing、1956 Dartmouth、80 年代末 AI Winter、90 年代统计方法</td>
+</tr>
+<tr>
+<td>任务 → 能力</td>
+<td>感知、规划 / 决策等，会举例</td>
+</tr>
+<tr>
+<td>CLIP</td>
+<td>4 亿 image-text pairs、open-world，不限于 1000 类</td>
+</tr>
+</tbody>
+</table>
