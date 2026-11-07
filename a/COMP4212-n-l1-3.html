@@ -1,0 +1,705 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>层层加东西：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><munder><munder><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒫</mi><mo stretchy="false">⟩</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>Markov Process</mtext></munder><mtext>  </mtext><mo>→</mo><mtext>  </mtext><munder><munder><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>Markov Reward Process</mtext></munder><mtext>  </mtext><mo>→</mo><mtext>  </mtext><munder><munder><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒜</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>Markov Decision Process</mtext></munder></mrow></math></div><ol>
+<li><strong>Markov Processes</strong>：Markov property、转移矩阵、Student Markov chain、episodic vs continuing</li>
+<li><strong>Markov Reward Processes</strong>：return、discount、value function、<strong>Bellman equation</strong>（含矩阵形式和闭式解）</li>
+<li><strong>Markov Decision Processes</strong>：policy、MDP → MRP、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math>、<strong>Bellman expectation equation</strong></li>
+<li><strong>Optimal policies &amp; optimal value functions</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math>、最优 policy 的存在和求法、<strong>Bellman optimality equation</strong></li>
+</ol>
+<blockquote>
+<p>必考：<strong>Bellman expectation / optimality equation 四个式子</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>↔<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 的互相表示）；从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> 求最优 policy（后者需要 dynamics）；<strong>手算一个 state 的 value</strong>（课件 4.3、7.4、Gridworld 4.43、24.4、22.0）；sample return 的计算；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mo stretchy="false">(</mo><mi>I</mi><mo>−</mo><mi>γ</mi><mi>P</mi><msup><mo stretchy="false">)</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>r</mi></mrow></math> 及复杂度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>N</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow></math>；deterministic policy 个数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><msup><mo stretchy="false">∣</mo><mrow><mo stretchy="false">∣</mo><mi>𝒮</mi><mo stretchy="false">∣</mo></mrow></msup></mrow></math>。</p>
+</blockquote>
+<h2>1 · Markov Processes</h2>
+<h3>1.1 Markov property</h3>
+<blockquote>
+<p><strong>Definition.</strong> A state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow></math> is <strong>Markov</strong> iff <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></p>
+</blockquote>
+<ul>
+<li>state 包含 history 中所有相关信息；知道 state 后，history 可以丢掉</li>
+<li>state 是未来的 sufficient statistic</li>
+</ul>
+<h3>1.2 Markov process 与转移矩阵</h3>
+<p><strong>Markov process</strong> 是 <strong>memoryless</strong> 的随机过程：一串满足 Markov property 的随机 state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo></mrow></math></p>
+<blockquote>
+<p><strong>Definition.</strong> A <strong>Markov Process（Markov Chain）</strong> is a tuple <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒫</mi><mo stretchy="false">⟩</mo></mrow></math>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒮</mi></mrow></math>：（有限）state 集合</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒫</mi></mrow></math>：<strong>state transition probability matrix</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒫</mi><mrow><mi>s</mi><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</blockquote>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>𝒫</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo>∣</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>2</mn></msub><mo>∣</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo lspace="0em" rspace="0em">⋯</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>N</mi></msub><mo>∣</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo>∣</mo><msub><mi>s</mi><mi>N</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo lspace="0em" rspace="0em">⋯</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo lspace="0em" rspace="0em">⋯</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>N</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>N</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><p><strong>第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> 行 = 从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>i</mi></msub></mrow></math> 出发的分布</strong>，所以<strong>每一行加起来是 1</strong>。</p>
+<h3>1.3 例：Student Markov Chain</h3>
+<table>
+<thead>
+<tr>
+<th>from \ to</th>
+<th>C1</th>
+<th>C2</th>
+<th>C3</th>
+<th>Pass</th>
+<th>Pub</th>
+<th>FB</th>
+<th>Sleep</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td></td>
+<td>0.5</td>
+<td></td>
+<td></td>
+<td></td>
+<td>0.5</td>
+<td></td>
+</tr>
+<tr>
+<td>C2</td>
+<td></td>
+<td></td>
+<td>0.8</td>
+<td></td>
+<td></td>
+<td></td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>C3</td>
+<td></td>
+<td></td>
+<td></td>
+<td>0.6</td>
+<td>0.4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pass</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>Pub</td>
+<td>0.2</td>
+<td>0.4</td>
+<td>0.4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FB</td>
+<td>0.1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>0.9</td>
+<td></td>
+</tr>
+<tr>
+<td>Sleep</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>每行和为 1；<strong>Sleep 是 terminal（absorbing）state</strong>（进去就出不来）</li>
+</ul>
+<p><strong>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>=</mo><mtext>C1</mtext></mrow></math> 开始的 sample episodes</strong>：</p>
+<ul>
+<li>C1 C2 C3 Pass Sleep</li>
+<li>C1 FB FB C1 C2 Sleep</li>
+<li>C1 C2 C3 Pub C2 C3 Pass Sleep</li>
+<li>C1 FB FB C1 C2 C3 Pub C1 FB FB FB C1 C2 C3 Pub C2 Sleep</li>
+</ul>
+<h3>1.4 Episodic vs Continuing tasks</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Episodic</th>
+<th>Continuing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>含义</td>
+<td>交互自然地分成一段段 <strong>episode</strong>（结束时评判 reward）</td>
+<td>没有自然的 episode，一直进行下去（就像现实生活）</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>一局游戏、走一趟迷宫</td>
+<td></td>
+</tr>
+<tr>
+<td>Return</td>
+<td>一般用简单总和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>r</mi><mi>T</mi></msub></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> = 到达 terminal 的时刻）</td>
+<td>一般用 discounted 总和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></msubsup><msup><mi>γ</mi><mi>k</mi></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>k</mi></mrow></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>2 · Markov Reward Processes</h2>
+<h3>2.1 定义</h3>
+<p><strong>MRP = Markov chain + values（rewards）</strong></p>
+<blockquote>
+<p><strong>Definition.</strong> A <strong>Markov Reward Process</strong> is a tuple <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow></math>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒮</mi></mrow></math>：（有限）state 集合</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒫</mi></mrow></math>：转移矩阵，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝒫</mi><mrow><mi>s</mi><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></msub><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>：<strong>reward function</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math>：<strong>discount factor</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+</blockquote>
+<p><strong>Student MRP 的 reward</strong>：C1 = C2 = C3 = −2，Pass = +10，Pub = +1，FB = −1，Sleep = 0。</p>
+<h3>2.2 Horizon 与 Return</h3>
+<ul>
+<li><strong>Horizon</strong>：每个 episode 最多多少步；可以无穷，否则叫 finite Markov (reward) process</li>
+</ul>
+<blockquote>
+<p><strong>Definition.</strong> The <strong>return</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math> is the total discounted reward from time step <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>G</mi><mi>t</mi></msub><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msup><mi>γ</mi><mi>k</mi></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>k</mi></mrow></msub></mrow></math></div></p>
+</blockquote>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> 是未来 reward 的「<strong>现值</strong>」：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 步之后收到的 reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math> 只值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>γ</mi><mi>k</mi></msup><mi>r</mi></mrow></math></li>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>→</mo><mn>0</mn></mrow></math>：myopic</strong>（短视）评价；<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>→</mo><mn>1</mn></mrow></math>：far-sighted</strong>（远见）评价</li>
+</ul>
+<h3>2.3 为什么要 discount</h3>
+<ul>
+<li>避免<strong>有环</strong>的 Markov process 中 return 无穷大</li>
+<li>如果所有序列都会终止，也可以用 undiscounted（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>）</li>
+<li>数学上方便</li>
+<li>对未来的不确定性可能没有被完全表示出来（打折是一种保守）</li>
+</ul>
+<h3>2.4 Value function</h3>
+<blockquote>
+<p><strong>Definition.</strong> The <strong>state value function</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> of an MRP is the <strong>expected return</strong> starting from state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></math></div></p>
+</blockquote>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math> 是一条具体路径的回报（随机变量）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 是它的期望（一个数）</li>
+</ul>
+<h3>2.5 Sample returns（计算题）</h3>
+<p>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>=</mo><mtext>C1</mtext></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>（每个 state 的 reward 乘以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>γ</mi><mi>k</mi></msup></mrow></math>）：</p>
+<table>
+<thead>
+<tr>
+<th>Episode</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mn>1</mn></msub></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1 C2 C3 Pass Sleep</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mn>10</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>8</mn></mfrac><mo>=</mo><mo>−</mo><mn>2.25</mn></mrow></math></td>
+</tr>
+<tr>
+<td>C1 FB FB C1 C2 Sleep</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn><mo>−</mo><mn>1</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>−</mo><mn>1</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>8</mn></mfrac><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>16</mn></mfrac><mo>=</mo><mo>−</mo><mn>3.125</mn></mrow></math></td>
+</tr>
+<tr>
+<td>C1 C2 C3 Pub C2 C3 Pass Sleep</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>2</mn><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mn>1</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>8</mn></mfrac><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>16</mn></mfrac><mo>−</mo><mn>2</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>32</mn></mfrac><mo>+</mo><mn>10</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>64</mn></mfrac><mo>=</mo><mo>−</mo><mn>3.41</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>2.6 Student MRP 的 value function</h3>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math></th>
+<th>C1</th>
+<th>C2</th>
+<th>C3</th>
+<th>Pass</th>
+<th>Pub</th>
+<th>FB</th>
+<th>Sleep</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>−2</td>
+<td>−2</td>
+<td>−2</td>
+<td>10</td>
+<td>1</td>
+<td>−1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0.9</td>
+<td>−5.0</td>
+<td>0.9</td>
+<td>4.1</td>
+<td>10</td>
+<td>1.9</td>
+<td>−7.6</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>−13</td>
+<td>1.5</td>
+<td>4.3</td>
+<td>10</td>
+<td>0.8</td>
+<td>−23</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>（只看眼前）</li>
+<li>（我用迭代验算：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math> 时 C1 = −12.54、FB = −22.54，课件四舍五入为 −13、−23）</li>
+</ul>
+<h3>2.7 Bellman equation for MRP（核心推导）</h3>
+<p>value function 可以分成两部分：<strong>immediate reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub></mrow></math></strong> + <strong>后继 state 的 discounted value <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mo stretchy="false">(</mo><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mtext> </mtext><mo stretchy="false">)</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>G</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（最后一步：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>G</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">]</mo><mo>=</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math>，再用全期望公式。）</p>
+<p><strong>Backup diagram 形式</strong>（从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 往下看一步）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><munder><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>immediate reward</mtext></munder><mo>+</mo><munder><munder><mrow><mi>γ</mi><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>discounted sum of future reward</mtext></munder></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>例</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>）：C3 的 value</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mn>4.3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><munder><mrow><mo>−</mo><mn>2</mn></mrow><mo stretchy="true">⏟</mo></munder><mrow><mi>r</mi><mo stretchy="false">(</mo><mtext>C3</mtext><mo stretchy="false">)</mo></mrow></munder><mo>+</mo><mn>0.6</mn><mo>⋅</mo><munder><munder><mn>10</mn><mo stretchy="true">⏟</mo></munder><mrow><mi>V</mi><mo stretchy="false">(</mo><mtext>Pass</mtext><mo stretchy="false">)</mo></mrow></munder></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mn>0.4</mn><mo>⋅</mo><munder><munder><mn>0.8</mn><mo stretchy="true">⏟</mo></munder><mrow><mi>V</mi><mo stretchy="false">(</mo><mtext>Pub</mtext><mo stretchy="false">)</mo></mrow></munder></mrow></mstyle></mtd></mtr></mtable></math></div><h3>2.8 矩阵形式与闭式解</h3>
+<p><strong>Q：能不能一次把所有 value 都算出来？</strong> 把每个 state 的 Bellman equation 摞起来：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>N</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>r</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>r</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>N</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>+</mo><mi>γ</mi><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo>∣</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo lspace="0em" rspace="0em">⋯</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>N</mi></msub><mo>∣</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo>∣</mo><msub><mi>s</mi><mi>N</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo lspace="0em" rspace="0em">⋯</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>N</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>N</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>N</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>V</mi><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mi>𝒫</mi><mi>V</mi></mrow></math></div><p><strong>线性方程</strong>，直接解：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>V</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mi>𝒫</mi><mi>V</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mi>I</mi><mo>−</mo><mi>γ</mi><mi>𝒫</mi><mo stretchy="false">)</mo><mi>V</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>V</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mi>I</mi><mo>−</mo><mi>γ</mi><mi>𝒫</mi><msup><mo stretchy="false">)</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>r</mi></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>计算复杂度 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>N</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow></math></strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 个 state，矩阵求逆）</li>
+<li><strong>只适用于小的 MRP</strong></li>
+<li>大 MRP 用迭代方法：<strong>dynamic programming、Monte-Carlo evaluation、temporal-difference learning</strong>（1.4、2.1）</li>
+</ul>
+<h2>3 · Markov Decision Processes</h2>
+<h3>3.1 定义</h3>
+<p><strong>MDP = MRP + decisions（actions）</strong>；所有 state 都是 Markov 的环境。</p>
+<blockquote>
+<p><strong>Definition.</strong> A <strong>Markov Decision Process</strong> is a tuple <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒜</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow></math>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒮</mi></mrow></math>：（有限）state 集合</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒜</mi></mrow></math>：（有限）<strong>action</strong> 集合</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒫</mi></mrow></math>：转移概率，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>𝒫</mi><mrow><mi>s</mi><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><mi>a</mi></msubsup><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>：reward function，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+</blockquote>
+<p><strong>和 MRP 的区别</strong>：转移和 reward 都多了一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>。</p>
+<p><strong>Alternative definition</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒜</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow></math>，其中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒫</mi></mrow></math> 是 reward 和下一 state 的<strong>联合</strong>概率：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>𝒫</mi><mo stretchy="false">(</mo><mi>r</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msub><mi>r</mi><mi>t</mi></msub><mo>=</mo><mi>r</mi><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒫</mi></mrow></math> 定义了问题的 <strong>dynamics</strong></li>
+<li>两种定义等价（没有额外假设）：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>r</mi></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>r</mi><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>r</mi></munder><mi>r</mi><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>r</mi><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><h3>3.2 例：Student MDP</h3>
+<table>
+<thead>
+<tr>
+<th>state</th>
+<th>action</th>
+<th>reward</th>
+<th>去哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>Facebook</td>
+<td>−1</td>
+<td>FB</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>Study</td>
+<td>−2</td>
+<td>C2</td>
+</tr>
+<tr>
+<td>FB</td>
+<td>Facebook</td>
+<td>−1</td>
+<td>FB</td>
+</tr>
+<tr>
+<td>FB</td>
+<td>Quit</td>
+<td>0</td>
+<td>C1</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Sleep</td>
+<td>0</td>
+<td>Sleep（terminal）</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Study</td>
+<td>−2</td>
+<td>C3</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Study</td>
+<td>+10</td>
+<td>Sleep</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Pub</td>
+<td>+1</td>
+<td>0.2 → C1，0.4 → C2，0.4 → C3（<strong>随机</strong>）</td>
+</tr>
+</tbody>
+</table>
+<p>（只有 Pub 是随机转移，其余确定。）</p>
+<h3>3.3 Policy</h3>
+<blockquote>
+<p><strong>Definition.</strong> A <strong>policy</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> is a distribution over actions given states：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></div></p>
+</blockquote>
+<ul>
+<li>policy <strong>完全定义</strong>了 agent 的行为（每个 state 采取什么 action）</li>
+<li>MDP 的 policy <strong>只依赖当前 state</strong>（不依赖 history）——因为 state 是 Markov 的</li>
+<li>policy 是 <strong>stationary</strong>（与时间无关）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo>∼</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 对任意 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>&gt;</mo><mn>0</mn></mrow></math></li>
+<li>特例：<strong>deterministic policy</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> = 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 以概率 1 采取的 action</li>
+</ul>
+<h3>3.4 给定 policy：MDP → MP → MRP</h3>
+<p>给定 MDP <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒜</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow></math> 和 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>：</p>
+<ul>
+<li><strong>MDP → MP</strong>：state 序列 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo></mrow></math> 是 Markov process <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><msup><mi>𝒫</mi><mi>π</mi></msup><mo stretchy="false">⟩</mo></mrow></math></li>
+<li><strong>MDP → MRP</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo></mrow></math> 是 MRP <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><msup><mi>𝒫</mi><mi>π</mi></msup><mo separator="true">,</mo><msup><mi>r</mi><mi>π</mi></msup><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow></math>，其中</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>p</mi><mi>π</mi></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>r</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>直觉</strong>：policy 固定后，「选 action」这一步被平均掉了，剩下的就是一个 MRP——所以 MRP 的所有工具（Bellman equation、闭式解）都能用来<strong>评估 policy</strong>。</p>
+<h3>3.5 两个 value function</h3>
+<blockquote>
+<p><strong>State-value function</strong>：从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 出发、按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 行动的期望 return
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></math></div></p>
+</blockquote>
+<blockquote>
+<p><strong>Action-value function</strong>：从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 出发、<strong>先做 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math></strong>、之后按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 行动的期望 return
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math></div></p>
+</blockquote>
+<ul>
+<li>value function 体现了 agent 关于「每个 state 对目标有多好」的<strong>知识</strong>（Horde, AAMAS 2011：knowledge 可表示为并行学习的大量近似 value function）</li>
+</ul>
+<p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 与 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 的关系（必背）</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mtext> </mtext><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（站在 state 上：按 policy 对各 action 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 加权平均）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒮</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mtext> </mtext><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（做了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 之后：拿到即时 reward，再按转移概率对下一 state 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 加权平均、打折）</p>
+<h3>3.6 Bellman Expectation Equation</h3>
+<p><strong>期望形式</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>展开形式</strong>（把 3.5 的两式互相代入）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒮</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒮</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><munder><mo>∑</mo><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>π</mi><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Backup diagram</strong>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>（空心圆）→ 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 分到各个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>（实心点）→ 每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 分到各个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> → 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> → 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+</ul>
+<blockquote>
+<p><strong>Theorem.</strong> 对任意 MDP 和任意 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>，value functions 满足上面的 expectation equations。</p>
+</blockquote>
+<h3>3.7 例：Student MDP，uniform random policy（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>）</h3>
+<p>每个 state 两个 action 各 0.5。结果：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>：C1 = −1.3，C2 = 2.7，C3 = 7.4，FB = −2.3，Sleep = 0。</p>
+<p>验证 C3：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mtext>C3</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.5</mn><mo>⋅</mo><munder><munder><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mn>0.2</mn><mo>⋅</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1.3</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.4</mn><mo>⋅</mo><mn>2.7</mn><mo>+</mo><mn>0.4</mn><mo>⋅</mo><mn>7.4</mn><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>Pub</mtext></munder><mo>+</mo><mn>0.5</mn><mo>⋅</mo><munder><munder><mn>10</mn><mo stretchy="true">⏟</mo></munder><mtext>Study</mtext></munder></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mn>4.78</mn><mo>+</mo><mn>5</mn><mo>≈</mo><mn>7.4</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p>⚠️ 课件这一行印成「<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.4</mn><mo>∗</mo><mn>2.7</mn><mo>∗</mo><mn>7.4</mn></mrow></math>」，中间应为 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>0.4</mn><mo>∗</mo><mn>7.4</mn></mrow></math></strong>（第三个分支是以 0.4 留在 C3）。</p>
+<h3>3.8 矩阵形式</h3>
+<p>用 induced MRP：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo>=</mo><msup><mi>r</mi><mi>π</mi></msup><mo>+</mo><mi>γ</mi><msup><mi>𝒫</mi><mi>π</mi></msup><msub><mi>V</mi><mi>π</mi></msub><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><msub><mi>V</mi><mi>π</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mi>I</mi><mo>−</mo><mi>γ</mi><msup><mi>𝒫</mi><mi>π</mi></msup><msup><mo stretchy="false">)</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>r</mi><mi>π</mi></msup></mrow></math></div><h2>4 · Optimal Policies 与 Optimal Value Functions</h2>
+<h3>4.1 定义</h3>
+<blockquote>
+<ul>
+<li><strong>Optimal state-value function</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>π</mi></msub><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Optimal action-value function</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>π</mi></msub><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</blockquote>
+<ul>
+<li>optimal value function 给出 MDP 中<strong>可能达到的最好表现</strong></li>
+<li><strong>知道了 optimal value function，MDP 就「solved」了</strong></li>
+</ul>
+<p><strong>Student MDP（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>C1</th>
+<th>C2</th>
+<th>C3</th>
+<th>FB</th>
+<th>Sleep</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math></td>
+<td>6</td>
+<td>8</td>
+<td>10</td>
+<td>6</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math></th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1, Facebook</td>
+<td>5</td>
+</tr>
+<tr>
+<td>C1, Study</td>
+<td>6</td>
+</tr>
+<tr>
+<td>FB, Facebook</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FB, Quit</td>
+<td>6</td>
+</tr>
+<tr>
+<td>C2, Sleep</td>
+<td>0</td>
+</tr>
+<tr>
+<td>C2, Study</td>
+<td>8</td>
+</tr>
+<tr>
+<td>C3, Study</td>
+<td>10</td>
+</tr>
+<tr>
+<td>C3, Pub</td>
+<td>9.4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Q：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> 的关系？</strong> —— <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>（每个 state 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> 就是该 state 最大的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math>）。</p>
+<p>验算 C3, Pub：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mn>0.2</mn><mo>⋅</mo><mn>6</mn><mo>+</mo><mn>0.4</mn><mo>⋅</mo><mn>8</mn><mo>+</mo><mn>0.4</mn><mo>⋅</mo><mn>10</mn><mo>=</mo><mn>1</mn><mo>+</mo><mn>1.2</mn><mo>+</mo><mn>3.2</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>9.4</mn></mrow></math> ✓</p>
+<h3>4.2 Optimal policy</h3>
+<p><strong>Policy 的偏序</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>π</mi><mo>≥</mo><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mspace width="1em"/><mtext>if </mtext><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>≥</mo><msub><mi>V</mi><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal">∀</mi><mi>s</mi></mrow></math></div><blockquote>
+<p><strong>Corollaries.</strong> 对任意 MDP：</p>
+<ul>
+<li><strong>存在至少一个</strong> optimal policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo>∗</mo></msup></mrow></math>，比所有其他 policy 好或一样好：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo>∗</mo></msup><mo>≥</mo><mi>π</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>π</mi></mrow></math></li>
+<li>也就是说，<strong>optimal policy 可能有多个</strong></li>
+<li>所有 optimal policy 都达到 optimal value function：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><msup><mi>π</mi><mo>∗</mo></msup></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>所有 optimal policy 都达到 optimal action-value function：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><msup><mi>π</mi><mo>∗</mo></msup></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</blockquote>
+<p><strong>注意</strong>：偏序要求<strong>每个</strong> state 都不差，所以一般两个 policy 可能比不出大小；但上面的结论保证存在一个对所有 state 同时最好的 policy。</p>
+<h3>4.3 怎样找 optimal policy</h3>
+<p><strong>已知 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math></strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>π</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>if </mtext><mi>a</mi><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></msub><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>otherwise</mtext></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><ul>
+<li><strong>任何 MDP 都存在 deterministic optimal policy</strong></li>
+<li>知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math> 就直接有 optimal policy，<strong>不需要 dynamics</strong>！</li>
+<li>若多个 action 都使 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow></math> 最大，任选（也可以随机选）</li>
+</ul>
+<p><strong>已知 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math></strong>：要用 model dynamics 做 <strong>one step look ahead</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>π</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>if </mtext><mi>a</mi><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></msub><msub><mo>∑</mo><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>r</mi></mrow></msub><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>r</mi><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>r</mi><mo>+</mo><mi>γ</mi><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>otherwise</mtext></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><ul>
+<li>只知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> 时，<strong>需要 dynamics</strong> 才能选出最优 action</li>
+</ul>
+<p><strong>为什么有这个区别？</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 已经把「做 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 之后会怎样」算进去了；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> 只告诉你每个 state 有多好，要知道每个 action 会把你带到哪些 state（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>），才能比较 action。→ 这也是为什么 <strong>model-free control 学的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 而不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math></strong>（2.2）。</p>
+<p><strong>Student MDP 的 optimal policy</strong>：C1 → Study，FB → Quit，C2 → Study，C3 → Study。</p>
+<h3>4.4 Policy search</h3>
+<ul>
+<li>一种办法是<strong>枚举</strong>所有 policy</li>
+<li><strong>Deterministic policy 的个数是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><msup><mo stretchy="false">∣</mo><mrow><mo stretchy="false">∣</mo><mi>𝒮</mi><mo stretchy="false">∣</mo></mrow></msup></mrow></math></strong>（每个 state 独立选一个 action）</li>
+<li>policy iteration、value iteration 更高效（1.4）</li>
+</ul>
+<h3>4.5 Prediction vs Control</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>State values</th>
+<th>Action values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Prediction</strong>（policy evaluation）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Control</strong>（policy optimization）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Problem 1：Prediction</strong> —— 给定 policy，期望 return 是多少？</li>
+<li><strong>Problem 2：Control</strong> —— 最好的行为方式是什么？optimal value function 是什么？</li>
+</ul>
+<h3>4.6 Bellman Optimality Equations</h3>
+<p><strong>回顾 expectation equation</strong>（对任意 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>）：见 3.6。</p>
+<blockquote>
+<p><strong>Theorem.</strong> 对 MDP <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>𝒮</mi><mo separator="true">,</mo><mi>𝒜</mi><mo separator="true">,</mo><mi>𝒫</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow></math>，optimal value functions 满足：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒮</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></math></div>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒮</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒜</mi></mrow></munder><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div></p>
+</blockquote>
+<p><strong>直觉理解</strong>：optimal policy 是对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math> 取 argmax 的 deterministic policy。把它代入 Bellman <strong>expectation</strong> equation，「按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo>∗</mo></msup></mrow></math> 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 加权平均」就变成「取 max」：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><munder><mo>∑</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><msup><mi>π</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒜</mi></mrow></munder><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>两个关系式</strong>（和 3.5 对应，平均换成 max）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Expectation vs Optimality 对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Expectation（给定 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>）</th>
+<th>Optimality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mi>a</mi></msub><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>+</mo><mi>γ</mi><msub><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>p</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>+</mo><mi>γ</mi><msub><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>p</mi><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>方程类型</td>
+<td><strong>线性</strong>（可直接解）</td>
+<td><strong>非线性</strong>（有 max，一般没有闭式解，要迭代）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例</strong>（Student MDP，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>，C1）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mtext>C1</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo>−</mo><mn>2</mn><mo>+</mo><mn>8</mn><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mn>1</mn><mo>+</mo><mn>6</mn><mo stretchy="false">}</mo></mrow></math>（Study 到 C2，Facebook 到 FB）。</p>
+<h3>4.7 例：Gridworld（Sutton &amp; Barto Ch 3，p.60）</h3>
+<ul>
+<li>5×5 网格，actions：north、south、east、west</li>
+<li>走出网格：<strong>不动，reward −1</strong></li>
+<li>其他 action reward 0；<strong>除了</strong>从特殊 state A 和 B 出去的：A 的任何 action → 到 A′，reward <strong>+10</strong>；B → B′，reward <strong>+5</strong></li>
+</ul>
+<p><strong>Equiprobable random policy（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.9</mn></mrow></math>）</strong>，某个格子（上、下、左、右邻居的 value 为 5.3、2.3、8.8，以及往边外走）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mn>4.43</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.25</mn><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>0</mn><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>5.3</mn><mo>+</mo><mn>0</mn><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>2.3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="2em"/><mo>+</mo><mn>0</mn><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>8.8</mn><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>4.4</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（最后一项：走出网格，reward −1，留在原地，value 4.4。）</p>
+<p><strong>Optimal policy（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.9</mn></mrow></math>）</strong>：</p>
+<ul>
+<li>A 格：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>24.4</mn><mo>=</mo><mn>10</mn><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>16.0</mn></mrow></math>（任何 action 都跳到 A′，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mn>16.0</mn></mrow></math>）</li>
+<li>另一格：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>22.0</mn><mo>=</mo><mi>max</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0</mn><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>19.4</mn><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>19.8</mn><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0</mn><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>24.4</mn><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.9</mn><mo>⋅</mo><mn>22</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>四项分别是 17.46、17.82、<strong>21.96</strong>、18.8，最大的 ≈ 22.0（走向 A 那个方向）。</p>
+<blockquote>
+<p>手算套路：<strong>每个 action 的值 = 即时 reward + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>×</mo></mrow></math> 到达 state 的 value</strong>；expectation 按 policy 概率<strong>平均</strong>，optimality 取 <strong>max</strong>。</p>
+</blockquote>
+<p><strong>Extra reading</strong>：Sutton &amp; Barto Ch 3。</p>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MP / MRP / MDP</td>
+<td>三个 tuple 分别是什么，逐层加了什么</td>
+</tr>
+<tr>
+<td>转移矩阵</td>
+<td>行和为 1；absorbing state</td>
+</tr>
+<tr>
+<td>Episodic vs continuing</td>
+<td>定义；对应的 return</td>
+</tr>
+<tr>
+<td>Return</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math> 定义；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math> 的意义（myopic / far-sighted）</td>
+</tr>
+<tr>
+<td>为什么 discount</td>
+<td>四条</td>
+</tr>
+<tr>
+<td>Sample return</td>
+<td>课件三条 episode 的计算</td>
+</tr>
+<tr>
+<td>Bellman eq（MRP）</td>
+<td>推导；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><mo>∑</mo><mi>p</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>；4.3 的例子</td>
+</tr>
+<tr>
+<td>矩阵形式</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mo stretchy="false">(</mo><mi>I</mi><mo>−</mo><mi>γ</mi><mi>𝒫</mi><msup><mo stretchy="false">)</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>r</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>N</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow></math>；大问题用 DP / MC / TD</td>
+</tr>
+<tr>
+<td>MDP 定义</td>
+<td>两种等价定义</td>
+</tr>
+<tr>
+<td>Policy</td>
+<td>定义；只依赖当前 state；stationary；deterministic</td>
+</tr>
+<tr>
+<td>MDP → MRP</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>p</mi><mi>π</mi></msup></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>r</mi><mi>π</mi></msup></mrow></math> 公式</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math></td>
+<td>定义；两个互相表示的式子</td>
+</tr>
+<tr>
+<td>Bellman expectation</td>
+<td>期望形式 + 展开形式；backup diagram；7.4 的例子</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math></td>
+<td>定义；Student MDP 的值</td>
+</tr>
+<tr>
+<td>Optimal policy</td>
+<td>偏序；存在性；可能多个；deterministic</td>
+</tr>
+<tr>
+<td>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> 求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo>∗</mo></msup></mrow></math></td>
+<td>前者不需要 dynamics，后者需要 one-step lookahead</td>
+</tr>
+<tr>
+<td>Policy 个数</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><msup><mo stretchy="false">∣</mo><mrow><mo stretchy="false">∣</mo><mi>𝒮</mi><mo stretchy="false">∣</mo></mrow></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Prediction vs control</td>
+<td>2×2 表</td>
+</tr>
+<tr>
+<td>Bellman optimality</td>
+<td>两个式子；由 expectation 推出；线性 vs 非线性</td>
+</tr>
+<tr>
+<td>Gridworld</td>
+<td>4.43、24.4、22.0 的计算</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 易错点</h2>
+<ul>
+<li>MRP 的 reward 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>，MDP 的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo>=</mo><msub><mo>∑</mo><mi>a</mi></msub><mi>π</mi><msub><mi>Q</mi><mi>π</mi></msub></mrow></math>（加权平均）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math>（取最大）——不要混。</li>
+<li>Bellman <strong>expectation</strong> equation 是线性的，可以矩阵求逆；<strong>optimality</strong> equation 有 max，不是线性的。</li>
+<li>只知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> 不能直接得到 policy（要 dynamics）；知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math> 可以。</li>
+<li>Deterministic policy 个数是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><msup><mo stretchy="false">∣</mo><mrow><mo stretchy="false">∣</mo><mi>𝒮</mi><mo stretchy="false">∣</mo></mrow></msup></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>𝒮</mi><msup><mo stretchy="false">∣</mo><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></msup></mrow></math>。</li>
+<li>Sample return 里第一个 reward 不打折（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>γ</mi><mn>0</mn></msup><mo>=</mo><mn>1</mn></mrow></math>）。</li>
+<li>Gridworld 走出边界：reward −1 且<strong>留在原地</strong>，所以那一项用的是<strong>自己</strong>的 value。</li>
+</ul>

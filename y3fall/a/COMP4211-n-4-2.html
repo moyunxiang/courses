@@ -1,0 +1,277 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Model</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo>=</mo><mtext>step</mtext><mo stretchy="false">(</mo><msub><mo>∑</mo><mi>j</mi></msub><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub><mo>−</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow></math>；bias 技巧 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mi>θ</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math></li>
+<li><strong>Representation power</strong>：AND、OR、NOT 可以；<strong>XOR 不行</strong>；单个 perceptron 能表示 ⟺ <strong>linearly separable</strong>；多层可以表示任意 Boolean function（DNF / CNF）</li>
+<li><strong>How to learn</strong>：perceptron learning rule <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>j</mi></msub><mo>←</mo><msub><mi>w</mi><mi>j</mi></msub><mo>+</mo><mi>α</mi><msub><mi>I</mi><mi>j</mi></msub><mo stretchy="false">(</mo><mi>T</mi><mo>−</mo><mi>O</mi><mo stretchy="false">)</mo></mrow></math>；<strong>课件 12 步 trace</strong>；几何解释；<strong>perceptron convergence theorem</strong></li>
+</ol>
+<blockquote>
+<p>必会计算：<strong>手跑 perceptron learning trace</strong>（课件例，最终 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math>）；给 AND / OR / NOT 设计权重和阈值；画 decision boundary（课件解的边界斜率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow></math>、截距 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></math>）。必会概念：为什么 XOR 不能用单个 perceptron；convergence theorem 的条件。</p>
+</blockquote>
+<h2>1 · Perceptron 是什么</h2>
+<blockquote>
+<p>一个 <strong>feed-forward</strong> 网络，只有<strong>一层可调（可学习）权重</strong>，连接到一个或多个 <strong>threshold units</strong>（作为 output units）。</p>
+</blockquote>
+<ul>
+<li>Frank <strong>Rosenblatt</strong> 1957 提出；Marvin <strong>Minsky</strong> &amp; Seymour <strong>Papert</strong> 1969 出版 <em>Perceptrons</em>（指出其局限）</li>
+<li>Perceptron network：多个输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>O</mi><mi>i</mi></msub></mrow></math>，权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>j</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub></mrow></math>；single perceptron：一个输出</li>
+</ul>
+<h2>2 · Model</h2>
+<ul>
+<li>输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>I</mi><mi>n</mi></msub></mrow></math>：来自其他神经元的信号</li>
+<li>权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>w</mi><mi>n</mi></msub></mrow></math>：<strong>可以是负的</strong></li>
+<li><strong>Activation function</strong>：把输入和输出联系起来</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>O</mi><mo>=</mo><mtext>step</mtext><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub><mo>−</mo><mi>θ</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo separator="true">,</mo><mspace width="2em"/><mtext>step</mtext><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>x</mi><mo>&lt;</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p><strong>Bias 技巧</strong>：令 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mi>θ</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>O</mi><mo>=</mo><mtext>step</mtext><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>Decision boundary</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></msubsup><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub><mo>=</mo><mn>0</mn></mrow></math>（一个超平面）。</p>
+<h2>3 · 能表示哪些 Boolean function</h2>
+<p>课件的设计（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> = 权重，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> = 阈值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>θ</mi></mrow></math>）：</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>权重</th>
+<th>阈值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></th>
+<th>等价 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mi>w</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AND</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>1</mn></msub><mo>=</mo><msub><mi>W</mi><mn>2</mn></msub><mo>=</mo><mn>1</mn></mrow></math></td>
+<td>1.5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1.5</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>OR</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>1</mn></msub><mo>=</mo><msub><mi>W</mi><mn>2</mn></msub><mo>=</mo><mn>1</mn></mrow></math></td>
+<td>0.5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>0.5</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>NOT</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.5</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0.5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>验证 AND</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>−</mo><mn>1.5</mn><mo>=</mo><mn>0.5</mn><mo>≥</mo><mn>0</mn><mo>→</mo><mn>1</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mn>1.5</mn><mo>&lt;</mo><mn>0</mn><mo>→</mo><mn>0</mn></mrow></math> ✓。
+<strong>验证 NOT</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>=</mo><mn>0</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>+</mo><mn>0.5</mn><mo>≥</mo><mn>0</mn><mo>→</mo><mn>1</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>=</mo><mn>1</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>&lt;</mo><mn>0</mn><mo>→</mo><mn>0</mn></mrow></math> ✓。</p>
+<p><strong>XOR</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>→</mo><mn>1</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>→</mo><mn>0</mn></mrow></math>——两类点在对角线上交错，<strong>没有一条直线能分开</strong> ⇒ 单个 perceptron <strong>不能</strong>表示。</p>
+<blockquote>
+<p><strong>Linearly separable functions</strong>：一个函数能被<strong>单个</strong> perceptron 表示 <strong>⟺</strong> 它是 <strong>linearly separable</strong> 的。</p>
+</blockquote>
+<h3>3.1 多层的表示能力</h3>
+<blockquote>
+<p><strong>Theorem</strong>：用<strong>更多层</strong>、足够多的 perceptrons，<strong>任何</strong> Boolean function 都可以表示。</p>
+</blockquote>
+<p>原因：任何 Boolean function 都能写成</p>
+<ul>
+<li><strong>DNF</strong>（disjunction of conjuncts，「或」of「与」）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>∧</mo><mi>c</mi><mo stretchy="false">)</mo><mo>∨</mo><mo stretchy="false">(</mo><mi>b</mi><mo>∧</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>∧</mo><mi mathvariant="normal">¬</mi><mi>b</mi><mo>∧</mo><mi mathvariant="normal">¬</mi><mi>c</mi><mo stretchy="false">)</mo><mo>∨</mo><mo stretchy="false">(</mo><mi mathvariant="normal">¬</mi><mi>d</mi><mo>∧</mo><mi>e</mi><mo>∧</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>CNF</strong>（conjunction of disjuncts，「与」of「或」）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>∨</mo><mi>c</mi><mo stretchy="false">)</mo><mo>∧</mo><mo stretchy="false">(</mo><mi>b</mi><mo>∨</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>∨</mo><mi>b</mi><mo stretchy="false">)</mo><mo>∧</mo><mo stretchy="false">(</mo><mi mathvariant="normal">¬</mi><mi>b</mi><mo>∨</mo><mi>c</mi><mo>∨</mo><mi mathvariant="normal">¬</mi><mi>d</mi><mo stretchy="false">)</mo><mo>∧</mo><mo stretchy="false">(</mo><mi>d</mi><mo>∨</mo><mi mathvariant="normal">¬</mi><mi>e</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<p>而 AND、OR、NOT 都能用 perceptron 实现 ⇒ 第一层算每个 conjunct（AND），第二层算 OR。</p>
+<p>（XOR 的两层解法见 4.4 MLP。）</p>
+<h2>4 · 怎么学：Perceptron Learning Rule</h2>
+<p><strong>Supervised learning</strong> ⇒ 需要 training examples，先<strong>转成 features</strong>。</p>
+<p><strong>课件数据</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> = target）：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>1</mn></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>2</mn></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>1</mn></msub></mrow></math></td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>2</mn></msub></mrow></math></td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>3</mn></msub></mrow></math></td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>4</mn></msub></mrow></math></td>
+<td>3</td>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>5</mn></msub></mrow></math></td>
+<td>4</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>6</mn></msub></mrow></math></td>
+<td>2</td>
+<td>3</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>模型 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo>=</mo><mtext>step</mtext><mo stretchy="false">(</mo><msub><mi>w</mi><mn>0</mn></msub><mo>+</mo><msub><mi>w</mi><mn>1</mn></msub><msub><mi>I</mi><mn>1</mn></msub><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><msub><mi>I</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></math>。</p>
+<p><strong>基本算法</strong>（迭代）：随机初始化权重 → repeat：对每个 example 算输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math>、拿到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>、根据 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo separator="true">,</mo><mi>O</mi><mo separator="true">,</mo><mi>T</mi></mrow></math> 更新权重 → until 全部预测正确或满足停止条件。</p>
+<p><strong>更新的思路</strong>：</p>
+<ul>
+<li>误差 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>−</mo><mi>O</mi><mo>&gt;</mo><mn>0</mn></mrow></math> ⇒ 要<strong>增大</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mn>0</mn></mrow></math> ⇒ 要<strong>减小</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math></li>
+<li>每个输入贡献 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mi>j</mi></msub><mo>&gt;</mo><mn>0</mn></mrow></math> 时增大 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>j</mi></msub></mrow></math> 会增大 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mi>j</mi></msub><mo>&lt;</mo><mn>0</mn></mrow></math> 时增大 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>j</mi></msub></mrow></math> 会减小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>w</mi><mi>j</mi></msub><mo>←</mo><msub><mi>w</mi><mi>j</mi></msub><mo>+</mo><mi>α</mi><msub><mi>I</mi><mi>j</mi></msub><mo stretchy="false">(</mo><mi>T</mi><mo>−</mo><mi>O</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="1em"/><mi mathvariant="normal">∀</mi><mi>j</mi></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math>：learning rate。</p>
+<h3>4.1 课件 trace（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>1</mn></mrow></math>，初始权重 0；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi></mrow></math> 含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math>）</h3>
+<table>
+<thead>
+<tr>
+<th>迭代</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mtext>old</mtext></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mi>O</mi></mrow></math>?</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mtext>new</mtext></msub></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>0</td>
+<td>1</td>
+<td>no</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>0</td>
+<td>0</td>
+<td>yes</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>1</td>
+<td>0</td>
+<td>no</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>1</td>
+<td>0</td>
+<td>no</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>0</td>
+<td>1</td>
+<td>no</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>6</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>1</td>
+<td>0</td>
+<td>no</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>7–12</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>第二遍 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>1</mn></msub></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>6</mn></msub></mrow></math></td>
+<td></td>
+<td></td>
+<td>全部 yes</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键细节</strong>：</p>
+<ul>
+<li>迭代 1：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>⋅</mo><mi>I</mi><mo>=</mo><mn>0</mn></mrow></math>，<strong>step(0) = 1</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow></math> 取 1）⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo>=</mo><mn>1</mn><mo mathvariant="normal">≠</mo><mi>T</mi><mo>=</mo><mn>0</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>←</mo><mi>𝐰</mi><mo>+</mo><mo stretchy="false">(</mo><mn>0</mn><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></li>
+<li>迭代 3：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>−</mo><mn>5</mn><mo>−</mo><mn>1</mn><mo>=</mo><mo>−</mo><mn>7</mn><mo>&lt;</mo><mn>0</mn><mo>⇒</mo><mi>O</mi><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>1</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>←</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>5</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></li>
+<li>第二遍全对 ⇒ 停止</li>
+</ul>
+<p>（已用 python 逐步复算，与课件一致。）</p>
+<h3>4.2 几何解释</h3>
+<p>解 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math>：边界 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mn>3</mn><msub><mi>I</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>I</mi><mn>2</mn></msub><mo>=</mo><mn>0</mn><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><msub><mi>I</mi><mn>2</mn></msub><mo>=</mo><mfrac><mn>3</mn><mn>4</mn></mfrac><msub><mi>I</mi><mn>1</mn></msub><mo>−</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></math>——<strong>斜率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow></math></strong>，在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>2</mn></msub></mrow></math> 轴截距 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></math>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>1</mn></mrow></math> 的点在直线上方。</p>
+<h2>5 · Perceptron Convergence Theorem</h2>
+<blockquote>
+<p>若训练样本<strong>线性可分</strong>，则 perceptron 权重更新规则<strong>总能</strong>在<strong>有限步</strong>内收敛到某个解（一组权重），<strong>对任意初始权重</strong>都成立。</p>
+</blockquote>
+<p><strong>不线性可分怎么办？</strong>——不保证收敛（会一直震荡）→ 引出 Adaline（4.3，梯度下降最小化误差）和 MLP（4.4）。</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td>step 函数（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>≥</mo><mn>0</mn><mo>→</mo><mn>1</mn></mrow></math>）；bias 技巧</td>
+</tr>
+<tr>
+<td>AND / OR / NOT</td>
+<td>课件权重与阈值；自己能验证</td>
+</tr>
+<tr>
+<td>XOR</td>
+<td>为何不行；linearly separable ⟺ 单个 perceptron 可表示</td>
+</tr>
+<tr>
+<td>多层</td>
+<td>任意 Boolean function；DNF / CNF</td>
+</tr>
+<tr>
+<td>学习规则</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>j</mi></msub><mo>←</mo><msub><mi>w</mi><mi>j</mi></msub><mo>+</mo><mi>α</mi><msub><mi>I</mi><mi>j</mi></msub><mo stretchy="false">(</mo><mi>T</mi><mo>−</mo><mi>O</mi><mo stretchy="false">)</mo></mrow></math>；直觉</td>
+</tr>
+<tr>
+<td>Trace</td>
+<td>12 步；最终 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>几何</td>
+<td>斜率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow></math>、截距 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td>Convergence</td>
+<td>条件：线性可分；有限步；任意初值</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>step(0) = <strong>1</strong>（课件定义 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>≥</mo><mn>0</mn><mo>→</mo><mn>1</mn></mrow></math>），trace 第一步就靠这个。</li>
+<li>更新时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi></mrow></math> 要包含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math>（bias 也要更新）。</li>
+<li>预测正确（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mi>O</mi></mrow></math>）时<strong>不更新</strong>。</li>
+<li>收敛定理只在<strong>线性可分</strong>时成立。</li>
+<li>阈值形式 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub><mo>−</mo><mi>θ</mi></mrow></math> 与 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mi>θ</mi></mrow></math> 的符号要对应。</li>
+</ul>

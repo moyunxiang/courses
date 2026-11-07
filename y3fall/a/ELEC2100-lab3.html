@@ -1,0 +1,111 @@
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>s</mi></msub><mo>=</mo><mn>100</mn></mrow></math> kHz, 1 s of audio (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mn>5</mn></msup></mrow></math> points). Rule: no <code>for</code> / <code>while</code> / <code>if</code>. Output inline, export to PDF.</p>
+<h2>Part I (10)</h2>
+<h3>(b) Read file, time index</h3>
+<pre><code class="language-matlab">[x, fs] = audioread('sample3a.wav');
+fs_kHz = fs/1000                        % 100 kHz
+t = (0:length(x)-1)/fs;
+</code></pre>
+<h3>(c) FS coefficients, frequency index</h3>
+<pre><code class="language-matlab">Xk = fft(x)/length(x);
+f  = (-length(x)/2 : length(x)/2-1)*fs/length(x);   % -fs/2 to fs/2
+</code></pre>
+<h3>(d) Magnitude and phase</h3>
+<pre><code class="language-matlab">Xkp = angle(Xk).*(abs(Xk) &gt; 0.001);
+figure;
+subplot(211); plot(f, abs(fftshift(Xk))); grid; ylabel('|Xk|'); xlabel('frequency (Hz)');
+subplot(212); plot(f, fftshift(Xkp));     grid; ylabel('\angle Xk (rad)'); xlabel('frequency (Hz)');
+</code></pre>
+<h3>(e) Fundamental frequency</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟏𝟎𝟎</mn><mtext> </mtext><mi>𝐇</mi><mi>𝐳</mi></mrow></math> = HCF of 300, 7000, 12000 Hz, so <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mi>f</mi><mi mathvariant="normal">/</mi><mn>100</mn></mrow></math>.</p>
+<h3>(f) Table (positive <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>)</h3>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math></th>
+<th>Frequency (Hz)</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><msub><mi>X</mi><mi>k</mi></msub><mo stretchy="false">∣</mo></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∠</mi><msub><mi>X</mi><mi>k</mi></msub></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>300</td>
+<td>0.05</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.25</mn><mi>π</mi></mrow></math></td>
+</tr>
+<tr>
+<td>70</td>
+<td>7000</td>
+<td>0.20</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.5</mn><mi>π</mi></mrow></math></td>
+</tr>
+<tr>
+<td>120</td>
+<td>12000</td>
+<td>0.15</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>(f) Time-domain expression (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mn>2</mn><mo stretchy="false">∣</mo><msub><mi>X</mi><mi>k</mi></msub><mo stretchy="false">∣</mo></mrow></math>)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Sample3a</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.1</mn><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>600</mn><mi>π</mi><mi>t</mi><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>π</mi><mn>4</mn></mfrac></mstyle><mo stretchy="false">)</mo><mo>+</mo><mn>0.4</mn><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>14000</mn><mi>π</mi><mi>t</mi><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>π</mi><mn>2</mn></mfrac></mstyle><mo stretchy="false">)</mo><mo>+</mo><mn>0.3</mn><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>24000</mn><mi>π</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math></div><h3>(g) Compare (first 800 points)</h3>
+<pre><code class="language-matlab">xm = 0.1*cos(600*pi*t - pi/4) + 0.4*cos(14000*pi*t - pi/2) + 0.3*cos(24000*pi*t);
+figure;
+subplot(211); plot(t(1:800), x(1:800));  grid; ylabel('x(t)'); title('Audio file');
+subplot(212); plot(t(1:800), xm(1:800)); grid; ylabel('x(t)'); title('Expression');
+xlabel('time (s)');
+</code></pre>
+<h2>Part II (10)</h2>
+<h3>(a) Cutoffs (keep 7 kHz, remove 300 Hz and 12 kHz)</h3>
+<p>Lower cutoff <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mrow><mn>𝟓𝟎𝟎𝟎</mn><mtext> </mtext><mi>𝐇</mi><mi>𝐳</mi></mrow></mrow></math>, higher cutoff <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mrow><mn>𝟗𝟎𝟎𝟎</mn><mtext> </mtext><mi>𝐇</mi><mi>𝐳</mi></mrow></mrow></math>.</p>
+<h3>(b) Wn, butter, freqz</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mi>n</mi></msub><mo>=</mo><mo stretchy="false">[</mo><mn>5000</mn><mtext>  </mtext><mn>9000</mn><mo stretchy="false">]</mo><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><msub><mi>f</mi><mi>s</mi></msub><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>0.1</mn><mtext>  </mtext><mn>0.18</mn><mo stretchy="false">]</mo></mrow></math>.</p>
+<pre><code class="language-matlab">N  = 8;
+Wn = [5000 9000]/(fs/2)
+[B, A]  = butter(N, Wn);
+[H, fh] = freqz(B, A, 1e3, fs);
+</code></pre>
+<h3>(c) Magnitude and phase response</h3>
+<pre><code class="language-matlab">figure;
+subplot(211); MR = plot(fh, abs(H));   grid; ylabel('|H|'); axis([0 20000 0 1.2]);
+subplot(212); PR = plot(fh, angle(H)); grid; ylabel('\angle H (rad)'); xlabel('frequency (Hz)'); xlim([0 20000]);
+</code></pre>
+<h3>(d) Six datatips</h3>
+<pre><code class="language-matlab">I1 = find(fh==300);  I2 = find(fh==7000);  I3 = find(fh==12000);
+datatip(MR, fh(I1), abs(H(I1)));    datatip(MR, fh(I2), abs(H(I2)));    datatip(MR, fh(I3), abs(H(I3)));
+datatip(PR, fh(I1), angle(H(I1)));  datatip(PR, fh(I2), angle(H(I2)));  datatip(PR, fh(I3), angle(H(I3)));
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Frequency (Hz)</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>H</mi><mo stretchy="false">∣</mo></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∠</mi><mi>H</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>300</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≈</mo><mn>3</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>13</mn></mrow></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.044</mn><mi>π</mi></mrow></math></td>
+</tr>
+<tr>
+<td>7000</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.000</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.219</mn><mi>π</mi></mrow></math></td>
+</tr>
+<tr>
+<td>12000</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2.5</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.793</mn><mi>π</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>(e) Filter</h3>
+<pre><code class="language-matlab">y = filter(B, A, x);
+figure; plot(t(1:800), y(1:800)); grid; xlabel('time (s)'); ylabel('y(t)');
+</code></pre>
+<h3>(f) Output at steady state</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>≈</mo><mn>0.4</mn><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>14000</mn><mi>π</mi><mi>t</mi><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>π</mi><mn>2</mn></mfrac></mstyle><mo>−</mo><mn>0.219</mn><mi>π</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.4</mn><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>14000</mn><mi>π</mi><mi>t</mi><mo>−</mo><mn>0.719</mn><mi>π</mi><mo stretchy="false">)</mo></mrow></math></div><h3>(g) What the bandpass does</h3>
+<p>Passband (5–9 kHz): the 7 kHz component passes with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>H</mi><mo stretchy="false">∣</mo><mo>≈</mo><mn>1</mn></mrow></math> (amplitude 0.4 kept); only its phase shifts by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>0.219</mn><mi>π</mi></mrow></math> (a delay). Stopband: 300 Hz and 12 kHz get <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>H</mi><mo stretchy="false">∣</mo><mo>≈</mo><mn>0</mn></mrow></math>, so they are removed; after the start-up transient <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math> is a single 7 kHz cosine.</p>

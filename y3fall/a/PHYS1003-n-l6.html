@@ -1,0 +1,167 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>第二定律</strong>：Kelvin 表述（没有完美热机）、Clausius 表述（热不会自发从冷流向热）</li>
+<li><strong>可逆 / 不可逆过程</strong></li>
+<li><strong>熵</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mi>S</mi><mo>=</mo><mfrac><mrow><mi>d</mi><msub><mi>Q</mi><mtext>rev</mtext></msub></mrow><mi>T</mi></mfrac></mrow></math>；可逆 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>tot</mtext></msub><mo>=</mo><mn>0</mn></mrow></math>，不可逆 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>0</mn></mrow></math>；热传导的熵变</li>
+<li><strong>Carnot engine</strong>：两条等温 + 两条绝热；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mi>C</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></math>；<strong>为什么它最高效</strong>（熵论证）</li>
+<li>第一、第二定律的含义：量 vs 质；熵 = 无序</li>
+</ol>
+<blockquote>
+<p>必会计算：<strong>Carnot 效率</strong>（人体 37 °C、室温 20 °C → 5.48%）；<strong>热传导熵变</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mi>Q</mi><mo stretchy="false">(</mo><mfrac><mn>1</mn><msub><mi>T</mi><mn>2</mn></msub></mfrac><mo>−</mo><mfrac><mn>1</mn><msub><mi>T</mi><mn>1</mn></msub></mfrac><mo stretchy="false">)</mo><mo>&gt;</mo><mn>0</mn></mrow></math>；Carnot 各段 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> 的正负。必会推导：由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>tot</mtext></msub><mo>≥</mo><mn>0</mn></mrow></math> 推出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>≤</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></math>。概念：「You can't win / You can't even break even」；Check Your Understanding（混合：能量不变、熵增加）。</p>
+</blockquote>
+<h2>1 · 第二定律</h2>
+<h3>1.1 Kelvin 表述</h3>
+<p>热机效率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>=</mo><mfrac><msub><mi>W</mi><mtext>eng</mtext></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac></mrow></math>。若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>c</mi></msub><mo>=</mo><mn>0</mn></mrow></math>（不向冷源排热，吸的热全部变成功）⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>=</mo><mn>100</mn><mi mathvariant="normal">%</mi></mrow></math>——<strong>完美热机</strong>，太好了，不可能是真的。</p>
+<blockquote>
+<p><strong>Kelvin statement</strong>：<strong>完美热机不可能</strong>。</p>
+</blockquote>
+<h3>1.2 Clausius 表述</h3>
+<blockquote>
+<p>热不可能从较冷物体传到较热物体而<strong>不引起其他变化</strong>。即没有外界做功，热不会<strong>自发</strong>从冷流向热（这正是 heat pump 需要做功的原因）。</p>
+</blockquote>
+<p>例：周围空气（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>H</mi></msub></mrow></math>）的热流向冰水（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>C</mi></msub></mrow></math>），反过来不会。Demo：thermoelectric converter。</p>
+<h2>2 · 可逆与不可逆过程</h2>
+<ul>
+<li><strong>可逆</strong>：单摆运动倒放录像看起来一样</li>
+<li><strong>不可逆</strong>：限制在一角的气体扩散充满容器——倒放一眼就看出不对，逆过程不会自发发生</li>
+</ul>
+<h2>3 · 熵（Entropy）</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>d</mi><mi>S</mi><mo>=</mo><mfrac><mrow><mi>d</mi><msub><mi>Q</mi><mtext>rev</mtext></msub></mrow><mi>T</mi></mfrac><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mo>∫</mo><mfrac><mrow><mi>d</mi><mi>Q</mi></mrow><mi>T</mi></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><msub><mi>Q</mi><mtext>rev</mtext></msub></mrow></math>：可逆过程中在温度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>（<strong>K</strong>）下进出系统的一小份热。</p>
+<blockquote>
+<p><strong>Second law（熵表述）</strong>：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>rev</mtext></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>system</mtext></msub><mo>+</mo><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>surroundings</mtext></msub><mo>=</mo><mn>0</mn><mspace width="1em"/><mtext>（可逆）</mtext></mrow></math></div>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>irrev</mtext></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>system</mtext></msub><mo>+</mo><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>surroundings</mtext></msub><mo>&gt;</mo><mn>0</mn><mspace width="1em"/><mtext>（不可逆）</mtext></mrow></math></div></p>
+</blockquote>
+<h3>3.1 热传导的熵变</h3>
+<p>热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 从热物体（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub></mrow></math>）流到冷物体（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>2</mn></msub></mrow></math>），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub><mo>&gt;</mo><msub><mi>T</mi><mn>2</mn></msub></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mfrac><mi>Q</mi><msub><mi>T</mi><mn>1</mn></msub></mfrac><mo separator="true">,</mo><mspace width="1em"/><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mn>2</mn></msub><mo>=</mo><mo>+</mo><mfrac><mi>Q</mi><msub><mi>T</mi><mn>2</mn></msub></mfrac><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mi>Q</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><msub><mi>T</mi><mn>2</mn></msub></mfrac><mo>−</mo><mfrac><mn>1</mn><msub><mi>T</mi><mn>1</mn></msub></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>&gt;</mo><mn>0</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><blockquote>
+<p>另一种表述：所有自然发生的过程，效果总是<strong>增加宇宙的总熵</strong>。</p>
+</blockquote>
+<p><strong>补充算例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mn>1000</mn></mrow></math> J 从 400 K 流到 300 K：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mn>1000</mn><mo stretchy="false">(</mo><mfrac><mn>1</mn><mn>300</mn></mfrac><mo>−</mo><mfrac><mn>1</mn><mn>400</mn></mfrac><mo stretchy="false">)</mo><mo>≈</mo><mn>0.83</mn></mrow></math> J/K &gt; 0。</p>
+<ul>
+<li>两个不同温度的系统接触，热<strong>总是</strong>从热流向冷；反过来不可能自发发生</li>
+<li>第二定律是<strong>能量降级</strong>的表达：在所有不可逆过程中，能量自发地流向越来越低的温度</li>
+</ul>
+<h2>4 · Carnot Engine</h2>
+<p><strong>理想、可逆</strong>的 Carnot 循环，工作在两个热源之间——<strong>最高效</strong>的热机，是所有在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>h</mi></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>c</mi></msub></mrow></math> 之间工作的热机效率的<strong>上限</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>过程</th>
+<th>热</th>
+<th>功（on gas）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A→B</td>
+<td><strong>等温膨胀</strong>（接触 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>h</mi></msub></mrow></math>）</td>
+<td>吸热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>h</mi></msub><mo>=</mo><mi>n</mi><mi>R</mi><msub><mi>T</mi><mi>h</mi></msub><mi>ln</mi><mo>⁡</mo><mfrac><msub><mi>V</mi><mi>B</mi></msub><msub><mi>V</mi><mi>A</mi></msub></mfrac><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>A</mi><mi>B</mi></mrow></msub><mo>=</mo><mo>−</mo><msub><mi>Q</mi><mi>h</mi></msub><mo>&lt;</mo><mn>0</mn></mrow></math>（举起活塞）</td>
+</tr>
+<tr>
+<td>B→C</td>
+<td><strong>绝热膨胀</strong>（隔热底座）</td>
+<td>0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>B</mi><mi>C</mi></mrow></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>&lt;</mo><mn>0</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>→</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>C→D</td>
+<td><strong>等温压缩</strong>（接触 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>c</mi></msub></mrow></math>）</td>
+<td>排热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>c</mi></msub><mo>=</mo><mi>n</mi><mi>R</mi><msub><mi>T</mi><mi>c</mi></msub><mi>ln</mi><mo>⁡</mo><mfrac><msub><mi>V</mi><mi>D</mi></msub><msub><mi>V</mi><mi>C</mi></msub></mfrac><mo>&lt;</mo><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>C</mi><mi>D</mi></mrow></msub><mo>=</mo><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>D→A</td>
+<td><strong>绝热压缩</strong></td>
+<td>0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>D</mi><mi>A</mi></mrow></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>&gt;</mo><mn>0</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>c</mi></msub><mo>→</mo><msub><mi>T</mi><mi>h</mi></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>引擎做的功 = 循环<strong>围成的面积</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>eng</mtext></msub></mrow></math>；整个循环 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mn>0</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>eng</mtext></msub><mo>=</mo><mo stretchy="false">∣</mo><msub><mi>Q</mi><mi>h</mi></msub><mo stretchy="false">∣</mo><mo>−</mo><mo stretchy="false">∣</mo><msub><mi>Q</mi><mi>c</mi></msub><mo stretchy="false">∣</mo></mrow></math></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>e</mi><mi>C</mi></msub><mo>=</mo><mfrac><mi>W</mi><msub><mi>Q</mi><mi>h</mi></msub></mfrac><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>Exercise</strong>：人体（37 °C）当作热机，室温 20 °C：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>e</mi><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>293</mn><mn>310</mn></mfrac><mo>≈</mo><mn>5.48</mn><mi mathvariant="normal">%</mi></mrow></math></div><h2>5 · 为什么 Carnot 最高效</h2>
+<p>第二定律：引擎 + 周围的总熵只能增加不能减少。一个循环后引擎回到原态：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>engine</mtext></msub><mo>=</mo><mn>0</mn></mrow></math>。</p>
+<ul>
+<li>热源：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mi>h</mi></msub><mo>=</mo><mo>−</mo><mfrac><msub><mi>Q</mi><mi>h</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac><mo>&lt;</mo><mn>0</mn></mrow></math></li>
+<li>冷源：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mi>c</mi></msub><mo>=</mo><mo>+</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>T</mi><mi>c</mi></msub></mfrac><mo>&gt;</mo><mn>0</mn></mrow></math></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>tot</mtext></msub><mo>=</mo><mn>0</mn><mo>−</mo><mfrac><msub><mi>Q</mi><mi>h</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac><mo>+</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>T</mi><mi>c</mi></msub></mfrac><mo>≥</mo><mn>0</mn><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac><mo>≥</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>e</mi><mtext>any engine</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac><mo>≤</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac><mo>=</mo><msub><mi>e</mi><mtext>Carnot</mtext></msub></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>等号<strong>只</strong>对 Carnot 循环（可逆，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>tot</mtext></msub><mo>=</mo><mn>0</mn></mrow></math>）成立。</p>
+<h3>5.1 含义</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></math> 越小（热源越热、冷源越冷）⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi></mrow></math> 越大</li>
+<li><strong>第一定律</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi></mrow></math> 不能大于 1——「<strong>You can't win</strong>」（得到的不能比投入多）</li>
+<li><strong>第二定律</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi></mrow></math> 不能等于 1——「<strong>You can't even break even</strong>」（只能得到比投入少的）</li>
+</ul>
+<h2>6 · 第一、第二定律的含义</h2>
+<ul>
+<li>第一定律管能量的<strong>量</strong>；第二定律管能量的<strong>质</strong></li>
+<li>按第一定律能量永远用不完；按第二定律<strong>高品质 / 有用的能量</strong>会用完</li>
+<li>高品质能量<strong>不能回收</strong>：燃料和食物只能用一次做有用功；一块煤、一箱汽油烧掉后，其高品质能量就永远失去了</li>
+</ul>
+<p><strong>熵的另一面：无序</strong>——摇晃或加热会让东西更乱；自然的不可逆过程倾向于增加无序。</p>
+<p><strong>第二定律的推论</strong>：时间的方向（热从热流向冷）；孤立系统的<strong>可用能量不断减少</strong>；通过不可逆过程能量降级（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>∼</mo><mi>T</mi><mi mathvariant="normal">Δ</mi><mi>S</mi></mrow></math> 的损失）；孤立机器不能永动做功；<strong>宇宙的熵必须增加</strong>。</p>
+<blockquote>
+<p>「Nothing in life is certain except death, taxes and the second law of thermodynamics.」（Seth Lloyd）</p>
+</blockquote>
+<h2>7 · Check Your Understanding</h2>
+<p>两份等量、不同温度的水在隔热容器中混合到均匀温度。能量和熵如何变化？</p>
+<p><strong>答案 (d)</strong>：<strong>能量不变</strong>（隔热，无热交换、无做功 ⇒ 第一定律 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mn>0</mn></mrow></math>）；<strong>熵增加</strong>（热从热水流向冷水是不可逆过程）。</p>
+<h2>8 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kelvin / Clausius</td>
+<td>两种表述各一句</td>
+</tr>
+<tr>
+<td>可逆 / 不可逆</td>
+<td>例子</td>
+</tr>
+<tr>
+<td>熵</td>
+<td>定义（T 用 K）；可逆 = 0、不可逆 &gt; 0</td>
+</tr>
+<tr>
+<td>热传导熵变</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mfrac><mn>1</mn><msub><mi>T</mi><mn>2</mn></msub></mfrac><mo>−</mo><mfrac><mn>1</mn><msub><mi>T</mi><mn>1</mn></msub></mfrac><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Carnot 四段</td>
+<td>过程、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> 正负</td>
+</tr>
+<tr>
+<td>Carnot 效率</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub><mi mathvariant="normal">/</mi><msub><mi>T</mi><mi>h</mi></msub></mrow></math>；人体 5.48%</td>
+</tr>
+<tr>
+<td>最优性证明</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>tot</mtext></msub><mo>≥</mo><mn>0</mn></mrow></math> 推导</td>
+</tr>
+<tr>
+<td>含义</td>
+<td>can't win / can't break even；量 vs 质</td>
+</tr>
+<tr>
+<td>混合题</td>
+<td>能量不变、熵增</td>
+</tr>
+</tbody>
+</table>
+<h2>9 · 易错点</h2>
+<ul>
+<li>Carnot 效率的温度必须用 <strong>K</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mfrac><mn>20</mn><mn>37</mn></mfrac></mrow></math> 是错的）。</li>
+<li>熵增是对<strong>系统 + 环境</strong>的总熵；系统自身熵可以减少。</li>
+<li>Carnot 是<strong>两条等温 + 两条绝热</strong>（Stirling 是两条等温 + 两条<strong>等容</strong>）。</li>
+<li>循环一周后引擎自身 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mn>0</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mn>0</mn></mrow></math>。</li>
+</ul>

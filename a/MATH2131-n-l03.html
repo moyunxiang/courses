@@ -1,0 +1,296 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li>复习 subspace，补充例子（ring 里含域 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> ⇒ vector space）</li>
+<li><strong>Linear combination</strong>、<strong>Span</strong>，Span 是 subspace</li>
+<li><strong>Linear (in)dependence</strong>：定义、等价说法、例子（<strong>依赖于域</strong>）</li>
+<li><strong>Basis</strong>：定义、标准基、<strong>Unique Representation Theorem</strong>、<strong>coordinate vector</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mi>𝐯</mi><msub><mo stretchy="false">]</mo><mi>ℬ</mi></msub></mrow></math></li>
+<li>接下来几讲的路线图（Outline）</li>
+</ol>
+<blockquote>
+<p>必考：用定义判断 l.i.（列方程 → 解出全部系数为 0）；「两个向量 l.d. ⟺ 互为倍数」的证明（WLOG 写法）；Unique Representation Theorem 的证明；写坐标向量（注意基的<strong>顺序</strong>）。</p>
+</blockquote>
+<h2>1 · 复习：Subspace</h2>
+<p>Vector space <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mo>:</mo><mi>V</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⋅</mo><mo>:</mo><mi>K</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>，加 8 条规则；记住 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>𝐮</mi><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>⋅</mo><mi>𝐮</mi></mrow></math>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 是 field（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℚ</mi><mo separator="true">,</mo><mi>ℝ</mi><mo separator="true">,</mo><mi>ℂ</mi></mrow></math>），其元素叫 scalars（numbers）。</p>
+<p><strong>Subspace = vector space inside a vector space</strong>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi><mo>⊂</mo><mi>V</mi></mrow></math> is a subspace if</p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn><mo>∈</mo><mi>U</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math>（在有 2 的前提下）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math> is non-empty</li>
+<li>Closure：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi><mo>∈</mo><mi>U</mi><mo>⇒</mo><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo>∈</mo><mi>U</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>∈</mo><mi>K</mi><mo separator="true">,</mo><mi>𝐮</mi><mo>∈</mo><mi>U</mi><mo>⇒</mo><mi>k</mi><mi>𝐮</mi><mo>∈</mo><mi>U</mi></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>+</mo><mi>k</mi><mi>𝐯</mi><mo>∈</mo><mi>U</mi></mrow></math></li>
+</ol>
+<p>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>ℝ</mi><mn>3</mn></msup></mrow></math> 中过原点的平面（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mi>z</mi><mo>=</mo><mn>0</mn></mrow></math>）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>K</mi><mi>n</mi></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo>⊂</mo><mi>K</mi><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math>（degree <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mi>n</mi></mrow></math>）。</p>
+<h3>1.1 例：ring 中包含域 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math></h3>
+<blockquote>
+<p>若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 是一个 ring，且包含 field <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>⊂</mo><mi>V</mi></mrow></math>，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 也是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 上的 vector space。</p>
+</blockquote>
+<p><strong>为什么？</strong> ring 有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mo>:</mo><mi>V</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⋅</mo><mo>:</mo><mi>V</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>。把乘法<strong>限制</strong>到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>（左边只允许 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 中的元素）就是标量乘法；8 条公理由 ring 的公理直接给出。</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>⊂</mo><mi>K</mi><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math>（常数多项式）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>⊂</mo><msub><mi>M</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msub><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow></math>（把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi></mrow></math> 看成<strong>对角常数矩阵</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mi>I</mi></mrow></math>）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi><mo>⊂</mo><mi>ℂ</mi></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math> is a vector space over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math></strong></li>
+</ul>
+<p>（这些也是 subspace 的例子：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math> 的 subspace。）</p>
+<h3>1.2 例：用 Span 证明 subspace</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>U</mi><mo>=</mo><mrow><mo fence="true">{</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>a</mi><mo>−</mo><mn>3</mn><mi>b</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>b</mi><mo>−</mo><mi>a</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>∈</mo><msup><mi>ℝ</mi><mn>4</mn></msup><mo>:</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo>∈</mo><mi>ℝ</mi><mo fence="true">}</mo></mrow></mrow></math></div><p><strong>方法 1：Subspace criterion</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mi>b</mi><mo>=</mo><mn>0</mn></mrow></math> 给出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn><mo>∈</mo><mi>U</mi></mrow></math></li>
+<li>两个元素相加：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>−</mo><mn>3</mn><msub><mi>b</mi><mn>1</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>b</mi><mn>1</mn></msub><mo>−</mo><msub><mi>a</mi><mn>1</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>a</mi><mn>1</mn></msub></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>b</mi><mn>1</mn></msub></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>+</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>a</mi><mn>2</mn></msub><mo>−</mo><mn>3</mn><msub><mi>b</mi><mn>2</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>b</mi><mn>2</mn></msub><mo>−</mo><msub><mi>a</mi><mn>2</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>a</mi><mn>2</mn></msub></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>b</mi><mn>2</mn></msub></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">(</mo><msub><mi>a</mi><mn>1</mn></msub><mo>+</mo><msub><mi>a</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>−</mo><mn>3</mn><mo stretchy="false">(</mo><msub><mi>b</mi><mn>1</mn></msub><mo>+</mo><msub><mi>b</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">(</mo><msub><mi>b</mi><mn>1</mn></msub><mo>+</mo><msub><mi>b</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>−</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mn>1</mn></msub><mo>+</mo><msub><mi>a</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>+</mo><msub><mi>a</mi><mn>2</mn></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>b</mi><mn>1</mn></msub><mo>+</mo><msub><mi>b</mi><mn>2</mn></msub></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>∈</mo><mi>U</mi></mrow></mstyle></mtd></mtr></mtable></math></div><p>（取 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><msub><mi>a</mi><mn>1</mn></msub><mo>+</mo><msub><mi>a</mi><mn>2</mn></msub></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><msub><mi>b</mi><mn>1</mn></msub><mo>+</mo><msub><mi>b</mi><mn>2</mn></msub></mrow></math>）；scaling 同理</p>
+<p><strong>方法 2：写成 Span</strong>（更快）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>U</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">{</mo><mi>a</mi><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>+</mo><mi>b</mi><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>:</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo>∈</mo><mi>ℝ</mi><mo fence="true">}</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext>Span</mtext><mrow><mo fence="true">{</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo fence="true">}</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><p>Span 一定是 subspace（下面的定理），完成。</p>
+<h2>2 · Linear combination 与 Span</h2>
+<blockquote>
+<p><strong>Def.</strong> A <strong>linear combination</strong> of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>⊂</mo><mi>V</mi></mrow></math>（subset of a vector space over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math>）is any <strong>FINITE</strong> sum
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐯</mi><mn>1</mn></msub><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub><msub><mi>𝐯</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>r</mi></msub><msub><mi>𝐯</mi><mi>r</mi></msub><mo>∈</mo><mi>V</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>∈</mo><mi>K</mi><mo separator="true">,</mo><mtext> </mtext><msub><mi>𝐯</mi><mi>i</mi></msub><mo>∈</mo><mi>S</mi><mo separator="true">,</mo><mtext> </mtext><mi>r</mi><mo>∈</mo><msub><mi>ℤ</mi><mrow><mo>≥</mo><mn>0</mn></mrow></msub></mrow></mstyle></mtd></mtr></mtable></math></div></p>
+</blockquote>
+<ul>
+<li><strong>必须是有限和</strong>。即使 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> 是无穷集，每个 linear combination 也只用到其中有限个。</li>
+<li><strong>Rem</strong>：允许 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>0</mn></mrow></math>（空和）⇒ 结果是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math>。所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math> 永远是 linear combination。</li>
+</ul>
+<blockquote>
+<p><strong>Def.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math> = set of all linear combinations of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math>.</p>
+<p><strong>Rem</strong>：允许 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mi mathvariant="normal">∅</mi></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mo stretchy="false">(</mo><mi mathvariant="normal">∅</mi><mo stretchy="false">)</mo><mo>:</mo><mo>=</mo><mo stretchy="false">{</mo><mn>𝟎</mn><mo stretchy="false">}</mo></mrow></math>。</p>
+</blockquote>
+<blockquote>
+<p><strong>Thm.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math> is a subspace of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>.</p>
+</blockquote>
+<p><strong>Pf.</strong></p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>0</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn><mo>∈</mo><mtext>Span</mtext><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math> ✓</li>
+<li>两个 linear combination 相加还是（有限的）linear combination；乘以标量也是 ✓</li>
+</ol>
+<blockquote>
+<p><strong>Thm.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">)</mo><mo>=</mo><mi>V</mi></mrow></math>.</p>
+</blockquote>
+<p><strong>Pf.</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mtext> </mtext><mi>V</mi><mo>⊂</mo><mi>V</mi></mrow></math>：by definition（linear combination 的结果在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 里）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>⊂</mo><mtext>Span</mtext><mtext> </mtext><mi>V</mi></mrow></math>：任何 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi><mo>∈</mo><mi>V</mi></mrow></math> 就是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>=</mo><mn>1</mn></mrow></math> 的 linear combination</li>
+</ul>
+<p><strong>几何</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mo stretchy="false">(</mo><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math>（不共线）是过原点的平面，包含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>𝐮</mi><mo>+</mo><mn>3</mn><mi>𝐯</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>𝐮</mi></mrow></math> 等所有组合。</p>
+<h2>3 · Linear (in)dependence</h2>
+<blockquote>
+<p><strong>Def.</strong> A set of vectors <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msub><mi>𝐯</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>𝐯</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>𝐯</mi><mi>r</mi></msub><mo stretchy="false">}</mo><mo>⊂</mo><mi>V</mi></mrow></math> is <strong>linearly dependent</strong>（not l.i.）if
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐯</mi><mn>1</mn></msub><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub><msub><mi>𝐯</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>r</mi></msub><msub><mi>𝐯</mi><mi>r</mi></msub><mo>=</mo><mn>𝟎</mn></mrow></math></div>
+for some <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>∈</mo><mi>K</mi></mrow></math>, <strong>not all of them are 0</strong>（nontrivial）.</p>
+</blockquote>
+<blockquote>
+<p><strong>Def.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msub><mi>𝐯</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>𝐯</mi><mi>r</mi></msub><mo stretchy="false">}</mo></mrow></math> is <strong>linearly independent</strong>（l.i.）if it is <strong>not</strong> linearly dependent：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>If </mtext><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐯</mi><mn>1</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>r</mi></msub><msub><mi>𝐯</mi><mi>r</mi></msub><mo>=</mo><mn>𝟎</mn><mtext> then all </mtext><msub><mi>c</mi><mi>i</mi></msub><mo>=</mo><mn>0.</mn></mrow></math></div></p>
+</blockquote>
+<p><strong>逻辑小注（课件旁注）</strong>：「If <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math> then <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>」等价于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">¬</mi><mi>P</mi><mo>∨</mo><mi>Q</mi></mrow></math>；它的否定是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>∧</mo><mi mathvariant="normal">¬</mi><mi>Q</mi></mrow></math>。所以「不是 l.i.」= 「存在一组系数，使组合为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math>，<strong>且</strong>不全为 0」。</p>
+<blockquote>
+<p><strong>证 l.i. 的标准步骤</strong>：设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐯</mi><mn>1</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>r</mi></msub><msub><mi>𝐯</mi><mi>r</mi></msub><mo>=</mo><mn>𝟎</mn></mrow></math>，列出方程，<strong>解出所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow></math></strong>。
+<strong>证 l.d.</strong>：<strong>找出</strong>一组不全为 0 的系数（给出具体的 linear relation）。</p>
+</blockquote>
+<h3>3.1 一个向量（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>1</mn></mrow></math>）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="false">{</mo><mi>𝐯</mi><mo stretchy="false">}</mo><mtext> is l.i.</mtext><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mo stretchy="false">(</mo><mi>c</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mo>⇒</mo><mi>c</mi><mo>=</mo><mn>0</mn><mo stretchy="false">)</mo><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>𝐯</mi><mo mathvariant="normal">≠</mo><mn>𝟎</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="false">{</mo><mi>𝐯</mi><mo stretchy="false">}</mo><mtext> is not l.i.</mtext><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mo stretchy="false">(</mo><mi>c</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mtext> but </mtext><mi>c</mi><mo mathvariant="normal">≠</mo><mn>0</mn><mo stretchy="false">)</mo><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow></math></div><p>（用了上一讲的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>c</mi><mo>=</mo><mn>0</mn></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow></math>。）</p>
+<h3>3.2 两个向量（Prop）</h3>
+<blockquote>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi><mo stretchy="false">}</mo></mrow></math> is l.i. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi></mrow></math> are <strong>not multiples of each other</strong>（包括 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math> 的情况）</p>
+<p>等价地：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi><mo stretchy="false">}</mo></mrow></math> is <strong>not</strong> l.i. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi></mrow></math> are multiples of each other.</p>
+</blockquote>
+<p><strong>Pf.</strong></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>⇒</mo><mo stretchy="false">)</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub><mi>𝐮</mi><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow></math>，其中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>2</mn></msub><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>。<strong>WLOG</strong>（without loss of generality）设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>，则</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>𝐮</mi><mo>=</mo><mo>−</mo><mfrac><msub><mi>c</mi><mn>2</mn></msub><msub><mi>c</mi><mn>1</mn></msub></mfrac><mi>𝐯</mi></mrow></math></div><p>是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi></mrow></math> 的倍数 ✓</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>⇐</mo><mo stretchy="false">)</mo></mrow></math> WLOG <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>=</mo><mi>c</mi><mi>𝐯</mi></mrow></math>，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>⋅</mo><mi>𝐮</mi><mo>−</mo><mi>c</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow></math>，系数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>，是 <strong>nontrivial linear combination</strong> ✓ ∎</p>
+<p><strong>WLOG 的意思</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>2</mn></msub><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math> 两种情况完全对称，只证一种，另一种换名字即可。</p>
+<h3>3.3 更多例子</h3>
+<table>
+<thead>
+<tr>
+<th>例子</th>
+<th>结论</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任何含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math> 的集合</td>
+<td><strong>not l.i.</strong></td>
+<td>取 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><mn>𝟎</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>=</mo><mn>2131</mn></mrow></math>（任何非零数），其余 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow></math> ⇒ linear relation</td>
+</tr>
+<tr>
+<td>某个向量是其他向量的 linear combination</td>
+<td><strong>not l.i.</strong></td>
+<td>WLOG <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><msub><mi>c</mi><mn>2</mn></msub><msub><mi>𝐯</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>r</mi></msub><msub><mi>𝐯</mi><mi>r</mi></msub></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>⋅</mo><msub><mi>𝐯</mi><mn>1</mn></msub><mo>−</mo><msub><mi>c</mi><mn>2</mn></msub><msub><mi>𝐯</mi><mn>2</mn></msub><mo>−</mo><mo>⋯</mo><mo>−</mo><msub><mi>c</mi><mi>r</mi></msub><msub><mi>𝐯</mi><mi>r</mi></msub><mo>=</mo><mn>𝟎</mn></mrow></math>（nontrivial）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msup><mi>t</mi><mn>2</mn></msup><mo separator="true">,</mo><mi>t</mi><mo separator="true">,</mo><mn>4</mn><mi>t</mi><mo>−</mo><msup><mi>t</mi><mn>2</mn></msup><mo stretchy="false">}</mo><mo>⊂</mo><mi>K</mi><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td>not l.i.</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐯</mi><mn>3</mn></msub><mo>=</mo><mn>4</mn><msub><mi>𝐯</mi><mn>2</mn></msub><mo>−</mo><msub><mi>𝐯</mi><mn>1</mn></msub></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>−</mo><mn>4</mn><msub><mi>𝐯</mi><mn>2</mn></msub><mo>+</mo><msub><mi>𝐯</mi><mn>3</mn></msub><mo>=</mo><mn>𝟎</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>sin</mi><mo>⁡</mo><mn>2</mn><mi>t</mi><mo separator="true">,</mo><mi>sin</mi><mo>⁡</mo><mi>t</mi><mi>cos</mi><mo>⁡</mo><mi>t</mi><mo stretchy="false">}</mo><mo>⊂</mo><msup><mi>C</mi><mi mathvariant="normal">∞</mi></msup><mo stretchy="false">(</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>not l.i.</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>sin</mi><mo>⁡</mo><mn>2</mn><mi>t</mi><mo>=</mo><mn>2</mn><mi>sin</mi><mo>⁡</mo><mi>t</mi><mi>cos</mi><mo>⁡</mo><mi>t</mi></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><mn>2</mn><msub><mi>𝐯</mi><mn>2</mn></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>3.4 Linear dependence depends on fields!</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>sin</mi><mo>⁡</mo><mi>t</mi><mo separator="true">,</mo><mi>cos</mi><mo>⁡</mo><mi>t</mi><mo separator="true">,</mo><msup><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msup><mo stretchy="false">}</mo><mo>⊂</mo><mi>V</mi><mo>=</mo><mo stretchy="false">{</mo><mi>ℂ</mi><mtext>-valued functions over </mtext><mi>ℝ</mi><mo stretchy="false">}</mo></mrow></math>：</p>
+<ul>
+<li><strong>over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math>：not l.i.</strong>，因为 Euler 公式 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msup><mo>=</mo><mi>cos</mi><mo>⁡</mo><mi>t</mi><mo>+</mo><mi>i</mi><mi>sin</mi><mo>⁡</mo><mi>t</mi></mrow></math>，即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi><mi>sin</mi><mo>⁡</mo><mi>t</mi><mo>+</mo><mi>cos</mi><mo>⁡</mo><mi>t</mi><mo>−</mo><msup><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msup><mo>=</mo><mn>0</mn></mrow></math>（系数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math> 里）</li>
+<li><strong>over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>：l.i.</strong>，系数只能是实数，凑不出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math></li>
+</ul>
+<p><strong>补充（over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math> 为什么 l.i.）</strong>：设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi>sin</mi><mo>⁡</mo><mi>t</mi><mo>+</mo><mi>b</mi><mi>cos</mi><mo>⁡</mo><mi>t</mi><mo>+</mo><mi>c</mi><mtext> </mtext><msup><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msup><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi><mo>∈</mo><mi>ℝ</mi></mrow></math>。取虚部：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mi>sin</mi><mo>⁡</mo><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math> 对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mn>0</mn></mrow></math>；剩下 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi>sin</mi><mo>⁡</mo><mi>t</mi><mo>+</mo><mi>b</mi><mi>cos</mi><mo>⁡</mo><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math>，代 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow></math> 得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mn>0</mn></mrow></math>，代 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>π</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></math> 得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mn>0</mn></mrow></math>。</p>
+<h3>3.5 Worksheet 01 Problem 2（Example 1.33）</h3>
+<p><strong>(a)</strong> 证明 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">{</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>7</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>9</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo fence="true">}</mo></mrow></math> linearly dependent。</p>
+<ul>
+<li>列方程组 / 算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mo>=</mo><mn>0</mn></mrow></math> ⇒ 有 nontrivial solution——可以，但课件说 <strong>INSTEAD</strong>，直接找关系更快：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>+</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>7</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>9</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>10</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>12</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><p>即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>−</mo><mn>2</mn><msub><mi>𝐯</mi><mn>2</mn></msub><mo>+</mo><msub><mi>𝐯</mi><mn>3</mn></msub><mo>=</mo><mn>𝟎</mn></mrow></math>，nontrivial。</p>
+<p><strong>(b)</strong> 证明 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">{</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo fence="true">}</mo></mrow></math> linearly independent。</p>
+<p>设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><msub><mi>𝐯</mi><mn>1</mn></msub><mo>+</mo><mi>b</mi><msub><mi>𝐯</mi><mn>2</mn></msub><mo>+</mo><mi>c</mi><msub><mi>𝐯</mi><mn>3</mn></msub><mo>=</mo><mn>𝟎</mn></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>a</mi><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>2</mn><mi>a</mi><mo>+</mo><mn>4</mn><mi>b</mi><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>3</mn><mi>a</mi><mo>+</mo><mn>5</mn><mi>b</mi><mo>+</mo><mn>6</mn><mi>c</mi><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow></math></div><p>第一式 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mn>0</mn></mrow></math>；代入第二式 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mn>0</mn></mrow></math>；代入第三式 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mn>0</mn></mrow></math>。所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mi>b</mi><mo>=</mo><mi>c</mi><mo>=</mo><mn>0</mn></mrow></math> ✓（「三角形」结构，从上往下逐个解）</p>
+<h2>4 · Bases</h2>
+<h3>4.1 直觉（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>ℝ</mi><mn>2</mn></msup></mrow></math>）</h3>
+<ul>
+<li><strong>too few</strong>：一个向量，只能表示一条线上的点 ✗</li>
+<li><strong>刚好</strong>：两个不共线的向量，平面上每个点都能被<strong>唯一地</strong>表示为它们的组合 ✓（express the location uniquely as a span of some subset）</li>
+<li><strong>too many</strong>：三个向量，能表示所有点，但<strong>表示方法不唯一</strong> ✗</li>
+</ul>
+<h3>4.2 定义</h3>
+<blockquote>
+<p><strong>Def.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi><mo>⊂</mo><mi>V</mi></mrow></math>（<strong>ordered subset</strong>）is a <strong>basis</strong> of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> iff</p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi></mrow></math> is <strong>linearly independent</strong>，and</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mtext>Span</mtext><mo stretchy="false">(</mo><mi>ℬ</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ol>
+</blockquote>
+<ul>
+<li>有限时写成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msub><mi>𝐛</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>𝐛</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>𝐛</mi><mi>n</mi></msub><mo stretchy="false">}</mo></mrow></math></li>
+<li><strong>ordered</strong>：顺序重要（影响坐标向量）</li>
+<li>1 保证「不多余」（唯一性），2 保证「够用」（存在性）</li>
+</ul>
+<h3>4.3 Standard bases</h3>
+<ul>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>K</mi><mi>n</mi></msup></mrow></math></strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℰ</mi><mo>=</mo><mo stretchy="false">{</mo><msub><mi>𝐞</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>𝐞</mi><mi>n</mi></msub><mo stretchy="false">}</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐞</mi><mi>i</mi></msub></mrow></math> 第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> 个分量是 1，其余是 0</li>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>K</mi><mi>n</mi></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math></strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℰ</mi><mo>=</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mi>t</mi><mo separator="true">,</mo><msup><mi>t</mi><mn>2</mn></msup><mo separator="true">,</mo><msup><mi>t</mi><mn>3</mn></msup><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msup><mi>t</mi><mi>n</mi></msup><mo stretchy="false">}</mo></mrow></math></li>
+</ul>
+<h3>4.4 Goals（之后几讲要证的）</h3>
+<ul>
+<li><strong>Any vector space has a basis</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∞</mi></mrow></math>-dim 的情形也对，但要用 <strong>Axiom of Choice</strong>）</li>
+<li>★ <strong>Any vector is a unique linear combination of a given basis</strong>（下面马上证）</li>
+<li><strong>Any basis has the same size</strong> → 这个 size 就是 <strong>dimension of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math></strong></li>
+</ul>
+<h3>4.5 Unique Representation Theorem</h3>
+<blockquote>
+<p><strong>Thm.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi><mo>=</mo><mo stretchy="false">{</mo><msub><mi>𝐛</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>𝐛</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>𝐛</mi><mi>n</mi></msub><mo stretchy="false">}</mo><mo>⊂</mo><mi>V</mi></mrow></math>. If <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi></mrow></math> is a basis, then <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>𝐯</mi><mo>∈</mo><mi>V</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mo stretchy="false">!</mo><mtext> </mtext><msub><mi>c</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>c</mi><mi>n</mi></msub><mo>∈</mo><mi>K</mi></mrow></math> s.t.
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>𝐯</mi><mo>=</mo><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐛</mi><mn>1</mn></msub><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub><msub><mi>𝐛</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>n</mi></msub><msub><mi>𝐛</mi><mi>n</mi></msub></mrow></math></div></p>
+</blockquote>
+<p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mo stretchy="false">!</mo></mrow></math> = exists unique）</p>
+<p><strong>Pf.</strong></p>
+<ul>
+<li><strong>Exists</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi></mrow></math> spans <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> ✓</li>
+<li><strong>Unique</strong>：设另有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi><mo>=</mo><msubsup><mi>c</mi><mn>1</mn><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><msub><mi>𝐛</mi><mn>1</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msubsup><mi>c</mi><mi>n</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><msub><mi>𝐛</mi><mi>n</mi></msub></mrow></math>。两式相减：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mn>𝟎</mn><mo>=</mo><mo stretchy="false">(</mo><msub><mi>c</mi><mn>1</mn></msub><mo>−</mo><msubsup><mi>c</mi><mn>1</mn><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo stretchy="false">)</mo><msub><mi>𝐛</mi><mn>1</mn></msub><mo>+</mo><mo stretchy="false">(</mo><msub><mi>c</mi><mn>2</mn></msub><mo>−</mo><msubsup><mi>c</mi><mn>2</mn><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo stretchy="false">)</mo><msub><mi>𝐛</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><mo stretchy="false">(</mo><msub><mi>c</mi><mi>n</mi></msub><mo>−</mo><msubsup><mi>c</mi><mi>n</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo stretchy="false">)</mo><msub><mi>𝐛</mi><mi>n</mi></msub></mrow></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi></mrow></math> is l.i. ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>−</mo><msubsup><mi>c</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo>=</mo><mn>0</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>c</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo>=</mo><msub><mi>c</mi><mi>i</mi></msub></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>i</mi></mrow></math> ∎</p>
+<p><strong>看清楚</strong>：存在性来自 span，唯一性来自 l.i.——basis 的两个条件各管一半。</p>
+<h3>4.6 Coordinate vector</h3>
+<blockquote>
+<p><strong>Def.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mi>𝐯</mi><msub><mo stretchy="false">]</mo><mi>ℬ</mi></msub><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>c</mi><mn>1</mn></msub></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>c</mi><mn>2</mn></msub></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">⋮</mi><mpadded height="0em" voffset="0em"><mspace mathbackground="black" width="0em" height="1.5em"></mspace></mpadded></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>c</mi><mi>n</mi></msub></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>∈</mo><msup><mi>K</mi><mi>n</mi></msup></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi><mo>∈</mo><mi>V</mi></mrow></math> <strong>w.r.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi></mrow></math></strong> 的 <strong>coordinate vector</strong></p>
+<p><strong>Rem</strong>：depends on the <strong>ordering</strong> of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℬ</mi></mrow></math>.</p>
+</blockquote>
+<p><strong>例</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>=</mo><mi>ℝ</mi></mrow></math>）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>⋅</mo><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mn>3</mn><mi>t</mi><mo>+</mo><mn>4</mn><mo>⋅</mo><mn>1</mn><mo>∈</mo><msub><mi>ℝ</mi><mn>3</mn></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℰ</mi><mo>=</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mi>t</mi><mo separator="true">,</mo><msup><mi>t</mi><mn>2</mn></msup><mo separator="true">,</mo><msup><mi>t</mi><mn>3</mn></msup><mo stretchy="false">}</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msub><mo stretchy="false">]</mo><mi>ℰ</mi></msub><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>∈</mo><msup><mi>ℝ</mi><mn>4</mn></msup></mrow></math></li>
+<li>若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>ℰ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mo stretchy="false">{</mo><msup><mi>t</mi><mn>3</mn></msup><mo separator="true">,</mo><msup><mi>t</mi><mn>2</mn></msup><mo separator="true">,</mo><mi>t</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math>（顺序反过来）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msub><mo stretchy="false">]</mo><msup><mi>ℰ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></li>
+<li>若把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 看作 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ℝ</mi><mn>6</mn></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math> 的元素，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℰ</mi><mo>=</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mi>t</mi><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msup><mi>t</mi><mn>6</mn></msup><mo stretchy="false">}</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msub><mo stretchy="false">]</mo><mi>ℰ</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><msup><mo stretchy="false">)</mo><mi>T</mi></msup><mo>∈</mo><msup><mi>ℝ</mi><mn>7</mn></msup></mrow></math></li>
+</ul>
+<p><strong>意义</strong>：选定一组基后，任何 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 维空间里的向量都可以用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>K</mi><mi>n</mi></msup></mrow></math> 里的一列数表示——抽象空间「变成」<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>K</mi><mi>n</mi></msup></mrow></math>。</p>
+<h2>5 · Outline（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi>V</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>）</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>l.i. set</mtext><mtext>  </mtext><mo>⊆</mo><mtext>  </mtext><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mtext>Basis</mtext></mstyle></mstyle></mstyle></menclose><mtext>  </mtext><mo>⊆</mo><mtext>  </mtext><mtext>Spanning set</mtext></mrow></math></div><table>
+<thead>
+<tr>
+<th>定理</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Basis Extension Theorem</strong></td>
+<td>l.i. set 可以<strong>扩充</strong>成 basis</td>
+</tr>
+<tr>
+<td><strong>Spanning Set Theorem</strong></td>
+<td>spanning set 可以<strong>删减</strong>成 basis</td>
+</tr>
+<tr>
+<td><strong>Replacement Theorem</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mtext>l.i.</mtext><mo stretchy="false">∣</mo><mo>≤</mo><mo stretchy="false">∣</mo><mtext>span</mtext><mo stretchy="false">∣</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>（下一讲逐个证明。）</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ring ⊃ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> ⇒ vector space</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>M</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msub><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math> over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math></td>
+</tr>
+<tr>
+<td>用 Span 证 subspace</td>
+<td>把参数形式写成 Span</td>
+</tr>
+<tr>
+<td>Linear combination</td>
+<td><strong>有限</strong>和；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>0</mn></mrow></math> 给 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Span</td>
+<td>定义；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mo stretchy="false">(</mo><mi mathvariant="normal">∅</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">{</mo><mn>𝟎</mn><mo stretchy="false">}</mo></mrow></math>；是 subspace；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Span</mtext><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">)</mo><mo>=</mo><mi>V</mi></mrow></math></td>
+</tr>
+<tr>
+<td>l.d. / l.i. 定义</td>
+<td>nontrivial；否定的逻辑</td>
+</tr>
+<tr>
+<td>单个、两个向量</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo><mn>𝟎</mn></mrow></math>；不互为倍数（含 WLOG 证明）</td>
+</tr>
+<tr>
+<td>含 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>𝟎</mn></mrow></math>、某向量是组合</td>
+<td>都 l.d.</td>
+</tr>
+<tr>
+<td>依赖于域</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>sin</mi><mo>⁡</mo><mo separator="true">,</mo><mi>cos</mi><mo>⁡</mo><mo separator="true">,</mo><msup><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msup><mo stretchy="false">}</mo></mrow></math> over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math> vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Worksheet P2</td>
+<td>找关系 / 三角方程组</td>
+</tr>
+<tr>
+<td>Basis 定义</td>
+<td>ordered、l.i.、span</td>
+</tr>
+<tr>
+<td>标准基</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>K</mi><mi>n</mi></msup></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>K</mi><mi>n</mi></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Unique representation</td>
+<td>证明（存在 ← span，唯一 ← l.i.）</td>
+</tr>
+<tr>
+<td>坐标向量</td>
+<td>依赖顺序；会写</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>Linear combination 只能是<strong>有限</strong>和。</li>
+<li>l.d. 的定义是「<strong>存在</strong>不全为 0 的系数」，不是「所有系数都不为 0」。</li>
+<li>证 l.i. 时，要从「组合 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>𝟎</mn></mrow></math>」出发推出系数全 0，不能反过来写。</li>
+<li>坐标向量依赖基的<strong>顺序</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mi>t</mi><mo separator="true">,</mo><msup><mi>t</mi><mn>2</mn></msup><mo separator="true">,</mo><msup><mi>t</mi><mn>3</mn></msup><mo stretchy="false">}</mo></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msup><mi>t</mi><mn>3</mn></msup><mo separator="true">,</mo><msup><mi>t</mi><mn>2</mn></msup><mo separator="true">,</mo><mi>t</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math> 给出相反的列。</li>
+<li>判断 l.i. 一定要看清<strong>在哪个域上</strong>。</li>
+</ul>

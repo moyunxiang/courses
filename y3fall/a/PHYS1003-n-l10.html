@@ -1,0 +1,234 @@
+<blockquote>
+<p>依据 L1 section 的课件（L2 版本发布前，两个 section 内容通常相同）。</p>
+</blockquote>
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>飞机怎么飞</strong>：Bernoulli 原理、机翼（airfoil）产生升力；四个力 thrust / drag / lift / gravity</li>
+<li><strong>巡航功率</strong>：drag power <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msup><mi>v</mi><mn>3</mn></msup></mrow></math> + lift power <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><mrow><mo stretchy="false">(</mo><mi>m</mi><mi>g</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub></mrow></mfrac></mrow></math></li>
+<li><strong>推力 = 能量 / 距离</strong>；<strong>最优速度</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi></mrow></msub></mrow></math> 和<strong>最小推力</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>=</mo><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow></math></li>
+<li><strong>航程（range）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>range</mtext><mo>=</mo><mfrac><mrow><mi>ε</mi><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt></mfrac><mtext> </mtext><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mo>=</mo><mi>C</mi><mi mathvariant="normal">/</mi><mi>g</mi><mo>≈</mo><mn>4000</mn></mrow></math> km → ≈ 13,000 km</li>
+<li><strong>运输效率</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mi>ε</mi></mfrac><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>g</mi><mo>=</mo><mn>0.15</mn><mi>g</mi></mrow></math> N/kg = <strong>0.4 kWh/(t·km)</strong>；货运 ≈ 1.2；客运 L/(p·km)</li>
+</ol>
+<blockquote>
+<p>必会计算：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mo>=</mo><mi>C</mi><mi mathvariant="normal">/</mi><mi>g</mi></mrow></math>；range = 3.3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></math>；<strong>0.15 g N/kg → 0.4 kWh/(t·km)</strong>（1 kWh/(t·km) = 3.6 N/kg）；747 最小推力 ≈ 0.035 mg；客运效率公式。必会概念：为什么飞机<strong>不需要限速</strong>（已经在最优速度飞）；一半的功用来「浮着」，一半用来「前进」；range 与体型无关。</p>
+</blockquote>
+<h2>1 · 飞机怎么飞</h2>
+<blockquote>
+<p><strong>Bernoulli 原理</strong>（1738）：层流流体速度增大时，静压（或势能）同时减小。</p>
+</blockquote>
+<ul>
+<li><strong>Airfoil</strong>：上表面弯、下表面平、后缘尖 → 上方气流更快 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mrow><mi>t</mi><mi>o</mi><mi>p</mi></mrow></msub><mo>&lt;</mo><msub><mi>p</mi><mrow><mi>b</mi><mi>o</mi><mi>t</mi><mi>t</mi><mi>o</mi><mi>m</mi></mrow></msub></mrow></math> → 压差产生向上的 <strong>lift</strong></li>
+<li>压差产生力：从高压指向低压；例子 —— <strong>用吸管喝水</strong>（吸走管内空气，大气压把液体压上来）</li>
+<li>课堂问题「地球上能用的最长吸管多长」：管内完全真空时，液柱压强 = 大气压</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>h</mi><mo>=</mo><mfrac><msub><mi>p</mi><mrow><mi>a</mi><mi>t</mi><mi>m</mi></mrow></msub><mrow><mi>ρ</mi><mi>g</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>1.013</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup></mrow><mrow><mn>1000</mn><mo>×</mo><mn>9.8</mn></mrow></mfrac><mo>≈</mo><mn>10.3</mn><mtext> m（水）</mtext></mrow></math></div><p>（补充计算；课件只提问没给答案。）</p>
+<ul>
+<li>Circulation、Kutta 条件、Kutta–Joukowski 定理：<strong>「for airplane enthusiast only (excluded in exam)」</strong></li>
+</ul>
+<p><strong>四个力</strong>：thrust（向前）、drag（阻力）、lift（向上）、gravitation（向下）。</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>巡航（匀速平飞）</td>
+<td>thrust = drag，lift = weight</td>
+</tr>
+<tr>
+<td>起飞加速</td>
+<td>thrust &gt; drag，lift &gt; weight</td>
+</tr>
+<tr>
+<td>减速 / 下降</td>
+<td>thrust &lt; drag，lift &lt; weight</td>
+</tr>
+</tbody>
+</table>
+<p>巡航：约 900 km/h、10 km 高空，低于声速 1235 km/h。Wright Flyer（1903-12-17）：12 s 飞 37 m（≈ 11 km/h）。</p>
+<h2>2 · 巡航功率</h2>
+<p><strong>汽车</strong>：只留下一根「空气管」→ 只有 drag。<strong>飞机</strong>：推两根空气管 —— 一根向后（drag），一根<strong>向下</strong>（反作用力就是 lift）。</p>
+<h3>2.1 Drag power（和汽车一样）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>P</mi><mrow><mi>d</mi><mi>r</mi><mi>a</mi><mi>g</mi></mrow></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msup><mi>v</mi><mn>3</mn></msup></mrow></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>d</mi></msub></mrow></math> 阻力系数，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>p</mi></msub></mrow></math> 飞机<strong>正面</strong>面积（蓝色），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi></mrow></math> 空气密度。</p>
+<h3>2.2 Lift power</h3>
+<p>时间 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 内飞过的空气柱：截面 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>c</mi></msub></mrow></math>（∼ <strong>翼展²</strong>，黄色），长 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mi>t</mi></mrow></math>，质量 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>m</mi><mi>c</mi></msub><mo>=</mo><mi>ρ</mi><mi>v</mi><mi>t</mi><msub><mi>A</mi><mi>c</mi></msub></mrow></math>，被压成向下速度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi></mrow></math>。</p>
+<p>牛顿第三定律：把空气往下推的力 = lift</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>F</mi><mo>=</mo><msub><mi>m</mi><mi>c</mi></msub><mfrac><mi>u</mi><mi>t</mi></mfrac><mo>=</mo><mi>ρ</mi><mi>v</mi><mi>t</mi><msub><mi>A</mi><mi>c</mi></msub><mfrac><mi>u</mi><mi>t</mi></mfrac><mo>=</mo><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub><mi>u</mi><mo><mover><mo><mo>=</mo></mo><mtext>平衡</mtext></mover></mo><mi>m</mi><mi>g</mi><mtext> </mtext><mo>⇒</mo><mtext> </mtext><mi>u</mi><mo>=</mo><mfrac><mrow><mi>m</mi><mi>g</mi></mrow><mrow><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub></mrow></mfrac></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>P</mi><mrow><mi>l</mi><mi>i</mi><mi>f</mi><mi>t</mi></mrow></msub><mo>=</mo><mfrac><msub><mi>E</mi><mrow><mi>k</mi><mi>i</mi><mi>n</mi></mrow></msub><mi>t</mi></mfrac><mo>=</mo><mfrac><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>m</mi><mi>c</mi></msub><msup><mi>u</mi><mn>2</mn></msup></mrow><mi>t</mi></mfrac><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub><msup><mi>u</mi><mn>2</mn></msup><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><mrow><mo stretchy="false">(</mo><mi>m</mi><mi>g</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub></mrow></mfrac></mrow></math></div><h3>2.3 总功率</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>P</mi><mrow><mi>t</mi><mi>o</mi><mi>t</mi></mrow></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msup><mi>v</mi><mn>3</mn></msup><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><mrow><mo stretchy="false">(</mo><mi>m</mi><mi>g</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>drag 项随 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math> <strong>增大</strong>；lift 项随 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>v</mi></mrow></math> <strong>减小</strong>（飞得快，每秒扫过的空气多，只需给它很小的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi></mrow></math>）。</li>
+</ul>
+<h2>3 · 推力与最优速度</h2>
+<p><strong>能量 / 距离 = 推力</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>F</mi><mo>=</mo><mfrac><mi>E</mi><mi>d</mi></mfrac><mo>=</mo><mfrac><msub><mi>P</mi><mrow><mi>t</mi><mi>o</mi><mi>t</mi></mrow></msub><mi>v</mi></mfrac><mo>=</mo><munder><munder><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msup><mi>v</mi><mn>2</mn></msup></mrow><mo stretchy="true">⏟</mo></munder><mrow><mtext>drag </mtext><mo>↑</mo><msup><mi>v</mi><mn>2</mn></msup></mrow></munder><mo>+</mo><munder><munder><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><mrow><mo stretchy="false">(</mo><mi>m</mi><mi>g</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><mi>ρ</mi><msup><mi>v</mi><mn>2</mn></msup><msub><mi>A</mi><mi>c</mi></msub></mrow></mfrac></mrow><mo stretchy="true">⏟</mo></munder><mrow><mtext>lift </mtext><mo>↓</mo><msup><mi>v</mi><mn>2</mn></msup></mrow></munder></mrow></math></div><p>两项一升一降 ⇒ 存在使 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi></mrow></math> 最小的<strong>最优速度</strong>。令 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mi>F</mi><mi mathvariant="normal">/</mi><mi>d</mi><mi>v</mi><mo>=</mo><mn>0</mn></mrow></math>（两项相等）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>ρ</mi><msubsup><mi>v</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi></mrow><mn>2</mn></msubsup><mo>=</mo><mfrac><mrow><mi>m</mi><mi>g</mi></mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msub><mi>A</mi><mi>c</mi></msub></mrow></msqrt></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>代回（两项各占一半）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>F</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><msqrt><mfrac><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub></mrow><msub><mi>A</mi><mi>c</mi></msub></mfrac></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi><mo>=</mo><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow></mstyle></mstyle></mstyle></menclose><mo separator="true">,</mo><mspace width="2em"/><msub><mi>f</mi><mi>A</mi></msub><mo>=</mo><mfrac><msub><mi>A</mi><mi>p</mi></msub><msub><mi>A</mi><mi>c</mi></msub></mfrac><mtext> </mtext><mo stretchy="false">(</mo><mtext>filling factor</mtext><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt></mrow></math> = <strong>drag-to-lift ratio</strong>（阻升比），只由<strong>形状</strong>决定</li>
+<li><strong>Reality check（747）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>d</mi></msub><mo>≈</mo><mn>0.03</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>A</mi></msub><mo>≈</mo><mn>0.04</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mo>=</mo><msqrt><mn>0.0012</mn></msqrt><mo>≈</mo><mn>0.035</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>363,000</mn></mrow></math> kg ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>≈</mo><mn>0.035</mn><mi>m</mi><mi>g</mi><mo>≈</mo><mn>123</mn></mrow></math> kN（课件写 ≈ 130 kN）；747 规格书的实际巡航推力 <strong>200 kN</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>747</th>
+<th>Albatross</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>质量</td>
+<td>363,000 kg</td>
+<td>8 kg</td>
+</tr>
+<tr>
+<td>翼展 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math></td>
+<td>64.4 m</td>
+<td>3.3 m</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>p</mi></msub></mrow></math></td>
+<td>180 m²</td>
+<td>0.09 m²</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi></mrow></math>（飞行高度）</td>
+<td>0.4 kg/m³</td>
+<td>1.2 kg/m³</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>d</mi></msub></mrow></math></td>
+<td>0.03</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi></mrow></msub></mrow></math></td>
+<td>220 m/s（490 mph）</td>
+<td>14 m/s（32 mph）</td>
+</tr>
+<tr>
+<td>实际巡航</td>
+<td>560 mph</td>
+<td>30–55 mph</td>
+</tr>
+</tbody>
+</table>
+<p>（补充：取 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>c</mi></msub><mo>=</mo><msup><mi>w</mi><mn>2</mn></msup></mrow></math> 复算，信天翁 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi></mrow></msub><mo>=</mo><mn>14.4</mn></mrow></math> m/s 与表一致；747 得 244 m/s，课件 220 m/s 来自 MacKay 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>c</mi></msub></mrow></math> 的不同取法。）</p>
+<h2>4 · 航程（Range）</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>range</mtext><mo>=</mo><msub><mi>v</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi></mrow></msub><mtext> </mtext><mi>t</mi><mo separator="true">,</mo><mspace width="2em"/><mi>t</mi><mo>=</mo><mfrac><mtext>fuel energy usable</mtext><mtext>power</mtext></mfrac><mtext> </mtext><mo>⇒</mo><mtext> range</mtext><mo>=</mo><mfrac><mrow><mtext>energy</mtext><mo>×</mo><mi>ε</mi></mrow><mtext>force</mtext></mfrac></mrow></math></div><p>燃料能量 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>C</mi><mo>⋅</mo><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mi>m</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi></mrow></math> 热值 J/kg，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></math> 燃料占总质量比例），推力 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>range</mtext><mo>=</mo><mfrac><mrow><mi>ε</mi><mi>C</mi><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mi>m</mi></mrow><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow></mfrac><mo>=</mo><munder><munder><mfrac><mrow><mi>ε</mi><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt></mfrac><mo stretchy="true">⏟</mo></munder><mtext>无量纲</mtext></munder><mo>⋅</mo><munder><munder><mfrac><mi>C</mi><mi>g</mi></mfrac><mo stretchy="true">⏟</mo></munder><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></munder></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li><strong>Fundamental fuel distance</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mo>=</mo><mi>C</mi><mi mathvariant="normal">/</mi><mi>g</mi></mrow></math>：只取决于燃料和重力，<strong>与体型、质量、空气密度无关</strong>；鹅油和航空煤油都是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mtext>CH</mtext><mn>2</mn></msub><msub><mo stretchy="false">)</mo><mi>n</mi></msub></mrow></math>，一样</li>
+</ul>
+<p><strong>算例</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mn>40</mn><mtext> MJ/kg</mtext></mrow><mrow><mn>10</mn><mtext> N/kg</mtext></mrow></mfrac><mo>=</mo><mn>4000</mn><mtext> km</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>ε</mi><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>×</mo><mn>0.5</mn></mrow><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>20</mn></mrow></mfrac><mo>=</mo><mfrac><mn>20</mn><mn>6</mn></mfrac><mo>≈</mo><mn>3.3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>range</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>≈</mo><mn>3.3</mn><mo>×</mo><mn>4000</mn><mo>≈</mo><mn>13,000</mn><mtext> km</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>747：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mo>=</mo><mn>0.46</mn></mrow></math>（约一半质量是燃料），不经停纪录 16,560 km</li>
+<li><strong>range 与体型无关</strong> → 大雁到燕子都能跨洲迁徙；鸟类最长不经停纪录：斑尾塍鹬（bar-tailed godwit）11,000 km</li>
+<li>「747 和秃鹫谁飞得远？」—— 按此模型差不多（都由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></math>、阻升比决定，与大小无关）</li>
+<li>同一「cartoon model」也适用于水翼船、摩托艇等贴水面高速行驶的船</li>
+</ul>
+<h2>5 · 运输效率</h2>
+<h3>5.1 重量效率（每吨每公里）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mtext>Energy</mtext><mrow><mtext>distance</mtext><mo>×</mo><mtext>mass</mtext></mrow></mfrac><mo>=</mo><mfrac><mtext>Thrust</mtext><mrow><mi>ε</mi><mo>⋅</mo><mtext>mass</mtext></mrow></mfrac><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mn>1</mn><mi>ε</mi></mfrac><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>g</mi></mrow></mstyle></mstyle></mstyle></menclose><mspace width="1em"/><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mfrac><mtext>N</mtext><mtext>kg</mtext></mfrac><mtext> 或 </mtext><mfrac><mtext>kWh</mtext><mtext>t⋅km</mtext></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></math></div><ul>
+<li><strong>不依赖</strong>飞机总质量、大小、空气密度 → 对所有飞机都适用</li>
+<li>例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mo>=</mo><mfrac><mn>1</mn><mn>20</mn></mfrac></mrow></math>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mn>3</mn><mn>20</mn></mfrac><mi>g</mi><mo>=</mo><mn>0.15</mn><mo>×</mo><mn>9.8</mn><mo>=</mo><mn>1.47</mn><mtext> </mtext><mfrac><mtext>N</mtext><mtext>kg</mtext></mfrac><mo>=</mo><mfrac><mn>1.47</mn><mn>3.6</mn></mfrac><mtext> </mtext><mfrac><mtext>kWh</mtext><mtext>t⋅km</mtext></mfrac><mo>≈</mo><mrow><mn>𝟎.𝟒</mn><mtext> </mtext><mi>𝐤</mi><mi>𝐖</mi><mi>𝐡</mi><mi mathvariant="bold">/</mi><mo stretchy="false">(</mo><mi>𝐭</mi><mo separator="true">⋅</mo><mi>𝐤</mi><mi>𝐦</mi><mo stretchy="false">)</mo></mrow></mrow></math></div><p>（换算：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> kWh/(t⋅km)</mtext><mo>=</mo><mfrac><mrow><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mtext> J</mtext></mrow><mrow><msup><mn>10</mn><mn>3</mn></msup><mtext> kg</mtext><mo>×</mo><msup><mn>10</mn><mn>3</mn></msup><mtext> m</mtext></mrow></mfrac><mo>=</mo><mn>3.6</mn></mrow></math> N/kg。）</p>
+<ul>
+<li>这包括飞机<strong>自重</strong>；747 货物约占 1/3 ⇒ 货运 ≈ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>0.4</mn><mo>≈</mo></mrow></math> <strong>1.2 kWh/(t·km)</strong>，和卡车（≈ 1 kWh/(t·km)）相当</li>
+</ul>
+<h3>5.2 实际数据（欧洲 8 国）</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>客运</th>
+<th>货运</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>航空</td>
+<td>≈ 0.8 kWh/(p·km)（≈ 3 MJ）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>汽车 / 卡车</td>
+<td>≈ 0.5 kWh/(p·km)</td>
+<td>≈ 0.8 kWh/(t·km)</td>
+</tr>
+<tr>
+<td>船</td>
+<td>—</td>
+<td>≈ 0.2 kWh/(t·km)（最低一条线）</td>
+</tr>
+</tbody>
+</table>
+<p>（数值读自课件图表，来源：LBL International Energy Studies / EEA。）</p>
+<h3>5.3 客运效率（每人每公里耗油）</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 名乘客；航空煤油 10 kWh/L = 36 MJ/L：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mtext>Total Energy</mtext><mtext>Distance</mtext></mfrac><mo>=</mo><mfrac><mtext>Thrust</mtext><mi>ε</mi></mfrac><mo>=</mo><mfrac><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow><mi>ε</mi></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mtext>liter</mtext><mtext>person⋅km</mtext></mfrac><mo>=</mo><mfrac><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow><mrow><mi>ε</mi><mi>N</mi><mtext> </mtext><mo stretchy="false">(</mo><mn>36</mn><mtext> MJ/L</mtext><mo stretchy="false">)</mo></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mstyle></mtd></mtr></mtable></math></div><p><strong>补充算例</strong>（747，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mo>=</mo><mn>0.035</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>400</mn></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mfrac><mrow><mn>0.0346</mn><mo>×</mo><mn>363,000</mn><mo>×</mo><mn>9.8</mn></mrow><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>×</mo><mn>400</mn><mo>×</mo><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>7</mn></msup></mrow></mfrac><mo>=</mo><mn>2.6</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup><mtext> L/m</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.026</mn><mtext> L/(p⋅km)</mtext><mo>≈</mo><mn>0.26</mn><mtext> kWh/(p⋅km)</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><h2>6 · Key points（课件总结）</h2>
+<ul>
+<li>飞机做的功<strong>一半用来浮着、一半用来前进</strong>（最优速度时两项相等）</li>
+<li>最优速度下的「能量 / 距离」= 推力 = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow></math>，<strong>正比于飞机重量</strong>，比例系数是阻升比（由形状决定）</li>
+<li>汽车限速能省能；<strong>飞机限速没意义</strong>——它们已经在最优速度飞</li>
+<li>range 与鸟 / 飞机大小无关，只取决于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math>、阻升比、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></math>、热值</li>
+<li>能量 / 距离 = 推力；推力 / 乘客数 = 每人每距离的能耗</li>
+</ul>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bernoulli / lift</td>
+<td>流速快 → 压强低；四个力的平衡关系</td>
+</tr>
+<tr>
+<td>吸管</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><msub><mi>p</mi><mrow><mi>a</mi><mi>t</mi><mi>m</mi></mrow></msub><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><mi>g</mi><mo stretchy="false">)</mo><mo>≈</mo><mn>10</mn></mrow></math> m</td>
+</tr>
+<tr>
+<td>两种功率</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mrow><mi>d</mi><mi>r</mi><mi>a</mi><mi>g</mi></mrow></msub><mo>∝</mo><msup><mi>v</mi><mn>3</mn></msup></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mrow><mi>l</mi><mi>i</mi><mi>f</mi><mi>t</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>m</mi><mi>g</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></math> 及推导</td>
+</tr>
+<tr>
+<td>推力</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>=</mo><mi>P</mi><mi mathvariant="normal">/</mi><mi>v</mi></mrow></math>；两项一升一降</td>
+</tr>
+<tr>
+<td>最优速度</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi><msubsup><mi>v</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi></mrow><mn>2</mn></msubsup><mo>=</mo><mi>m</mi><mi>g</mi><mi mathvariant="normal">/</mi><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msub><mi>A</mi><mi>c</mi></msub></mrow></msqrt></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mi>m</mi><mi>g</mi></mrow></math></td>
+</tr>
+<tr>
+<td>747</td>
+<td>0.035 mg ≈ 125 kN vs 实际 200 kN</td>
+</tr>
+<tr>
+<td>range</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mo>=</mo><mi>C</mi><mi mathvariant="normal">/</mi><mi>g</mi><mo>=</mo><mn>4000</mn></mrow></math> km；×3.3 ≈ 13,000 km</td>
+</tr>
+<tr>
+<td>效率</td>
+<td>0.15 g N/kg = 0.4 kWh/(t·km)；货运 1.2；1 kWh/(t·km) = 3.6 N/kg</td>
+</tr>
+<tr>
+<td>客运</td>
+<td>L/(p·km) 公式</td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>p</mi></msub></mrow></math>（正面面积）进 drag，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>c</mi></msub></mrow></math>（∼ 翼展²）进 lift——别混。</li>
+<li>阻升比是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></math>（747：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub><mo>=</mo><mn>0.0012</mn></mrow></math>，开方才是 0.035）。</li>
+<li>推力 = <strong>能量 / 距离</strong>，单位 N = J/m。</li>
+<li>效率公式除以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math>：燃料能量 = 机械功 / 热效率。</li>
+<li>N/kg → kWh/(t·km)：<strong>除以 3.6</strong>。</li>
+<li>0.4 kWh/(t·km) 是对<strong>整机质量</strong>；只算货物要除以货物占比。</li>
+</ul>

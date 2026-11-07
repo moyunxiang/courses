@@ -1,0 +1,631 @@
+<h2>0 · 这一章在讲什么</h2>
+<ol>
+<li><strong>Overview</strong>：为什么要多线程；thread 的组成；四个好处</li>
+<li><strong>Multicore programming</strong>：五个挑战；<strong>concurrency vs parallelism</strong>；data / task parallelism；<strong>Amdahl's Law</strong></li>
+<li>线程细节：TCB、共享 / 私有状态、生命周期</li>
+<li><strong>User threads vs kernel threads</strong>；<strong>multithreading models</strong>：many-to-one、one-to-one、many-to-many、two-level</li>
+<li><strong>Threading issues</strong>：fork / exec 语义、<strong>signal handling</strong>、<strong>thread cancellation</strong></li>
+<li><strong>OS examples</strong>：Windows threads（ETHREAD / KTHREAD / TEB）、<strong>Linux threads（task、<code>clone()</code>）</strong></li>
+</ol>
+<blockquote>
+<p>往年选择题考过：<strong>多线程进程的说法</strong>（thread creation 比 process creation 快）；<strong>concurrency vs parallelism</strong>（单核也能有 concurrency）；<strong>Amdahl's Law 计算</strong>（给出并行比例和核数，判断加速比落在哪个区间）；<strong>signal handling</strong>（「所有 signal 都要发给所有线程」是错的）。</p>
+</blockquote>
+<h2>1 · Motivation</h2>
+<ul>
+<li><strong>很多应用是多线程的</strong>：
+<ul>
+<li>浏览器：一个线程显示图片 / 文字，另一个从网络取数据</li>
+<li>文字处理：一个线程显示图形，一个响应键盘，第三个在后台做拼写和语法检查</li>
+</ul>
+</li>
+<li><strong>大多数 OS kernel 是多线程的</strong>：如 Linux 启动时创建若干 kernel threads，各做特定任务（管理设备、内存管理、中断处理）</li>
+<li>能利用<strong>多核</strong>的处理能力：数据挖掘、图形、AI 等广泛使用并行编程</li>
+<li><strong>进程创建耗时耗资源</strong>：process creation 是 <strong>heavy-weight</strong>，thread creation 是 <strong>light-weight</strong>——同一进程的线程共享 code、data 等</li>
+</ul>
+<p><strong>多线程程序的例子</strong>：嵌入式系统（电梯、飞机、医疗系统、手表：单个程序、并发操作）；现代 OS kernel（内部并发处理多用户请求，<strong>kernel 内部不需要保护</strong>）；数据库服务器（多用户并发访问共享数据 + 后台处理）；网络服务器（文件、Web、订票系统）；并行编程（把程序和数据拆到多个线程）。</p>
+<h2>2 · Thread 是什么</h2>
+<blockquote>
+<p>A <strong>thread</strong> is a <strong>basic unit of CPU utilization</strong>——独立调度和运行（an instance of execution），由 <strong>thread ID、program counter（PC）、register set、stack</strong> 表示。它和同一进程的其他线程<strong>共享 code、data 和其他 OS 资源</strong>（如 <strong>open files、signals</strong>）。</p>
+</blockquote>
+<p><strong>Single vs multithreaded process</strong>（课件图）：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>单线程进程</th>
+<th>多线程进程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>共享</td>
+<td>code、data、files</td>
+<td>code、data、files（<strong>所有线程共享一份</strong>）</td>
+</tr>
+<tr>
+<td>每个线程</td>
+<td>registers、PC、stack</td>
+<td><strong>每个线程各一份</strong> registers、stack、PC</td>
+</tr>
+</tbody>
+</table>
+<h3>2.1 四个好处（必背）</h3>
+<table>
+<thead>
+<tr>
+<th>好处</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Responsiveness</strong></td>
+<td>进程的一部分（一个线程）被阻塞时，其他部分可以继续执行——对<strong>有 UI 的交互应用</strong>尤其重要</td>
+</tr>
+<tr>
+<td><strong>Resource Sharing</strong></td>
+<td>线程<strong>默认共享</strong>进程的资源，比进程之间的 shared memory 或 message passing <strong>容易</strong>——它们本来就在同一地址空间</td>
+</tr>
+<tr>
+<td><strong>Economy</strong></td>
+<td>创建线程比创建进程<strong>便宜得多</strong>（时间和内存）；同一进程的线程间 <strong>context switch 通常比进程间快</strong></td>
+</tr>
+<tr>
+<td><strong>Scalability</strong></td>
+<td>进程能利用<strong>多核</strong>架构</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>往年考法</strong>：关于多线程进程正确的是「<strong>thread creation 通常比 process creation 快</strong>」。错误选项：「每个线程有自己的地址空间和 file descriptors」（共享）、「同一进程的线程不能在多核上并发运行」（能）、「不能利用多核」（能）。</p>
+</blockquote>
+<h2>3 · Multicore Programming</h2>
+<p>多线程编程让多核的使用更高效、提高并发性。</p>
+<h3>3.1 五个挑战</h3>
+<table>
+<thead>
+<tr>
+<th>挑战</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dividing tasks</strong></td>
+<td>怎样拆成独立的、可并发的任务</td>
+</tr>
+<tr>
+<td><strong>Balance</strong></td>
+<td>每个任务做「<strong>相等</strong>」的工作量</td>
+</tr>
+<tr>
+<td><strong>Data splitting</strong></td>
+<td>任务用到的数据要拆开，在不同核上运行</td>
+</tr>
+<tr>
+<td><strong>Data dependency</strong></td>
+<td>有数据依赖就要<strong>同步</strong></td>
+</tr>
+<tr>
+<td><strong>Testing and debugging</strong></td>
+<td>执行路径各不相同，调试困难</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 Concurrency vs Parallelism（往年选择题）</h3>
+<ul>
+<li><strong>Parallelism</strong>：系统能<strong>同时</strong>执行多于一个任务</li>
+<li><strong>Concurrency</strong>：支持多于一个任务<strong>都在推进（making progress）</strong>——可以是<strong>单核上按时间复用</strong>，由 scheduler 提供 concurrency</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>单核</th>
+<th>多核</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>执行</td>
+<td>T1 T2 T3 T4 T1 T2 …（<strong>时间复用</strong>）</td>
+<td>core 1：T1 T3 T1 T3…；core 2：T2 T4 T2 T4…（<strong>真正同时</strong>）</td>
+</tr>
+<tr>
+<td>Concurrency？</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Parallelism？</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一句话</strong>：parallelism 一定是 concurrency，concurrency 不一定是 parallelism。</p>
+<ul>
+<li>多核的出现要求全新的软件设计方法，尤其重视并行编程</li>
+</ul>
+<blockquote>
+<p><strong>往年考法</strong>：正确的是「<strong>单核上通过 scheduler 的时间复用可以支持 concurrency</strong>」。错误选项把 concurrency 和 parallelism 的定义互换（「concurrency 意味着<strong>恰好同时</strong>执行」是错的），或说「多核让测试调试更容易」（更难）。</p>
+</blockquote>
+<h3>3.3 Data vs Task parallelism</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Data parallelism</strong></td>
+<td>把<strong>数据</strong>的子集分到多个核上，每个核做<strong>相同</strong>操作（分布式机器学习中常见）</td>
+</tr>
+<tr>
+<td><strong>Task parallelism</strong></td>
+<td>把<strong>线程</strong>分到多个核，每个线程做<strong>不同</strong>操作</td>
+</tr>
+</tbody>
+</table>
+<p>两者不互斥，一个应用可以同时用（hybrid）。</p>
+<h3>3.4 Amdahl's Law（计算必考）</h3>
+<p>识别给一个<strong>既有串行又有并行部分</strong>的应用增加核心带来的性能增益（固定工作量下延迟的理论加速比）。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math>：<strong>串行</strong>比例，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>S</mi></mrow></math>：并行比例，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math>：核数。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>speedup</mtext><mo>≤</mo><mfrac><mn>1</mn><mrow><mi>S</mi><mo>+</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mn>1</mn><mo>−</mo><mi>S</mi></mrow><mi>N</mi></mfrac></mstyle></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>课件例</strong>：75% 并行、25% 串行，从 1 核到 2 核：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mn>1</mn><mrow><mn>0.25</mn><mo>+</mo><mfrac><mn>0.75</mn><mn>2</mn></mfrac></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>0.625</mn></mfrac><mo>=</mo><mn>1.6</mn></mrow></math></div><p><strong>极限</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></math> 时 speedup <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo><mfrac><mn>1</mn><mi>S</mi></mfrac></mrow></math>（上例最多 4 倍）。</p>
+<blockquote>
+<p><strong>Serial portion of an application has a disproportionate effect on performance gained by adding additional cores.</strong>（串行部分对加核带来的增益影响<strong>不成比例地大</strong>）——课件图：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>0.05</mn></mrow></math> 时 16 核约 9 倍，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>0.10</mn></mrow></math> 约 6.4 倍，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>0.50</mn></mrow></math> 不到 2 倍。</p>
+</blockquote>
+<p><strong>往年考法（改写）</strong>：加速比在 1.6 到 1.7 之间的组合？逐个代入：</p>
+<table>
+<thead>
+<tr>
+<th>并行比例</th>
+<th>核数</th>
+<th>加速比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>81%</td>
+<td>3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>0.19</mn><mo>+</mo><mn>0.27</mn><mo stretchy="false">)</mo><mo>≈</mo><mn>2.17</mn></mrow></math></td>
+</tr>
+<tr>
+<td>81%</td>
+<td>5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>0.19</mn><mo>+</mo><mn>0.162</mn><mo stretchy="false">)</mo><mo>≈</mo><mn>2.84</mn></mrow></math></td>
+</tr>
+<tr>
+<td><strong>61%</strong></td>
+<td><strong>3</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>0.39</mn><mo>+</mo><mn>0.203</mn><mo stretchy="false">)</mo><mo>≈</mo></mrow></math> <strong>1.69</strong> ✓</td>
+</tr>
+<tr>
+<td>61%</td>
+<td>5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>0.39</mn><mo>+</mo><mn>0.122</mn><mo stretchy="false">)</mo><mo>≈</mo><mn>1.95</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>解题套路：先算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>1</mn><mo>−</mo></mrow></math> 并行比例；分母 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>S</mi><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>S</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>N</mi></mrow></math>；取倒数。注意题目给的是<strong>并行</strong>比例还是<strong>串行</strong>比例。</p>
+</blockquote>
+<h2>4 · 线程细节</h2>
+<h3>4.1 Multithreaded process</h3>
+<ul>
+<li>多线程进程有多个执行实例，每个有自己的 PC</li>
+<li>thread 和 process 类似，但<strong>共享同一地址空间</strong>，能访问同一批数据</li>
+<li>每个线程有 PC 和<strong>私有的一组寄存器</strong></li>
+<li>同一处理器上从 T1 切到 T2 也要 <strong>context switch</strong>：保存 T1 的寄存器状态，从 T2 的 stack（TCB）恢复 T2 的状态
+<ul>
+<li><strong>地址空间不变</strong>，所以 context switch 开销<strong>小得多</strong></li>
+<li>切到<strong>另一个进程</strong>的线程，开销更大</li>
+</ul>
+</li>
+<li>提供进程内的并行，能让 <strong>I/O 和其他活动重叠</strong>：一个线程在 CPU 上算，另一个线程在做 I/O</li>
+</ul>
+<h3>4.2 TCB（Thread Control Block）</h3>
+<p>thread = 唯一的执行上下文，<strong>lightweight process</strong>（PC、registers、execution flags、stack）；在处理器上执行时就驻留在寄存器里。</p>
+<p>每个线程一个 <strong>TCB</strong>：</p>
+<ul>
+<li><strong>Execution state</strong>：CPU registers、PC、stack 指针</li>
+<li><strong>Scheduling info</strong>：state、priority、CPU time</li>
+<li><strong>Accounting info</strong></li>
+<li>各种指针（实现调度队列）</li>
+<li><strong>指向所属进程 PCB 的指针</strong></li>
+</ul>
+<h3>4.3 共享 vs 私有状态</h3>
+<ul>
+<li><strong>Thread 封装 concurrency</strong>——进程的「<strong>主动</strong>」部分</li>
+<li><strong>Address space 封装 protection</strong>——进程的「<strong>被动</strong>」部分（一个程序的地址空间和另一个不同，防止 buggy 程序搞垮整个系统）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>所有线程共享</th>
+<th>每个线程私有（在 TCB 里）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>内存内容（<strong>全局变量、heap</strong>）</td>
+<td><strong>CPU registers</strong>（含 PC）</td>
+</tr>
+<tr>
+<td>I/O 状态（<strong>file descriptors</strong>、网络连接等）</td>
+<td><strong>Execution stack</strong>（参数、临时变量、保存的 PC）</td>
+</tr>
+</tbody>
+</table>
+<h3>4.4 Thread 的生命周期</h3>
+<p>和 process 一样：<strong>new → ready → running → waiting → terminated</strong>。活跃线程由 TCB 表示，TCB 按状态组织成队列：ready queue 和各设备（tape、disk、ethernet……）的 queue，每个队列有自己的调度策略；线程不在运行时，它的 TCB 就在某个队列里。</p>
+<h2>5 · User Threads 与 Kernel Threads</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>User threads</th>
+<th>Kernel threads</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>是什么</td>
+<td>程序中可独立执行的实体，由<strong>用户级线程库</strong>创建和管理</td>
+<td>能在 CPU 上被调度执行，由 <strong>OS</strong> 支持和管理</td>
+</tr>
+<tr>
+<td>kernel 知道吗</td>
+<td><strong>不知道</strong>（只对程序员可见）⇒ <strong>不能被直接调度</strong>到 CPU 上</td>
+<td>知道；<strong>OS 只管理和调度 kernel threads</strong></td>
+</tr>
+<tr>
+<td>例</td>
+<td>Pthreads、Windows threads、Java threads 三大线程库（对应 POSIX、Win32、Java API）</td>
+<td>几乎所有通用 OS：Windows、Linux、macOS、iOS、Android</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>user-level threads 提供了程序中<strong>并发和模块化的实体</strong>，OS 可以利用；<strong>程序中如果没有定义 user threads，就不会有可调度的 kernel threads</strong></li>
+<li>所以必须建立 user threads 和 kernel threads 之间的<strong>映射</strong></li>
+</ul>
+<h2>6 · Multithreading Models</h2>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>映射</th>
+<th>优点</th>
+<th>缺点</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Many-to-One</strong></td>
+<td>多个 user threads → <strong>一个</strong> kernel thread</td>
+<td></td>
+<td><strong>一个线程阻塞（即那个 kernel thread 阻塞），所有线程都阻塞</strong>（整个进程阻塞）；<strong>不能在多核上并行</strong>（同一时刻只有一个 kernel thread 活跃）</td>
+<td>Solaris Green Threads、GNU Portable Threads（现在很少用）</td>
+</tr>
+<tr>
+<td><strong>One-to-One</strong></td>
+<td>每个 user thread → <strong>一个</strong> kernel thread</td>
+<td><strong>最大的并发</strong>；多个线程能在多处理器 / 多核上<strong>并行</strong></td>
+<td>创建 user thread 就<strong>必须创建</strong> kernel thread，开销大（kernel threads 占内存、I/O 等资源）⇒ 有时要<strong>限制</strong>每个进程的线程数</td>
+<td><strong>Windows、Linux</strong>（<strong>现代 OS 最常用</strong>）</td>
+</tr>
+<tr>
+<td><strong>Many-to-Many</strong></td>
+<td>多个 user threads → <strong>较少或相等</strong>数量的 kernel threads</td>
+<td>一定程度的并发；OS 可以<strong>预先创建</strong>足够的 kernel threads——<strong>thread pool</strong></td>
+<td>最灵活但<strong>难实现</strong></td>
+<td>Windows ThreadFiber（否则不常见）</td>
+</tr>
+<tr>
+<td><strong>Two-level</strong></td>
+<td>类似 many-to-many，但<strong>允许把某个 user thread 绑定</strong>到一个 kernel thread</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>many-to-one 和 many-to-many 中「哪个 user thread 映射到 kernel thread」是一个调度问题，叫 <strong>process-contention scope（PCS）</strong>（Ch5）</li>
+<li>many-to-many 的灵活性：例如在 8 核系统上一个应用可以分到比 4 核系统更多的 kernel threads</li>
+<li><strong>随着核数越来越多，限制 kernel threads 的数量变得不那么重要 ⇒ 现在大多数 OS 用 one-to-one</strong></li>
+</ul>
+<h2>7 · Threading Issues</h2>
+<h3>7.1 fork() 和 exec() 的语义</h3>
+<ul>
+<li>一个线程调用 <code>fork()</code>，是<strong>只复制调用线程</strong>，还是<strong>复制进程的所有线程</strong>？</li>
+<li>有的 UNIX 系统有<strong>两个版本</strong>的 <code>fork()</code>：
+<ul>
+<li>如果 <code>fork()</code> 之后<strong>立刻 <code>exec()</code></strong>，复制所有线程<strong>没必要</strong>（exec 会替换整个进程）⇒ 只复制调用线程</li>
+<li>否则复制所有线程</li>
+</ul>
+</li>
+<li><strong><code>exec()</code> 照常工作</strong>：替换<strong>整个进程</strong>，包括所有线程</li>
+</ul>
+<h3>7.2 Signal handling（往年选择题）</h3>
+<ul>
+<li>UNIX 用 <strong>signal</strong> 通知进程某个事件发生了；根据来源和原因，可以<strong>同步</strong>或<strong>异步</strong>接收</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Synchronous signals</th>
+<th>Asynchronous signals</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>来源</td>
+<td>进程<strong>自己的操作</strong>引起</td>
+<td>运行进程<strong>外部</strong>的事件</td>
+</tr>
+<tr>
+<td>例子</td>
+<td><strong>非法内存访问、除以 0</strong></td>
+<td>用特定按键（<strong>Ctrl+C</strong>）终止进程、<strong>timer 到期</strong></td>
+</tr>
+<tr>
+<td>发给谁</td>
+<td>发给<strong>引起它的那个进程</strong>（所以叫同步）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>处理方式不同：有的可以忽略，有的（如非法内存访问）通过终止程序处理</li>
+</ul>
+<p><strong>Signal handler 的模式</strong>：</p>
+<ol>
+<li>某个事件<strong>产生</strong> signal</li>
+<li>signal 被<strong>递送</strong>到进程</li>
+<li>由两种 handler 之一<strong>处理</strong>：<strong>default</strong> 或 <strong>user-defined</strong></li>
+</ol>
+<ul>
+<li>每个 signal 都有 kernel 用的 <strong>default handler</strong>；<strong>user-defined handler 可以覆盖</strong> default</li>
+<li>单线程进程：signal 发给该进程 / 线程</li>
+<li>**多线程进程，signal 发给谁？**四种选择：
+<ol>
+<li>发给 signal <strong>所针对的那个线程</strong></li>
+<li>发给进程中<strong>每个线程</strong></li>
+<li>发给进程中<strong>某些线程</strong></li>
+<li>指定一个线程接收该进程的<strong>所有</strong> signal</li>
+</ol>
+</li>
+<li><strong>取决于 signal 的类型</strong>：
+<ul>
+<li><strong>同步 signal</strong> 发给<strong>引起它的那个线程</strong>，不发给其他线程</li>
+<li>某些<strong>异步 signal</strong>（如终止进程的 Ctrl+C）应<strong>发给所有线程</strong></li>
+</ul>
+</li>
+<li>UNIX 递送 signal 的函数：<code>kill(pid_t pid, int signal)</code>（指定进程）</li>
+<li>POSIX Pthreads：<code>pthread_kill(pthread_t tid, int signal)</code>（指定线程）</li>
+</ul>
+<blockquote>
+<p><strong>往年考法</strong>：关于 signal handling <strong>错误</strong>的是「<strong>所有 signal 都应该递送给进程中所有线程</strong>」——要看类型，同步 signal 只发给引起它的线程。signal 可同步或异步接收、用户可以给某些 signal 定义 handler、同一进程中不同 signal 可以有不同 handler——都对。</p>
+</blockquote>
+<h3>7.3 Thread cancellation</h3>
+<ul>
+<li>在线程完成前终止它；要被取消的线程叫 <strong>target thread</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Asynchronous cancellation</strong></td>
+<td><strong>立即</strong>终止 target thread</td>
+</tr>
+<tr>
+<td><strong>Deferred cancellation</strong></td>
+<td>target thread <strong>定期检查</strong>自己是否该终止，有机会<strong>有序地</strong>结束自己</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>发起取消只是<strong>请求</strong>取消，实际取消取决于线程的状态和类型</li>
+<li>Pthreads 中，如果线程<strong>禁用了</strong>取消，取消请求会<strong>挂起</strong>直到它启用；<strong>默认类型是 deferred</strong></li>
+</ul>
+<p><strong>为什么 asynchronous 有风险？（补充）</strong> 线程可能正在更新共享数据或持有资源，被立刻杀掉会留下不一致的数据或没释放的资源；deferred 让它在安全的检查点（cancellation point）退出。</p>
+<p><strong>Pthreads 代码</strong>（<code>#include &lt;pthread.h&gt;</code>）：</p>
+<pre><code class="language-c">pthread_t tid;
+/* create the thread */
+pthread_create(&amp;tid, 0, worker, NULL);   /* worker 是 start routine */
+...
+/* cancel the thread */
+pthread_cancel(tid);
+/* wait for the thread to terminate */
+pthread_join(tid, NULL);
+</code></pre>
+<h2>8 · OS Examples</h2>
+<h3>8.1 Windows threads</h3>
+<ul>
+<li>Windows 应用作为一个独立进程运行，每个进程可有一个或多个线程；主要 API 是 Windows API</li>
+<li>Windows 用 <strong>one-to-one</strong> 映射</li>
+<li>一个 Windows 线程的组成：
+<ul>
+<li><strong>thread ID</strong></li>
+<li><strong>register set</strong>（处理器状态）</li>
+<li><strong>PC</strong></li>
+<li><strong>分开的 user stack 和 kernel stack</strong>（线程在 user mode / kernel mode 运行时用）</li>
+<li><strong>私有数据存储区</strong>（runtime 库和 DLL 用）</li>
+</ul>
+</li>
+<li>register set、stacks、私有存储区合称线程的 <strong>context</strong></li>
+</ul>
+<p><strong>主要数据结构</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>结构</th>
+<th>在哪</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ETHREAD</strong>（executive thread block）</td>
+<td>kernel space</td>
+<td>指向所属<strong>进程</strong>的指针、指向 <strong>KTHREAD</strong> 的指针</td>
+</tr>
+<tr>
+<td><strong>KTHREAD</strong>（kernel thread block）</td>
+<td>kernel space</td>
+<td><strong>调度和同步</strong>信息、<strong>kernel-mode stack</strong>、指向 <strong>TEB</strong> 的指针</td>
+</tr>
+<tr>
+<td><strong>TEB</strong>（thread environment block）</td>
+<td><strong>user space</strong></td>
+<td><strong>thread id</strong>、<strong>user-mode stack</strong>、<strong>thread-local storage</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>8.2 Linux threads</h3>
+<ul>
+<li><strong>Linux 不区分 thread 和 process</strong>：对 Linux 来说，线程只是一种特殊的进程，统称 <strong>task</strong></li>
+<li>Linux 的线程是<strong>可以和其他线程共享某些资源</strong>的进程；每个线程有自己唯一的 <strong><code>task_struct</code></strong>，看起来就是普通进程——只是碰巧和其他 task 共享资源（如地址空间）</li>
+<li>和 Windows、Solaris 形成对比：它们对线程有<strong>显式的 kernel 支持</strong>（有时称线程为 lightweight processes）</li>
+</ul>
+<p><strong>例：一个进程有两个线程</strong>：</p>
+<ul>
+<li><strong>Windows</strong>：<strong>一个 PCB</strong> 描述共享资源（地址空间、打开的文件），它指向<strong>两个线程</strong>；每个线程的 <strong>TCB</strong> 描述它<strong>独有</strong>的资源</li>
+<li><strong>Linux</strong>：就是<strong>两个 task</strong>，各有普通的 <code>task_struct</code>，被设置成<strong>共享资源</strong></li>
+</ul>
+<p><strong><code>clone()</code></strong>：线程的创建方式和普通 task 一样，只是用 <code>clone()</code> 传递 <strong>flags</strong>，指定要共享的资源：</p>
+<pre><code class="language-c">clone(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND, 0);
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>flag</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLONE_FS</code></td>
+<td>File-system information is shared</td>
+</tr>
+<tr>
+<td><code>CLONE_VM</code></td>
+<td>The same memory space is shared</td>
+</tr>
+<tr>
+<td><code>CLONE_SIGHAND</code></td>
+<td>Signal handlers are shared</td>
+</tr>
+<tr>
+<td><code>CLONE_FILES</code></td>
+<td>The set of open files is shared</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>clone()</code> 让 child task 共享 parent 的一部分执行上下文（地址空间、file descriptors、signal handler），由 flags 控制</li>
+<li><strong>不像 <code>fork()</code> 那样复制所有数据结构</strong>，新 task 根据 flags <strong>指向</strong> parent 的数据结构</li>
+<li><strong>普通的 <code>fork()</code> 可以实现为 <code>clone(SIGCHLD, 0)</code></strong>（什么都不共享）</li>
+</ul>
+<h2>9 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>动机</td>
+<td>应用 / kernel 都多线程；进程创建 heavy-weight</td>
+</tr>
+<tr>
+<td>Thread 定义</td>
+<td>thread ID、PC、register set、stack；共享 code / data / files / signals</td>
+</tr>
+<tr>
+<td>四个好处</td>
+<td>responsiveness、resource sharing、economy、scalability</td>
+</tr>
+<tr>
+<td>五个挑战</td>
+<td>dividing、balance、data splitting、data dependency、testing</td>
+</tr>
+<tr>
+<td>Concurrency vs parallelism</td>
+<td>定义；单核只有 concurrency</td>
+</tr>
+<tr>
+<td>Data vs task parallelism</td>
+<td>区别</td>
+</tr>
+<tr>
+<td>Amdahl</td>
+<td>公式；1.6 的例子；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></math> 趋于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>S</mi></mrow></math>；会算往年四个组合</td>
+</tr>
+<tr>
+<td>线程 context switch</td>
+<td>地址空间不变，开销小</td>
+</tr>
+<tr>
+<td>TCB</td>
+<td>内容；指向 PCB</td>
+</tr>
+<tr>
+<td>共享 / 私有</td>
+<td>全局变量、heap、fd 共享；registers、stack 私有</td>
+</tr>
+<tr>
+<td>User vs kernel threads</td>
+<td>kernel 只调度 kernel threads；三大线程库</td>
+</tr>
+<tr>
+<td>四种模型</td>
+<td>映射、优缺点、例子；现代 OS 多用 one-to-one</td>
+</tr>
+<tr>
+<td>fork / exec 语义</td>
+<td>两个版本的 fork；exec 替换全部</td>
+</tr>
+<tr>
+<td>Signals</td>
+<td>同步 vs 异步（例子）；三步处理；default / user-defined；多线程的四种递送；kill / pthread_kill</td>
+</tr>
+<tr>
+<td>Cancellation</td>
+<td>asynchronous vs deferred；Pthreads 默认 deferred；三个 Pthreads 函数</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>one-to-one；线程组成；ETHREAD / KTHREAD / TEB 及位置</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>不区分线程和进程（task）；<code>clone()</code> 四个 flag；fork = <code>clone(SIGCHLD, 0)</code></td>
+</tr>
+</tbody>
+</table>
+<h2>10 · 易错点</h2>
+<ul>
+<li>同一进程的线程<strong>共享地址空间和 file descriptors</strong>；各自有 <strong>registers、PC、stack</strong>。</li>
+<li>Concurrency ≠ parallelism：<strong>单核也能 concurrency</strong>，但只有多核才有 parallelism。</li>
+<li>Amdahl 公式里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> 是<strong>串行</strong>比例；题目常给并行比例，要先换算。</li>
+<li>Many-to-one：一个阻塞全部阻塞、<strong>不能并行</strong>；one-to-one：<strong>最大并发</strong>但开销大。</li>
+<li>现代 OS（Windows、Linux）多用 <strong>one-to-one</strong>。</li>
+<li>同步 signal（除 0、非法内存访问）只发给<strong>引起它的线程</strong>；Ctrl+C 这种才发给所有线程。</li>
+<li>Pthreads 默认的 cancellation 类型是 <strong>deferred</strong>。</li>
+<li>TEB 在 <strong>user space</strong>，ETHREAD / KTHREAD 在 <strong>kernel space</strong>。</li>
+<li>Linux 的线程就是<strong>共享资源的 task</strong>，没有单独的线程结构。</li>
+</ul>
