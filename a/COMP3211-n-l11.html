@@ -1,0 +1,437 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap：<strong>Value Iteration</strong>（复习加深）→ <strong>Policy Iteration</strong> → <strong>A Preview of Reinforcement Learning</strong></p>
+<blockquote>
+<p>必考：MDP 的四个量（policy / utility / value / Q-value）；racing search tree 的两个问题和对策；<strong>value iteration 的三个问题</strong>（为什么引出 policy iteration）；<strong>policy iteration 两步 + 收敛</strong>；<strong>car racing 的 policy iteration 手算</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.5</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo>=</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mtext>fast</mtext><mo separator="true">,</mo><mtext>slow</mtext><mo stretchy="false">]</mo></mrow></math> → 收敛）；两种迭代的对比和复杂度；offline vs online planning。</p>
+</blockquote>
+<h2>1 · Grid World：确定性 vs 随机</h2>
+<table>
+<thead>
+<tr>
+<th>Deterministic Grid World</th>
+<th>Stochastic Grid World</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>North 就一定往北走</td>
+<td><strong>Noisy movements</strong>：动作不一定照计划执行</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>80%</strong> 往北；<strong>10%</strong> 往西；<strong>10%</strong> 往东</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · Recap：MDP</h2>
+<blockquote>
+<p><strong>Definition: MDP</strong>：States、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mtext>start</mtext></msub></mrow></math>、Actions(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>)、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>、Reward(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>)、IsEnd(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>)</p>
+</blockquote>
+<p><strong>和确定性搜索的显著区别</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Succ</mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>→</mo><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Cost</mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>→</mo><mtext>Reward</mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>。</p>
+<h3>2.1 四个重要的量</h3>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Policy</strong></td>
+<td>states → actions 的映射</td>
+</tr>
+<tr>
+<td><strong>Utility</strong></td>
+<td>一条 path 上 <strong>discounted rewards 的和</strong></td>
+</tr>
+<tr>
+<td><strong>Value</strong></td>
+<td>从一个 <strong>state</strong> 出发的 expected（future）utility</td>
+</tr>
+<tr>
+<td><strong>Q-Value</strong></td>
+<td>从一个 <strong>Q-state</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 出发的 expected（future）utility</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Search problem 的解：a path；MDP 的解：<strong>a policy</strong></li>
+<li><strong>State</strong> 是做决定的节点；<strong>Q-state</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 是「已选好 action、等待随机结果」的节点</li>
+</ul>
+<h2>3 · 用 Value Iteration 解 MDP</h2>
+<h3>3.1 Car Racing（同 L10）</h3>
+<ul>
+<li>想跑得远、跑得快；三个 states：Cool、Warm、Overheated；两个 actions：Slow、Fast；fast 的 reward 翻倍</li>
+<li>Cool：slow → Cool（1.0，+1）；fast → Cool / Warm（各 0.5，+2）</li>
+<li>Warm：slow → Cool / Warm（各 0.5，+1）；fast → Overheated（1.0，−10）</li>
+</ul>
+<h3>3.2 Racing search tree</h3>
+<p>从一个 state 展开：state → 两个 action（slow、fast）→ Q-state（transition）→ 各种 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> → ……</p>
+<p><strong>Many many paths, and could be infinite in depth.</strong> 计算 state 的 value 时有什么问题？</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>对策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Problem 1：Tree goes on forever</strong></td>
+<td><strong>depth-limited</strong> computation + <strong>discounting factor</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>&lt;</mo><mn>1</mn></mrow></math> 时树的深处最终不重要（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>γ</mi><mi>k</mi></msup><mo>→</mo><mn>0</mn></mrow></math>）</td>
+</tr>
+<tr>
+<td><strong>Problem 2：States are repeated</strong>（同一个 state 在树里出现无数次）</td>
+<td><strong>只计算需要的量</strong>（如 optimal values），每个 state 算一次就行，不用整棵树展开</td>
+</tr>
+</tbody>
+</table>
+<p>Value iteration 就是这两个对策的结合：第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 轮的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mrow></math> 相当于「深度为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 的树」的值，而且每个 state 只存一个数。</p>
+<h3>3.3 Optimal quantities</h3>
+<ul>
+<li><strong>Optimal value at state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math></strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mtext>opt</mtext></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>：从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 出发、<strong>acting optimally</strong> 的最大 expected utility</li>
+<li><strong>Optimal value at q-state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></strong>（optimal <strong>q-value</strong>）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mtext>opt</mtext></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>：在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 做 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>、<strong>此后</strong> acting optimally 的最大 expected utility</li>
+<li><strong>Optimal policy</strong>：从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 出发的最优 action（让 optimal q-value 最大的 action）</li>
+</ul>
+<p><strong>Updating：</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msubsup><mi>V</mi><mtext>opt</mtext><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msubsup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mrow></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>a</mi><mo>∈</mo><mtext>Actions</mtext><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></munder><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mtext>Reward</mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><msubsup><mi>V</mi><mtext>opt</mtext><mrow><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><h3>3.4 Value iteration 算法（Bellman, 1957）</h3>
+<blockquote>
+<p>Initialize <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>V</mi><mtext>opt</mtext><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></msubsup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mn>0</mn></mrow></math> for all states <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>.
+For iteration <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>t</mi><mtext>VI</mtext></msub></mrow></math>: For each state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>: 用上式更新。</p>
+<p><strong>Time：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mtext>VI</mtext></msub><mtext> </mtext><mi>S</mi><mi>A</mi><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></strong></p>
+</blockquote>
+<ul>
+<li>每个 state 都要<strong>遍历所有 actions</strong> 才能找到最好的 Q-value。</li>
+<li><strong>Do we need to loop over all the states in each iteration?</strong> → 看下面的 grid world。</li>
+</ul>
+<h3>3.5 Grid World 上的 value iteration</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>12</mn></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>100</mn></mrow></math> 时的 value 几乎一样：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.64</td>
+<td>0.74</td>
+<td>0.85</td>
+<td><strong>1.00</strong></td>
+</tr>
+<tr>
+<td>0.57</td>
+<td>（墙）</td>
+<td>0.57</td>
+<td><strong>−1.00</strong></td>
+</tr>
+<tr>
+<td>0.49</td>
+<td>0.42 → 0.43</td>
+<td>0.47 → 0.48</td>
+<td>0.28</td>
+</tr>
+</tbody>
+</table>
+<p>（箭头左边是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>12</mn></mrow></math>，右边是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>100</mn></mrow></math>；其余格子两者相同）</p>
+<p><strong>Most of the state values converge at early iterations!!!</strong> —— 很多 state 早就不变了，每轮还对它们重算是浪费。</p>
+<h2>4 · Policy Iteration</h2>
+<h3>4.1 Value iteration 的问题</h3>
+<p>Value iteration 不断重复 Bellman update：</p>
+<ul>
+<li><strong>Problem 1</strong>：<strong>慢</strong>——每轮 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>S</mi><mi>A</mi><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Problem 2</strong>：每个 state 上的 <strong>「max」很少变化</strong>（选中的 action 早就定了）</li>
+<li><strong>Problem 3</strong>：<strong>policy 往往比 values 早很多就收敛了</strong></li>
+</ul>
+<p><strong>Could we directly target solving the policy?</strong> —— <strong>Yes, by policy iteration!</strong></p>
+<p><strong>为什么 problem 3 重要？</strong> 我们最终要的是 policy，不是精确的 value。value 还在小数点后几位慢慢变的时候，argmax 早就不变了。</p>
+<h3>4.2 Key idea</h3>
+<blockquote>
+<ul>
+<li><strong>Policy Evaluation</strong>：对<strong>固定的当前</strong> policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>，用 policy evaluation 求 values（迭代直到 values 收敛）</li>
+<li><strong>Policy Improvement</strong>：对<strong>固定的</strong> values，用 <strong>policy extraction</strong> 得到更好的 policy</li>
+<li><strong>Repeat</strong>：重复直到 <strong>policy 收敛</strong></li>
+</ul>
+</blockquote>
+<p><strong>Step 1：Policy evaluation</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mtext>Reward</mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="2em"/><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（左边是 state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 下的 value，右边是 Q-state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math> 的 value。）</p>
+<p><strong>两种算法求 values：</strong></p>
+<ul>
+<li><strong>Linear equation system</strong>（直接解方程）</li>
+<li><strong>Iterative algorithm</strong>（见 Lecture 10）</li>
+</ul>
+<p><strong>Step 2：Policy improvement（policy extraction，one-step lookahead）</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>π</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><mrow></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mtext>Reward</mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><msub><mi>V</mi><msub><mi>π</mi><mi>i</mi></msub></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>用<strong>当前 policy 的 values</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><msub><mi>π</mi><mi>i</mi></msub></msub></mrow></math>，对每个 action 往前看一步，选 Q 最大的。</li>
+</ul>
+<p><strong>Step 3：Repeat</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>π</mi><mo>∗</mo></msup><mo>←</mo><msub><mi>π</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>π</mi><mi>i</mi></msub></mrow></math></div><ul>
+<li>当 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>π</mi><mi>i</mi></msub></mrow></math>（policy 不再变化），返回它作为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo>∗</mo></msup></mrow></math>。</li>
+</ul>
+<h3>4.3 Car Racing 手算（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.5</mn></mrow></math>，考试重点）</h3>
+<p>初始 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>0</mn></msub></mrow></math>：Cool → slow，Warm → slow，Overheated → --（terminal）。</p>
+<p><strong>Step 1：Policy evaluation（求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup></mrow></math>）</strong>——用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>T</mi><mo stretchy="false">[</mo><mtext>Reward</mtext><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math> 列方程：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mtext> </mtext><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo stretchy="false">(</mo><mtext>warm</mtext><mo stretchy="false">)</mo><mo>=</mo><mrow></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0.5</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mtext> </mtext><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>+</mo><mn>0.5</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mtext> </mtext><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo stretchy="false">(</mo><mtext>warm</mtext><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>解：</p>
+<ul>
+<li>第一式：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mi>V</mi><mo>⇒</mo><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn></mrow></math></li>
+<li>第二式代入 cool = 2：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo>+</mo><mn>0.5</mn><mo>+</mo><mn>0.25</mn><mi>V</mi><mo>=</mo><mn>1.5</mn><mo>+</mo><mn>0.25</mn><mi>V</mi></mrow></math>，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo stretchy="false">(</mo><mtext>warm</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn></mrow></math></li>
+<li>Overheated：0</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo>=</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mtext>  </mtext><mn>2</mn><mo separator="true">,</mo><mtext>  </mtext><mn>0</mn><mo stretchy="false">]</mo></mrow></math></div><p><strong>Step 2：Policy improvement（求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>1</mn></msub></mrow></math>）</strong></p>
+<ul>
+<li><strong>Cool</strong>：
+<ul>
+<li>slow：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo stretchy="false">]</mo><mo>=</mo><mn>2</mn></mrow></math></li>
+<li>fast：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.5</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>2</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>2</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo stretchy="false">]</mo><mo>=</mo><mn>3</mn></mrow></math></li>
+<li>→ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo>=</mo><mtext>fast</mtext></mrow></math></li>
+</ul>
+</li>
+<li><strong>Warm</strong>：
+<ul>
+<li>slow：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.5</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo stretchy="false">]</mo><mo>=</mo><mn>2</mn></mrow></math></li>
+<li>fast：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>⋅</mo><mo stretchy="false">[</mo><mo>−</mo><mn>10</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mo>−</mo><mn>10</mn></mrow></math></li>
+<li>→ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mtext>warm</mtext><mo stretchy="false">)</mo><mo>=</mo><mtext>slow</mtext></mrow></math></li>
+</ul>
+</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>π</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mtext>fast</mtext><mo separator="true">,</mo><mtext>  </mtext><mtext>slow</mtext><mo separator="true">,</mo><mtext>  </mtext><mtext>–</mtext><mo stretchy="false">]</mo></mrow></math></div><blockquote>
+<p>⚠️ 课件这一步写 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>argmax</mtext><mo stretchy="false">{</mo><mtext>slow</mtext><mo>:</mo><mn>3</mn><mo separator="true">,</mo><mtext> fast</mtext><mo>:</mo><mo>−</mo><mn>10</mn><mo stretchy="false">}</mo></mrow></math>，但 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.5</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mo stretchy="false">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>2</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow></math>，不是 3。结论（选 slow）不受影响。</p>
+</blockquote>
+<p><strong>Step 3：Policy convergence</strong></p>
+<p>再做一轮：</p>
+<ul>
+<li>评估 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>1</mn></msub></mrow></math>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo>=</mo><mrow></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0.5</mn><mo stretchy="false">[</mo><mn>2</mn><mo>+</mo><mn>0.5</mn><mi>V</mi><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>+</mo><mn>0.5</mn><mo stretchy="false">[</mo><mn>2</mn><mo>+</mo><mn>0.5</mn><mi>V</mi><mo stretchy="false">(</mo><mtext>warm</mtext><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><mtext>warm</mtext><mo stretchy="false">)</mo><mo>=</mo><mrow></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0.5</mn><mo stretchy="false">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mi>V</mi><mo stretchy="false">(</mo><mtext>cool</mtext><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>+</mo><mn>0.5</mn><mo stretchy="false">[</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mi>V</mi><mo stretchy="false">(</mo><mtext>warm</mtext><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>解得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>1</mn></msub></msup><mo>=</mo><mo stretchy="false">[</mo><mn>3.5</mn><mo separator="true">,</mo><mtext>  </mtext><mn>2.5</mn><mo separator="true">,</mo><mtext>  </mtext><mn>0</mn><mo stretchy="false">]</mo></mrow></math>（课件没写这些数，这里补全）。</p>
+<ul>
+<li>提取：
+<ul>
+<li>Cool：slow <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>1</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>3.5</mn><mo>=</mo><mn>2.75</mn></mrow></math>，fast <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0.5</mn><mo stretchy="false">(</mo><mn>2</mn><mo>+</mo><mn>1.75</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.5</mn><mo stretchy="false">(</mo><mn>2</mn><mo>+</mo><mn>1.25</mn><mo stretchy="false">)</mo><mo>=</mo><mn>3.5</mn></mrow></math> → fast</li>
+<li>Warm：slow <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0.5</mn><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mn>1.75</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.5</mn><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mn>1.25</mn><mo stretchy="false">)</mo><mo>=</mo><mn>2.5</mn></mrow></math>，fast <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo>−</mo><mn>10</mn></mrow></math> → slow</li>
+</ul>
+</li>
+</ul>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mtext>fast</mtext><mo separator="true">,</mo><mtext>slow</mtext><mo stretchy="false">]</mo><mo>=</mo><msub><mi>π</mi><mn>1</mn></msub></mrow></math>，<strong>policy 不变 → 收敛</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>1</mn></msub><mo>=</mo><msub><mi>π</mi><mn>2</mn></msub><mo>=</mo><msup><mi>π</mi><mo>∗</mo></msup></mrow></math>。</p>
+<h3>4.4 Policy iteration 算法</h3>
+<blockquote>
+<p><strong>Algorithm: policy iteration</strong></p>
+<p>Initialize <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> arbitrarily, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>s</mi><mo>∈</mo><mi>S</mi></mrow></math></p>
+<p>For iteration <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>t</mi><mtext>PI</mtext></msub></mrow></math>:</p>
+<ul>
+<li>Initialize any state value to be 0, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mn>0</mn></mrow></math></li>
+<li><strong>Repeat</strong>（Policy evaluation）
+<ul>
+<li>For each state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>（即 4.2 的式子）</li>
+</ul>
+</li>
+<li><strong>Until</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>'s convergence</li>
+<li>For each state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>（Policy improvement）：
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>（即 4.2 step 2 的式子）</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p><strong>Time complexity</strong>（每次外层迭代）：</p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>时间</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Policy evaluation</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mtext>PE</mtext></msub><mtext> </mtext><mi>S</mi><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>只用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 一个 action</td>
+</tr>
+<tr>
+<td>Policy improvement</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>S</mi><mi>A</mi><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>每个 state 遍历所有 action，一次</td>
+</tr>
+</tbody>
+</table>
+<p><strong>In practice, only a few iterations are needed to converge the policy (fast)!</strong></p>
+<h2>5 · Value Iteration vs Policy Iteration</h2>
+<p>两者都能求出 MDP 的 <strong>optimal values</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>Value iteration</th>
+<th>Policy iteration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>每轮<strong>同时</strong>更新 values 和（隐式的）policy</td>
+<td>先用<strong>固定 policy</strong> 做几遍 value 更新（每遍快，因为只看一个 action，不看全部）</td>
+</tr>
+<tr>
+<td>不显式记录 policy，但对 actions（Q-values）取 max 等于每轮重新算了一次 policy</td>
+<td>policy 评估完后，再选新 policy（相当于做一次 value iteration 那样的 pass）</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>收敛快</strong>（实际中通常几次迭代就够了）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>MDP Algorithms：So you want to…</strong></p>
+<table>
+<thead>
+<tr>
+<th>想要</th>
+<th>用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>求 optimal values</td>
+<td><strong>value iteration</strong> 或 <strong>policy iteration</strong></td>
+</tr>
+<tr>
+<td>求某个特定 policy 的 values</td>
+<td><strong>policy evaluation</strong></td>
+</tr>
+<tr>
+<td>把 values 变成 policy</td>
+<td><strong>policy extraction</strong>（one-step lookahead）</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · A Preview of Reinforcement Learning</h2>
+<h3>6.1 Double Bandit Game</h3>
+<ul>
+<li><strong>Actions</strong>：Blue、Red；<strong>States</strong>：Win、Lose</li>
+<li>Blue：概率 1.0 得 $1</li>
+<li>Red：概率 0.75 得 $2，概率 0.25 得 $0</li>
+<li>No discount，100 time steps，两个 state 的 value 一样</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Play Red</td>
+<td>150（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>100</mn><mo>×</mo><mo stretchy="false">(</mo><mn>0.75</mn><mo>×</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>150</mn></mrow></math>）</td>
+</tr>
+<tr>
+<td>Play Blue</td>
+<td>100（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>100</mn><mo>×</mo><mn>1</mn></mrow></math>）</td>
+</tr>
+</tbody>
+</table>
+<h3>6.2 Offline planning</h3>
+<ul>
+<li><strong>Solving MDPs is offline planning</strong>
+<ul>
+<li>所有量都<strong>通过计算</strong>得到</li>
+<li>需要知道 MDP 的<strong>全部细节</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 和 Reward）</li>
+<li><strong>You do not actually play the game!</strong></li>
+</ul>
+</li>
+</ul>
+<h3>6.3 Online planning</h3>
+<ul>
+<li><strong>Rules changed! Red's win chance is different</strong>——但没告诉你变成多少。How do we figure it out?</li>
+<li>只能真的去玩：课件 Let's Play 里拉 Red 得到一串 $0 $0 $0 $2 $0 / $2 $0 $0 $0 $0，从结果里估计 Red 现在的胜率。</li>
+<li><strong>Not offline planning any more. It is online planning (learning)</strong>
+<ul>
+<li>具体说就是 <strong>reinforcement learning</strong></li>
+<li>有一个 MDP，但<strong>光靠计算解不出来</strong>（不知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> / Reward）</li>
+<li><strong>You need to actually act to figure it out</strong></li>
+</ul>
+</li>
+</ul>
+<h2>7 · Summary</h2>
+<ul>
+<li><strong>MDPs</strong>：应对不确定性的模型</li>
+<li><strong>Solution</strong>：policies rather than paths</li>
+<li><strong>Policy evaluation</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>MDP</mtext><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">)</mo><mo>→</mo><msub><mi>V</mi><mi>π</mi></msub></mrow></math></li>
+<li><strong>Value iteration</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>MDP</mtext><mo>→</mo><mo stretchy="false">(</mo><msub><mi>V</mi><mtext>opt</mtext></msub><mo separator="true">,</mo><msub><mi>Q</mi><mtext>opt</mtext></msub><mo separator="true">,</mo><msub><mi>π</mi><mtext>opt</mtext></msub><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Policy iteration</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>MDP</mtext><mo>→</mo><mo stretchy="false">(</mo><msub><mi>π</mi><mtext>opt</mtext></msub><mo separator="true">,</mo><msub><mi>V</mi><mtext>opt</mtext></msub><mo separator="true">,</mo><msub><mi>Q</mi><mtext>opt</mtext></msub><mo stretchy="false">)</mo></mrow></math></li>
+<li>Next time：Reinforcement Learning</li>
+</ul>
+<h2>8 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stochastic grid world</td>
+<td>80 / 10 / 10 的 noisy movement</td>
+</tr>
+<tr>
+<td>四个量</td>
+<td>policy、utility、value、Q-value 的定义；state vs Q-state</td>
+</tr>
+<tr>
+<td>Search tree 的两个问题</td>
+<td>无限深 → depth-limited + discount；重复 state → 只算需要的量</td>
+</tr>
+<tr>
+<td>Optimal quantities</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mtext>opt</mtext></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mtext>opt</mtext></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mtext>opt</mtext></msub></mrow></math> 的文字定义和更新式</td>
+</tr>
+<tr>
+<td>Value iteration</td>
+<td>算法、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mtext>VI</mtext></msub><mi>S</mi><mi>A</mi><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>；grid world 早期收敛</td>
+</tr>
+<tr>
+<td>VI 的三个问题</td>
+<td>慢、max 很少变、policy 先于 values 收敛</td>
+</tr>
+<tr>
+<td>Policy iteration</td>
+<td>evaluation + improvement + repeat；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo>∗</mo></msup><mo>←</mo><msub><mi>π</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>π</mi><mi>i</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>PE 的两种求法</td>
+<td>解线性方程、迭代</td>
+</tr>
+<tr>
+<td>Car racing PI</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><msub><mi>π</mi><mn>0</mn></msub></msup><mo>=</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mtext>fast</mtext><mo separator="true">,</mo><mtext>slow</mtext><mo stretchy="false">]</mo></mrow></math>；收敛</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>PE <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mtext>PE</mtext></msub><mi>S</mi><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>，improvement <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>S</mi><mi>A</mi><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>VI vs PI</td>
+<td>对比表；什么时候用哪个</td>
+</tr>
+<tr>
+<td>Offline vs online</td>
+<td>知不知道 MDP 细节；要不要真的去 act → RL</td>
+</tr>
+<tr>
+<td>Double bandit</td>
+<td>Red 150、Blue 100</td>
+</tr>
+</tbody>
+</table>
+<h2>9 · 易错点</h2>
+<ul>
+<li>Policy iteration 的 evaluation 步<strong>没有 max</strong>（action 由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 固定）；只有 improvement 步有 argmax。</li>
+<li>Improvement 用的是 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><msub><mi>π</mi><mi>i</mi></msub></msub></mrow></math></strong>（当前 policy 的值），不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mtext>opt</mtext></msub></mrow></math>。</li>
+<li>收敛条件是 <strong>policy 不再变化</strong>，不是 values 不再变化。</li>
+<li>Car racing 的 policy iteration 例子用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.5</mn></mrow></math>；L10 的 value iteration 例子是无 discount。看清题目给的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math>。</li>
+<li>Overheated 是 terminal，value 恒为 0，policy 写「--」。</li>
+<li>课件 warm 的 slow 那一步算成 3 是错的，正确值是 2（不影响结论）。</li>
+<li>Offline planning 需要<strong>已知</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 和 Reward；不知道时就是 RL。</li>
+</ul>

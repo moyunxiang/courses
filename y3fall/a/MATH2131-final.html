@@ -1,0 +1,792 @@
+<h2>Scope</h2>
+<ul>
+<li><strong>Thu 2026-12-17, 08:30–11:30, Tsang Shiu Tim Art Hall (Atrium)</strong> (ARO exam timetable). <strong>3 hours</strong> (Syllabus: &quot;one 3-hour Final Exam&quot;). Weight <strong>53%</strong> (Canvas page) vs 55% (<code>files/Syllabus.pdf</code>).</li>
+<li><strong>Scope not announced yet</strong> (no final-exam announcement on Canvas as of 11-11). Working assumption: <strong>cumulative, Lecture Notes Ch 1–10</strong>, with weight on what the midterm did not test: <strong>§4.4–4.7 and Ch 5–10</strong>. Source: Syllabus topic list + tentative schedule (Wk 8 Spectral Theory … Wk 13 Quotient and Dual Spaces); HW04–HW06 headers (Ch 5.1–6.2 / 7.1–8.4 / 9.1–10.2).</li>
+<li>Rules unknown. Midterm was open notes (4 A4 pages) + HKEAA calculator, &quot;only results up till Chapter 4&quot;; expect the same format (T/F · Computations · Short proofs · Long question) — <strong>not confirmed</strong>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Notes §</th>
+<th>Topic</th>
+<th>Lecture</th>
+<th>Status (11-11)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.4–4.7</td>
+<td>orthogonal matrices, QR, least squares, Gram det</td>
+<td>L13</td>
+<td>given</td>
+</tr>
+<tr>
+<td>5.1–5.3</td>
+<td>eigenvalues, char. polynomial, diagonalization</td>
+<td>L14–L15</td>
+<td>given</td>
+</tr>
+<tr>
+<td>5.4</td>
+<td>spectral theorem (real symmetric)</td>
+<td>L15</td>
+<td>given</td>
+</tr>
+<tr>
+<td>6.1–6.2</td>
+<td>positive definite, √A, SVD, A⁺, polar</td>
+<td>L16–L17a</td>
+<td>given</td>
+</tr>
+<tr>
+<td>7.1–7.4</td>
+<td>adjoint, unitary, Hermitian, normal, Schur</td>
+<td>L17b–L18</td>
+<td>given</td>
+</tr>
+<tr>
+<td>8.1–8.2</td>
+<td>invariant subspaces, Cayley–Hamilton</td>
+<td>L19</td>
+<td>given</td>
+</tr>
+<tr>
+<td>App. C</td>
+<td>complexification, real normal matrices</td>
+<td>L19.5</td>
+<td>given</td>
+</tr>
+<tr>
+<td>8.3–8.4</td>
+<td>minimal polynomial, commuting operators</td>
+<td>Wk 11</td>
+<td><strong>pending</strong> (sheet below from the notes)</td>
+</tr>
+<tr>
+<td>9.1–9.3</td>
+<td>nilpotent, Jordan, rational canonical form</td>
+<td>Wk 12</td>
+<td><strong>pending</strong></td>
+</tr>
+<tr>
+<td>10.1–10.2</td>
+<td>quotient spaces, dual spaces</td>
+<td>Wk 13</td>
+<td><strong>pending</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Ch 1–4.3 formulas and templates: see the <strong>Midterm Review Outline</strong> (<code>MATH2131/solutions/midterm.md</code>); not repeated here.</li>
+<li>Notation: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo><mo>=</mo><mi>det</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false">)</mo></mrow></math> (sign <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi>n</mi></msup></mrow></math> vs monic); complex inner product linear in the <strong>first</strong> slot, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo>⋅</mo><mi>v</mi><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>u</mi><mi>i</mi></msub><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mi>i</mi></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>∗</mo></msup><mo>=</mo><msup><mover accent="true"><mi>A</mi><mo>ˉ</mo></mover><mi>T</mi></msup></mrow></math>.</li>
+</ul>
+<h2>Formula Sheet</h2>
+<h3>Ch 4.4–4.7 Orthogonal matrices, QR, least squares (not on the midterm)</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Formula / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isometry (Prop 4.27)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>T</mi><mi>v</mi><mo stretchy="false">∥</mo><mo>=</mo><mo stretchy="false">∥</mo><mi>v</mi><mo stretchy="false">∥</mo><mtext> </mtext><mi mathvariant="normal">∀</mi><mi>v</mi><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mo stretchy="false">⟨</mo><mi>T</mi><mi>u</mi><mo separator="true">,</mo><mi>T</mi><mi>v</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">⟩</mo></mrow></math>; always injective</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> (Def 4.30, Thm 4.31)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>P</mi><mi>T</mi></msup><mi>P</mi><mo>=</mo><mi>I</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><msup><mi>P</mi><mi>T</mi></msup></mrow></math>, group, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mi>P</mi><mo>=</mo><mo>±</mo><mn>1</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mo>=</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>QR (Thm 4.32)</td>
+<td>indep. cols: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>Q</mi><mi>R</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> = G–S orthonormal cols, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>=</mo><msup><mi>Q</mi><mi>T</mi></msup><mi>A</mi></mrow></math> upper triangular, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Least squares (Thm 4.33)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mover accent="true"><mi>x</mi><mo>^</mo></mover><mo>=</mo><msub><mrow><mi mathvariant="normal">Proj</mi><mo>⁡</mo></mrow><mrow><mi mathvariant="normal">Col</mi><mo>⁡</mo><mi>A</mi></mrow></msub><mi>b</mi><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi><mover accent="true"><mi>x</mi><mo>^</mo></mover><mo>=</mo><msup><mi>A</mi><mi>T</mi></msup><mi>b</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mover accent="true"><mi>x</mi><mo>^</mo></mover><mo>=</mo><msup><mi>Q</mi><mi>T</mi></msup><mi>b</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Gram det (Thm 4.34)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-volume <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msqrt><mrow><mi>det</mi><mo>⁡</mo><mo stretchy="false">(</mo><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi><mo stretchy="false">)</mo></mrow></msqrt></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>Ch 5 Spectral Theory</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Formula / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Eigen (Def 5.1, Prop 5.3)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>v</mi><mo>=</mo><mi>λ</mi><mi>v</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>λ</mi></msub><mo>=</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>T</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false">)</mo></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> eigenvalue <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>T</mi><mo>−</mo><mi>λ</mi><mi>I</mi></mrow></math> not invertible</td>
+</tr>
+<tr>
+<td>Triangular (Prop 5.4)</td>
+<td>eigenvalues = diagonal entries</td>
+</tr>
+<tr>
+<td>Distinct eigenvalues (Thm 5.5)</td>
+<td>eigenvectors for distinct <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>λ</mi><mi>i</mi></msub></mrow></math> are independent</td>
+</tr>
+<tr>
+<td>Char. poly (Prop 5.7)</td>
+<td>top <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi>n</mi></msup><msup><mi>λ</mi><mi>n</mi></msup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><mi mathvariant="normal">Tr</mi><mo>⁡</mo><mi>A</mi></mrow></math>; constant: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mi>A</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math> (Cor 5.10)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Tr</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><mo>∑</mo><msub><mi>λ</mi><mi>i</mi></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><mo>∏</mo><msub><mi>λ</mi><mi>i</mi></msub></mrow></math> (with alg. mult.)</td>
+</tr>
+<tr>
+<td>Similar (Prop 5.11)</td>
+<td>same det, Tr, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></math>, eigenvalues, alg. + geom. multiplicities</td>
+</tr>
+<tr>
+<td>Powers (Prop 5.13)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>P</mi><mi>B</mi><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>⇒</mo><msup><mi>A</mi><mi>k</mi></msup><mo>=</mo><mi>P</mi><msup><mi>B</mi><mi>k</mi></msup><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mi>P</mi><mtext> </mtext><mi>q</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mtext> </mtext><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Diagonalization (Thm 5.14)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>P</mi><mi>D</mi><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>n</mi></mrow></math> independent eigenvectors; cols of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math> = eigenvectors, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>D</mi></mrow></math> = eigenvalues</td>
+</tr>
+<tr>
+<td>Cor 5.16–5.18</td>
+<td>diag. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>V</mi><mo>=</mo><mo>⨁</mo><msub><mi>V</mi><msub><mi>λ</mi><mi>i</mi></msub></msub><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> geom. = alg. for all <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> distinct <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>⇒</mo></mrow></math> diag.</td>
+</tr>
+<tr>
+<td>Geom ≤ alg (Cor 8.6)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>≤</mo><mi>dim</mi><mo>⁡</mo><msub><mi>V</mi><mi>λ</mi></msub><mo>≤</mo></mrow></math> alg. mult.</td>
+</tr>
+<tr>
+<td>Symmetric (Prop 5.20)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup><mo>=</mo><mi>A</mi><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>u</mi><mo>⋅</mo><mi>A</mi><mi>v</mi><mo>=</mo><mi>A</mi><mi>u</mi><mo>⋅</mo><mi>v</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Thm 5.21 / 5.24</td>
+<td>symmetric: eigenspaces orthogonal; all eigenvalues real</td>
+</tr>
+<tr>
+<td>Spectral thm (Thm 5.25)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup><mo>=</mo><mi>A</mi><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>A</mi><mo>=</mo><mi>P</mi><mi>D</mi><msup><mi>P</mi><mi>T</mi></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>∈</mo><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>Ch 6 Positive Definite Matrices, SVD</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Formula / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bilinear form (Prop 6.2)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>x</mi><mi>T</mi></msup><mi>A</mi><mi>y</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><msub><mi>e</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>e</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow></math>; Killing form <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>n</mi><mi mathvariant="normal">Tr</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>A</mi><mi>B</mi><mo stretchy="false">)</mo><mo>−</mo><mn>2</mn><mi mathvariant="normal">Tr</mi><mo>⁡</mo><mi>A</mi><mi mathvariant="normal">Tr</mi><mo>⁡</mo><mi>B</mi></mrow></math> (Ex 6.2)</td>
+</tr>
+<tr>
+<td>Pos. (semi)definite (Def 6.3)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup><mo>=</mo><mi>A</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>x</mi><mi>T</mi></msup><mi>A</mi><mi>x</mi><mo>&gt;</mo><mn>0</mn></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>0</mn></mrow></math>) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>x</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Inner products on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>ℝ</mi><mi>n</mi></msup></mrow></math> (Prop 6.4)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">⟩</mo><mo>=</mo><msup><mi>x</mi><mi>T</mi></msup><mi>A</mi><mi>y</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> positive definite</td>
+</tr>
+<tr>
+<td>Thm 6.5, Cor 6.6</td>
+<td>pos. (semi)def. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> all <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>λ</mi><mi>i</mi></msub><mo>&gt;</mo><mn>0</mn></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>0</mn></mrow></math>) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo><mi>det</mi><mo>⁡</mo><mi>A</mi><mo>&gt;</mo><mn>0</mn></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>0</mn></mrow></math>); signature <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>n</mi><mo>+</mo></msub><mo separator="true">,</mo><msub><mi>n</mi><mo>−</mo></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Square root (Thm 6.7, Prop 6.8)</td>
+<td>unique p.s.d. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mi>A</mi></msqrt><mo>=</mo><mi>P</mi><msup><mi>D</mi><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup><msup><mi>P</mi><mi>T</mi></msup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mi>A</mi></msqrt><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>λ</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msqrt><msub><mi>λ</mi><mi>i</mi></msub></msqrt></mrow></math> (Lagrange)</td>
+</tr>
+<tr>
+<td>Cor 6.9</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi><mi>A</mi><mo>=</mo><mi>A</mi><mi>B</mi><mo>⇒</mo><mi>B</mi><msqrt><mi>A</mi></msqrt><mo>=</mo><msqrt><mi>A</mi></msqrt><mi>B</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Absolute value (Thm 6.10)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></math> p.s.d.; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>A</mi><mo stretchy="false">∣</mo><mo>=</mo><msqrt><mrow><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></msqrt></mrow></math>; every p.s.d. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Prop 6.11</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Nul</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><mi mathvariant="normal">Nul</mi><mo>⁡</mo><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">rank</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><mi mathvariant="normal">rank</mi><mo>⁡</mo><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Singular values (Def 6.12)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>σ</mi><mi>i</mi></msub><mo>=</mo><msqrt><mrow><msub><mi>λ</mi><mi>i</mi></msub><mo stretchy="false">(</mo><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi><mo stretchy="false">)</mo></mrow></msqrt><mo>=</mo><mo stretchy="false">∥</mo><mi>A</mi><msub><mi>v</mi><mi>i</mi></msub><mo stretchy="false">∥</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>σ</mi><mn>1</mn></msub><mo>≥</mo><mo>⋯</mo><mo>≥</mo><msub><mi>σ</mi><mi>r</mi></msub><mo>&gt;</mo><mn>0</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mi mathvariant="normal">rank</mi><mo>⁡</mo><mi>A</mi></mrow></math></td>
+</tr>
+<tr>
+<td>SVD (Thm 6.13)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>U</mi><mi mathvariant="normal">Σ</mi><msup><mi>V</mi><mi>T</mi></msup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>i</mi></msub></mrow></math> = O.N. eigenvectors of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>u</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><mi>A</mi><msub><mi>v</mi><mi>i</mi></msub></mrow><msub><mi>σ</mi><mi>i</mi></msub></mfrac></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi><mo>≤</mo><mi>r</mi></mrow></math>), extend to O.N. basis</td>
+</tr>
+<tr>
+<td>Four subspaces (Thm 6.15)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Row</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>v</mi><mrow><mn>1..</mn><mi>r</mi></mrow></msub><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Nul</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>v</mi><mrow><mi>r</mi><mo>+</mo><mn>1..</mn><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Col</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>u</mi><mrow><mn>1..</mn><mi>r</mi></mrow></msub><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Nul</mi><mo>⁡</mo><msup><mi>A</mi><mi>T</mi></msup><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>u</mi><mrow><mi>r</mi><mo>+</mo><mn>1..</mn><mi>m</mi></mrow></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Polar (Thm 6.14)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>P</mi><mi>H</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mi>U</mi><msup><mi>V</mi><mi>T</mi></msup></mrow></math> orthogonal, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo>=</mo><mi>V</mi><mi mathvariant="normal">Σ</mi><msup><mi>V</mi><mi>T</mi></msup><mo>=</mo><mo stretchy="false">∣</mo><mi>A</mi><mo stretchy="false">∣</mo></mrow></math> p.s.d.</td>
+</tr>
+<tr>
+<td>Pseudo-inverse (Def 6.16, Thm 6.17)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><msub><mi>U</mi><mi>r</mi></msub><mi>D</mi><msubsup><mi>V</mi><mi>r</mi><mi>T</mi></msubsup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>+</mo></msup><mo>=</mo><msub><mi>V</mi><mi>r</mi></msub><msup><mi>D</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msubsup><mi>U</mi><mi>r</mi><mi>T</mi></msubsup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><msup><mi>A</mi><mo>+</mo></msup><mo>=</mo><msub><mrow><mi mathvariant="normal">Proj</mi><mo>⁡</mo></mrow><mrow><mi mathvariant="normal">Col</mi><mo>⁡</mo><mi>A</mi></mrow></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>x</mi><mo>^</mo></mover><mo>=</mo><msup><mi>A</mi><mo>+</mo></msup><mi>b</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Truncation (WS06)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>k</mi></msub><mo>=</mo><msub><mo>∑</mo><mrow><mi>i</mi><mo>≤</mo><mi>k</mi></mrow></msub><msub><mi>σ</mi><mi>i</mi></msub><msub><mi>u</mi><mi>i</mi></msub><msubsup><mi>v</mi><mi>i</mi><mi>T</mi></msubsup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>A</mi><mo>−</mo><msub><mi>A</mi><mi>k</mi></msub><mo stretchy="false">∥</mo><mo>=</mo><msub><mi>σ</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>A</mi><mo stretchy="false">∥</mo><mo>=</mo><msub><mi>σ</mi><mn>1</mn></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>Ch 7 Complex Matrices (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>=</mo><mi>ℂ</mi></mrow></math>)</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Formula / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adjoint (Def 7.1, Prop 7.2)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>T</mi><mi>v</mi><mo separator="true">,</mo><mi>w</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mi>v</mi><mo separator="true">,</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>w</mi><mo stretchy="false">⟩</mo></mrow></math>; exists if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi>V</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>, unique if exists</td>
+</tr>
+<tr>
+<td>Prop 7.3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>c</mi><mi>T</mi><msup><mo stretchy="false">)</mo><mo>∗</mo></msup><mo>=</mo><mover accent="true"><mi>c</mi><mo>ˉ</mo></mover><msup><mi>T</mi><mo>∗</mo></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>T</mi><mo>+</mo><msup><mi>T</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><msup><mo stretchy="false">)</mo><mo>∗</mo></msup><mo>=</mo><msup><mi>T</mi><mo>∗</mo></msup><mo>+</mo><msup><mi>T</mi><mrow><mo mathvariant="normal">′</mo><mo>∗</mo></mrow></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>T</mi><mrow><mo>∗</mo><mo>∗</mo></mrow></msup><mo>=</mo><mi>T</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>T</mi><mi>S</mi><msup><mo stretchy="false">)</mo><mo>∗</mo></msup><mo>=</mo><msup><mi>S</mi><mo>∗</mo></msup><msup><mi>T</mi><mo>∗</mo></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Matrix (Def 7.4)</td>
+<td>O.N. bases: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><msup><mi>T</mi><mo>∗</mo></msup><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mi>T</mi><msup><mo stretchy="false">]</mo><mo>∗</mo></msup><mo>=</mo><msup><mover accent="true"><mrow><mo stretchy="false">[</mo><mi>T</mi><mo stretchy="false">]</mo></mrow><mo>ˉ</mo></mover><mi>T</mi></msup></mrow></math>; real: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Thm 7.5</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><msup><mi>A</mi><mo>∗</mo></msup><mo>=</mo><mover accent="true"><mrow><mi>det</mi><mo>⁡</mo><mi>A</mi></mrow><mo stretchy="true">‾</mo></mover></mrow></math></td>
+</tr>
+<tr>
+<td>Self-adjoint (Thm 7.9)</td>
+<td>eigenspaces orthogonal, eigenvalues real, O.N. eigenbasis</td>
+</tr>
+<tr>
+<td>Orth. projection (Def 7.8)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>P</mi><mn>2</mn></msup><mo>=</mo><mi>P</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>P</mi><mo>∗</mo></msup><mo>=</mo><mi>P</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Unitary (Def 7.10, Thm 7.11)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>U</mi><mo>∗</mo></msup><mi>U</mi><mo>=</mo><mi>I</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>U</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><msup><mi>U</mi><mo>∗</mo></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> group; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>det</mi><mo>⁡</mo><mi>U</mi><mo stretchy="false">∣</mo><mo>=</mo><mn>1</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>λ</mi><mo stretchy="false">∣</mo><mo>=</mo><mn>1</mn></mrow></math> (Prop 7.13–7.14)</td>
+</tr>
+<tr>
+<td>Schur (Thm 7.15)</td>
+<td>every <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∈</mo><msub><mi>M</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msub><mo stretchy="false">(</mo><mi>ℂ</mi><mo stretchy="false">)</mo></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>U</mi><mi>T</mi><msup><mi>U</mi><mo>∗</mo></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> upper triangular; real <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> with real eigenvalues: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>P</mi><mi>T</mi><msup><mi>P</mi><mi>T</mi></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Thm 7.16</td>
+<td>real <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo><mi>B</mi></mrow></math> over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi><mo>⇒</mo></mrow></math> over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>; unitarily equiv. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> orthogonally similar</td>
+</tr>
+<tr>
+<td>Hermitian (Thm 7.18)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>∗</mo></msup><mo>=</mo><mi>A</mi><mo>⇒</mo></mrow></math> real eigenvalues, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>U</mi><mi>D</mi><msup><mi>U</mi><mo>∗</mo></msup></mrow></math>; converse needs all <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>∈</mo><mi>ℝ</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Normal (Def 7.19, Prop 7.20)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><msup><mi>T</mi><mo>∗</mo></msup><mo>=</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>T</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>T</mi><mi>v</mi><mo stretchy="false">∥</mo><mo>=</mo><mo stretchy="false">∥</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>v</mi><mo stretchy="false">∥</mo></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>v</mi><mo>=</mo><mi>λ</mi><mi>v</mi><mo>⇒</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>v</mi><mo>=</mo><mover accent="true"><mi>λ</mi><mo>ˉ</mo></mover><mi>v</mi></mrow></math>; eigenspaces orthogonal</td>
+</tr>
+<tr>
+<td>Prop 7.21</td>
+<td>upper triangular + normal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> diagonal</td>
+</tr>
+<tr>
+<td>Spectral thm (Thm 7.22)</td>
+<td>unitarily diagonalizable <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> normal</td>
+</tr>
+<tr>
+<td>Normal examples (Ex 7.7)</td>
+<td>Hermitian, unitary, skew-Hermitian, real symmetric, real orthogonal</td>
+</tr>
+<tr>
+<td>Real normal (Thm C.7)</td>
+<td>orthogonally similar to blocks <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>λ</mi><mi>i</mi></msub></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mi>b</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Complexification (App. C)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>ℂ</mi></msub><mo>=</mo><mi>V</mi><mo>×</mo><mi>V</mi></mrow></math>, same matrix; same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math>; non-real <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> come in pairs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo separator="true">,</mo><mover accent="true"><mi>λ</mi><mo>ˉ</mo></mover></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>-invariant <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>dim</mi><mo>⁡</mo></mrow><mi>ℝ</mi></msub><mi>U</mi><mo>∈</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">}</mo></mrow></math> (Prop C.5)</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch 8 Invariant Subspaces</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Formula / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>-invariant (Def 8.1)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>U</mi><mo stretchy="false">)</mo><mo>⊂</mo><mi>U</mi></mrow></math>; e.g. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>0</mn><mo stretchy="false">}</mo><mo separator="true">,</mo><mi>V</mi><mo separator="true">,</mo><msub><mi>V</mi><mi>λ</mi></msub><mo separator="true">,</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mi>T</mi><mo separator="true">,</mo><mi mathvariant="normal">Im</mi><mo>⁡</mo><mi>T</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Cyclic (Def 8.2, Prop 8.3)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>v</mi></msub><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">{</mo><mi>v</mi><mo separator="true">,</mo><mi>T</mi><mi>v</mi><mo separator="true">,</mo><msup><mi>T</mi><mn>2</mn></msup><mi>v</mi><mo separator="true">,</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">}</mo></mrow></math>, basis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>v</mi><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msup><mi>T</mi><mrow><mi>r</mi><mo>−</mo><mn>1</mn></mrow></msup><mi>v</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mi>dim</mi><mo>⁡</mo><msub><mi>U</mi><mi>v</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Block form (Prop 8.5)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mo>⨁</mo><msub><mi>U</mi><mi>i</mi></msub></mrow></math> invariant <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> block diagonal; one invariant <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> block upper triangular</td>
+</tr>
+<tr>
+<td>Prop 8.7</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>-inv. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo><msup><mi>U</mi><mo>⊥</mo></msup></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>T</mi><mo>∗</mo></msup></mrow></math>-inv.; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> normal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo><msup><mi>U</mi><mo>⊥</mo></msup></mrow></math> also <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>-inv.</td>
+</tr>
+<tr>
+<td>Prop 8.8</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mrow><mi mathvariant="normal">∣</mi><mi>U</mi></mrow></msub><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></math> divides <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Cayley–Hamilton (Thm 8.9)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mi>O</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Minimal poly (Def 8.10, Prop 8.11–8.12)</td>
+<td>monic, least degree, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mi>O</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mi>O</mi><mo>⇒</mo><mi>m</mi><mo>∣</mo><mi>q</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>∣</mo><mi>p</mi></mrow></math>; roots of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> = all eigenvalues</td>
+</tr>
+<tr>
+<td>Primary decomposition (Thm 8.13)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><msub><mi>p</mi><mn>1</mn></msub><mo>⋯</mo><msub><mi>p</mi><mi>k</mi></msub></mrow></math> pairwise coprime <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo><mi>V</mi><mo>=</mo><mo>⨁</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Diag. test (Thm 8.14)</td>
+<td>diagonalizable <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>m</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></math> = product of <strong>distinct</strong> linear factors</td>
+</tr>
+<tr>
+<td>Prop 8.15</td>
+<td>diag. / normal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>⇒</mo><mi>T</mi><msub><mi mathvariant="normal">∣</mi><mi>U</mi></msub></mrow></math> diag. / normal</td>
+</tr>
+<tr>
+<td>Commuting (Thm 8.16, Cor 8.18)</td>
+<td>diagonalizable <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>i</mi></msub></mrow></math>: commute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> simultaneously diagonalizable; all normal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> unitary <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>Ch 9 Canonical Forms (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>=</mo><mi>ℂ</mi></mrow></math>)</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Formula / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generalized eigenspace (Def 9.1)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>T</mi><mo>−</mo><mi>λ</mi><mi>I</mi><msup><mo stretchy="false">)</mo><mi>m</mi></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Nilpotent (Def 9.2)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mi>m</mi></msup><mo>=</mo><mi>O</mi></mrow></math>; strictly upper triangular is nilpotent</td>
+</tr>
+<tr>
+<td>Jordan chain (Prop 9.3)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mi>k</mi></msup><mi>v</mi><mo>=</mo><mn>0</mn><mo mathvariant="normal">≠</mo><msup><mi>S</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup><mi>v</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msup><mi>S</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup><mi>v</mi><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>S</mi><mi>v</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">}</mo></mrow></math> basis of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mi>v</mi></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup><mi>v</mi></mrow></math> = eigenvector</td>
+</tr>
+<tr>
+<td>Jordan block (Def 9.4)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>J</mi><mi>λ</mi><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></msubsup></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> on diagonal, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> on superdiagonal</td>
+</tr>
+<tr>
+<td>Block count (Prop 9.6)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mi>k</mi></msub><mo>=</mo><mi>dim</mi><mo>⁡</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><msup><mo stretchy="false">)</mo><mi>k</mi></msup></mrow></math>: #blocks of size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mi>k</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msub><mi>d</mi><mi>k</mi></msub><mo>−</mo><msub><mi>d</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></math>; #size exactly <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>2</mn><msub><mi>d</mi><mi>k</mi></msub><mo>−</mo><msub><mi>d</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>d</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math></td>
+</tr>
+<tr>
+<td>JCF (Thm 9.7)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo><mi>J</mi><mo>=</mo><mo>⨁</mo><msubsup><mi>J</mi><msub><mi>λ</mi><mi>i</mi></msub><mrow><mo stretchy="false">(</mo><msub><mi>k</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></msubsup></mrow></math>, unique up to order of blocks</td>
+</tr>
+<tr>
+<td>Reading <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>J</mi></mrow></math> (Prop 9.8)</td>
+<td>alg. mult. = # of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> on diagonal; geom. mult. = # <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math>-blocks; exponent in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> = largest <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math>-block</td>
+</tr>
+<tr>
+<td>Thm 9.9</td>
+<td>C–H; diag. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>m</mi></mrow></math> has distinct linear factors; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo></mrow></math> upper triangular; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo><msup><mi>A</mi><mi>T</mi></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Companion (Prop 9.10)</td>
+<td>basis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>v</mi><mo separator="true">,</mo><mi>T</mi><mi>v</mi><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msup><mi>T</mi><mrow><mi>r</mi><mo>−</mo><mn>1</mn></mrow></msup><mi>v</mi><mo stretchy="false">}</mo></mrow></math>: subdiagonal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math>'s, last column <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo>−</mo><msub><mi>a</mi><mn>0</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mo>−</mo><msub><mi>a</mi><mrow><mi>r</mi><mo>−</mo><mn>1</mn></mrow></msub><msup><mo stretchy="false">)</mo><mi>T</mi></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><msup><mi>λ</mi><mi>r</mi></msup><mo>+</mo><msub><mi>a</mi><mrow><mi>r</mi><mo>−</mo><mn>1</mn></mrow></msub><msup><mi>λ</mi><mrow><mi>r</mi><mo>−</mo><mn>1</mn></mrow></msup><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>a</mi><mn>0</mn></msub></mrow></math></td>
+</tr>
+<tr>
+<td>RCF (Thm 9.11)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo><mo>⨁</mo><mi>C</mi><mo stretchy="false">(</mo><msub><mi>g</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>g</mi><mn>1</mn></msub><mo>∣</mo><msub><mi>g</mi><mn>2</mn></msub><mo>∣</mo><mo>⋯</mo><mo>∣</mo><msub><mi>g</mi><mi>k</mi></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mo>±</mo><mo>∏</mo><msub><mi>g</mi><mi>i</mi></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><msub><mi>g</mi><mi>k</mi></msub></mrow></math>; works over any field (e.g. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>)</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch 10 Quotient and Dual Spaces</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Formula / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quotient (Def 10.1, Thm 10.2)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>w</mi><mo>ˉ</mo></mover><mo>=</mo><mi>w</mi><mo>+</mo><mi>U</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>+</mo><mi>U</mi><mo>=</mo><msub><mi>w</mi><mn>2</mn></msub><mo>+</mo><mi>U</mi><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><msub><mi>w</mi><mn>1</mn></msub><mo>−</mo><msub><mi>w</mi><mn>2</mn></msub><mo>∈</mo><mi>U</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi></mrow></math> vector space, zero <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>U</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Quotient map (Prop 10.3)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo>:</mo><mi>v</mi><mo>↦</mo><mi>v</mi><mo>+</mo><mi>U</mi></mrow></math> surjective, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mi>π</mi><mo>=</mo><mi>U</mi></mrow></math></td>
+</tr>
+<tr>
+<td>1st Isomorphism (Thm 10.4)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mi>T</mi><mo>≃</mo><mi mathvariant="normal">Im</mi><mo>⁡</mo><mi>T</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mo>↦</mo><mi>T</mi><mi>v</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Cor 10.5–10.7</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mi>U</mi><mo>⊕</mo><mi>W</mi><mo>⇒</mo><mi>W</mi><mo>≃</mo><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>=</mo><mi>dim</mi><mo>⁡</mo><mi>V</mi><mo>−</mo><mi>dim</mi><mo>⁡</mo><mi>U</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>≃</mo><msup><mi>U</mi><mo>⊥</mo></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Bases (Thm 10.8)</td>
+<td>basis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>u</mi><mrow><mn>1..</mn><mi>r</mi></mrow></msub></mrow></math> of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mrow><mn>1..</mn><mi>m</mi></mrow></msub></mrow></math> of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mrow><mn>1..</mn><mi>m</mi></mrow></msub></mrow></math> basis of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi></mrow></math>'s and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi></mrow></math>'s basis of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Induced map (Thm 10.9)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>U</mi><mo stretchy="false">)</mo><mo>⊂</mo><msup><mi>U</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>⇒</mo><mover accent="true"><mi>T</mi><mo>ˉ</mo></mover><mo>:</mo><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>→</mo><mi>W</mi><mi mathvariant="normal">/</mi><msup><mi>U</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>v</mi><mo>ˉ</mo></mover><mo>↦</mo><mover accent="true"><mrow><mi>T</mi><mi>v</mi></mrow><mo stretchy="true">‾</mo></mover></mrow></math> well-defined</td>
+</tr>
+<tr>
+<td>Universal property (Thm 10.10)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi><mo>⊂</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mi>T</mi><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi mathvariant="normal">∃</mi><mo stretchy="false">!</mo><mtext> </mtext><mover accent="true"><mi>T</mi><mo>ˉ</mo></mover></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mover accent="true"><mi>T</mi><mo>ˉ</mo></mover><mo>∘</mo><mi>π</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Dual (Def 10.11, Prop 10.12)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup><mo>=</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>K</mi><mo stretchy="false">)</mo></mrow></math>; dual basis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>u</mi><mi>i</mi><mo>∗</mo></msubsup><mo stretchy="false">(</mo><msub><mi>u</mi><mi>j</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msub><mi>δ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><msup><mi>V</mi><mo>∗</mo></msup><mo>=</mo><mi>dim</mi><mo>⁡</mo><mi>V</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Riesz-type (Prop 10.13)</td>
+<td>real inner product space: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>≃</mo><msup><mi>V</mi><mo>∗</mo></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>↦</mo><mo stretchy="false">⟨</mo><mo>⋅</mo><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">⟩</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Dual map (Def 10.14, Prop 10.15)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>T</mi><mo>∗</mo></msup><mi>ϕ</mi><mo>=</mo><mi>ϕ</mi><mo>∘</mo><mi>T</mi></mrow></math>; matrix = transpose; = adjoint under <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>≃</mo><msup><mi>V</mi><mo>∗</mo></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Cor 10.16</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">rank</mi><mo>⁡</mo><mi>T</mi><mo>=</mo><mi mathvariant="normal">rank</mi><mo>⁡</mo><msup><mi>T</mi><mo>∗</mo></msup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> inj. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><msup><mi>T</mi><mo>∗</mo></msup></mrow></math> surj.; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> surj. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><msup><mi>T</mi><mo>∗</mo></msup></mrow></math> inj.</td>
+</tr>
+<tr>
+<td>Double dual (Thm 10.17)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi>V</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>≃</mo><msup><mi>V</mi><mrow><mo>∗</mo><mo>∗</mo></mrow></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mrow><mo>∗</mo><mo>∗</mo></mrow></msup><mo stretchy="false">(</mo><mi>ϕ</mi><mo stretchy="false">)</mo><mo>=</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow></math> (canonical)</td>
+</tr>
+<tr>
+<td>Annihilator (Thm 10.18)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>U</mi><mn>0</mn></msup><mo>=</mo><mo stretchy="false">{</mo><mi>ϕ</mi><mo>:</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>U</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo stretchy="false">}</mo><mo>≃</mo><mo stretchy="false">(</mo><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><msup><mo stretchy="false">)</mo><mo>∗</mo></msup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi>U</mi><mo>+</mo><mi>dim</mi><mo>⁡</mo><msup><mi>U</mi><mn>0</mn></msup><mo>=</mo><mi>dim</mi><mo>⁡</mo><mi>V</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>Question Types → Templates</h2>
+<h3>T1 Diagonalize, then compute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>k</mi></msup></mrow></math> (WS05 P2 = Example 5.9)</h3>
+<p>Steps: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></math> → eigenvectors → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>D</mi></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>k</mi></msup><mo>=</mo><mi>P</mi><msup><mi>D</mi><mi>k</mi></msup><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math>, find <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mn>8</mn></msup></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mn>3</mn><mi>λ</mi><mo>+</mo><mn>2</mn><mo>=</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>V</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi>T</mi></msup><mo stretchy="false">}</mo><mo separator="true">,</mo><mspace width="1em"/><msub><mi>V</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><msup><mo stretchy="false">)</mo><mi>T</mi></msup><mo stretchy="false">}</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>P</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mtext> </mtext><mi>D</mi><mo>=</mo><mi mathvariant="normal">diag</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>A</mi><mi>k</mi></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>P</mi><mi mathvariant="normal">diag</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><msup><mn>2</mn><mi>k</mi></msup><mo stretchy="false">)</mo><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn><mo>+</mo><mn>3</mn><mo>⋅</mo><msup><mn>2</mn><mi>k</mi></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>3</mn><mo>−</mo><mn>3</mn><mo>⋅</mo><msup><mn>2</mn><mi>k</mi></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn><mo>+</mo><msup><mn>2</mn><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>3</mn><mo>−</mo><msup><mn>2</mn><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>A</mi><mn>8</mn></msup><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>766</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>765</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>510</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>509</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T2 Orthogonal diagonalization (WS05 P4 = Example 5.14)</h3>
+<p>Steps: eigenvalues → basis of each <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>λ</mi></msub></mrow></math> → Gram–Schmidt <strong>inside</strong> each <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>λ</mi></msub></mrow></math> → normalize (different <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>λ</mi></msub></mrow></math> already orthogonal, Thm 5.21).</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>7</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">(</mo><mi>λ</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>V</mi><mn>7</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo>−</mo><mn>2</mn><mi>x</mi><mo>−</mo><mi>y</mi><mo>+</mo><mn>2</mn><mi>z</mi><mo>=</mo><mn>0</mn><mo>⇒</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>G–S</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>−</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>V</mi><mrow><mo>−</mo><mn>2</mn></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>P</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>18</mn></msqrt></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mfrac><mn>4</mn><msqrt><mn>18</mn></msqrt></mfrac></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mfrac><mn>1</mn><msqrt><mn>18</mn></msqrt></mfrac></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mfrac><mn>2</mn><mn>3</mn></mfrac></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mspace width="1em"/><mi>D</mi><mo>=</mo><mi mathvariant="normal">diag</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>7</mn><mo separator="true">,</mo><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="1em"/><mi>A</mi><mo>=</mo><mi>P</mi><mi>D</mi><msup><mi>P</mi><mi>T</mi></msup></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T3 Positive definite / square root (WS06 P1 = Example 6.7)</h3>
+<p>Steps: symmetric? → all <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>λ</mi><mi>i</mi></msub><mo>&gt;</mo><mn>0</mn></mrow></math> (Thm 6.5) → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mi>A</mi></msqrt><mo>=</mo><mi>P</mi><msup><mi>D</mi><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup><msup><mi>P</mi><mi>T</mi></msup></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>λ</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msqrt><msub><mi>λ</mi><mi>i</mi></msub></msqrt></mrow></math>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>λ</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>9</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo>&gt;</mo><mn>0</mn><mo>⇒</mo><mtext>positive definite</mtext><mo separator="true">;</mo><mtext> </mtext><msub><mi>v</mi><mn>9</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><msub><mi>v</mi><mn>1</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msqrt><mi>A</mi></msqrt></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>3</mn><msub><mi>v</mi><mn>9</mn></msub><msubsup><mi>v</mi><mn>9</mn><mi>T</mi></msubsup><mo>+</mo><mn>1</mn><mtext> </mtext><msub><mi>v</mi><mn>1</mn></msub><msubsup><mi>v</mi><mn>1</mn><mi>T</mi></msubsup><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><mn>9</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mtext> </mtext><mi>p</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>⇒</mo><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mi>t</mi><mo>+</mo><mn>3</mn></mrow><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mspace width="1em"/><mi>p</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><msqrt><mi>A</mi></msqrt></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msqrt><mi>A</mi></msqrt><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo stretchy="false">(</mo><mi>A</mi><mo>+</mo><mn>3</mn><mi>I</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Quick tests (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math>, symmetric): p.d. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><msub><mi>a</mi><mn>11</mn></msub><mo>&gt;</mo><mn>0</mn></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mi>A</mi><mo>&gt;</mo><mn>0</mn></mrow></math>. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow></math>: leading minors <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>0</mn></mrow></math> is <strong>not</strong> enough for p.s.d. (HW04 1(j), False).</li>
+</ul>
+<h3>T4 SVD and pseudo-inverse (WS06 P2 = Example 6.8)</h3>
+<p>Steps: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>λ</mi><mi>i</mi></msub></mrow></math>, O.N. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>i</mi></msub></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>σ</mi><mi>i</mi></msub><mo>=</mo><msqrt><msub><mi>λ</mi><mi>i</mi></msub></msqrt></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>u</mi><mi>i</mi></msub><mo>=</mo><mi>A</mi><msub><mi>v</mi><mi>i</mi></msub><mi mathvariant="normal">/</mi><msub><mi>σ</mi><mi>i</mi></msub></mrow></math> → extend → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>+</mo></msup><mo>=</mo><msub><mi>V</mi><mi>r</mi></msub><msup><mi>D</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msubsup><mi>U</mi><mi>r</mi><mi>T</mi></msubsup></mrow></math>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>A</mi><mi>T</mi></msup><mi>A</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mtext> </mtext><mi>λ</mi><mo>=</mo><mn>4</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>v</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><msub><mi>v</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><msub><mi>v</mi><mn>3</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>σ</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>σ</mi><mn>2</mn></msub><mo>=</mo><msqrt><mn>2</mn></msqrt><mo separator="true">;</mo><mspace width="1em"/><msub><mi>u</mi><mn>1</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mi>A</mi><msub><mi>v</mi><mn>1</mn></msub></mrow><mn>2</mn></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><msub><mi>u</mi><mn>2</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mi>A</mi><msub><mi>v</mi><mn>2</mn></msub></mrow><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>A</mi><mo>+</mo></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><msub><mi>v</mi><mn>1</mn></msub><msubsup><mi>u</mi><mn>1</mn><mi>T</mi></msubsup><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><msub><mi>v</mi><mn>2</mn></msub><msubsup><mi>u</mi><mn>2</mn><mi>T</mi></msubsup><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mo>=</mo><mi>U</mi><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><msqrt><mn>2</mn></msqrt></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><msup><mi>V</mi><mi>T</mi></msup><mo separator="true">,</mo><mspace width="1em"/><mi>U</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>u</mi><mn>1</mn></msub><mtext> </mtext><msub><mi>u</mi><mn>2</mn></msub><mo stretchy="false">]</mo><mo separator="true">,</mo><mtext> </mtext><mi>V</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>v</mi><mn>1</mn></msub><mtext> </mtext><msub><mi>v</mi><mn>2</mn></msub><mtext> </mtext><msub><mi>v</mi><mn>3</mn></msub><mo stretchy="false">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Check: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><msup><mi>A</mi><mo>+</mo></msup><mo>=</mo><msub><mi>I</mi><mn>2</mn></msub></mrow></math> (rank 2 = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math>, so <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Col</mi><mo>⁡</mo><mi>A</mi><mo>=</mo><msup><mi>ℝ</mi><mn>2</mn></msup></mrow></math>). Least-norm solution of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mi>x</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><msup><mo stretchy="false">)</mo><mi>T</mi></msup></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>+</mo></msup><mi>b</mi><mo>=</mo><mo stretchy="false">(</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo separator="true">,</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo separator="true">,</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mo stretchy="false">)</mo><mi>T</mi></msup></mrow></math>.</li>
+<li>Polar (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> square): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mi>U</mi><msup><mi>V</mi><mi>T</mi></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo>=</mo><mi>V</mi><mi mathvariant="normal">Σ</mi><msup><mi>V</mi><mi>T</mi></msup></mrow></math>.</li>
+</ul>
+<h3>T5 Unitary diagonalization of a Hermitian / normal matrix (自编题)</h3>
+<p>Steps: check <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><msup><mi>A</mi><mo>∗</mo></msup><mo>=</mo><msup><mi>A</mi><mo>∗</mo></msup><mi>A</mi></mrow></math> → eigenvalues → eigenvectors (orthogonal automatically if distinct <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math>) → normalize → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>U</mi><mi>D</mi><msup><mi>U</mi><mo>∗</mo></msup></mrow></math>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>i</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mi>i</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>∗</mo></msup><mo>=</mo><mi>A</mi></mrow></math>):</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo>−</mo><mi>λ</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>−</mo><mn>1</mn><mo>⇒</mo><mi>λ</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>λ</mi><mo>=</mo><mn>3</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo>−</mo><mi>x</mi><mo>+</mo><mi>i</mi><mi>y</mi><mo>=</mo><mn>0</mn><mo>⇒</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">;</mo><mspace width="2em"/><mi>λ</mi><mo>=</mo><mn>1</mn><mo>:</mo><mtext> </mtext><mi>x</mi><mo>+</mo><mi>i</mi><mi>y</mi><mo>=</mo><mn>0</mn><mo>⇒</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mo>−</mo><mi>i</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>check</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>⋅</mo><mo stretchy="false">(</mo><mo>−</mo><mi>i</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mi>i</mi><mo>⋅</mo><mover accent="true"><mrow><mo stretchy="false">(</mo><mo>−</mo><mi>i</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">‾</mo></mover><mo>+</mo><mn>1</mn><mo>=</mo><mi>i</mi><mo>⋅</mo><mi>i</mi><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>U</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mi>i</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>i</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mspace width="1em"/><mi>A</mi><mo>=</mo><mi>U</mi><mi mathvariant="normal">diag</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><msup><mi>U</mi><mo>∗</mo></msup></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T6 Schur triangularization (Thm 7.15; HW05 2(b) style) (自编题)</h3>
+<p>Steps: one eigenvector <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi></mrow></math> → O.N. basis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>v</mi><mo separator="true">,</mo><msub><mi>u</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">}</mo></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>U</mi><mn>1</mn><mo>∗</mo></msubsup><mi>A</mi><msub><mi>U</mi><mn>1</mn></msub><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>λ</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo lspace="0em" rspace="0em">∗</mo></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mi>A</mi><mn>1</mn></msub></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math> → recurse on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mn>1</mn></msub></mrow></math>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>λ</mi><mo>+</mo><mn>4</mn><mo>⇒</mo><mi>λ</mi><mo>=</mo><mn>2</mn><mtext> </mtext><mo stretchy="false">(</mo><mtext>double</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>V</mi><mn>2</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">{</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo><mo separator="true">,</mo><mtext> complete with </mtext><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>U</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mspace width="1em"/><msup><mi>U</mi><mo>∗</mo></msup><mi>A</mi><mi>U</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mo>=</mo><mi>U</mi><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><msup><mi>U</mi><mo>∗</mo></msup></mrow></mstyle></mstyle></mstyle></menclose><mspace width="1em"/><mo stretchy="false">(</mo><mtext>not normal: </mtext><mi>T</mi><mtext> not diagonal, Prop 7.21</mtext><mo stretchy="false">)</mo></mrow></math></div><h3>T7 Cayley–Hamilton: inverse / powers (WS08 P1 = Example 8.8)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mn>3</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><msup><mi>λ</mi><mn>3</mn></msup><mo>−</mo><mn>5</mn><msup><mi>λ</mi><mn>2</mn></msup><mo>+</mo><mn>7</mn><mi>λ</mi><mo>−</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>A</mi><mn>3</mn></msup><mo>−</mo><mn>5</mn><msup><mi>A</mi><mn>2</mn></msup><mo>+</mo><mn>7</mn><mi>A</mi><mo>−</mo><mn>3</mn><mi>I</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>O</mi><mtext> (Thm 8.9)</mtext><mo>⇒</mo><mi>A</mi><mo stretchy="false">(</mo><msup><mi>A</mi><mn>2</mn></msup><mo>−</mo><mn>5</mn><mi>A</mi><mo>+</mo><mn>7</mn><mi>I</mi><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn><mi>I</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>A</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">(</mo><msup><mi>A</mi><mn>2</mn></msup><mo>−</mo><mn>5</mn><mi>A</mi><mo>+</mo><mn>7</mn><mi>I</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>A</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Powers: divide <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>λ</mi><mi>k</mi></msup></mrow></math> by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>, keep the remainder <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math> (deg <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mi>n</mi></mrow></math>): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>k</mi></msup><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math>.</li>
+</ul>
+<h3>T8 Minimal polynomial → diagonalizable? (WS08 P2 = Examples 8.13–8.14)</h3>
+<p>Steps: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></math> → candidates = divisors of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> containing every eigenvalue (Prop 8.12) → test the smallest → Thm 8.14.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>A</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>4</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>:</mo><mtext> </mtext><mi>p</mi><mo>=</mo><mo>−</mo><mi>λ</mi><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mtext> </mtext><mi>A</mi><mo stretchy="false">(</mo><mi>A</mi><mo>−</mo><mi>I</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>4</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo mathvariant="normal">≠</mo><mi>O</mi><mo>⇒</mo><mi>m</mi><mo>=</mo><mi>λ</mi><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>B</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>:</mo><mtext> </mtext><mi>p</mi><mo>=</mo><mo>−</mo><mi>λ</mi><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mtext> </mtext><mi>B</mi><mo stretchy="false">(</mo><mi>B</mi><mo>−</mo><mn>2</mn><mi>I</mi><mo stretchy="false">)</mo><mo>=</mo><mi>O</mi><mo>⇒</mo><mi>m</mi><mo>=</mo><mi>λ</mi><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mtext> not diagonalizable</mtext><mo separator="true">;</mo><mtext> </mtext><mi>B</mi><mtext> diagonalizable</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Shortcut: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mn>2</mn></msup><mo>=</mo><mi>A</mi></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>∣</mo><mi>λ</mi><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> ⇒ distinct linear factors ⇒ diagonalizable (HW04 1(e)).</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mi>O</mi></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> having no real roots ⇒ no real eigenvalues ⇒ (odd <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>) impossible over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>.</li>
+</ul>
+<h3>T9 Jordan form from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><msup><mo stretchy="false">)</mo><mi>k</mi></msup></mrow></math> (Examples 9.4–9.6)</h3>
+<p>Steps: alg. mult. = total size · # blocks = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><msub><mi>V</mi><mi>λ</mi></msub></mrow></math> · largest block = exponent in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> · still ambiguous → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow></math> (Prop 9.6).</p>
+<p>Example 9.4: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><msup><mo stretchy="false">)</mo><mn>4</mn></msup><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>3</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>3</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><msub><mi>V</mi><mn>2</mn></msub><mo>=</mo><mn>3</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><msub><mi>V</mi><mn>3</mn></msub><mo>=</mo><mn>1</mn></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>λ</mi><mo>=</mo><mn>2</mn><mo>:</mo><mtext> </mtext><mn>3</mn><mtext> blocks, max </mtext><mn>2</mn><mo separator="true">,</mo><mtext> total </mtext><mn>4</mn><mo>⇒</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo separator="true">;</mo><mspace width="1em"/><mi>λ</mi><mo>=</mo><mn>3</mn><mo>:</mo><mtext> </mtext><mn>1</mn><mtext> block of size </mtext><mn>2</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mo>∼</mo><msubsup><mi>J</mi><mn>2</mn><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>⊕</mo><msubsup><mi>J</mi><mn>2</mn><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>⊕</mo><msubsup><mi>J</mi><mn>2</mn><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>⊕</mo><msubsup><mi>J</mi><mn>3</mn><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Example 9.6: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><msup><mi>λ</mi><mn>7</mn></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><msup><mi>λ</mi><mn>3</mn></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><msub><mi>V</mi><mn>0</mn></msub><mo>=</mo><mn>3</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>3</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math> or <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">}</mo></mrow></math>; decide by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mn>2</mn></msub><mo>=</mo><mi>dim</mi><mo>⁡</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><msup><mi>A</mi><mn>2</mn></msup></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="false">{</mo><mn>3</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">}</mo><mo>:</mo><mtext> </mtext><msub><mi>d</mi><mn>2</mn></msub><mo>=</mo><mn>2</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>5</mn><mo separator="true">;</mo><mspace width="2em"/><mo stretchy="false">{</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">}</mo><mo>:</mo><mtext> </mtext><msub><mi>d</mi><mn>2</mn></msub><mo>=</mo><mn>2</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>6</mn></mrow></math></div><h3>T10 Jordan basis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>P</mi><mi>J</mi><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> (自编题)</h3>
+<p>Steps: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi></mrow></math> → pick <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo mathvariant="normal">∉</mo><mi mathvariant="normal">Ker</mi><mo>⁡</mo><msup><mi>S</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> → chain <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msup><mi>S</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup><mi>v</mi><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">}</mo></mrow></math> as columns (eigenvector first).</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mtext> </mtext><mi>S</mi><mo>=</mo><mi>A</mi><mo>−</mo><mn>2</mn><mi>I</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo mathvariant="normal">≠</mo><mi>O</mi><mo separator="true">,</mo><mtext> </mtext><msup><mi>S</mi><mn>2</mn></msup><mo>=</mo><mi>O</mi><mo>⇒</mo><mtext>one block </mtext><msubsup><mi>J</mi><mn>2</mn><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>v</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>e</mi><mn>1</mn></msub><mo separator="true">,</mo><mtext> </mtext><mi>S</mi><mi>v</mi><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mi>T</mi></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>P</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mspace width="1em"/><mi>A</mi><mi>P</mi><mo>=</mo><mi>P</mi><mi>J</mi><mtext> </mtext><mi mathvariant="normal">✓</mi></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mo>=</mo><mi>P</mi><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T11 Rational canonical forms: list invariant factors (Example 9.8; HW06 2(b) style) (自编题)</h3>
+<p>Steps: factor <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> → all chains <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>g</mi><mn>1</mn></msub><mo>∣</mo><mo>⋯</mo><mo>∣</mo><msub><mi>g</mi><mi>k</mi></msub></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∏</mo><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mo>±</mo><mi>p</mi></mrow></math> → one RCF per chain; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><msub><mi>g</mi><mi>k</mi></msub></mrow></math>.</p>
+<p>Over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>3</mn></msup></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>m</mi><mo>=</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>3</mn></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>3</mn></msup><mo stretchy="false">}</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>m</mi><mo>=</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo stretchy="false">{</mo><mi>λ</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">}</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>m</mi><mo>=</mo><mi>λ</mi><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo stretchy="false">{</mo><mi>λ</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mi>λ</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mi>λ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>C</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>C</mi><mo stretchy="false">(</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mn>2</mn><mi>λ</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>3</mn><mtext> RCFs</mtext><mo separator="true">;</mo><mtext> </mtext><mi>m</mi><mo>=</mo><mo stretchy="false">(</mo><mi>λ</mi><mo>−</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>:</mo><mtext> </mtext><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo><mo>⊕</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T12 Quotient space: dimension and basis (Thm 10.4, 10.8) (自编题)</h3>
+<p>Steps: find onto <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mi>T</mi><mo>=</mo><mi>U</mi></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>≃</mo><mi mathvariant="normal">Im</mi><mo>⁡</mo><mi>T</mi></mrow></math> → basis = images of a complement basis.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><msub><mi>K</mi><mn>3</mn></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi><mo>=</mo><mo stretchy="false">{</mo><mi>p</mi><mo>:</mo><mi>p</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left" columnspacing="0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><msub><mrow><mi mathvariant="normal">Ev</mi><mo>⁡</mo></mrow><mn>1</mn></msub><mo>:</mo><msub><mi>K</mi><mn>3</mn></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo>→</mo><mi>K</mi><mtext> onto</mtext><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal">Ker</mi><mo>⁡</mo><msub><mrow><mi mathvariant="normal">Ev</mi><mo>⁡</mo></mrow><mn>1</mn></msub><mo>=</mo><mi>U</mi><mo>⇒</mo><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>≃</mo><mi>K</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>(Thm 10.4)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo stretchy="false">{</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mn>1</mn><mo separator="true">,</mo><msup><mi>t</mi><mn>3</mn></msup><mo>−</mo><mn>1</mn><mo stretchy="false">}</mo><mtext> basis of </mtext><mi>U</mi><mo separator="true">,</mo><mtext> </mtext><mo>+</mo><mo stretchy="false">{</mo><mn>1</mn><mo stretchy="false">}</mo><mtext> basis of </mtext><mi>V</mi><mo>⇒</mo><mo stretchy="false">{</mo><mn>1</mn><mo>+</mo><mi>U</mi><mo stretchy="false">}</mo><mtext> basis of </mtext><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>(Thm 10.8)</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>dim</mi><mo>⁡</mo><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>=</mo><mn>4</mn><mo>−</mo><mn>3</mn><mo>=</mo><mn>1</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T13 Dual basis and annihilator (Prop 10.12, Thm 10.18) (自编题)</h3>
+<p>Steps: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mo stretchy="false">[</mo><msub><mi>b</mi><mn>1</mn></msub><mo>⋯</mo><msub><mi>b</mi><mi>n</mi></msub><mo stretchy="false">]</mo></mrow></math> → rows of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>b</mi><mi>i</mi><mo>∗</mo></msubsup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>U</mi><mn>0</mn></msup></mrow></math> = solutions of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><msub><mi>u</mi><mi>j</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>ℬ</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo><mo>:</mo><mtext> </mtext><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>⇒</mo><msubsup><mi>b</mi><mn>1</mn><mo>∗</mo></msubsup><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mn>2</mn></mfrac></mstyle><mo separator="true">,</mo><mtext> </mtext><msubsup><mi>b</mi><mn>2</mn><mo>∗</mo></msubsup><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mi>x</mi><mo>−</mo><mi>y</mi></mrow><mn>2</mn></mfrac></mstyle></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>U</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo><mo>⊂</mo><msup><mi>ℝ</mi><mn>3</mn></msup><mo>:</mo><mtext> </mtext><msup><mi>U</mi><mn>0</mn></msup><mo>=</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi><mo stretchy="false">)</mo><mo>:</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo>=</mo><mn>0</mn><mo stretchy="false">}</mo><mo>=</mo><mi mathvariant="normal">Span</mi><mo>⁡</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>dim</mi><mo>⁡</mo><mi>U</mi><mo>+</mo><mi>dim</mi><mo>⁡</mo><msup><mi>U</mi><mn>0</mn></msup><mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>3</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T14 Adjoint for a non-standard inner product (HW05 2(a) style) (自编题)</h3>
+<p>Steps: O.N. basis → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><msup><mi>T</mi><mo>∗</mo></msup><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mi>T</mi><msup><mo stretchy="false">]</mo><mo>∗</mo></msup></mrow></math> → back to the original basis.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>D</mi><mo>=</mo><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math> on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ℝ</mi><mn>1</mn></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">⟩</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mi>p</mi><mi>q</mi><mtext> </mtext><mi>d</mi><mi>t</mi></mrow></math>; O.N. basis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>0</mn></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>=</mo><msqrt><mfrac><mn>3</mn><mn>2</mn></mfrac></msqrt><mtext> </mtext><mi>t</mi></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>D</mi><msub><mi>e</mi><mn>0</mn></msub></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mi>D</mi><msub><mi>e</mi><mn>1</mn></msub><mo>=</mo><msqrt><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>3</mn><mn>2</mn></mfrac></mstyle></msqrt><mo>=</mo><msqrt><mn>3</mn></msqrt><mtext> </mtext><msub><mi>e</mi><mn>0</mn></msub><mo>⇒</mo><mo stretchy="false">[</mo><mi>D</mi><mo stretchy="false">]</mo><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><msqrt><mn>3</mn></msqrt></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">[</mo><msup><mi>D</mi><mo>∗</mo></msup><mo stretchy="false">]</mo><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msqrt><mn>3</mn></msqrt></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>D</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msqrt><mn>2</mn></msqrt><mtext> </mtext><msup><mi>D</mi><mo>∗</mo></msup><msub><mi>e</mi><mn>0</mn></msub><mo>=</mo><msqrt><mn>2</mn></msqrt><msqrt><mn>3</mn></msqrt><mtext> </mtext><msub><mi>e</mi><mn>1</mn></msub><mo>=</mo><mn>3</mn><mi>t</mi><mo separator="true">,</mo><mspace width="1em"/><msup><mi>D</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>check</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext> </mtext><mo stretchy="false">⟨</mo><mi>D</mi><mi>t</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">⟩</mo><mo>=</mo><mn>2</mn><mo>=</mo><mo stretchy="false">⟨</mo><mi>t</mi><mo separator="true">,</mo><mn>3</mn><mi>t</mi><mo stretchy="false">⟩</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>D</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn><mi>a</mi><mtext> </mtext><mi>t</mi></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T15 True / False bank</h3>
+<table>
+<thead>
+<tr>
+<th>Statement</th>
+<th>Verdict</th>
+<th>Reason / counterexample</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> even, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mi>A</mi><mo>&lt;</mo><mn>0</mn></mrow></math> ⇒ real eigenvector (HW04 1(a))</td>
+<td>T</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo>&lt;</mo><mn>0</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>→</mo><mo>+</mo><mi mathvariant="normal">∞</mi></mrow></math> ⇒ real root (IVT)</td>
+</tr>
+<tr>
+<td>at most <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> eigenvectors (HW04 1(b))</td>
+<td>F</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>λ</mi></msub></mrow></math> has infinitely many</td>
+</tr>
+<tr>
+<td>same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> diagonalizable ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo><mi>B</mi></mrow></math> (HW04 1(d))</td>
+<td>F</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>2</mn></msub></mrow></math> vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> diag. ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup></mrow></math> same eigenvectors (HW04 1(f))</td>
+<td>F</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>2</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mn>3</mn></msup></mrow></math> diag., <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> invertible ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> diag. over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math> (HW04 1(g))</td>
+<td>F</td>
+<td>rotation by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>120</mn><mi mathvariant="normal">°</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mn>3</mn></msup><mo>=</mo><mi>I</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi></mrow></math> p.d. ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mi>T</mi></msup><mi>B</mi><mi>A</mi></mrow></math> p.d. (HW04 1(i))</td>
+<td>F</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>O</mi></mrow></math> (only p.s.d.)</td>
+</tr>
+<tr>
+<td>real symmetric ⇒ real eigenvalues</td>
+<td>T</td>
+<td>Thm 5.24</td>
+</tr>
+<tr>
+<td>complex symmetric ⇒ real eigenvalues</td>
+<td>F</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mtext> </mtext><mi>i</mi><mtext> </mtext><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>unitarily diag. ⇒ Hermitian</td>
+<td>F</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">diag</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>; needs real <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi></mrow></math> (Thm 7.18)</td>
+</tr>
+<tr>
+<td>normal + upper triangular ⇒ diagonal</td>
+<td>T</td>
+<td>Prop 7.21</td>
+</tr>
+<tr>
+<td>geom. mult. ≤ alg. mult.</td>
+<td>T</td>
+<td>Cor 8.6</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>∼</mo><msup><mi>A</mi><mi>T</mi></msup></mrow></math> over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math></td>
+<td>T</td>
+<td>Thm 9.9</td>
+</tr>
+<tr>
+<td>same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> ⇒ similar</td>
+<td>F</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>J</mi><mn>0</mn><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>⊕</mo><msubsup><mi>J</mi><mn>0</mn><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup></mrow></math> vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>J</mi><mn>0</mn><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>⊕</mo><msubsup><mi>J</mi><mn>0</mn><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>⊕</mo><msubsup><mi>J</mi><mn>0</mn><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>×</mo><mn>4</mn></mrow></math>)</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>=</mo><mi>dim</mi><mo>⁡</mo><mi>V</mi><mo>−</mo><mi>dim</mi><mo>⁡</mo><mi>U</mi></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo><mi>V</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>)</td>
+<td>T</td>
+<td>Cor 10.6</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>≃</mo><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> canonically, any <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math></td>
+<td>F</td>
+<td>needs inner product (Prop 10.13); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>≃</mo><msup><mi>V</mi><mrow><mo>∗</mo><mo>∗</mo></mrow></msup></mrow></math> is canonical (Thm 10.17)</td>
+</tr>
+</tbody>
+</table>
+<h3>T16 Proof templates</h3>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Template</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eigenvalue property</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mi>v</mi><mo>=</mo><mi>λ</mi><mi>v</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math> → apply hypothesis → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo><mi>v</mi><mo>=</mo><mn>0</mn><mo>⇒</mo><mi>f</mi><mo stretchy="false">(</mo><mi>λ</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>real eigenvalue (self-adjoint)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo stretchy="false">⟨</mo><mi>v</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mi>T</mi><mi>v</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mi>v</mi><mo separator="true">,</mo><mi>T</mi><mi>v</mi><mo stretchy="false">⟩</mo><mo>=</mo><mover accent="true"><mi>λ</mi><mo>ˉ</mo></mover><mo stretchy="false">⟨</mo><mi>v</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">⟩</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>λ</mi><mo stretchy="false">∣</mo><mo>=</mo><mn>1</mn></mrow></math> (unitary)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>v</mi><mo stretchy="false">∥</mo><mo>=</mo><mo stretchy="false">∥</mo><mi>U</mi><mi>v</mi><mo stretchy="false">∥</mo><mo>=</mo><mo stretchy="false">∣</mo><mi>λ</mi><mo stretchy="false">∣</mo><mo stretchy="false">∥</mo><mi>v</mi><mo stretchy="false">∥</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>T</mi><mi>v</mi><mo stretchy="false">∥</mo><mo>=</mo><mo stretchy="false">∥</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>v</mi><mo stretchy="false">∥</mo></mrow></math> (normal)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>T</mi><mi>v</mi><mo separator="true">,</mo><mi>T</mi><mi>v</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>T</mi><mi>v</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mi>T</mi><msup><mi>T</mi><mo>∗</mo></msup><mi>v</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>v</mi><mo separator="true">,</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>v</mi><mo stretchy="false">⟩</mo></mrow></math></td>
+</tr>
+<tr>
+<td>orthogonal eigenspaces</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>λ</mi><mn>1</mn></msub><mo stretchy="false">⟨</mo><msub><mi>v</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>v</mi><mn>2</mn></msub><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mi>T</mi><msub><mi>v</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>v</mi><mn>2</mn></msub><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><msub><mi>v</mi><mn>1</mn></msub><mo separator="true">,</mo><mi>T</mi><msub><mi>v</mi><mn>2</mn></msub><mo stretchy="false">⟩</mo><mo>=</mo><msub><mi>λ</mi><mn>2</mn></msub><mo stretchy="false">⟨</mo><msub><mi>v</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>v</mi><mn>2</mn></msub><mo stretchy="false">⟩</mo></mrow></math></td>
+</tr>
+<tr>
+<td>diagonalizable</td>
+<td>find <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mi>O</mi></mrow></math>, distinct linear factors ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>∣</mo><mi>q</mi></mrow></math> (Prop 8.11) ⇒ Thm 8.14</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><msup><mi>e</mi><mi>A</mi></msup><mo>=</mo><msup><mi>e</mi><mrow><mi mathvariant="normal">Tr</mi><mo>⁡</mo><mi>A</mi></mrow></msup></mrow></math> type (HW04 3(b))</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>P</mi><mi>D</mi><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>⇒</mo><mi>f</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mi>P</mi><mi>f</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo><msup><mi>P</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>, then compute on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>D</mi></mrow></math></td>
+</tr>
+<tr>
+<td>commuting maps</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mi>T</mi><mo>=</mo><mi>T</mi><mi>S</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>∈</mo><msub><mi>V</mi><mi>λ</mi></msub><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>⇒</mo><mi>T</mi><mo stretchy="false">(</mo><mi>S</mi><mi>v</mi><mo stretchy="false">)</mo><mo>=</mo><mi>S</mi><mi>T</mi><mi>v</mi><mo>=</mo><mi>λ</mi><mi>S</mi><mi>v</mi></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo stretchy="false">(</mo><msub><mi>V</mi><mi>λ</mi></msub><mo stretchy="false">)</mo><mo>⊂</mo><msub><mi>V</mi><mi>λ</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>invariant complement</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>-inv. ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>u</mi><mo separator="true">,</mo><msup><mi>T</mi><mo>∗</mo></msup><mi>w</mi><mo stretchy="false">⟩</mo><mo>=</mo><mo stretchy="false">⟨</mo><mi>T</mi><mi>u</mi><mo separator="true">,</mo><mi>w</mi><mo stretchy="false">⟩</mo><mo>=</mo><mn>0</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>U</mi><mo>⊥</mo></msup></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>T</mi><mo>∗</mo></msup></mrow></math>-inv. (Prop 8.7)</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi><mo>≃</mo><mi>W</mi></mrow></math></td>
+<td>build <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>:</mo><mi>V</mi><mo>→</mo><mi>W</mi></mrow></math>, show onto + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Ker</mi><mo>⁡</mo><mi>T</mi><mo>=</mo><mi>U</mi></mrow></math> ⇒ Thm 10.4</td>
+</tr>
+<tr>
+<td>well-defined on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mi mathvariant="normal">/</mi><mi>U</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>+</mo><mi>U</mi><mo>=</mo><msup><mi>v</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><mi>U</mi><mo>⇒</mo><mi>v</mi><mo>−</mo><msup><mi>v</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>U</mi><mo>⇒</mo><mi>T</mi><mi>v</mi><mo>−</mo><mi>T</mi><msup><mi>v</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><msup><mi>U</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></td>
+</tr>
+<tr>
+<td>induction on <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>dim</mi><mo>⁡</mo></mrow></math> (Thm 5.25, 7.15)</td>
+<td>one eigenvector → O.N. completion → block form → apply to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>×</mo><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>Common Mistakes</h2>
+<ul>
+<li>Eigenvector must be <strong>nonzero</strong>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow></math> is allowed.</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> diagonalizable ⇏ distinct eigenvalues (e.g. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi></mrow></math>); distinct ⇒ diagonalizable only one way.</li>
+<li>Over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>, rotation-type matrices have no eigenvalues; say which field (HW04: &quot;diagonalization only over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>&quot;).</li>
+<li>Orthogonal diagonalization: Gram–Schmidt within each eigenspace only; mixing eigenspaces destroys eigenvectors.</li>
+<li>SVD: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>u</mi><mi>i</mi></msub><mo>=</mo><mi>A</mi><msub><mi>v</mi><mi>i</mi></msub><mi mathvariant="normal">/</mi><msub><mi>σ</mi><mi>i</mi></msub></mrow></math> — do not compute <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> independently (sign mismatch). <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Σ</mi></mrow></math> is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>×</mo><mi>n</mi></mrow></math>.</li>
+<li>Complex inner product: conjugate in the 2nd slot; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><mi>v</mi><mo separator="true">,</mo><mi>c</mi><mi>w</mi><mo stretchy="false">⟩</mo><mo>=</mo><mover accent="true"><mi>c</mi><mo>ˉ</mo></mover><mo stretchy="false">⟨</mo><mi>v</mi><mo separator="true">,</mo><mi>w</mi><mo stretchy="false">⟩</mo></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>c</mi><mi>T</mi><msup><mo stretchy="false">)</mo><mo>∗</mo></msup><mo>=</mo><mover accent="true"><mi>c</mi><mo>ˉ</mo></mover><msup><mi>T</mi><mo>∗</mo></msup></mrow></math>.</li>
+<li>Hermitian ⇒ unitarily diagonalizable, but the converse needs real eigenvalues; normal is the exact condition (Thm 7.22).</li>
+<li>Minimal polynomial must contain <strong>every</strong> eigenvalue (Prop 8.12); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>deg</mi><mo>⁡</mo><mi>m</mi><mo>≤</mo><mi>n</mi></mrow></math>.</li>
+<li>Jordan: # blocks = geometric multiplicity, <strong>not</strong> algebraic; largest block = exponent in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math>.</li>
+<li>RCF invariant factors divide each other in increasing order; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><msub><mi>g</mi><mi>k</mi></msub></mrow></math> is the <strong>last</strong> one.</li>
+<li>Quotient maps: always check well-definedness before linearity.</li>
+<li>Dual map <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>T</mi><mo>∗</mo></msup><mo>:</mo><msup><mi>W</mi><mo>∗</mo></msup><mo>→</mo><msup><mi>V</mi><mo>∗</mo></msup></mrow></math> goes the opposite direction; matrix = transpose (no conjugate).</li>
+</ul>
+<h2>Practice Sources</h2>
+<p>⚠️ No past <strong>final</strong> papers on Canvas (<code>files/Examination/</code> has midterms only). The 2023 / 2026 midterms explicitly ban eigenvalues, so they practice Ch 1–4 only.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Problems</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>files/Homeworks/HW04.pdf</code> + <code>HW4-Solution.pdf</code> (Ch 5.1–6.2)</td>
+<td>1(a)–(j)</td>
+<td>T15</td>
+</tr>
+<tr>
+<td></td>
+<td>2(a) Fibonacci by diagonalization</td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>2(b) SVD + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>+</mo></msup></mrow></math> in Hermite basis</td>
+<td>T4</td>
+</tr>
+<tr>
+<td></td>
+<td>3(a)–(d)</td>
+<td>T16</td>
+</tr>
+<tr>
+<td></td>
+<td>4 Killing form</td>
+<td>Ch 6 bilinear forms</td>
+</tr>
+<tr>
+<td><code>files/Homeworks/HW05.pdf</code> (Ch 7.1–8.4, due 11/22)</td>
+<td>1 / 2(a) / 2(b) / 3–4</td>
+<td>T15 / T14 / T6 / T16</td>
+</tr>
+<tr>
+<td><code>files/Homeworks/HW06.pdf</code> (Ch 9.1–10.2, due 12/6)</td>
+<td>1 / 2(a) / 2(b) / 3–4</td>
+<td>T15 / T10 / T11 / T12–T13, T16</td>
+</tr>
+<tr>
+<td><code>files/Worksheet/Worksheet05.pdf</code> (Ch 5)</td>
+<td>P1–P4</td>
+<td>T1, T2</td>
+</tr>
+<tr>
+<td><code>files/Worksheet/Worksheet06.pdf</code> (Ch 6)</td>
+<td>P1–P4</td>
+<td>T3, T4, truncated SVD</td>
+</tr>
+<tr>
+<td><code>files/Worksheet/Worksheet08.pdf</code> (Ch 8)</td>
+<td>P1–P2</td>
+<td>T7, T8</td>
+</tr>
+<tr>
+<td><code>files/Tutorial Notes/MATH2131-TA8(with solution).pdf</code></td>
+<td>eigenvalues, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mi>O</mi><mo stretchy="false">(</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mi>O</mi><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td>T1, T2</td>
+</tr>
+<tr>
+<td><code>files/Tutorial Notes/Math TA9 answer.pdf</code></td>
+<td>Ex 1.1–5.1</td>
+<td>Ch 7–8</td>
+</tr>
+<tr>
+<td><code>files/Tutorial Notes/TA notes 10 with answer.pdf</code></td>
+<td>Cayley–Hamilton …</td>
+<td>T7, T8</td>
+</tr>
+<tr>
+<td><code>files/Examination/mid_2021.pdf</code> + <code>mid_2021_sol.pdf</code></td>
+<td>dual-space problem (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>L</mi><mo>∗</mo></msup></mrow></math>, dual basis)</td>
+<td>T13 (different syllabus that year)</td>
+</tr>
+<tr>
+<td><code>files/Lecture Notes/LectureNotes.pdf</code></td>
+<td>Examples 5.1–10.5</td>
+<td>all</td>
+</tr>
+</tbody>
+</table>

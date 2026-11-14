@@ -1,0 +1,151 @@
+<p>Only <code>mlfq()</code> and a few helpers are needed; parsing and printing are given. The full source is kept offline, not on this page, because JPlag is run on every submission. Tested on csl2wk01 (gcc 11.5, <code>gcc -std=c99 -Wall</code>, no warnings): 8/8 given cases pass, and 300 random inputs give output identical to the official <code>mlfq</code> executable.</p>
+<h2>Rules (from the lab 5 step-by-step example)</h2>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arrival at time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></td>
+<td>append to the <strong>end of Q0</strong></td>
+</tr>
+<tr>
+<td>Each time unit</td>
+<td>run the <strong>head of the highest non-empty queue</strong> for 1 unit</td>
+</tr>
+<tr>
+<td>Finished</td>
+<td>remove from the MLFQ</td>
+</tr>
+<tr>
+<td>Used <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><msub><mi>q</mi><mi>i</mi></msub></mrow></math> in total at level <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math></td>
+<td>move to the <strong>end of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math></strong>, reset its used time</td>
+</tr>
+<tr>
+<td>Pre-empted by a higher queue</td>
+<td><strong>stays at the head</strong> of its queue, keeps its used time</td>
+</tr>
+<tr>
+<td>Last queue</td>
+<td>FCFS (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mi>q</mi><mo>=</mo><mn>1000</mn></mrow></math>)</td>
+</tr>
+</tbody>
+</table>
+<p>Gantt chart: consecutive units of the same process are merged into one item, even across a demotion. For example, in <code>in05</code>, J runs 18→28 as a single item.</p>
+<h2>Simulation loop (1 time unit per step)</h2>
+<p>Repeat while some process is unfinished:</p>
+<ol>
+<li>Append every process with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>arrival</mtext><mo>=</mo><mi>t</mi></mrow></math> to the end of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>0</mn></msub></mrow></math>.</li>
+<li>Let <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> be the highest non-empty level and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mtext>head</mtext><mo stretchy="false">(</mo><msub><mi>Q</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></math>.</li>
+<li>Add one unit of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> to the chart (merge with the last item if it is also <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>). Then <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>remain</mtext><mi>p</mi></msub><mtext>–</mtext></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>used</mtext><mi>p</mi></msub><mtext>++</mtext></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mtext>++</mtext></mrow></math>.</li>
+<li>If <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>remain</mtext><mi>p</mi></msub><mo>=</mo><mn>0</mn></mrow></math>: dequeue <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> and count it as finished.</li>
+<li>Else if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>used</mtext><mi>p</mi></msub><mo>=</mo><mi>t</mi><msub><mi>q</mi><mi>i</mi></msub></mrow></math>: dequeue <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>, enqueue it into <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mrow><mi>min</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>i</mi><mo>+</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mi>N</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msub></mrow></math>, and set <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>used</mtext><mi>p</mi></msub><mo>=</mo><mn>0</mn></mrow></math>.</li>
+</ol>
+<p>Data structures (no extra headers): <code>int queue[4][10]</code> plus <code>queue_size[4]</code> (index 0 = head, dequeue shifts left), and <code>used_quantum[10]</code>. Set <code>remain_time = burst_time</code> before the loop.</p>
+<p>Arrivals are added <strong>before</strong> choosing the process at time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math>. This order is what makes the new arrival pre-empt (P3 at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>4</mn></mrow></math> and P4 at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>6</mn></mrow></math> in <code>in01</code>). A demoted process is appended <strong>after</strong> the processes already waiting in that queue (P4 joins Q1 behind P1 at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>8</mn></mrow></math>).</p>
+<h2>Trace of <code>in01</code> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mi>q</mi><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mtext>FCFS</mtext></mrow></math>)</h2>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math></th>
+<th>Event</th>
+<th>Q0</th>
+<th>Q1</th>
+<th>Q2</th>
+<th>Run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>P1 arrives</td>
+<td>P1</td>
+<td></td>
+<td></td>
+<td>P1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>P1 used 2 → Q1</td>
+<td>P2</td>
+<td>P1</td>
+<td></td>
+<td>P2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>P2 done</td>
+<td></td>
+<td>P1</td>
+<td></td>
+<td>P1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>P3 arrives, pre-empts</td>
+<td>P3</td>
+<td>P1 (used 1)</td>
+<td></td>
+<td>P3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>P3 done</td>
+<td></td>
+<td>P1</td>
+<td></td>
+<td>P1</td>
+</tr>
+<tr>
+<td>6</td>
+<td>P4 arrives, pre-empts</td>
+<td>P4</td>
+<td>P1 (used 2)</td>
+<td></td>
+<td>P4</td>
+</tr>
+<tr>
+<td>8</td>
+<td>P4 used 2 → Q1</td>
+<td></td>
+<td>P1 P4</td>
+<td></td>
+<td>P1</td>
+</tr>
+<tr>
+<td>10</td>
+<td>P1 used 4 → Q2</td>
+<td></td>
+<td>P4</td>
+<td>P1</td>
+<td>P4</td>
+</tr>
+<tr>
+<td>11</td>
+<td>P4 done</td>
+<td></td>
+<td></td>
+<td>P1</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>12</td>
+<td>P1 done</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Gantt</mtext><mo>=</mo><mn>0</mn><mtext> P1 </mtext><mn>2</mn><mtext> P2 </mtext><mn>3</mn><mtext> P1 </mtext><mn>4</mn><mtext> P3 </mtext><mn>5</mn><mtext> P1 </mtext><mn>6</mn><mtext> P4 </mtext><mn>8</mn><mtext> P1 </mtext><mn>10</mn><mtext> P4 </mtext><mn>11</mn><mtext> P1 </mtext><mn>12</mn></mrow></math></div><h2>Pitfalls</h2>
+<ul>
+<li>Do not restart the quantum after pre-emption. At <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mn>8</mn></mrow></math>, P1 has only <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>2</mn></mrow></math> units left at level 1, so it runs 8→10, not 8→11.</li>
+<li>Do not move a pre-empted process to the tail of its queue.</li>
+<li>Do not create a new chart item when the same process continues after a demotion.</li>
+<li>The skeleton file uses CRLF line endings. Converting to LF is harmless for gcc.</li>
+<li>Test the final version with <code>diff</code> on a CS Lab 2 machine.</li>
+</ul>

@@ -1,0 +1,235 @@
+<h2>1. Multiple Choices</h2>
+<p><strong>B D A C B C D A B C</strong></p>
+<h2>2. Synchronization</h2>
+<h3>1) Interleaved updates</h3>
+<p><strong>(a)</strong> Possible final values: <strong>10, 13, 15</strong>. Either serial order gives <strong>13</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn><mo>+</mo><mn>3</mn><mo>−</mo><mn>2</mn></mrow></math>).</p>
+<p><strong>(b)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Statement</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>L0</td>
+<td>r0 = 12</td>
+</tr>
+<tr>
+<td>2</td>
+<td>L1</td>
+<td>r1 = 12</td>
+</tr>
+<tr>
+<td>3</td>
+<td>A0</td>
+<td>r0 = 15</td>
+</tr>
+<tr>
+<td>4</td>
+<td>A1</td>
+<td>r1 = 10</td>
+</tr>
+<tr>
+<td>5</td>
+<td>W0</td>
+<td>x = 15</td>
+</tr>
+<tr>
+<td>6</td>
+<td>W1</td>
+<td><strong>x = 10</strong></td>
+</tr>
+</tbody>
+</table>
+<p>T0's <strong>+3 is lost</strong>: W1 overwrites x with r1, which was read before W0 stored 15.</p>
+<h3>2) Atomic instructions and waiting</h3>
+<p><strong>(a)</strong> T0's call returns <strong>false</strong>, T1's call returns <strong>true</strong>; <strong>lock = true</strong> after both.</p>
+<p><strong>(b)</strong> <strong>No.</strong> T0 can release and immediately re-acquire the lock (its <code>test_and_set</code> runs before T1's) again and again, so T1 may spin forever; nothing orders the waiters.</p>
+<h3>3) A semaphore with a waiting queue</h3>
+<p><strong>(a)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>S.value</th>
+<th>Waiting queue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0 wait(S)</td>
+<td>0</td>
+<td>empty</td>
+</tr>
+<tr>
+<td>P1 wait(S)</td>
+<td>−1</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>P2 wait(S)</td>
+<td>−2</td>
+<td>P1, P2</td>
+</tr>
+<tr>
+<td>P0 signal(S)</td>
+<td>−1</td>
+<td>P2 (P1 made ready)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>(b)</strong> A negative value <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>k</mi></mrow></math> means <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> processes are blocked</strong> on S; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∣</mi><mi>S</mi><mi mathvariant="normal">.</mi><mtext>value</mtext><mi mathvariant="normal">∣</mi></mrow></math> = length of the waiting queue.</p>
+<h2>3. Classic Synchronization Problems</h2>
+<h3>1) A bounded job buffer</h3>
+<p><strong>(a)</strong> <strong>mutex = 1, empty = 8 − 3 = 5, full = 3</strong></p>
+<p><strong>(b)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Blank</th>
+<th>Call</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td><code>wait(empty)</code></td>
+<td>reserve a free slot (block if buffer full)</td>
+</tr>
+<tr>
+<td>B2</td>
+<td><code>wait(mutex)</code></td>
+<td>exclusive access for <code>insert</code></td>
+</tr>
+<tr>
+<td>B3</td>
+<td><code>signal(mutex)</code></td>
+<td>release buffer after <code>remove</code></td>
+</tr>
+<tr>
+<td>B4</td>
+<td><code>signal(empty)</code></td>
+<td>one more free slot</td>
+</tr>
+</tbody>
+</table>
+<p><strong>(c)</strong> Buffer full: empty = 0, full = 8, mutex = 1.</p>
+<ol>
+<li>Producer: <code>wait(mutex)</code> succeeds (mutex = 0).</li>
+<li>Producer: <code>wait(empty)</code> blocks (empty = 0) while holding mutex.</li>
+<li>Consumer: <code>wait(full)</code> succeeds (full = 7).</li>
+<li>Consumer: <code>wait(mutex)</code> blocks (mutex = 0).</li>
+</ol>
+<p><strong>Deadlock</strong>: producer waits for <strong>empty</strong> (only the consumer can signal it), consumer waits for <strong>mutex</strong> (held by the producer).
+Fix: producer calls <strong><code>wait(empty)</code> before <code>wait(mutex)</code></strong>.</p>
+<h3>2) Readers and writers</h3>
+<p><strong>(a)</strong> R1 is blocked on <strong>rw_mutex</strong> (while holding mutex); R2 is blocked on <strong>mutex</strong>; <strong>read_count = 1</strong>.</p>
+<p><strong>(b)</strong> The <strong>second (last) departure</strong>: it makes read_count = 0, so it calls <code>signal(rw_mutex)</code>.
+<code>read_count++/--</code> is a non-atomic read-modify-write; without mutex an update can be lost → rw_mutex released while readers remain, or never released.</p>
+<p><strong>(c)</strong> <strong>Yes.</strong> rw_mutex is released only when read_count = 0; new readers skip <code>wait(rw_mutex)</code> (read_count ≠ 1) and increment read_count, so with overlapping arrivals read_count never reaches 0 and the writer waits forever.</p>
+<h2>4. Deadlock and the Banker's Algorithm</h2>
+<p><strong>(a)</strong> Need = Max − Allocation</p>
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>(b)</strong> <strong>Safe</strong>, safe sequence <strong>⟨P0, P2, P1, P3, P4⟩</strong> (Work column &quot;part b&quot;; column &quot;part c&quot; is for (c)).</p>
+<table>
+<thead>
+<tr>
+<th>After completion of</th>
+<th>Work for part b</th>
+<th>Work for part c</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Initial</td>
+<td>(2, 1, 1, 1)</td>
+<td>(1, 1, 0, 1)</td>
+</tr>
+<tr>
+<td>P0</td>
+<td>(3, 1, 2, 1)</td>
+<td>(2, 1, 1, 1)</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>(3, 2, 3, 1)</td>
+<td>(3, 2, 3, 1)</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>(4, 3, 3, 2)</td>
+<td>(4, 3, 3, 2)</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>(5, 3, 3, 3)</td>
+<td>(5, 3, 3, 3)</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>(5, 4, 3, 4)</td>
+<td>(5, 4, 3, 4)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>(c)</strong> <strong>Yes, grant.</strong>
+Checks: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>≤</mo><msub><mtext>Need</mtext><mn>2</mn></msub><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> ✓; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>≤</mo><mtext>Available</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> ✓.
+Tentative: Available = <strong>(1, 1, 0, 1)</strong>, Allocation[P2] = <strong>(1, 1, 2, 0)</strong>, Need[P2] = <strong>(1, 1, 1, 1)</strong>.
+Safe sequence <strong>⟨P0, P2, P1, P3, P4⟩</strong>, Work in column &quot;part c&quot; above.</p>
+<p><strong>(d)</strong> <strong>No, cannot be granted.</strong>
+Checks: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>≤</mo><msub><mtext>Need</mtext><mn>1</mn></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> ✓; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>≤</mo><mtext>Available</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> ✓.
+Tentative: Available = <strong>(2, 0, 1, 1)</strong>, Allocation[P1] = <strong>(1, 2, 0, 1)</strong>, Need[P1] = <strong>(1, 1, 1, 1)</strong>.
+Safety: P0 finishes → Work = (3, 0, 2, 1); remaining Needs P1 (1,1,1,1), P2 (2,1,2,1), P3 (0,1,1,2), P4 (2,1,2,0) all need B ≥ 1 &gt; 0 → <strong>unsafe</strong>.
+The tentative allocation is <strong>rolled back</strong> (old state restored) and <strong>P1 must wait</strong>.</p>

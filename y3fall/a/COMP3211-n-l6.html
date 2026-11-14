@@ -1,0 +1,581 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap：</p>
+<ol>
+<li><strong>Search Problem</strong>（怎么形式化一个搜索问题）</li>
+<li><strong>General Tree Search</strong>（frontier、expansion、exploration strategy）</li>
+<li><strong>Uninformed Search</strong>：<strong>DFS</strong>、<strong>BFS</strong>、<strong>Iterative Deepening</strong>、<strong>UCS</strong></li>
+</ol>
+<blockquote>
+<p>必考：四种算法的 <strong>complete / optimal / time / space</strong> 四个性质（结尾 summary 表），以及在课件那张图上<strong>手推展开顺序</strong>（尤其 UCS 每个节点的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math>）。还有一道课件里的 Quiz：<strong>什么时候 BFS 比 DFS 好、什么时候反过来</strong>。</p>
+</blockquote>
+<h2>1 · 为什么需要 search（Beyond reflex）</h2>
+<p>三个应用：</p>
+<table>
+<thead>
+<tr>
+<th>应用</th>
+<th>Objective</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Route finding</td>
+<td>shortest? fastest? most scenic?</td>
+<td>go straight、turn left、turn right</td>
+</tr>
+<tr>
+<td>Robot motion planning</td>
+<td>fastest? most energy efficient? safest?</td>
+<td>translate and rotate joints</td>
+</tr>
+<tr>
+<td>Solving puzzles</td>
+<td>用<strong>最少步数</strong>到达目标配置</td>
+<td>move pieces（如 Move12Down）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Beyond reflex 的关键区别</strong>：L2–L5 的模型是 <strong>reflex-based</strong>——输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math>，一次性算出输出。搜索问题要<strong>考虑行动的后果（例如 cost）</strong>，并选出<strong>达到目标的最佳行动序列</strong>。一步看起来好，不代表整条路线最好。</p>
+<h2>2 · Search Problem 的定义</h2>
+<blockquote>
+<p><strong>Define a search problem</strong></p>
+<ul>
+<li>A <strong>state space</strong>（所有可能状态）</li>
+<li>A <strong>successor function</strong>
+<ul>
+<li>Input：当前 state 和一个 action</li>
+<li>Output：successor state（下一状态）和 <strong>cost</strong></li>
+</ul>
+</li>
+<li>A <strong>start state</strong></li>
+<li>A <strong>goal test</strong>：判断一个 state 是不是 goal state</li>
+</ul>
+<p>A <strong>solution</strong> is a <strong>sequence of actions（a plan）</strong> which transforms the start state to a goal state.</p>
+</blockquote>
+<h3>2.1 例 1：Traveling in Romania</h3>
+<table>
+<thead>
+<tr>
+<th>组成</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>State space</td>
+<td>Cities</td>
+</tr>
+<tr>
+<td>Successor function</td>
+<td>Action：go to an adjacent city；cost = 两城之间的 road distance</td>
+</tr>
+<tr>
+<td>Start state</td>
+<td>Arad</td>
+</tr>
+<tr>
+<td>Goal test</td>
+<td>Is state == Bucharest?</td>
+</tr>
+<tr>
+<td>Solution</td>
+<td>一串城市，如 Arad → Sibiu → Fagaras → Bucharest</td>
+</tr>
+</tbody>
+</table>
+<h3>2.2 例 2：8 Puzzles</h3>
+<table>
+<thead>
+<tr>
+<th>组成</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>State space</td>
+<td>Configurations of tiles（所有摆法）</td>
+</tr>
+<tr>
+<td>Successor function</td>
+<td>Action：move tile left / right / up / down；cost = <strong>1 per move</strong></td>
+</tr>
+<tr>
+<td>Start state</td>
+<td>A configuration of tiles</td>
+</tr>
+<tr>
+<td>Goal test</td>
+<td>Is state == a target configuration?</td>
+</tr>
+<tr>
+<td>Solution</td>
+<td>一串 tile movements，最后到达 goal state</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>考题常见形式：给一个新问题（如走迷宫、过河），让你写出这四个组成部分。套路：<strong>state 要包含做决定所需的全部信息</strong>；successor 写清楚「有哪些 action、到哪个 state、cost 多少」。</p>
+</blockquote>
+<h2>3 · General Tree Search</h2>
+<h3>3.1 Search tree</h3>
+<p>从 Arad 出发，把「从当前城市能去哪」一层层展开成一棵树：</p>
+<ul>
+<li>根 Arad；孩子 Sibiu、Timisoara、Zerind</li>
+<li>Sibiu 的孩子 Arad、Fagaras、Oradea、Rimnicu Vilcea……</li>
+<li><strong>注意</strong>：树里会<strong>重复出现</strong> Arad（Arad → Sibiu → Arad）。树上的一个节点代表的是<strong>一条从根出发的路径</strong>（a partial plan），不只是一个城市。</li>
+</ul>
+<h3>3.2 三个 key ideas</h3>
+<ul>
+<li><strong>Frontier</strong>：维护「正在考虑、还需要行动」的节点（partial plans）</li>
+<li><strong>Expansion</strong>：从 frontier 里<strong>取出</strong>一个节点，换成它的孩子节点</li>
+<li><strong>Exploration strategy</strong>：frontier 里<strong>先挑哪个</strong>节点？——不同搜索算法的唯一区别就在这里</li>
+</ul>
+<h3>3.3 三类节点</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Expanded</strong></td>
+<td>已经取出并展开过的</td>
+</tr>
+<tr>
+<td><strong>Frontier</strong></td>
+<td>已经生成、还没展开的</td>
+</tr>
+<tr>
+<td><strong>Unexplored</strong></td>
+<td>还没生成的</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Reached（visited）= expanded ∪ frontier</strong></li>
+<li><strong>Frontier 把 expanded 区域和 unexplored 区域隔开</strong></li>
+<li><strong>展开一个 frontier 节点</strong>：
+<ol>
+<li>把它从 frontier 移到 expanded</li>
+<li>把它的孩子从 unexplored 加入 frontier</li>
+</ol>
+</li>
+</ul>
+<p><strong>Important question：Which node to explore first?</strong> → 下面四种算法。</p>
+<h2>4 · Uninformed vs Informed</h2>
+<blockquote>
+<p><strong>Definition: Uninformed search strategies</strong>
+Use <strong>only the information available in the problem definition</strong>.</p>
+<ul>
+<li>Depth-first search、Iterative deepening search、Breadth-first search、Uniform-cost search</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>Definition: Informed search strategies</strong>
+Use <strong>problem-specific knowledge</strong>（e.g., how close a state is to the goal state）to guide the search. <strong>Usually more efficient.</strong>（下一讲：Greedy、A*）</p>
+</blockquote>
+<h2>5 · 统一的例图</h2>
+<p>下面三个算法都用同一张有向图（起点 S、终点 G），边权（UCS 用）：</p>
+<table>
+<thead>
+<tr>
+<th>边</th>
+<th>cost</th>
+<th>边</th>
+<th>cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S→d</td>
+<td>3</td>
+<td>e→h</td>
+<td>8</td>
+</tr>
+<tr>
+<td>S→e</td>
+<td>9</td>
+<td>e→r</td>
+<td>2</td>
+</tr>
+<tr>
+<td>S→p</td>
+<td>1</td>
+<td>r→f</td>
+<td>1</td>
+</tr>
+<tr>
+<td>d→b</td>
+<td>1</td>
+<td>f→c</td>
+<td>3</td>
+</tr>
+<tr>
+<td>d→c</td>
+<td>8</td>
+<td>f→G</td>
+<td>2</td>
+</tr>
+<tr>
+<td>d→e</td>
+<td>2</td>
+<td>p→q</td>
+<td>15</td>
+</tr>
+<tr>
+<td>b→a</td>
+<td>2</td>
+<td>h→p、h→q、c→a</td>
+<td>（课件图上未标，本题用不到）</td>
+</tr>
+</tbody>
+</table>
+<p>展开时孩子按字母顺序（d、e、p）。</p>
+<h2>6 · Depth-First Search（DFS）</h2>
+<p><strong>Strategy：expand a deepest node first</strong>（frontier 当作 <strong>stack</strong>，后进先出）。</p>
+<h3>6.1 手推</h3>
+<p>从 S 开始，一直往最左边走到底，走不通再回退：</p>
+<p>S → d → b → a（死路，回退）→ c → a（死路）→ e → h → p → q → q → r → f → c → a → <strong>G</strong></p>
+<p><strong>Solution：S → d → e → r → f → G</strong>（cost = 3+2+2+1+2 = 10，这里碰巧是最便宜的，但 DFS 不保证）</p>
+<h3>6.2 搜索树的记号</h3>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> = <strong>branching factor</strong>（每个节点最多几个孩子）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> = <strong>maximum depth</strong></li>
+<li>第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 层有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>b</mi><mi>k</mi></msup></mrow></math> 个节点；整棵树节点数</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mn>1</mn><mo>+</mo><mi>b</mi><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>+</mo><mo>⋯</mo><mo>+</mo><msup><mi>b</mi><mi>m</mi></msup><mo>=</mo><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>m</mi></msup><mo stretchy="false">)</mo></mrow></math></div><h3>6.3 DFS 的四个性质</h3>
+<table>
+<thead>
+<tr>
+<th>性质</th>
+<th>结论</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>m</mi></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>处理树「左边的一部分」直到深度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math>；最坏要把整棵树走完</td>
+</tr>
+<tr>
+<td>Space（frontier）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>m</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>最坏情况每一层保留 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> 个兄弟节点，共 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 层</td>
+</tr>
+<tr>
+<td>Complete?</td>
+<td><strong>No</strong></td>
+<td>如果状态图有环，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 可以是无穷，DFS 会一直往下走</td>
+</tr>
+<tr>
+<td>Optimal?</td>
+<td><strong>No</strong></td>
+<td>它找到的是「<strong>最左边</strong>」的解，不管深度或 cost</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么 space 只有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mi>m</mi></mrow></math>？</strong> DFS 只沿一条路往下走，frontier 里只存「当前路径上每个节点的未展开兄弟」，每层最多 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> 个。</p>
+<h2>7 · Breadth-First Search（BFS）</h2>
+<p><strong>Strategy：expand a shallowest node first</strong>（frontier 当作 <strong>queue</strong>，先进先出），一层（tier）一层展开。</p>
+<h3>7.1 手推</h3>
+<ul>
+<li>Tier 0：S</li>
+<li>Tier 1：d、e、p</li>
+<li>Tier 2：b、c、e（d 的孩子）；h、r（e 的孩子）；q（p 的孩子）</li>
+<li>Tier 3：a、a、h、r、p、q、f</li>
+<li>Tier 4：……在 S→e→r→f 下面找到 G</li>
+</ul>
+<p><strong>BFS 找到的解：S → e → r → f → G</strong>（4 步，最浅；但 cost = 9+2+1+2 = 14，比 UCS 找到的 10 贵）。这正说明 BFS 的「optimal」只是<strong>步数最少</strong>。</p>
+<h3>7.2 BFS 的四个性质</h3>
+<p>设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> = <strong>最浅解的深度</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>性质</th>
+<th>结论</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>处理最浅解<strong>上面</strong>的所有节点</td>
+</tr>
+<tr>
+<td>Space</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>frontier 大约是<strong>最后一整层</strong></td>
+</tr>
+<tr>
+<td>Complete?</td>
+<td><strong>Yes</strong></td>
+<td>有解的话 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 一定有限</td>
+</tr>
+<tr>
+<td>Optimal?</td>
+<td><strong>Yes</strong>（课件写法）</td>
+<td>总能找到最浅的解</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>课件 summary 写 BFS optimal。严格说是「<strong>每步 cost 相同时</strong> optimal」（最浅 = 最便宜）。上面的例子里 cost 不相同，BFS 的解（14）就不是最便宜的。答题时写课件结论，必要时加这个条件。</p>
+</blockquote>
+<h3>7.3 Quiz：DFS vs BFS</h3>
+<ul>
+<li><strong>When will BFS outperform DFS?</strong> —— 解<strong>分布得浅</strong>时，BFS 更省时间（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math> vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>m</mi></msup><mo stretchy="false">)</mo></mrow></math>）。</li>
+<li><strong>When will DFS outperform BFS?</strong> —— DFS <strong>更省内存</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>m</mi><mo stretchy="false">)</mo></mrow></math> vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math>）；如果树里<strong>解分布得很密</strong>（很多解），DFS 随便往下走都容易碰到解，可能比 BFS 好。</li>
+</ul>
+<h2>8 · Iterative Deepening Search（IDS）</h2>
+<p><strong>Idea：get DFS's space advantage with BFS's time / shallow-solution advantage.</strong></p>
+<ul>
+<li>Run a DFS with <strong>depth limit 1</strong>. If no solution…</li>
+<li>Run a DFS with <strong>depth limit 2</strong>. If no solution…</li>
+<li>Run a DFS with <strong>depth limit 3</strong>. …</li>
+</ul>
+<p>性质：</p>
+<ul>
+<li><strong>Time</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> = 最浅解深度）；<strong>Space</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>Complete、optimal（和 BFS 一样，按深度）</li>
+<li><strong>Preferred uninformed search algorithm, when the search space is large and the depth of the solution is not known.</strong></li>
+</ul>
+<p><strong>为什么重复搜浅层不浪费？</strong> 每多一层，节点数乘 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math>，最后一层的节点数占了大头；前面各层重复做的那些加起来只是一小部分，所以总时间还是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math>。</p>
+<h2>9 · Uniform-Cost Search（UCS）</h2>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> = <strong>cost from root to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></strong>（从起点到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 的累计 cost）</li>
+<li><strong>Strategy：expand lowest <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></strong>（frontier 是 <strong>priority queue</strong>，按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math> 从小到大）</li>
+</ul>
+<h3>9.1 手推（考试重点）</h3>
+<p>每一步：取出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math> 最小的节点；把它的孩子按「父的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math> + 边 cost」加入 frontier。<strong>取出 G 时才结束</strong>（不是生成 G 时）。</p>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>取出（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math>）</th>
+<th>加入 frontier</th>
+<th>取出后的 frontier（按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math> 排）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>S（0）</td>
+<td>d 3、e 9、p 1</td>
+<td>p1、d3、e9</td>
+</tr>
+<tr>
+<td>2</td>
+<td>p（1）</td>
+<td>q 1+15=16</td>
+<td>d3、e9、q16</td>
+</tr>
+<tr>
+<td>3</td>
+<td>d（3）</td>
+<td>b 4、c 11、e 5</td>
+<td>b4、e5、e9、c11、q16</td>
+</tr>
+<tr>
+<td>4</td>
+<td>b（4）</td>
+<td>a 6</td>
+<td>e5、a6、e9、c11、q16</td>
+</tr>
+<tr>
+<td>5</td>
+<td>e（5）</td>
+<td>h 13、r 7</td>
+<td>a6、r7、e9、c11、h13、q16</td>
+</tr>
+<tr>
+<td>6</td>
+<td>a（6）</td>
+<td>（无孩子）</td>
+<td>r7、e9、c11、h13、q16</td>
+</tr>
+<tr>
+<td>7</td>
+<td>r（7）</td>
+<td>f 8</td>
+<td>f8、e9、c11、h13、q16</td>
+</tr>
+<tr>
+<td>8</td>
+<td>f（8）</td>
+<td>c 11、G 10</td>
+<td>e9、G10、c11、c11、h13、q16</td>
+</tr>
+<tr>
+<td>9</td>
+<td>e（9）（S→e 那条）</td>
+<td>h 17、r 11</td>
+<td>G10、c11、c11、r11、h13、q16、h17</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>G（10）</strong></td>
+<td>——</td>
+<td>结束</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Solution：S → d → e → r → f → G，cost 10</strong>（和课件一致）。</p>
+<p><strong>几个要点：</strong></p>
+<ul>
+<li>e 出现了两次：经 d 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>5</mn></mrow></math>，直接从 S 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>9</mn></mrow></math>。UCS 先展开便宜的那个。</li>
+<li>第 8 步<strong>生成</strong> G（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>10</mn></mrow></math>）时还不能停：frontier 里还有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>9</mn></mrow></math> 的 e，它理论上可能通向更便宜的 G。只有 G 被<strong>取出</strong>（它是 frontier 里最小的），才能保证没有更便宜的路。</li>
+<li>课件里的 <strong>Tiers（cost boundary）</strong>：UCS 像是按「cost 等高线」一圈圈往外扩，而 BFS 是按「深度」一层层扩。</li>
+</ul>
+<h3>9.2 UCS 的四个性质</h3>
+<p>设最优解的 cost 为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>C</mi><mo>∗</mo></msup></mrow></math>，任意两节点之间的<strong>最小 cost</strong> 为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math>。</p>
+<table>
+<thead>
+<tr>
+<th>性质</th>
+<th>结论</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mrow><msup><mi>C</mi><mo>∗</mo></msup><mi mathvariant="normal">/</mi><mi>ε</mi></mrow></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>「effective depth」大约 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>C</mi><mo>∗</mo></msup><mi mathvariant="normal">/</mi><mi>ε</mi></mrow></math>（每步至少花 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math>，到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>C</mi><mo>∗</mo></msup></mrow></math> 最多走这么多步）</td>
+</tr>
+<tr>
+<td>Space</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mrow><msup><mi>C</mi><mo>∗</mo></msup><mi mathvariant="normal">/</mi><mi>ε</mi></mrow></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>frontier 大约是最后一个 tier 的全部节点</td>
+</tr>
+<tr>
+<td>Complete?</td>
+<td><strong>Yes</strong></td>
+<td>有解时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>C</mi><mo>∗</mo></msup></mrow></math> 有限，且 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Optimal?</td>
+<td><strong>Yes</strong></td>
+<td>证明见下一讲（A*）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow></math>？</strong> 如果有 cost 为 0 的环，UCS 可能在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math> 不增加的环上一直转。</p>
+<h2>10 · Summary</h2>
+<ul>
+<li>Search problem 由 <strong>state space、initial state、successor function、goal test</strong> 定义</li>
+<li>Search algorithm 找到达 goal 的 action 序列；<strong>Optimal ⇒ minimum-cost</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>展开谁</th>
+<th>Complete</th>
+<th>Optimal</th>
+<th>Time</th>
+<th>Space</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DFS</strong></td>
+<td>最深的</td>
+<td>✗</td>
+<td>✗</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>m</mi></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>m</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>BFS</strong></td>
+<td>最浅的</td>
+<td>✓</td>
+<td>✓</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>IDS</strong></td>
+<td>逐步加深的 DFS</td>
+<td>✓</td>
+<td>✓</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><strong>UCS</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> 最小的</td>
+<td>✓</td>
+<td>✓</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mrow><msup><mi>C</mi><mo>∗</mo></msup><mi mathvariant="normal">/</mi><mi>ε</mi></mrow></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mrow><msup><mi>C</mi><mo>∗</mo></msup><mi mathvariant="normal">/</mi><mi>ε</mi></mrow></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> branching factor，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 最大深度，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 最浅解深度，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>C</mi><mo>∗</mo></msup></mrow></math> 最优解 cost，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math> 最小边 cost）</p>
+<h2>11 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Search problem 四要素</td>
+<td>给新问题能写出 state space / successor（action + cost）/ start / goal test</td>
+</tr>
+<tr>
+<td>Solution</td>
+<td>一串 actions（plan）</td>
+</tr>
+<tr>
+<td>Frontier / expanded / unexplored</td>
+<td>定义；reached = expanded ∪ frontier；展开一步怎么变</td>
+</tr>
+<tr>
+<td>Uninformed vs informed</td>
+<td>是否用 problem-specific knowledge</td>
+</tr>
+<tr>
+<td>DFS</td>
+<td>stack；在例图上推出 S-d-e-r-f-G；四个性质及理由</td>
+</tr>
+<tr>
+<td>BFS</td>
+<td>queue；按层；四个性质；最浅解</td>
+</tr>
+<tr>
+<td>DFS vs BFS quiz</td>
+<td>解浅 → BFS；省内存 / 解密 → DFS</td>
+</tr>
+<tr>
+<td>IDS</td>
+<td>逐步加深；space <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>s</mi><mo stretchy="false">)</mo></mrow></math>、time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math>；何时首选</td>
+</tr>
+<tr>
+<td>UCS</td>
+<td>priority queue 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math>；手推表；取出 G 才停；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mrow><msup><mi>C</mi><mo>∗</mo></msup><mi mathvariant="normal">/</mi><mi>ε</mi></mrow></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Summary 表</td>
+<td>四行四列全部背出</td>
+</tr>
+</tbody>
+</table>
+<h2>12 · 易错点</h2>
+<ul>
+<li>树搜索里<strong>同一个 state 可以出现多次</strong>（不同路径）；节点 = 路径。</li>
+<li>DFS 的 space 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>m</mi><mo stretchy="false">)</mo></mrow></math>（乘），time 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>m</mi></msup><mo stretchy="false">)</mo></mrow></math>（幂），别写反。</li>
+<li>BFS 的复杂度用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>（最浅解深度），不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math>。</li>
+<li>UCS <strong>生成</strong> goal 时不能停，要等它被<strong>取出</strong>。</li>
+<li>UCS 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math> 是从<strong>起点</strong>累计的，不是最后一条边的 cost。</li>
+<li>BFS 只在每步 cost 相同时才真正 cost-optimal；cost 不同时要用 UCS。</li>
+<li>IDS 的 space 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>b</mi><mi>s</mi><mo stretchy="false">)</mo></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>b</mi><mi>s</mi></msup><mo stretchy="false">)</mo></mrow></math>。</li>
+</ul>

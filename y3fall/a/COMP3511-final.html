@@ -1,0 +1,1042 @@
+<h2>Scope</h2>
+<ul>
+<li><strong>Date</strong>: the course site says <strong>Sat 2026-12-19, 12:30–15:00</strong> (2.5 h used of the 3-h slot), <strong>S H Ho Sports Hall</strong> (&quot;Final Exam Schedule&quot;, posted 22-Oct on the course site; there is no Canvas announcement). The ARO timetable confirms <strong>Sat 2026-12-19, 12:30–15:30 slot, S H Ho Sports Hall</strong>.</li>
+<li><strong>Coverage: not announced yet.</strong> Assumed: <strong>post-midterm chapters (Ch7 onward)</strong>.
+<ul>
+<li>The midterm covered Chapters 1–6 (announcement 10/14).</li>
+<li>The S26 final tested only Ch7, 8, 9, 10, 11, 13, 14 and 17.</li>
+<li>The course site warns: &quot;The exam coverage may be different each semester.&quot; Ch6 tools (semaphores, locks) are still needed for Ch7.</li>
+</ul>
+</li>
+<li><strong>Slides out now</strong>: Ch7 Synchronization Examples · Ch8 Deadlocks · Ch9 Main Memory · Ch10 Virtual Memory (<code>site/notes/</code>). Summaries: Ch6–7, Ch8, Ch9.</li>
+<li><strong>Pending (no slides yet)</strong>: Ch11 Mass-Storage · Ch13 File-System Interface · Ch14 File-System Implementation · Ch17 Protection · Review lecture · HW4. The sections below for these chapters come from the S26 final paper only; re-check them when the slides are released.</li>
+<li>Expected rules (from S26 and the midterm): <strong>open-book, open-notes</strong> (printed material), calculator only, bring your own rough-work sheets.</li>
+<li>S26 final format (100 marks, 2.5 h):</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Marks</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q1 MC</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>20</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>20</mn><mo>×</mo><mn>1</mn></mrow></math>: Ch7 ×2, Ch8 ×3, Ch9 ×4, Ch10 ×3, Ch11 ×3, Ch13–14 ×3, Ch17 ×2</td>
+</tr>
+<tr>
+<td>Q2 Short</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn></mrow></math></td>
+<td>page-size effects, PFF, allocation-method drawbacks, inode max file size</td>
+</tr>
+<tr>
+<td>Q3 Sync + Deadlock</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>26</mn></mrow></math></td>
+<td>reader/writer semaphore fill-in (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn></mrow></math>), RAG <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> matrices + safe sequence (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math>), Banker (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn></mrow></math>)</td>
+</tr>
+<tr>
+<td>Q4 Memory + VM</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>30</mn></mrow></math></td>
+<td>two-level translation with TLB (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn></mrow></math>), FIFO / OPT / LRU (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn></mrow></math>), access pattern + EAT (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn></mrow></math>)</td>
+</tr>
+<tr>
+<td>Q5 FS + Disk</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn></mrow></math></td>
+<td>FAT16 (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math>), FCFS / SSTF / SCAN / C-SCAN / LOOK / C-LOOK (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math>)</td>
+</tr>
+</tbody>
+</table>
+<h2>Formula Sheet</h2>
+<h3>Ch7 Synchronization Examples</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bounded buffer</td>
+<td><code>mutex = 1</code>, <code>empty = n</code>, <code>full = 0</code>; producer <code>wait(empty); wait(mutex); … signal(mutex); signal(full);</code> consumer mirrors it</td>
+</tr>
+<tr>
+<td>Order of waits</td>
+<td>counting semaphore <strong>before</strong> <code>mutex</code> (otherwise deadlock: holder of <code>mutex</code> sleeps on <code>empty</code>)</td>
+</tr>
+<tr>
+<td>First readers-writers</td>
+<td><code>rw_mutex = 1</code>, <code>mutex = 1</code>, <code>read_count = 0</code>; <strong>first</strong> reader <code>wait(rw_mutex)</code>, <strong>last</strong> reader <code>signal(rw_mutex)</code>; <code>mutex</code> only protects <code>read_count</code></td>
+</tr>
+<tr>
+<td>Waiting while a writer is in</td>
+<td>1st reader blocks on <code>rw_mutex</code>; the other <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></math> readers block on <code>mutex</code></td>
+</tr>
+<tr>
+<td>Starvation</td>
+<td>1st variation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> writers can starve; 2nd variation (writer waiting <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> no new readers) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> readers can starve</td>
+</tr>
+<tr>
+<td>Reader-writer lock</td>
+<td>lock in read mode (shared) or write mode (exclusive)</td>
+</tr>
+<tr>
+<td>Solaris adaptive mutex</td>
+<td>holder running on another CPU <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> spin; holder not running <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> block</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>interrupt masks (1 CPU), spinlocks (multi-CPU; holder never preempted); dispatcher objects: signaled = available</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>atomic integers (<code>atomic_t</code>), spinlocks, semaphores, reader-writer locks; 1 CPU: spinlock <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> disable kernel preemption</td>
+</tr>
+<tr>
+<td>POSIX condition variable</td>
+<td><code>pthread_cond_wait(&amp;c, &amp;m)</code>: <strong>releases <code>m</code> while sleeping, re-acquires before return</strong>; call in <code>while (cond)</code> loop; hold <code>m</code> when signaling</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch8 Deadlocks</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4 necessary conditions</td>
+<td>mutual exclusion · hold and wait · no preemption · circular wait (all at once; necessary, not sufficient)</td>
+</tr>
+<tr>
+<td>RAG</td>
+<td>request <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mi>i</mi></msub><mo>→</mo><msub><mi>R</mi><mi>j</mi></msub></mrow></math>, assignment <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mi>j</mi></msub><mo>→</mo><msub><mi>P</mi><mi>i</mi></msub></mrow></math>; no cycle <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> no deadlock; cycle <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> deadlock <strong>iff every resource has 1 instance</strong></td>
+</tr>
+<tr>
+<td>Wait-for graph</td>
+<td>single-instance only; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mi>i</mi></msub><mo>→</mo><msub><mi>P</mi><mi>j</mi></msub></mrow></math>; cycle detection <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Prevention</td>
+<td>break one condition; <strong>circular wait: total order, request in increasing order</strong> (most common); hold-and-wait: request all at start (low utilization, starvation); preemption: only for state-saveable resources (not locks)</td>
+</tr>
+<tr>
+<td>Avoidance</td>
+<td>needs a priori Max; safe state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> no deadlock; unsafe <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> deadlock <strong>possible</strong>; RAG claim edges (1 instance) / Banker (many)</td>
+</tr>
+<tr>
+<td>Banker</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Need</mtext><mo>=</mo><mtext>Max</mtext><mo>−</mo><mtext>Allocation</mtext></mrow></math>; safety: find <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Need</mtext><mi>i</mi></msub><mo>≤</mo><mtext>Work</mtext></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Work</mtext><mo>+</mo><mo>=</mo><msub><mtext>Alloc</mtext><mi>i</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Resource request</td>
+<td>(1) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Req</mtext><mo>≤</mo><mtext>Need</mtext></mrow></math> else error; (2) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Req</mtext><mo>≤</mo><mtext>Avail</mtext></mrow></math> else wait; (3) pretend allocate, run safety; unsafe <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> roll back, wait</td>
+</tr>
+<tr>
+<td>Detection</td>
+<td>same loop with <strong>Request</strong> instead of Need; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Finish</mtext><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo>=</mo><mtext>true</mtext></mrow></math> initially if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Alloc</mtext><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>m</mi><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></math>; leftover <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Finish</mtext><mo>=</mo><mtext>false</mtext></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> deadlocked</td>
+</tr>
+<tr>
+<td>Recovery</td>
+<td>abort all / one at a time (priority, time run, resources …); preemption: victim, rollback, starvation</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch9 Main Memory</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>base/limit</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext>legal</mtext><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mtext>base</mtext><mo>≤</mo><mi>a</mi><mo>&lt;</mo><mtext>base</mtext><mo>+</mo><mtext>limit</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>paging</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mi>m</mi><mtext>-bit address</mtext><mo separator="true">,</mo><mtext> </mtext><msup><mn>2</mn><mi>n</mi></msup><mtext> page</mtext><mo>⇒</mo><mi>p</mi><mo>=</mo><mtext>high </mtext><mi>m</mi><mo>−</mo><mi>n</mi><mtext> bits</mtext><mo separator="true">,</mo><mtext> </mtext><mi>d</mi><mo>=</mo><mtext>low </mtext><mi>n</mi><mtext> bits</mtext><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal">#</mi><mtext>pages</mtext><mo>=</mo><msup><mn>2</mn><mrow><mi>m</mi><mo>−</mo><mi>n</mi></mrow></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>physical</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>f</mi><mo>×</mo><msup><mn>2</mn><mi>n</mi></msup><mo>+</mo><mi>d</mi><mspace width="1em"/><mo stretchy="false">(</mo><mtext>frame</mtext><mi mathvariant="normal">∥</mi><mtext>offset</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>segmentation</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>d</mi><mo stretchy="false">)</mo><mtext> legal</mtext><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>s</mi><mo>&lt;</mo><mtext>STLR</mtext><mo separator="true">,</mo><mtext> </mtext><mi>d</mi><mo>&lt;</mo><msub><mtext>limit</mtext><mi>s</mi></msub><mo separator="true">;</mo><mtext>  physical</mtext><mo>=</mo><msub><mtext>base</mtext><mi>s</mi></msub><mo>+</mo><mi>d</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>PT size</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">#</mi><mtext>pages</mtext><mo>×</mo><mtext>PTE size</mtext><mspace width="1em"/><mo stretchy="false">(</mo><msup><mn>2</mn><mn>20</mn></msup><mo>×</mo><mn>4</mn><mtext> B</mtext><mo>=</mo><mn>4</mn><mtext> MB for 32-bit, 4 KB</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>bits per level</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mo stretchy="false">(</mo><mtext>page size</mtext><mi mathvariant="normal">/</mi><mtext>PTE size</mtext><mo stretchy="false">)</mo><mtext>  </mtext><mo stretchy="false">(</mo><mn>4</mn><mtext> KB</mtext><mi mathvariant="normal">/</mi><mn>4</mn><mo>⇒</mo><mo stretchy="false">[</mo><mn>10</mn><mo>∣</mo><mn>10</mn><mo>∣</mo><mn>12</mn><mo stretchy="false">]</mo><mo separator="true">;</mo><mtext> </mtext><mn>8</mn><mtext> KB</mtext><mi mathvariant="normal">/</mi><mn>4</mn><mo>⇒</mo><mo stretchy="false">[</mo><mn>8</mn><mo>∣</mo><mn>11</mn><mo>∣</mo><mn>13</mn><mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mtext>EAT</mtext><mtext>TLB</mtext></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>α</mi><mo stretchy="false">(</mo><mi>ε</mi><mo>+</mo><mi>m</mi><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>ε</mi><mo>+</mo><mn>2</mn><mi>m</mi><mo stretchy="false">)</mo><mspace width="1em"/><mo stretchy="false">(</mo><mi>k</mi><mtext>-level: miss</mtext><mo>=</mo><mi>ε</mi><mo>+</mo><mo stretchy="false">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>internal frag.</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext>page</mtext><mo>−</mo><mo stretchy="false">(</mo><mtext>size</mtext><mtext> </mtext><mo lspace="0.22em" rspace="0.22em"><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow></mo><mtext> </mtext><mtext>page</mtext><mo stretchy="false">)</mo><mo separator="true">;</mo><mtext> avg </mtext><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mtext> page</mtext><mo separator="true">,</mo><mtext> worst </mtext><mn>1</mn><mtext> page</mtext><mo>−</mo><mn>1</mn><mtext> B</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Address binding</td>
+<td>compile time (absolute code) · load time (relocatable) · <strong>execution time</strong> (MMU; all modern OS; logical <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo></mrow></math> physical only here)</td>
+</tr>
+<tr>
+<td>MMU</td>
+<td>maps logical <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> physical at run time; user never sees physical addresses</td>
+</tr>
+<tr>
+<td>First / best / worst fit</td>
+<td>first hole big enough · smallest big enough · largest; first &amp; best <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo></mrow></math> worst; first fastest</td>
+</tr>
+<tr>
+<td>Fragmentation</td>
+<td>external: total free enough but not contiguous (contiguous, segmentation); internal: unused part of an allocated unit (paging)</td>
+</tr>
+<tr>
+<td>Compaction</td>
+<td>fixes external frag.; only with <strong>execution-time</strong> relocation; expensive</td>
+</tr>
+<tr>
+<td>Segmentation</td>
+<td>user view (code, stack, …); STBR / STLR in PCB; protection + sharing per segment; external frag. smaller</td>
+</tr>
+<tr>
+<td>Paging</td>
+<td>no external frag.; PTBR / PTLR; 2 memory accesses without TLB</td>
+</tr>
+<tr>
+<td>TLB</td>
+<td>associative, parallel search, 64–1024 entries, shared by all processes (ASID / PID + page #); entries can be wired down</td>
+</tr>
+<tr>
+<td>Valid-invalid bit</td>
+<td>page in logical address space?; violation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> trap</td>
+</tr>
+<tr>
+<td>Shared pages</td>
+<td>one copy of read-only (reentrant) code</td>
+</tr>
+<tr>
+<td>Hierarchical</td>
+<td>forward-mapped; page the page table; 64-bit needs too many levels</td>
+</tr>
+<tr>
+<td>Hashed PT</td>
+<td>for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>32</mn></mrow></math>-bit; chain of (VPN, frame, next)</td>
+</tr>
+<tr>
+<td>IA-32 / x86-64 / ARM</td>
+<td>IA-32: segmentation + paging, 4 KB / 4 MB pages; x86-64: 48-bit VA, 4 levels, 4 KB / 2 MB / 1 GB; ARM: 2 levels, micro TLBs + main TLB</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch10 Virtual Memory</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>EAT</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>m</mi><mo>+</mo><mi>p</mi><mo>×</mo><mtext>page-fault service time</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>dirty victim</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>⇒</mo><mtext>2 transfers (out + in)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>proportional allocation</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><msub><mi>a</mi><mi>i</mi></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><msub><mi>s</mi><mi>i</mi></msub><mi>S</mi></mfrac></mstyle><mtext> </mtext><mi>m</mi><mo separator="true">,</mo><mtext> </mtext><mi>S</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mo>∑</mo><msub><mi>s</mi><mi>i</mi></msub></mstyle></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>working set</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mtext>WS</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>distinct pages in last </mtext><mi mathvariant="normal">Δ</mi><mtext> refs</mtext><mo separator="true">;</mo><mtext> </mtext><mi>D</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mo>∑</mo><msub><mtext>WSS</mtext><mi>i</mi></msub><mo separator="true">;</mo><mtext> </mtext><mi>D</mi><mo>&gt;</mo><mi>m</mi><mo>⇒</mo><mtext>thrashing</mtext></mstyle></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>TLB reach</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">#</mi><mtext>entries</mtext><mo>×</mo><mtext>page size</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Demand paging</td>
+<td>load page only when referenced (lazy swapper / pager); pure demand paging = start with 0 pages</td>
+</tr>
+<tr>
+<td>Page fault steps</td>
+<td>trap <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> check PTE (illegal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> abort) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> free frame <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> read from disk <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> set PTE valid <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <strong>restart the instruction</strong></td>
+</tr>
+<tr>
+<td>HW support</td>
+<td>valid-invalid bit, swap space, instruction restart</td>
+</tr>
+<tr>
+<td>Zero-fill-on-demand</td>
+<td>frames zeroed before reuse (security)</td>
+</tr>
+<tr>
+<td>COW</td>
+<td><code>fork</code> shares pages; copy only the page that is written</td>
+</tr>
+<tr>
+<td>FIFO</td>
+<td>evict oldest; <strong>Belady's anomaly</strong> (more frames can mean more faults)</td>
+</tr>
+<tr>
+<td>OPT</td>
+<td>evict the page used farthest in the future; lowest faults; benchmark only</td>
+</tr>
+<tr>
+<td>LRU</td>
+<td>evict least recently used; counter or stack implementation; needs HW</td>
+</tr>
+<tr>
+<td>Stack algorithms</td>
+<td>LRU, OPT: no Belady (pages with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> frames <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⊆</mo></mrow></math> pages with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></math> frames)</td>
+</tr>
+<tr>
+<td>Second chance (clock)</td>
+<td>FIFO + reference bit: bit 1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> clear, skip; bit 0 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> evict</td>
+</tr>
+<tr>
+<td>LFU / MFU</td>
+<td>counting; rarely used</td>
+</tr>
+<tr>
+<td>Global vs local</td>
+<td>global: better throughput, unpredictable per-process time; local: consistent, may waste memory</td>
+</tr>
+<tr>
+<td>Thrashing</td>
+<td>more time paging than executing; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo></mrow></math> locality <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo></mrow></math> memory; OS raising multiprogramming makes it worse</td>
+</tr>
+<tr>
+<td>WS approximation</td>
+<td>timer + reference bits (e.g. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mo>=</mo><mn>10,000</mn></mrow></math>, interrupt every <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5,000</mn></mrow></math>, 2 bits)</td>
+</tr>
+<tr>
+<td>PFF</td>
+<td>set upper/lower bounds on fault rate: too high <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>gain</strong> a frame; too low <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>lose</strong> a frame</td>
+</tr>
+<tr>
+<td>Prepaging</td>
+<td>worth it iff <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mi>α</mi></mrow></math> saved faults cost more than <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo></mrow></math> wasted pages</td>
+</tr>
+<tr>
+<td>Page size</td>
+<td>larger <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> smaller PT, larger TLB reach, more internal frag., more I/O per fault, fewer faults</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch11 Mass Storage (pending; from S26)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>T</mi><mtext>service</mtext></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>T</mi><mtext>seek</mtext></msub><mo>+</mo><munder><munder><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>⋅</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>60</mn><mtext>RPM</mtext></mfrac></mstyle></mrow><mo stretchy="true">⏟</mo></munder><mtext>avg rotational latency</mtext></munder><mo>+</mo><msub><mi>T</mi><mtext>transfer</mtext></msub><mo>+</mo><msub><mi>T</mi><mtext>controller</mtext></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>head movement</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mo>∑</mo><mo stretchy="false">∣</mo><msub><mi>c</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>c</mi><mi>k</mi></msub><mo stretchy="false">∣</mo></mstyle></mrow></mstyle></mtd></mtr></mtable></math></div><table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FCFS</td>
+<td>queue order</td>
+</tr>
+<tr>
+<td>SSTF</td>
+<td>closest pending cylinder next (can starve far requests)</td>
+</tr>
+<tr>
+<td>SCAN</td>
+<td>sweep in the current direction <strong>to the disk end</strong>, then reverse</td>
+</tr>
+<tr>
+<td>C-SCAN</td>
+<td>sweep to the end, <strong>jump to the other end</strong> (jump counted in S26), continue the same direction</td>
+</tr>
+<tr>
+<td>LOOK / C-LOOK</td>
+<td>like SCAN / C-SCAN but turn (or jump) at the <strong>last request</strong>, not the disk end</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>RAID</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>striping; faster; <strong>no redundancy</strong></td>
+</tr>
+<tr>
+<td>1</td>
+<td>mirroring; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo></mrow></math> storage</td>
+</tr>
+<tr>
+<td>5</td>
+<td>block striping + <strong>distributed parity</strong>; survives <strong>1</strong> disk failure</td>
+</tr>
+<tr>
+<td>SSD</td>
+<td>no seek / rotation; erase-before-write, wear leveling</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch13–14 File Systems (pending; from S26)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>inode max size</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>B</mi><mtext> </mtext><mo stretchy="false">(</mo><mi>n</mi><mo>+</mo><mi>x</mi><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>x</mi><mn>3</mn></msup><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="1em"/><mi>x</mi><mo>=</mo><mi>B</mi><mi mathvariant="normal">/</mi><mi>A</mi><mspace width="1em"/><mo stretchy="false">(</mo><mi>B</mi><mo>=</mo><mtext>block size</mtext><mo separator="true">,</mo><mtext> </mtext><mi>A</mi><mo>=</mo><mtext>address size</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>FAT-</mtext><mi>k</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mo>≤</mo><msup><mn>2</mn><mi>k</mi></msup><mtext> clusters</mtext><mo separator="true">;</mo><mtext> min cluster</mtext><mo>=</mo><mtext>region</mtext><mi mathvariant="normal">/</mi><msup><mn>2</mn><mi>k</mi></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>clusters for a file</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">⌈</mo><mtext>size</mtext><mi mathvariant="normal">/</mi><mi>C</mi><mo stretchy="false">⌉</mo><mo separator="true">,</mo><mspace width="1em"/><mtext>waste</mtext><mo>=</mo><mo stretchy="false">⌈</mo><mtext>size</mtext><mi mathvariant="normal">/</mi><mi>C</mi><mo stretchy="false">⌉</mo><mi>C</mi><mo>−</mo><mtext>size</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Open-file tables</td>
+<td>per-process: <strong>file pointer</strong>, access mode; system-wide: location, <strong>open count</strong> (entry removed when it reaches 0)</td>
+</tr>
+<tr>
+<td>Contiguous</td>
+<td>fast sequential + direct; <strong>external frag., hard to grow</strong></td>
+</tr>
+<tr>
+<td>Linked</td>
+<td>no external frag., easy growth; <strong>poor random access, pointer space</strong> (FAT = links in a table)</td>
+</tr>
+<tr>
+<td>Indexed</td>
+<td>direct access, no external frag.; <strong>index-block overhead</strong></td>
+</tr>
+<tr>
+<td>UNIX permissions</td>
+<td><code>rwx</code> for owner / group / other; <strong>only the first matching class applies</strong> (owner <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> group <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> other, no OR)</td>
+</tr>
+</tbody>
+</table>
+<h3>Ch17 Protection (pending; from S26)</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rings</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mo>&lt;</mo><mi>i</mi><mo>⇒</mo><msub><mi>D</mi><mi>i</mi></msub><mo>⊆</mo><msub><mi>D</mi><mi>j</mi></msub></mrow></math> (inner ring has more privilege); ring 3 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> 0 only through gates (trap, interrupt, <code>syscall</code>)</td>
+</tr>
+<tr>
+<td>TrustZone / hypervisor</td>
+<td><strong>more</strong> privileged than the OS kernel (not ring 1/2 apps); TZ keeps keys safe even if the kernel is compromised</td>
+</tr>
+<tr>
+<td>Access matrix</td>
+<td>rows = domains, columns = objects</td>
+</tr>
+<tr>
+<td>ACL vs capability</td>
+<td><strong>column</strong> = ACL (per object); <strong>row</strong> = capability list (per domain)</td>
+</tr>
+</tbody>
+</table>
+<h2>Question Types → Templates</h2>
+<h3>T1 Semaphore fill-in: bounded buffer / readers-writers</h3>
+<p>Steps: count semaphores = resources (<code>empty</code> = free slots, <code>full</code> = items) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <code>mutex</code> around the buffer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> wait on the counting semaphore <strong>before</strong> <code>mutex</code>.</p>
+<p>Example (自编题): buffer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>5</mn></mrow></math> holding <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math> items.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext mathvariant="monospace">mutex</mtext><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mtext mathvariant="monospace">empty</mtext><mo>=</mo><mn>5</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mtext> </mtext><mtext mathvariant="monospace">full</mtext><mo>=</mo><mn>2</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Producer with <code>wait(mutex); wait(empty);</code> and a full buffer: holds <code>mutex</code>, sleeps on <code>empty</code>; the consumer sleeps on <code>mutex</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>deadlock</strong> (F26 HW3 Q3.1(c)).</li>
+<li>Readers-writers trace: writer inside, R1 then R2 arrive <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> R1 on <code>rw_mutex</code>, R2 on <code>mutex</code>, <code>read_count</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>1</mn></mrow></math> (HW3 Q3.2(a)).</li>
+<li>S26 Q3.1 (writer-priority with HIGH / NORMAL writers): each blank is a guard condition. A new reader enters only if no writer is active or waiting and no reader batch is being released. Only the <strong>last</strong> reader (<code>activeReaders == 0</code>) calls <code>schedule_next()</code>. A NORMAL writer also waits while any HIGH writer is waiting.</li>
+</ul>
+<h3>T2 RAG: deadlock or not</h3>
+<p>Steps: find cycles <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> all resources in the cycle single-instance? <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> deadlock. Multi-instance <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> try to reduce: grant any process whose requests can be met, release its resources, repeat.</p>
+<p>Example (自编题): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>1</mn></msub></mrow></math> (1 instance), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>2</mn></msub></mrow></math> (2 instances). <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mn>1</mn></msub></mrow></math> holds <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>1</mn></msub></mrow></math> and requests <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>2</mn></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mn>2</mn></msub></mrow></math> holds <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>2</mn></msub></mrow></math> and requests <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>1</mn></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mn>3</mn></msub></mrow></math> holds <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>2</mn></msub></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>cycle </mtext><msub><mi>P</mi><mn>1</mn></msub><mo>→</mo><msub><mi>R</mi><mn>2</mn></msub><mo>→</mo><msub><mi>P</mi><mn>2</mn></msub><mo>→</mo><msub><mi>R</mi><mn>1</mn></msub><mo>→</mo><msub><mi>P</mi><mn>1</mn></msub><mo separator="true">;</mo><mspace width="1em"/><msub><mi>P</mi><mn>3</mn></msub><mtext> finishes</mtext><mo>⇒</mo><msub><mi>R</mi><mn>2</mn></msub><mtext> free</mtext><mo>→</mo><msub><mi>P</mi><mn>1</mn></msub><mo>→</mo><msub><mi>P</mi><mn>2</mn></msub><mo>⇒</mo><mrow><mtext>𝐧𝐨</mtext><mtext> </mtext><mtext>𝐝𝐞𝐚𝐝𝐥𝐨𝐜𝐤</mtext></mrow></mrow></math></div><ul>
+<li>Matrices from a RAG (S26 Q3.2): Allocation = assignment edges, Request = request edges, Available = instances <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo></mrow></math> allocated.</li>
+</ul>
+<h3>T3 Banker's algorithm</h3>
+<p>Steps: Need <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo></mrow></math> Max <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo></mrow></math> Alloc <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> Work <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo></mrow></math> Avail <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> repeatedly pick an unfinished <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mi>i</mi></msub></mrow></math> with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Need</mtext><mi>i</mi></msub><mo>≤</mo><mtext>Work</mtext></mrow></math>, then <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Work</mtext><mo>+</mo><mo>=</mo><msub><mtext>Alloc</mtext><mi>i</mi></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> all finished <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> safe.</p>
+<p>Slide example (Ch8): Avail <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math>.</p>
+<table>
+<thead>
+<tr>
+<th>P</th>
+<th>Alloc</th>
+<th>Max</th>
+<th>Need</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>9</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>6</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Pick</th>
+<th>Work after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>—</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>1</td>
+<td>P1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>5</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>2</td>
+<td>P3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>3</td>
+<td>P4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>4</td>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>10</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>5</td>
+<td>P0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>10</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>safe</mtext><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">⟨</mo><msub><mi>P</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>P</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>P</mi><mn>4</mn></msub><mo separator="true">,</mo><msub><mi>P</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>P</mi><mn>0</mn></msub><mo stretchy="false">⟩</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Request <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mn>1</mn></msub></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo><mo>≤</mo><msub><mtext>Need</mtext><mn>1</mn></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> ✓, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mtext>Avail</mtext></mrow></math> ✓. Pretend: Avail <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>, Alloc<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow></mrow><mn>1</mn></msub><mo>=</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math>, Need<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow></mrow><mn>1</mn></msub><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> still safe <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>grant</strong>. Then <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mn>4</mn></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>&gt;</mo></mrow></math> Avail <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> wait; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mn>0</mn></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> Avail <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>, no Need fits <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>unsafe, wait</strong>.</p>
+<ul>
+<li>S26 Q3.3 asks for the <strong>lexicographically largest</strong> safe sequence: at each step pick the <strong>largest eligible index</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⟨</mo><msub><mi>P</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>P</mi><mn>4</mn></msub><mo separator="true">,</mo><msub><mi>P</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>P</mi><mn>2</mn></msub><mo stretchy="false">⟩</mo></mrow></math>). Show Work after every step; the marks are split between safe/unsafe, the table and the sequence.</li>
+<li>When a request is granted only tentatively, show the new Alloc / Need / Avail, then run safety. If unsafe, <strong>roll back</strong>.</li>
+</ul>
+<h3>T4 Minimum extra instances to avoid deadlock (S26 MC5 type)</h3>
+<p>Steps: remaining need <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msub><mtext>max</mtext><mi>i</mi></msub><mo>−</mo><msub><mtext>held</mtext><mi>i</mi></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> smallest <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> (free instances) for which the safety loop finishes.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>max</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>6</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> held</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo><mo>⇒</mo><mtext>need</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo><mo separator="true">;</mo><mspace width="1em"/><mi>x</mi><mo>=</mo><mn>1</mn><mo>:</mo><mtext> none fits</mtext><mo separator="true">;</mo><mspace width="1em"/><mi>x</mi><mo>=</mo><mn>2</mn><mo>:</mo><mtext> </mtext><msub><mi>P</mi><mn>1</mn></msub><mo>→</mo><mn>4</mn><mo>→</mo><msub><mi>P</mi><mn>2</mn></msub><mo>→</mo><mn>7</mn><mo>→</mo><msub><mi>P</mi><mn>3</mn></msub><mtext> </mtext><mi mathvariant="normal">✓</mi></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Any allocation, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> processes each needing up to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math> units: deadlock-free guaranteed iff <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>≥</mo><mi>n</mi><mo stretchy="false">(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></math>.</li>
+</ul>
+<h3>T5 Deadlock detection algorithm</h3>
+<p>Slide example (Ch8): Avail <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>; Alloc P0–P4 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math>; Request <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>P</mi><mn>0</mn></msub><mo>→</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>→</mo><msub><mi>P</mi><mn>2</mn></msub><mo>→</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><mo>→</mo><msub><mi>P</mi><mn>1</mn></msub><mo>→</mo><mo stretchy="false">(</mo><mn>5</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo><mo>→</mo><msub><mi>P</mi><mn>3</mn></msub><mo>→</mo><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo><mo>→</mo><msub><mi>P</mi><mn>4</mn></msub><mo>→</mo><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">)</mo><mo>⇒</mo><mrow><mtext>𝐧𝐨</mtext><mtext> </mtext><mtext>𝐝𝐞𝐚𝐝𝐥𝐨𝐜𝐤</mtext></mrow></mrow></math></div><ul>
+<li>P2 now requests <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>: only P0 can finish (Work <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math>) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>P1, P2, P3, P4 deadlocked</strong>.</li>
+</ul>
+<h3>T6 Contiguous allocation: first / best / worst fit</h3>
+<p>Example (自编题): holes <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn><mo separator="true">,</mo><mn>600</mn><mo separator="true">,</mo><mn>350</mn><mo separator="true">,</mo><mn>200</mn><mo separator="true">,</mo><mn>750</mn><mo separator="true">,</mo><mn>125</mn></mrow></math> (in order); requests <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>115</mn><mo separator="true">,</mo><mn>500</mn><mo separator="true">,</mo><mn>358</mn><mo separator="true">,</mo><mn>200</mn><mo separator="true">,</mo><mn>375</mn></mrow></math>.</p>
+<table>
+<thead>
+<tr>
+<th>Request</th>
+<th>First fit</th>
+<th>Best fit</th>
+<th>Worst fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>115</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn><mo>→</mo><mn>185</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>125</mn><mo>→</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>750</mn><mo>→</mo><mn>635</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>500</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>600</mn><mo>→</mo><mn>100</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>600</mn><mo>→</mo><mn>100</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>635</mn><mo>→</mo><mn>135</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>358</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>750</mn><mo>→</mo><mn>392</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>750</mn><mo>→</mo><mn>392</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>600</mn><mo>→</mo><mn>242</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>200</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>350</mn><mo>→</mo><mn>150</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>200</mn><mo>→</mo><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>350</mn><mo>→</mo><mn>150</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>375</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>392</mn><mo>→</mo><mn>17</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>392</mn><mo>→</mo><mn>17</mn></mrow></math></td>
+<td><strong>waits</strong> (largest <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn></mrow></math>)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>S26 MC6 type: one request <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>212</mn></mrow></math> into <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>100</mn><mo separator="true">,</mo><mn>500</mn><mo separator="true">,</mo><mn>200</mn><mo separator="true">,</mo><mn>300</mn><mo separator="true">,</mo><mn>600</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> first <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>500</mn></mrow></math>, best <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn></mrow></math>, worst <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>600</mn></mrow></math>.</li>
+<li>PA3 <code>mm_malloc</code> = first fit with splitting; an unsplittable remainder is internal fragmentation.</li>
+</ul>
+<h3>T7 Paging address translation</h3>
+<p>Steps: offset bits <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mo stretchy="false">(</mo><mtext>page size</mtext><mo stretchy="false">)</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> split <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>∣</mo><mi>d</mi></mrow></math> (in hex, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math> KB <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> last <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn></mrow></math> hex digits) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mtext>PT</mtext><mo stretchy="false">[</mo><mi>p</mi><mo stretchy="false">]</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> physical <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>f</mi><mi mathvariant="normal">∥</mi><mi>d</mi></mrow></math>.</p>
+<p>Example (自编题): 32-bit address, 4 KB pages, <code>0x0001A7F3</code>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>PT</mtext><mo stretchy="false">[</mo><mtext mathvariant="monospace">0x1A</mtext><mo stretchy="false">]</mo><mo>=</mo><mtext mathvariant="monospace">0x3C</mtext></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>p</mi><mo>=</mo><mtext mathvariant="monospace">0x0001A</mtext><mo separator="true">,</mo><mtext> </mtext><mi>d</mi><mo>=</mo><mtext mathvariant="monospace">0x7F3</mtext><mo>⇒</mo><mtext>physical</mtext><mo>=</mo><mtext mathvariant="monospace">0x3C</mtext><mi mathvariant="normal">∥</mi><mtext mathvariant="monospace">7F3</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mtext mathvariant="monospace">0x3C7F3</mtext></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>Internal fragmentation (slide): page <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2048</mn></mrow></math> B, process <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>72,766</mn></mrow></math> B <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>35</mn></mrow></math> pages <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1,086</mn></mrow></math> B <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>36</mn></mrow></math> frames, waste <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2048</mn><mo>−</mo><mn>1086</mn><mo>=</mo><mn>962</mn></mrow></math> B.</li>
+<li>Valid bit (slide): 14-bit space, 2 KB pages, program uses <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10468</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> pages <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math> valid, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>7</mn></mrow></math> invalid.</li>
+</ul>
+<h3>T8 Segmentation</h3>
+<p>Steps: check <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>&lt;</mo><mtext>limit</mtext></mrow></math> (strict) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> physical <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mtext>base</mtext><mo>+</mo><mi>d</mi></mrow></math>; else trap.</p>
+<p>S26 MC8 type (base, limit): seg 0 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1200</mn><mo separator="true">,</mo><mn>600</mn><mo stretchy="false">)</mo></mrow></math>, seg 1 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3000</mn><mo separator="true">,</mo><mn>400</mn><mo stretchy="false">)</mo></mrow></math>, seg 2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>5000</mn><mo separator="true">,</mo><mn>1000</mn><mo stretchy="false">)</mo></mrow></math>:</p>
+<table>
+<thead>
+<tr>
+<th>Logical</th>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>430</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>430</mn><mo>&lt;</mo><mn>600</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1630</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>450</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>450</mn><mo>≥</mo><mn>400</mn></mrow></math></td>
+<td><strong>trap</strong></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>999</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>999</mn><mo>&lt;</mo><mn>1000</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5999</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>1000</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1000</mn><mo>≥</mo><mn>1000</mn></mrow></math></td>
+<td><strong>trap</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>T9 TLB effective access time</h3>
+<p>Slide: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>20</mn></mrow></math> ns, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>100</mn></mrow></math> ns.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>α</mi><mo>=</mo><mn>0.80</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mn>0.80</mn><mo>×</mo><mn>120</mn><mo>+</mo><mn>0.20</mn><mo>×</mo><mn>220</mn><mo>=</mo><mn>140</mn><mtext> ns</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>α</mi><mo>=</mo><mn>0.99</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mn>0.99</mn><mo>×</mo><mn>120</mn><mo>+</mo><mn>0.01</mn><mo>×</mo><mn>220</mn><mo>=</mo><mn>121</mn><mtext> ns</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><p>Two-level page table (自编题), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.9</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>10</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>100</mn></mrow></math>: miss <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi>ε</mi><mo>+</mo><mn>3</mn><mi>m</mi></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>EAT</mtext><mo>=</mo><mn>0.9</mn><mo>×</mo><mn>110</mn><mo>+</mo><mn>0.1</mn><mo>×</mo><mn>310</mn><mo>=</mo><mn>99</mn><mo>+</mo><mn>31</mn><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>130</mn><mtext> ns</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T10 Two-level page-table walk (S26 Q4.1 type)</h3>
+<p>Steps: split VA <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><msub><mi>p</mi><mn>1</mn></msub><mo>∣</mo><msub><mi>p</mi><mn>2</mn></msub><mo>∣</mo><mi>d</mi><mo stretchy="false">]</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> TLB hit? <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> frame <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∥</mi><mi>d</mi></mrow></math> (no checks) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> else PDE at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>PDBR</mtext><mo>+</mo><mn>4</mn><msub><mi>p</mi><mn>1</mn></msub></mrow></math> (big-endian 4 bytes) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> check V (and W for a write) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> PTE at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mtext>PPN</mtext><mtext>PDE</mtext></msub><mo>≪</mo><mn>12</mn><mo stretchy="false">)</mo><mo>+</mo><mn>4</mn><msub><mi>p</mi><mn>2</mn></msub></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> check V / W <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> physical <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msub><mtext>PPN</mtext><mtext>PTE</mtext></msub><mi mathvariant="normal">∥</mi><mi>d</mi></mrow></math>.</p>
+<p>Entry format (S26): PPN 24 bits <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∣</mo></mrow></math> other 5 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∣</mo></mrow></math> U <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∣</mo></mrow></math> W <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∣</mo></mrow></math> V <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> low byte <code>0x07</code> = U W V, <code>0x03</code> = W V (kernel-only, writable), <code>0x05</code> = U V (read-only).</p>
+<p>Example (自编题): PDBR <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mtext mathvariant="monospace">0x3000</mtext></mrow></math>, write to VA <code>0x00C02ABC</code>; word at <code>0x300C</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mtext mathvariant="monospace">0x00000507</mtext></mrow></math>; word at <code>0x5008</code> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mtext mathvariant="monospace">0x0012AB03</mtext></mrow></math>; TLB miss.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>p</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext mathvariant="monospace">0x003</mtext><mo separator="true">,</mo><mtext> </mtext><msub><mi>p</mi><mn>2</mn></msub><mo>=</mo><mtext mathvariant="monospace">0x002</mtext><mo separator="true">,</mo><mtext> </mtext><mi>d</mi><mo>=</mo><mtext mathvariant="monospace">0xABC</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>PDE</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi mathvariant="normal">@</mi><mtext> </mtext><mtext mathvariant="monospace">0x3000</mtext><mo>+</mo><mn>3</mn><mo>×</mo><mn>4</mn><mo>=</mo><mtext mathvariant="monospace">0x300C</mtext><mo>→</mo><mtext mathvariant="monospace">0x00000507</mtext><mo>:</mo><mtext> V</mtext><mo>=</mo><mtext>W</mtext><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mtext> PPN</mtext><mo>=</mo><mtext mathvariant="monospace">0x5</mtext><mo>⇒</mo><mtext>PT at </mtext><mtext mathvariant="monospace">0x5000</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>PTE</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi mathvariant="normal">@</mi><mtext> </mtext><mtext mathvariant="monospace">0x5000</mtext><mo>+</mo><mn>2</mn><mo>×</mo><mn>4</mn><mo>=</mo><mtext mathvariant="monospace">0x5008</mtext><mo>→</mo><mtext mathvariant="monospace">0x0012AB03</mtext><mo>:</mo><mtext> V</mtext><mo>=</mo><mtext>W</mtext><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mtext> U</mtext><mo>=</mo><mn>0</mn><mtext> </mtext><mo stretchy="false">(</mo><mtext>kernel-only, still translated in S26</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>physical</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext mathvariant="monospace">0x0012AB</mtext><mi mathvariant="normal">∥</mi><mtext mathvariant="monospace">ABC</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mtext mathvariant="monospace">0x12ABABC</mtext></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>PTE low bits <code>0x05</code> on a write <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>ERROR: non-writable</strong>; PDE with V <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0</mn></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>ERROR: invalid</strong> (stop at level 1). An error with no reason gets 0 marks.</li>
+</ul>
+<h3>T11 Page replacement: FIFO / OPT / LRU</h3>
+<p>Steps: one column per reference <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> hit if resident <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> fault: free frame, else victim (FIFO: oldest loaded; OPT: next use farthest, never used <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></math>, tie <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> smallest page number (S26); LRU: last use oldest).</p>
+<p>Slide string <code>7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1</code>, 3 frames: <strong>FIFO 15, OPT 9, LRU 12</strong>. Belady (<code>1 2 3 4 1 2 5 1 2 3 4 5</code>): FIFO 3 frames <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn></mrow></math>, 4 frames <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn></mrow></math>.</p>
+<p>Example (自编题): <code>4 1 2 1 5 4 3 1 2 5 1 4</code>, 3 frames.</p>
+<p>FIFO:</p>
+<table>
+<thead>
+<tr>
+<th>Ref</th>
+<th>4</th>
+<th>1</th>
+<th>2</th>
+<th>1</th>
+<th>5</th>
+<th>4</th>
+<th>3</th>
+<th>1</th>
+<th>2</th>
+<th>5</th>
+<th>1</th>
+<th>4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>F2</td>
+<td></td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>F3</td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Fault</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td></td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td></td>
+<td>F</td>
+</tr>
+</tbody>
+</table>
+<p>OPT:</p>
+<table>
+<thead>
+<tr>
+<th>Ref</th>
+<th>4</th>
+<th>1</th>
+<th>2</th>
+<th>1</th>
+<th>5</th>
+<th>4</th>
+<th>3</th>
+<th>1</th>
+<th>2</th>
+<th>5</th>
+<th>1</th>
+<th>4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>F2</td>
+<td></td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>F3</td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>2</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Fault</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td></td>
+<td>F</td>
+<td></td>
+<td>F</td>
+<td></td>
+<td>F</td>
+<td></td>
+<td></td>
+<td>F</td>
+</tr>
+</tbody>
+</table>
+<p>LRU:</p>
+<table>
+<thead>
+<tr>
+<th>Ref</th>
+<th>4</th>
+<th>1</th>
+<th>2</th>
+<th>1</th>
+<th>5</th>
+<th>4</th>
+<th>3</th>
+<th>1</th>
+<th>2</th>
+<th>5</th>
+<th>1</th>
+<th>4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>F2</td>
+<td></td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<td>F3</td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Fault</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td></td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td>F</td>
+<td></td>
+<td>F</td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>FIFO </mtext><mn>10</mn><mo separator="true">,</mo><mtext> OPT </mtext><mn>7</mn><mo separator="true">,</mo><mtext> LRU </mtext><mn>10</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>OPT at the last <code>4</code>: frames <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">}</mo></mrow></math>, none used again <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> tie <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> evict smallest page <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math>.</li>
+<li>S26 Q4.2 (<code>1 3 4 3 4 5 6 1 2 3 2 6 4 2 1 5 1 3 2 4</code>): FIFO <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn></mrow></math>, OPT <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>11</mn></mrow></math>, LRU <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math>, LRU with 4 frames <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn></mrow></math>.</li>
+<li>S26 MC11 (<code>1 2 3 2 4 1 5 2 1 2 3 4</code>, LRU, 3 frames): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn></mrow></math>.</li>
+</ul>
+<h3>T12 Demand-paging EAT</h3>
+<p>Slide: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>200</mn></mrow></math> ns, service <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn></mrow></math> ms, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><mn>1000</mn></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>EAT</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo stretchy="false">)</mo><mo>×</mo><mn>200</mn><mo>+</mo><mi>p</mi><mo>×</mo><mn>8,000,000</mn><mo>=</mo><mn>200</mn><mo>+</mo><mn>7,999,800</mn><mtext> </mtext><mi>p</mi><mo>=</mo><mn>8,199.8</mn><mtext> ns</mtext><mo>≈</mo><mn>8.2</mn><mtext> </mtext><mi>μ</mi><mtext>s </mtext><mo stretchy="false">(</mo><mn>40</mn><mo>×</mo><mtext>slower</mtext><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>degradation</mtext><mo>&lt;</mo><mn>10</mn><mi mathvariant="normal">%</mi><mo>:</mo><mtext> </mtext><mn>220</mn><mo>&gt;</mo><mn>200</mn><mo>+</mo><mn>7,999,800</mn><mtext> </mtext><mi>p</mi><mo>⇒</mo><mi>p</mi><mo>&lt;</mo><mn>2.5</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow></math></div><p>Example (自编题): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>100</mn></mrow></math> ns, service <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10</mn></mrow></math> ms (clean) / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>20</mn></mrow></math> ms (dirty, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>30</mn><mi mathvariant="normal">%</mi></mrow></math>), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>service</mtext><mo>=</mo><mn>0.7</mn><mo>×</mo><mn>10</mn><mo>+</mo><mn>0.3</mn><mo>×</mo><mn>20</mn><mo>=</mo><mn>13</mn><mtext> ms</mtext><mo separator="true">;</mo><mspace width="1em"/><mtext>EAT</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup><mo stretchy="false">)</mo><mo>×</mo><mn>100</mn><mo>+</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup><mo>×</mo><mn>13</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mo>≈</mo><mn>100</mn><mo>+</mo><mn>130</mn></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>≈</mo><mn>230</mn><mtext> ns</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>T13 Memory access pattern → reference string (S26 Q4.3 type)</h3>
+<p>Steps: page of each access <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">⌊</mo><mtext>offset</mtext><mi mathvariant="normal">/</mi><mtext>page size</mtext><mo stretchy="false">⌋</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> reference string in program order <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> run the policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>EAT</mtext><mo>=</mo><mfrac><mrow><mi mathvariant="normal">#</mi><mtext>faults</mtext><mo>⋅</mo><msub><mi>T</mi><mi>f</mi></msub><mo>+</mo><mi mathvariant="normal">#</mi><mtext>hits</mtext><mo>⋅</mo><msub><mi>T</mi><mi>h</mi></msub></mrow><mrow><mi mathvariant="normal">#</mi><mtext>accesses</mtext></mrow></mfrac></mrow></math>.</p>
+<p>Slide: <code>int data[128][128]</code>, one row per page. Inner loop over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> (column order) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>128</mn><mo>×</mo><mn>128</mn><mo>=</mo><mn>16,384</mn></mrow></math> faults; inner loop over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi></mrow></math> (row order) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>128</mn></mrow></math> faults.</p>
+<p>Example (自编题): <code>int A[4][1024]</code> (one row <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>4</mn></mrow></math> KB <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo></mrow></math> one page), 2 frames, LRU.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>column order </mtext><mo stretchy="false">(</mo><mi>j</mi><mtext> outer</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mo>⋯</mo><mo>⇒</mo><mtext>every access faults</mtext><mo>=</mo><mn>4</mn><mo>×</mo><mn>1024</mn><mo>=</mo><mn>4096</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>row order </mtext><mo stretchy="false">(</mo><mi>i</mi><mtext> outer</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mn>0</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>⋯</mo><mo>⇒</mo><mn>4</mn><mtext> faults</mtext></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>S26 Q4.3: preorder over <code>T[16]</code> (250 B nodes, 1000 B pages, 3 frames, LRU) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math> faults; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>EAT</mtext><mo>=</mo><mfrac><mrow><mn>6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mo>+</mo><mn>10</mn><mo>×</mo><mn>101</mn></mrow><mn>16</mn></mfrac><mo>≈</mo><mn>375,063</mn></mrow></math> ns.</li>
+</ul>
+<h3>T14 Frame allocation, working set, thrashing</h3>
+<p>Proportional (slide): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>64</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>=</mo><mn>10</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>2</mn></msub><mo>=</mo><mn>127</mn></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>10</mn><mn>137</mn></mfrac></mstyle><mo>×</mo><mn>64</mn><mo>≈</mo><mn>4.67</mn><mo>→</mo><mn>5</mn><mo separator="true">,</mo><mspace width="2em"/><msub><mi>a</mi><mn>2</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>127</mn><mn>137</mn></mfrac></mstyle><mo>×</mo><mn>64</mn><mo>≈</mo><mn>59.3</mn><mo>→</mo><mn>59</mn></mrow></math></div><p>Working set (自编题): refs <code>1 2 3 2 1 4 5 4 5 4</code>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mo>=</mo><mn>5</mn></mrow></math>.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>WS</mtext><mo stretchy="false">(</mo><mi>t</mi><mo>=</mo><mn>5</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">}</mo><mtext> </mtext><mo stretchy="false">(</mo><mtext>WSS</mtext><mo>=</mo><mn>3</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mtext>WS</mtext><mo stretchy="false">(</mo><mi>t</mi><mo>=</mo><mn>10</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">{</mo><mn>4</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">}</mo><mtext> </mtext><mo stretchy="false">(</mo><mtext>WSS</mtext><mo>=</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math></div><ul>
+<li>S26 MC12: WSS <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>7</mn><mo>=</mo><mn>22</mn><mo>&gt;</mo><mn>18</mn></mrow></math> frames <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> thrashing possible <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> suspend a process (<strong>not</strong> raise multiprogramming).</li>
+<li>S26 Q2.1 (page size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↑</mo></mrow></math>): page table <strong>decreases</strong>, TLB hit rate <strong>increases</strong>, internal fragmentation <strong>increases</strong>.</li>
+<li>TLB reach: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>64</mn></mrow></math> entries <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mn>4</mn></mrow></math> KB <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>256</mn></mrow></math> KB.</li>
+</ul>
+<h3>T15 Disk service time and disk scheduling (Ch11, pending)</h3>
+<p>Service time (自编题): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10,000</mn></mrow></math> RPM, seek <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math> ms, transfer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.1</mn></mrow></math> ms, controller <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.2</mn></mrow></math> ms.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>T</mi><mo>=</mo><mn>4</mn><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>×</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>60</mn><mn>10000</mn></mfrac></mstyle><mo>×</mo><mn>1000</mn><mo>+</mo><mn>0.1</mn><mo>+</mo><mn>0.2</mn><mo>=</mo><mn>4</mn><mo>+</mo><mn>3</mn><mo>+</mo><mn>0.3</mn><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>7.3</mn><mtext> ms</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>Scheduling (自编题): cylinders <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>199</mn></mrow></math>, head <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>50</mn></mrow></math> moving <strong>toward 0</strong>, queue <code>82 170 43 145 24 16 190 60</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Path</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FCFS</td>
+<td>82, 170, 43, 145, 24, 16, 190, 60</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>782</mn></mrow></math></td>
+</tr>
+<tr>
+<td>SSTF</td>
+<td>43, 60, 82, 24, 16, 145, 170, 190</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>286</mn></mrow></math></td>
+</tr>
+<tr>
+<td>SCAN</td>
+<td>43, 24, 16, <strong>0</strong>, 60, 82, 145, 170, 190</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>50</mn><mo>+</mo><mn>190</mn><mo>=</mo><mn>240</mn></mrow></math></td>
+</tr>
+<tr>
+<td>C-SCAN</td>
+<td>43, 24, 16, <strong>0 → 199</strong>, 190, 170, 145, 82, 60</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>50</mn><mo>+</mo><mn>199</mn><mo>+</mo><mn>139</mn><mo>=</mo><mn>388</mn></mrow></math></td>
+</tr>
+<tr>
+<td>LOOK</td>
+<td>43, 24, 16, 60, 82, 145, 170, 190</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>34</mn><mo>+</mo><mn>174</mn><mo>=</mo><mn>208</mn></mrow></math></td>
+</tr>
+<tr>
+<td>C-LOOK</td>
+<td>43, 24, 16, <strong>→ 190</strong>, 170, 145, 82, 60</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>34</mn><mo>+</mo><mn>174</mn><mo>+</mo><mn>130</mn><mo>=</mo><mn>338</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>S26 Q5.2 (0–499, head 100, toward 0): FCFS <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1492</mn></mrow></math>, SSTF <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>514</mn></mrow></math>, SCAN <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>550</mn></mrow></math>, C-SCAN <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>997</mn></mrow></math>, LOOK <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>510</mn></mrow></math>, C-LOOK <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>859</mn></mrow></math>. S26 MC14 (SSTF, head 53): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>236</mn></mrow></math>.</li>
+</ul>
+<h3>T16 File-system sizes: inode and FAT (Ch14, pending)</h3>
+<p>Inode (自编题): block <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math> KB, address <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math> B, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12</mn></mrow></math> direct + single + double + triple indirect.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo>=</mo><mn>4096</mn><mi mathvariant="normal">/</mi><mn>4</mn><mo>=</mo><mn>1024</mn><mo separator="true">;</mo><mspace width="1em"/><mtext>max</mtext><mo>=</mo><mn>4</mn><mtext> KB</mtext><mo>×</mo><mo stretchy="false">(</mo><mn>12</mn><mo>+</mo><mn>1024</mn><mo>+</mo><msup><mn>1024</mn><mn>2</mn></msup><mo>+</mo><msup><mn>1024</mn><mn>3</mn></msup><mo stretchy="false">)</mo><mo>=</mo><mn>48</mn><mtext> KB</mtext><mo>+</mo><mn>4</mn><mtext> MB</mtext><mo>+</mo><mn>4</mn><mtext> GB</mtext><mo>+</mo><mn>4</mn><mtext> TB</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>≈</mo><mn>4</mn><mtext> TB </mtext><mo stretchy="false">(</mo><mn>4,402,345,721,856</mn><mtext> B</mtext><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>FAT16 (自编题): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> GB data region, file <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>100,000</mn></mrow></math> B.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>cluster</mtext><mo>≥</mo><msup><mn>2</mn><mn>30</mn></msup><mi mathvariant="normal">/</mi><msup><mn>2</mn><mn>16</mn></msup><mo>=</mo><mn>16</mn><mtext> KB</mtext><mo separator="true">;</mo><mspace width="1em"/><mo stretchy="false">⌈</mo><mn>100000</mn><mi mathvariant="normal">/</mi><mn>16384</mn><mo stretchy="false">⌉</mo><mo>=</mo><mn>7</mn><mo separator="true">;</mo><mspace width="1em"/><mtext>waste</mtext><mo>=</mo><mn>7</mn><mo>×</mo><mn>16384</mn><mo>−</mo><mn>100000</mn><mo>=</mo><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>14,688</mn><mtext> B</mtext></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li>S26 Q5.1: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math> GB <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>32</mn></mrow></math> KB clusters; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>282,124</mn></mrow></math> B <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn></mrow></math> clusters, waste <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12,788</mn></mrow></math> B. S26 Q2.4: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>2</mn><mi>b</mi></msup><mo stretchy="false">(</mo><mi>n</mi><mo>+</mo><mi>x</mi><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>x</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><msup><mn>2</mn><mrow><mi>b</mi><mo>−</mo><mi>a</mi></mrow></msup></mrow></math>.</li>
+</ul>
+<h3>T17 Permissions and access matrix (Ch13 / Ch17, pending)</h3>
+<ul>
+<li><code>chmod 705 f</code>, owner alice, group dev_team: owner <code>rwx</code>, group <code>---</code>, other <code>r-x</code>. bob in dev_team <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> the group class applies <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>denied</strong> (other bits not ORed in) (S26 MC18).</li>
+<li>Access matrix: <strong>capability list of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>2</mn></msub></mrow></math> = row <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>2</mn></msub></mrow></math></strong>; ACL of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub></mrow></math> = column <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub></mrow></math>; an empty cell = no access (S26 MC20).</li>
+</ul>
+<h2>Common Mistakes</h2>
+<ul>
+<li>Cycle in a RAG <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo></mrow></math> deadlock when a resource has several instances; reduce the graph first.</li>
+<li>Banker: compare <strong>Need</strong> (avoidance) vs <strong>Request</strong> (detection); after a process finishes add its <strong>Allocation</strong>, not its Max. A granted-but-unsafe request must be <strong>rolled back</strong>.</li>
+<li>Unsafe <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo></mrow></math> deadlocked: unsafe only means deadlock is possible.</li>
+<li>Bounded buffer: <code>wait(empty)</code> / <code>wait(full)</code> before <code>wait(mutex)</code>; <code>signal</code> order does not matter.</li>
+<li>Segmentation: offset <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo></mrow></math> limit is already <strong>illegal</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>&lt;</mo><mtext>limit</mtext></mrow></math>).</li>
+<li>TLB miss with a <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-level table costs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math> memory accesses (plus <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math>); the 2-level walk stops at an invalid PDE.</li>
+<li>Physical address: concatenate frame and offset (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>×</mo><msup><mn>2</mn><mi>n</mi></msup><mo>+</mo><mi>d</mi></mrow></math>); do not add the page number.</li>
+<li>OPT: next use counted from the <strong>current</strong> position; follow the stated tie rule. Do not count hits right after a fault as faults.</li>
+<li>Thrashing <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>decrease</strong> multiprogramming; PFF too high <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>add</strong> frames.</li>
+<li>Disk: rotational latency is <strong>half</strong> a rotation; SCAN goes to the disk end, LOOK does not; C-SCAN in S26 <strong>counts</strong> the return jump.</li>
+<li>⚠️ Ch11 / Ch13 / Ch14 / Ch17 conventions here come from the S26 paper; re-check them against the F26 slides when they are released.</li>
+</ul>
+<h2>Past Papers / Homework Mapping</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S26 Final MC1–MC2</td>
+<td>Ch7: roles of <code>mutex</code> / <code>rw_mutex</code>; <code>pthread_cond_wait</code> releases and re-acquires</td>
+</tr>
+<tr>
+<td>S26 Final MC3–MC5</td>
+<td>Ch8: circular wait <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo></mrow></math> global ordering; Banker variables; T4</td>
+</tr>
+<tr>
+<td>S26 Final MC6–MC9</td>
+<td>T6 · T7 · T8 · multi-level PT purpose (no huge contiguous table)</td>
+</tr>
+<tr>
+<td>S26 Final MC10–MC12</td>
+<td>demand-paging fault · T11 (LRU <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>9</mn></mrow></math>) · T14</td>
+</tr>
+<tr>
+<td>S26 Final MC13–MC15</td>
+<td>T15 service time (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>10.51</mn></mrow></math> ms) · SSTF (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>236</mn></mrow></math>) · RAID</td>
+</tr>
+<tr>
+<td>S26 Final MC16–MC18</td>
+<td>open-file tables · indexed allocation · T17</td>
+</tr>
+<tr>
+<td>S26 Final MC19–MC20</td>
+<td>rings / TrustZone · T17 access matrix</td>
+</tr>
+<tr>
+<td>S26 Final Q2.1–Q2.4</td>
+<td>T14 page size · PFF · allocation drawbacks · T16 inode</td>
+</tr>
+<tr>
+<td>S26 Final Q3.1</td>
+<td>T1 (writer-priority readers-writers)</td>
+</tr>
+<tr>
+<td>S26 Final Q3.2 / Q3.3</td>
+<td>T2 · T3</td>
+</tr>
+<tr>
+<td>S26 Final Q4.1 / Q4.2 / Q4.3</td>
+<td>T10 · T11 · T13</td>
+</tr>
+<tr>
+<td>S26 Final Q5.1 / Q5.2</td>
+<td>T16 FAT · T15</td>
+</tr>
+<tr>
+<td>F26 HW3 Q3.1 / Q3.2</td>
+<td>T1 (<code>solutions/hw3.md</code>)</td>
+</tr>
+<tr>
+<td>F26 HW3 Q4</td>
+<td>T3 Banker + two requests</td>
+</tr>
+<tr>
+<td>Lab 7</td>
+<td>Banker step-by-step, contiguous allocation, segmentation</td>
+</tr>
+<tr>
+<td>Lab 8 Part 1 / PA3</td>
+<td>memory management review; first fit + split + coalesce (T6)</td>
+</tr>
+</tbody>
+</table>

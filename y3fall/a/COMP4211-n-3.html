@@ -1,0 +1,138 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Training error vs testing error</strong>：能测的 vs 想要的</li>
+<li><strong>Overfitting</strong> 的形式定义</li>
+<li><strong>Bias–variance tradeoff</strong></li>
+<li><strong>验证方法</strong>：hold-out validation、<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-fold cross-validation</strong>、leave-one-out</li>
+</ol>
+<blockquote>
+<p>必会：两种 error 的公式；overfitting 定义（要有另一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>）；复杂 / 简单模型的 bias、variance 方向；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-fold 的步骤和计数（训练几次、每次用多少数据）。</p>
+</blockquote>
+<h2>1 · Training Error</h2>
+<p><strong>设定</strong>：target function <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math>；hypothesis / model <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math>（例如某个神经网络）；实例分布 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒟</mi></mrow></math>；从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒟</mi></mrow></math> 抽出的 training set <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math>（大小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>）。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>error</mtext><mi>S</mi></msub><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mi>S</mi></mrow></munder><mi>δ</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>δ</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>otherwise</mtext></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p>= <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> 中被 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 分错的比例——<strong>我们能测量的</strong>。</p>
+<p><strong>问题</strong>：用几个 hidden units / layers？选 training error 最小的网络？——<strong>不对</strong>，我们想要的是 <strong>testing error 低</strong>的模型。</p>
+<h2>2 · Testing Error</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>error</mtext><mi>𝒟</mi></msub><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mrow><mi>Pr</mi><mo>⁡</mo></mrow><mrow><mi>x</mi><mo>∈</mo><mi>𝒟</mi></mrow></munder><mo stretchy="false">[</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math></div><p>= 从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒟</mi></mrow></math> 随机抽一个实例被 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 分错的<strong>概率</strong>——<strong>我们想要的</strong>。</p>
+<p>通常用 <strong>test set</strong> 估计：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>error</mtext><mtext>test</mtext></msub><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">∣</mo><mtext>testSet</mtext><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mtext>testSet</mtext></mrow></munder><mi>δ</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></div><blockquote>
+<ul>
+<li>Test patterns 要<strong>独立</strong>抽取</li>
+<li>Testing data <strong>不能以任何方式</strong>用于学习 hypothesis</li>
+</ul>
+</blockquote>
+<h2>3 · 为什么不直接拟合训练集</h2>
+<ul>
+<li>Training set 只是从底层分布中抽出的一个<strong>样本</strong></li>
+<li><strong>不同的 training set 会得到不同的 classifier</strong>（回归同理）——完美拟合某一个样本，会把它的噪声也学进去</li>
+</ul>
+<h2>4 · Overfitting</h2>
+<blockquote>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>∈</mo><mi>ℋ</mi></mrow></math> <strong>overfits</strong> the training data，如果存在另一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>ℋ</mi></mrow></math> 使得</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 在<strong>训练样本</strong>上的误差比 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> <strong>小</strong>，但</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 在<strong>整个实例分布</strong>上的误差比 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> <strong>大</strong>。</li>
+</ul>
+</blockquote>
+<p>（模型复杂度 ↑：training error 一直 ↓；testing error 先 ↓ 后 ↑。）</p>
+<h2>5 · Bias–Variance Tradeoff</h2>
+<ul>
+<li><strong>Bias</strong>：预测偏离真值的量</li>
+<li><strong>Variance</strong>：换一个训练集时模型变化的量</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>Bias</th>
+<th>Variance</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>太复杂</strong>（hidden units 太多）</td>
+<td><strong>小</strong></td>
+<td><strong>大</strong></td>
+<td>能贴近真实函数，但对有限训练集敏感</td>
+</tr>
+<tr>
+<td><strong>太简单</strong>（hidden units 太少）</td>
+<td><strong>大</strong></td>
+<td><strong>小</strong></td>
+<td>离真实函数远，但对训练集不敏感</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · Hold-Out Validation</h2>
+<p>把可用的（训练）数据分成两部分：</p>
+<ul>
+<li><strong>Training set</strong>：学 hypothesis</li>
+<li><strong>Validation set</strong>：估计这个 hypothesis 在后续数据上的准确率</li>
+</ul>
+<p>评估完后（可选）用<strong>全部数据</strong>训练最终 hypothesis。</p>
+<p><strong>Tradeoff</strong>：training set 越大 → hypothesis 越好；validation set 越大 → 误差估计越准。</p>
+<p>例：留 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow></math> 做 validation，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>2</mn><mn>3</mn></mfrac></mrow></math> 训练。</p>
+<p><strong>怎么让估计更可靠</strong>？用不同的子样本<strong>重复</strong>这个过程 → cross-validation。</p>
+<h2>7 · <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-fold Cross-Validation</h2>
+<ol>
+<li>把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 个样本分成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 个<strong>不相交</strong>子集，每个大小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>m</mi><mi>k</mi></mfrac></mrow></math></li>
+<li>跑 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 次学习，每次用一个子集做 validation，其余 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></math> 个合并做训练</li>
+<li>对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 次 validation 表现<strong>取平均</strong></li>
+</ol>
+<p><strong>性质</strong>：</p>
+<ul>
+<li>每个样本在 validation 中<strong>恰好用一次</strong>，在训练中用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></math> 次</li>
+<li>每次训练用了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><mi>k</mi></mfrac></mrow></math> 的数据，同时<strong>全部</strong>数据都参与了误差估计</li>
+<li>要训练 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 次</strong>；常用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>≈</mo><mn>10</mn></mrow></math></li>
+<li><strong>Leave-one-out</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mi>m</mi></mrow></math>）：每次在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow></math> 个上训练、1 个上验证；适合<strong>小数据集</strong></li>
+</ul>
+<p><strong>计数例</strong>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>100</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mn>5</mn></mrow></math>：每折验证 20、训练 80；训练 5 次</li>
+<li>LOOCV，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>100</mn></mrow></math>：训练 100 次，每次 99 个</li>
+<li>用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-fold 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>M</mi></mrow></math> 个候选模型中选：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>M</mi><mo>⋅</mo><mi>k</mi></mrow></math> 次训练，选平均 validation error 最低的</li>
+</ul>
+<h2>8 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>error</mtext><mi>S</mi></msub></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>error</mtext><mi>𝒟</mi></msub></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>error</mtext><mtext>test</mtext></msub></mrow></math></td>
+<td>公式；能测 vs 想要</td>
+</tr>
+<tr>
+<td>Test set 规则</td>
+<td>独立；不能用于学习</td>
+</tr>
+<tr>
+<td>Overfitting</td>
+<td>定义中的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Bias / variance</td>
+<td>复杂 / 简单模型的方向</td>
+</tr>
+<tr>
+<td>Hold-out</td>
+<td>比例；两个「越大越好」的 tradeoff</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-fold</td>
+<td>三步；每个样本验证一次；训练 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 次；LOOCV</td>
+</tr>
+</tbody>
+</table>
+<h2>9 · 易错点</h2>
+<ul>
+<li><strong>不能</strong>用 test set 调参 / 选模型——用 validation set。</li>
+<li>Overfitting 是相对于<strong>另一个</strong> hypothesis <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 定义的。</li>
+<li>复杂模型：<strong>低</strong> bias、<strong>高</strong> variance（别反了）。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math>-fold 中每个样本做 validation <strong>恰好一次</strong>。</li>
+<li>LOOCV 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mi>m</mi></mrow></math>，训练 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 次。</li>
+</ul>

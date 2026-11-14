@@ -1,0 +1,215 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li>回顾 p-V 图、isotherm；<strong>heat engine vs heat pump</strong>（顺时针 vs 逆时针）</li>
+<li><strong>Heat pump 热力学</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>=</mo><msub><mi>Q</mi><mi>h</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub></mrow></math>；<strong>COP</strong>（cooling / heating）及其<strong>Carnot 上限</strong></li>
+<li><strong>理想化制冷循环</strong>（两条等容 + 两条绝热）；<strong>真实的 vapor-compression 循环</strong></li>
+<li>例子：冰箱、空调、除湿机；air-source / ground-source heat pump；HKUST 海水热泵</li>
+</ol>
+<blockquote>
+<p>必会计算：<strong>COP 上限</strong>——制热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>T</mi><mi>h</mi></msub><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac></mrow></math>（20 °C 室内、−5 °C 室外 → 11.72）；制冷 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>T</mi><mi>c</mi></msub><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac></mrow></math>；<strong>最少功</strong>：制冷取 10 kJ（20 °C / 35 °C）→ 512 J；制热供 10 kJ（20 °C / 10 °C）→ 341 J。概念：COP 可以 &gt; 1；温差越小 COP 越大；heat pump 与 heater 的能源对比。</p>
+</blockquote>
+<h2>1 · 回顾：p-V 图</h2>
+<ul>
+<li>图上一点 = 一个<strong>状态</strong>，满足 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mi>V</mi><mo>=</mo><mi>n</mi><mi>R</mi><mi>T</mi></mrow></math></li>
+<li>线 = 一个过程连接的状态</li>
+<li><strong>Isotherm</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><msub><mi>T</mi><mn>0</mn></msub></mrow></math>）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mfrac><mrow><mi>n</mi><mi>R</mi><msub><mi>T</mi><mn>0</mn></msub></mrow><mi>V</mi></mfrac></mrow></math>；温度变化的过程要穿过不同的 isotherm</li>
+</ul>
+<h2>2 · Heat Engine vs Heat Pump</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Heat engine</th>
+<th>Heat pump</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一句话</td>
+<td>「放进热，拿出功」</td>
+<td>「放进功，拿出热（搬运热）」</td>
+</tr>
+<tr>
+<td>符号</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>&lt;</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>&gt;</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>&lt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>p-V 循环方向</td>
+<td><strong>顺时针</strong></td>
+<td><strong>逆时针</strong></td>
+</tr>
+<tr>
+<td>应用</td>
+<td>交通、发电</td>
+<td>家居制暖 / 制冷、冷藏</td>
+</tr>
+</tbody>
+</table>
+<p>两者 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>W</mi><mo stretchy="false">∣</mo></mrow></math> = 循环<strong>围成的面积</strong>。</p>
+<h2>3 · Heat Pump 热力学</h2>
+<p><strong>倒着跑的热机</strong>：从冷端（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>c</mi></msub></mrow></math>）抽热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>c</mi></msub></mrow></math>，对它做功 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math>，向热端（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>h</mi></msub></mrow></math>）送热 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>h</mi></msub></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>W</mi><mo>=</mo><msub><mi>Q</mi><mi>h</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub><mspace width="1em"/><mo stretchy="false">(</mo><msub><mi>Q</mi><mi>h</mi></msub><mo separator="true">,</mo><msub><mi>Q</mi><mi>c</mi></msub><mtext> 取大小</mtext><mo stretchy="false">)</mo></mrow></math></div><table>
+<thead>
+<tr>
+<th>用途</th>
+<th>热端</th>
+<th>冷端</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>空调（制冷）</td>
+<td>室外空气</td>
+<td>室内空气</td>
+</tr>
+<tr>
+<td>冰箱</td>
+<td>厨房空气</td>
+<td>食物、饮料</td>
+</tr>
+<tr>
+<td>制暖</td>
+<td>室内空气</td>
+<td>室外空气</td>
+</tr>
+</tbody>
+</table>
+<h3>3.1 COP（coefficient of performance）</h3>
+<p>有用的热搬运量 / 输入的功：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>COP</mtext><mtext>cool</mtext></msub><mo>=</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><mi>W</mi></mfrac><mo>=</mo><mfrac><mtext>heat extracted</mtext><mtext>work done</mtext></mfrac><mo separator="true">,</mo><mspace width="2em"/><msub><mtext>COP</mtext><mtext>heat</mtext></msub><mo>=</mo><mfrac><msub><mi>Q</mi><mi>h</mi></msub><mi>W</mi></mfrac><mo>=</mo><mfrac><mtext>heat delivered</mtext><mtext>work done</mtext></mfrac></mrow></math></div><h3>3.2 上限（第二定律）</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>≥</mo><mn>0</mn><mo>⇒</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac><mo>≤</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></math>（与 L6 同理）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mtext>COP</mtext><mtext>cool</mtext></msub><mo>=</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><mrow><msub><mi>Q</mi><mi>h</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub></mrow></mfrac><mo>≤</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"/><msub><mtext>COP</mtext><mtext>heat</mtext></msub><mo>=</mo><mfrac><msub><mi>Q</mi><mi>h</mi></msub><mrow><msub><mi>Q</mi><mi>h</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub></mrow></mfrac><mo>≤</mo><mfrac><msub><mi>T</mi><mi>h</mi></msub><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><blockquote>
+<p><strong>COP &gt; 1，且温差 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math> 越小 COP 越大</strong>。冰箱在冷环境里效果最好，heat pump（制暖）在暖环境里效果最好。</p>
+</blockquote>
+<p>对比热机：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>≤</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></math>（&lt; 1）。</p>
+<p>（补充：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>COP</mtext><mtext>heat</mtext></msub><mo>=</mo><msub><mtext>COP</mtext><mtext>cool</mtext></msub><mo>+</mo><mn>1</mn></mrow></math>，因为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>h</mi></msub><mo>=</mo><msub><mi>Q</mi><mi>c</mi></msub><mo>+</mo><mi>W</mi></mrow></math>。）</p>
+<p><strong>例</strong>：室外 −5 °C，室内保持 20 °C（制热）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>COP</mtext><mtext>heat</mtext></msub><mo>≤</mo><mfrac><mn>293</mn><mrow><mn>293</mn><mo>−</mo><mn>268</mn></mrow></mfrac><mo>=</mo><mfrac><mn>293</mn><mn>25</mn></mfrac><mo>=</mo><mn>11.72</mn></mrow></math></div><h2>4 · 制冷循环</h2>
+<h3>4.1 理想化简化循环（cooling mode）</h3>
+<p>把热从室内 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>i</mi></msub></mrow></math> 搬到室外 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>o</mi></msub><mo>&gt;</mo><msub><mi>T</mi><mi>i</mi></msub></mrow></math>：要求吸热时工质温度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>3</mn></msub><mo>&lt;</mo><msub><mi>T</mi><mi>i</mi></msub></mrow></math>，放热时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub><mo>&gt;</mo><msub><mi>T</mi><mi>o</mi></msub></mrow></math>。</p>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>过程</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(1)→(2)</td>
+<td>等容冷却（向室外放热）</td>
+<td>0</td>
+<td>&lt; 0</td>
+</tr>
+<tr>
+<td>(2)→(3)</td>
+<td>绝热膨胀（降温到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>3</mn></msub><mo>&lt;</mo><msub><mi>T</mi><mi>i</mi></msub></mrow></math>）</td>
+<td>&lt; 0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>(3)→(4)</td>
+<td>等容加热（从室内吸热）</td>
+<td>0</td>
+<td>&gt; 0</td>
+</tr>
+<tr>
+<td>(4)→(1)</td>
+<td>绝热压缩（升温到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub><mo>&gt;</mo><msub><mi>T</mi><mi>o</mi></msub></mrow></math>）</td>
+<td>&gt; 0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例（制冷）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>i</mi></msub><mo>=</mo><mn>20</mn><mtext> </mtext><msup><mrow></mrow><mo>∘</mo></msup></mrow></math>C，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>o</mi></msub><mo>=</mo><mn>35</mn><mtext> </mtext><msup><mrow></mrow><mo>∘</mo></msup></mrow></math>C，要抽出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>c</mi></msub><mo>=</mo><mn>10</mn></mrow></math> kJ，最少需要多少功？</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>COP</mtext><mtext>cool</mtext></msub><mo>=</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><mi>W</mi></mfrac><mo>≤</mo><mfrac><msub><mi>T</mi><mi>C</mi></msub><mrow><msub><mi>T</mi><mi>H</mi></msub><mo>−</mo><msub><mi>T</mi><mi>C</mi></msub></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>T</mi><mi>H</mi></msub><mi mathvariant="normal">/</mi><msub><mi>T</mi><mi>C</mi></msub><mo>−</mo><mn>1</mn></mrow></mfrac></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>W</mi><mo>≥</mo><msub><mi>Q</mi><mi>c</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><msub><mi>T</mi><mi>H</mi></msub><msub><mi>T</mi><mi>C</mi></msub></mfrac><mo>−</mo><mn>1</mn><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>=</mo><mn>10</mn><mtext> kJ</mtext><mo>×</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>308</mn><mn>293</mn></mfrac><mo>−</mo><mn>1</mn><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>≈</mo><mn>512</mn><mtext> J</mtext></mrow></math></div><p><strong>大 Q，小 W！</strong></p>
+<h3>4.2 现实：vapor-compression refrigeration</h3>
+<p>最常见的真实热泵（空调、冰箱、工业、楼宇制冷）。<strong>基于制冷剂的相变</strong>，沿液–气相界运行：</p>
+<ol>
+<li><strong>Compression</strong>（压缩蒸汽，升温升压）</li>
+<li><strong>Condensation</strong>（在热端冷凝成液体，放热——利用潜热）</li>
+<li><strong>Throttling</strong>（节流膨胀，降压降温）</li>
+<li><strong>Evaporation</strong>（在冷端蒸发，吸热）</li>
+</ol>
+<h2>5 · 生活中的热泵</h2>
+<ul>
+<li>冰箱、空调</li>
+<li><strong>除湿机</strong> = 把热风排回<strong>同一个房间</strong>的空调（所以房间会变暖）</li>
+</ul>
+<h3>5.1 住在寒冷地方</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>能源</th>
+<th>成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>传统：heater</td>
+<td>燃料 / 电</td>
+<td>贵</td>
+</tr>
+<tr>
+<td>现代：heat pump</td>
+<td>电（少量）+ <strong>环境中的热（免费）</strong></td>
+<td>便宜</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例（制热）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>i</mi></msub><mo>=</mo><mn>20</mn><mtext> </mtext><msup><mrow></mrow><mo>∘</mo></msup></mrow></math>C，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>o</mi></msub><mo>=</mo><mn>10</mn><mtext> </mtext><msup><mrow></mrow><mo>∘</mo></msup></mrow></math>C，供 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>h</mi></msub><mo>=</mo><mn>10</mn></mrow></math> kJ：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>COP</mtext><mtext>heat</mtext></msub><mo>=</mo><mfrac><msub><mi>Q</mi><mi>h</mi></msub><mi>W</mi></mfrac><mo>≤</mo><mfrac><msub><mi>T</mi><mi>H</mi></msub><mrow><msub><mi>T</mi><mi>H</mi></msub><mo>−</mo><msub><mi>T</mi><mi>C</mi></msub></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><msub><mi>T</mi><mi>C</mi></msub><mi mathvariant="normal">/</mi><msub><mi>T</mi><mi>H</mi></msub></mrow></mfrac></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>W</mi><mo>≥</mo><msub><mi>Q</mi><mi>h</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>C</mi></msub><msub><mi>T</mi><mi>H</mi></msub></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>=</mo><mn>10</mn><mtext> kJ</mtext><mo>×</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mn>1</mn><mo>−</mo><mfrac><mn>283</mn><mn>293</mn></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo>≈</mo><mn>341</mn><mtext> J</mtext></mrow></math></div><p>（电热器要 10 kJ 电才能给 10 kJ 热；理想热泵只要 341 J。）</p>
+<p><strong>做法</strong>：把房子放到循环的另一侧，或<strong>反转循环方向</strong>。</p>
+<h3>5.2 Air-sourced vs ground-sourced</h3>
+<ul>
+<li><strong>Air source</strong>：与室外空气换热</li>
+<li><strong>Ground source</strong>：地下 10 m 的温度不受季节影响（常年 ~8–12 °C）；<strong>COP 通常 3–5</strong>（受地温影响）；优点：夏天制冷、冬天制暖都行；缺点：设备和钻 10–100 m 深孔的<strong>资本成本高</strong></li>
+</ul>
+<p><strong>HKUST</strong>：海水 + 空气源热泵；chiller plant complex；图书馆屋顶的 evaporators。香港政府建议室温设定 27 °C。</p>
+<p><strong>下一讲预告</strong>：Drinking bird 是热机！工作物质？<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>H</mi></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>C</mi></msub></mrow></math> 在哪？功去了哪？</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>engine vs pump</td>
+<td>方向、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 符号、应用</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>=</mo><msub><mi>Q</mi><mi>h</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub></mrow></math></td>
+<td>能量守恒</td>
+</tr>
+<tr>
+<td>COP</td>
+<td>两种定义；上限公式</td>
+</tr>
+<tr>
+<td>例题</td>
+<td>11.72；512 J；341 J</td>
+</tr>
+<tr>
+<td>循环</td>
+<td>理想化四段；vapor-compression 四步</td>
+</tr>
+<tr>
+<td>应用</td>
+<td>除湿机；ground-source COP 3–5</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>COP 的温度要用 <strong>K</strong>。</li>
+<li>制冷 COP 分子是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>c</mi></msub></mrow></math>，制热 COP 分子是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>h</mi></msub></mrow></math>；分母都是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></math>。</li>
+<li>COP 可以远大于 1（不违反能量守恒：搬运的热不是「产生」的）。</li>
+<li>最少功用 COP <strong>上限</strong>算（实际功更多）。</li>
+</ul>

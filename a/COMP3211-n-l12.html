@@ -1,0 +1,345 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap：<strong>Introduction to RL</strong> → <strong>Model-based RL</strong> → <strong>Model-free RL</strong>（Direct Evaluation、TD Value Learning）</p>
+<p>上两讲的 MDP 假设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math> 都<strong>已知</strong>，可以离线算出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mo>∗</mo></msup></mrow></math>。这一讲去掉这个假设：<strong>转移和奖励未知</strong>，只能靠和环境交互得到的样本来学。</p>
+<blockquote>
+<p>必考：offline planning vs online（RL）；<strong>model-based 的计数估计</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>R</mi><mo>^</mo></mover></mrow></math>；<strong>direct evaluation 的平均</strong>（课件的 A–E 例子，B=+8、C=+4、E=−2）；direct evaluation 的优缺点（为什么 B、E 都去 C 却值不同）；<strong>TD 更新式的两种写法</strong>和手算（例子 −1、3）；为什么 TD 学了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 还不能改进 policy ⇒ 引出 Q-learning。</p>
+<p>和 COMP4212 的对应：direct evaluation = <strong>MC policy evaluation</strong>（every-visit）；TD value learning = <strong>TD(0)</strong>；最后的「学 Q 而不是 V」= 4212 Lec 2.2 为什么 control 要用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>。</p>
+</blockquote>
+<h2>1 · Introduction to RL</h2>
+<h3>1.1 Review：MDP</h3>
+<blockquote>
+<p><strong>Definition: MDP</strong>：States；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mtext>start</mtext></msub></mrow></math>；Actions(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>)；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>：在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 做 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 的概率；Reward(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>)；IsEnd(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>)；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>γ</mi><mo>≤</mo><mn>1</mn></mrow></math>（默认 1）</p>
+</blockquote>
+<p><strong>现在的设定</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 和 Reward <strong>未知</strong>（racing car 例子里每条转移的概率和奖励都是「?」）⇒ <strong>Reinforcement learning!</strong></p>
+<h3>1.2 RL 的基本思路</h3>
+<p>Agent 在 state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 做 action <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>，environment 返回 reward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math> 和新的 state。</p>
+<ul>
+<li>通过 <strong>action</strong> 和环境交互</li>
+<li>以 <strong>reward</strong> 的形式收到反馈</li>
+<li>必须（学会）行动以<strong>最大化期望 reward</strong></li>
+<li><strong>所有学习都基于观察到的结果样本</strong></li>
+</ul>
+<h3>1.3 Offline（MDP）vs Online（RL）</h3>
+<table>
+<thead>
+<tr>
+<th>Offline Planning</th>
+<th>Online Planning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>知道 MDP 的全部细节</td>
+<td>一种特殊的 MDP：<strong>光靠计算解不出来</strong></td>
+</tr>
+<tr>
+<td>所有量都靠<strong>计算</strong>得到</td>
+<td>必须<strong>真的去行动</strong>才能弄清楚</td>
+</tr>
+<tr>
+<td><strong>不用真的玩</strong>这个游戏</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>课件的图：offline 时机器人在脑子里推演哪里有火坑；online 时要真走过去（可能掉进火坑）才知道。</p>
+<h3>1.4 例子</h3>
+<table>
+<thead>
+<tr>
+<th>例子</th>
+<th>Objective</th>
+<th>State</th>
+<th>Action</th>
+<th>Reward</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Learning to Walk（四足机器人）</td>
+<td>学会走路</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Robot Locomotion</td>
+<td>保持直立往前走</td>
+<td>关节的角度和位置</td>
+<td>施加在关节上的力矩</td>
+<td>每步直立 +1，加上前进距离</td>
+</tr>
+<tr>
+<td>Self-Driving Cars</td>
+<td>车道保持</td>
+<td>图像（96×96）</td>
+<td>加速、转向</td>
+<td>行驶距离，离车道中心的偏移</td>
+</tr>
+</tbody>
+</table>
+<h2>2 · Model-based RL</h2>
+<h3>2.1 思路</h3>
+<ul>
+<li><strong>Model-based idea</strong>：根据经验学一个<strong>近似模型</strong>，再在这个模型上解出 state values</li>
+<li><strong>Step 1：学经验 MDP（empirical MDP）</strong>
+<ul>
+<li>对每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，数各个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 出现的次数</li>
+<li><strong>归一化</strong>得到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math> 的估计</li>
+<li>每次经历 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math> 时<strong>记下</strong>它的 reward</li>
+</ul>
+</li>
+<li><strong>Step 2：解学到的 MDP</strong>，例如用 value iteration（和之前一样）</li>
+</ul>
+<p><strong>数据</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>0</mn></msub><mo separator="true">;</mo><msub><mi>a</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">;</mo><msub><mi>a</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>2</mn></msub><mo separator="true">;</mo><msub><mi>a</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>s</mi><mn>3</mn></msub><mo separator="true">;</mo><mo>…</mo><mtext> </mtext><mo separator="true">;</mo><msub><mi>a</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>r</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>s</mi><mi>n</mi></msub></mrow></math></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mi mathvariant="normal">#</mi><mtext> times </mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi mathvariant="normal">#</mi><mtext> times </mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mtext>Reward</mtext><mo stretchy="true">^</mo></mover><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mtext> in </mtext><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><h3>2.2 例：A–E gridworld（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>）</h3>
+<p>地图：中间一行 B–C–D，C 上方 A、下方 E。<strong>Input policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math></strong>：B → east，C → east，E → north；A、D 是出口（exit）。</p>
+<p><strong>Observed episodes</strong>（每行是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>）：</p>
+<table>
+<thead>
+<tr>
+<th>Episode 1</th>
+<th>Episode 2</th>
+<th>Episode 3</th>
+<th>Episode 4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B, east, C, −1</td>
+<td>B, east, C, −1</td>
+<td>E, north, C, −1</td>
+<td>E, north, C, −1</td>
+</tr>
+<tr>
+<td>C, east, D, −1</td>
+<td>C, east, D, −1</td>
+<td>C, east, D, −1</td>
+<td>C, east, A, −1</td>
+</tr>
+<tr>
+<td>D, exit, x, +10</td>
+<td>D, exit, x, +10</td>
+<td>D, exit, x, +10</td>
+<td>A, exit, x, −10</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Learned model</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>B</mi><mo separator="true">,</mo><mtext>east</mtext><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>2</mn></mfrac></mstyle><mo>=</mo><mn>1.00</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>C</mi><mo separator="true">,</mo><mtext>east</mtext><mo separator="true">,</mo><mi>D</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>3</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>0.75</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>C</mi><mo separator="true">,</mo><mtext>east</mtext><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>4</mn></mfrac></mstyle><mo>=</mo><mn>0.25</mn></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>B</mi><mo separator="true">,</mo><mtext>east</mtext><mo stretchy="false">)</mo></mrow></math> 出现 2 次（Ep 1、2），两次都到 C</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>C</mi><mo separator="true">,</mo><mtext>east</mtext><mo stretchy="false">)</mo></mrow></math> 出现 4 次（每个 episode 一次），3 次到 D、1 次到 A（Ep 4：C 处 east 却到了 A，说明转移是随机的）</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>R</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>B</mi><mo separator="true">,</mo><mtext>east</mtext><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mspace width="2em"/><mover accent="true"><mi>R</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>C</mi><mo separator="true">,</mo><mtext>east</mtext><mo separator="true">,</mo><mi>D</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mi>R</mi><mo>^</mo></mover><mo stretchy="false">(</mo><mi>D</mi><mo separator="true">,</mo><mtext>exit</mtext><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>+</mo><mn>10</mn><mo separator="true">,</mo><mtext> </mtext><mo>…</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>补充：Step 2 解出来是多少</strong>（课件没算，按 policy evaluation 自己算，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>10</mn><mo separator="true">,</mo><mspace width="2em"/><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>10</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.75</mn><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo>+</mo><mn>10</mn><mo stretchy="false">)</mo><mo>+</mo><mn>0.25</mn><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo>−</mo><mn>10</mn><mo stretchy="false">)</mo><mo>=</mo><mn>6.75</mn><mo>−</mo><mn>2.75</mn><mo>=</mo><mn>4</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mn>1</mn><mo>+</mo><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mspace width="2em"/><mi>V</mi><mo stretchy="false">(</mo><mi>E</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>1</mn><mo>+</mo><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p>注意 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mi>V</mi><mo stretchy="false">(</mo><mi>E</mi><mo stretchy="false">)</mo></mrow></math>——模型把「B 和 E 都确定地走到 C」这个结构用上了。和 3.2 的 direct evaluation 对比。</p>
+<h3>2.3 优缺点</h3>
+<ul>
+<li><strong>优点</strong>：非常简单直观，效果却出奇地好；<strong>只靠计数和归一化</strong>就得到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math></li>
+<li><strong>缺点</strong>：要为<strong>每个见过的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math> 维护计数</strong>，代价高</li>
+</ul>
+<h2>3 · Model-free RL：Direct Evaluation</h2>
+<h3>3.1 思路</h3>
+<ul>
+<li><strong>目标</strong>：在 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 下算出每个 state 的 value</li>
+<li><strong>Idea</strong>：<strong>对所有观察到的样本值取平均</strong>
+<ul>
+<li>按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 行动（生成 episodes）</li>
+<li><strong>每次</strong>访问某个 state，记下从那以后的折扣 reward 总和：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>sample</mtext><mi>i</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>R</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><mi>R</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><mi>R</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><mo stretchy="false">)</mo><mo>+</mo><mo>⋯</mo></mrow></math></div></li>
+<li>用这些样本的平均来估计 state value：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mtext>sample</mtext><mi>i</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mi>N</mi></mfrac><mspace width="2em"/><mo stretchy="false">(</mo><mi>N</mi><mo>=</mo><mtext>访问次数</mtext><mo stretchy="false">)</mo></mrow></math></div></li>
+</ul>
+</li>
+</ul>
+<p>课件配图是老虎机：拉很多次、记下每次赢多少（$0、$2…），平均值就是期望。</p>
+<h3>3.2 例：同一组 episodes（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mtext>Total sample values</mtext><mrow><mi mathvariant="normal">#</mi><mtext> of times visited</mtext></mrow></mfrac></mrow></math></div><table>
+<thead>
+<tr>
+<th>state</th>
+<th>样本（从该 state 到结束的 reward 和）</th>
+<th>平均</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Ep 4：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>10</mn></mrow></math></td>
+</tr>
+<tr>
+<td>B</td>
+<td>Ep 1：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo>+</mo><mn>10</mn><mo>=</mo><mn>8</mn></mrow></math>；Ep 2：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>8</mn></mrow></math></td>
+</tr>
+<tr>
+<td>C</td>
+<td>Ep 1、2、3：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>+</mo><mn>10</mn><mo>=</mo><mn>9</mn></mrow></math>；Ep 4：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>−</mo><mn>10</mn><mo>=</mo><mo>−</mo><mn>11</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>9</mn><mo>+</mo><mn>9</mn><mo>+</mo><mn>9</mn><mo>−</mo><mn>11</mn></mrow><mn>4</mn></mfrac><mo>=</mo><mo>+</mo><mn>4</mn></mrow></math></td>
+</tr>
+<tr>
+<td>D</td>
+<td>Ep 1、2、3：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>10</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>10</mn></mrow></math></td>
+</tr>
+<tr>
+<td>E</td>
+<td>Ep 3：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo>+</mo><mn>10</mn><mo>=</mo><mn>8</mn></mrow></math>；Ep 4：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo>−</mo><mn>10</mn><mo>=</mo><mo>−</mo><mn>12</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>8</mn><mo>−</mo><mn>12</mn></mrow><mn>2</mn></mfrac><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>课件写出 E 的算式：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo>+</mo><mn>10</mn><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo>−</mo><mn>10</mn><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mi mathvariant="normal">/</mi><mn>2</mn><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math>。</p>
+<p><strong>问：B 和 E 在这个 policy 下都走到 C，它们的 value 能不一样吗？</strong></p>
+<p>真实意义上<strong>不应该</strong>不一样：两者都是「−1 后到 C」，所以真值都是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>+</mo><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></math>。这里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi><mo>=</mo><mn>8</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math>，只是因为<strong>样本太少</strong>——B 碰巧只跟了 C 的好结局，E 跟了一好一坏。样本足够多时两者都会收敛到同一个值（2.2 的模型给的是 3）。</p>
+<h3>3.3 Direct evaluation 的优缺点</h3>
+<p><strong>好处</strong>：</p>
+<ul>
+<li>容易理解</li>
+<li><strong>不需要任何关于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math> 的知识</strong></li>
+<li>只用样本转移，探索足够时<strong>最终会算出正确的 value</strong></li>
+</ul>
+<p><strong>坏处</strong>：</p>
+<ul>
+<li><strong>浪费了 state 之间连接的信息</strong>（没用上 Bellman 方程 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>1</mn><mo>+</mo><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></math>）</li>
+<li>每个 state 都要<strong>单独</strong>学</li>
+<li>所以要<strong>很久</strong>才能学好（不高效）</li>
+</ul>
+<h2>4 · Model-free RL：Temporal Difference Value Learning</h2>
+<h3>4.1 思路</h3>
+<ul>
+<li><strong>Learn from every experience!</strong> 每经历一次转移 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>r</mi><mo stretchy="false">)</mo></mrow></math> 就更新一次 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Temporal difference learning of values</strong>：
+<ul>
+<li><strong>policy 仍然固定</strong>，做的仍然是 <strong>policy evaluation</strong></li>
+<li>用 <strong>running average</strong> 把 value 往真值挪</li>
+</ul>
+</li>
+</ul>
+<h3>4.2 更新式（关键）</h3>
+<p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 的一个样本</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>sample</mtext><mo>=</mo><munder><munder><mrow><mi>R</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>immediate reward</mtext></munder><mo>+</mo><munder><munder><mrow><mi>γ</mi><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>discounted future rewards</mtext></munder></mrow></math></div><p><strong>更新</strong>（running average）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><munder><munder><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>old value</mtext></munder><mo>+</mo><mi>α</mi><mo>⋅</mo><munder><munder><mtext>sample</mtext><mo stretchy="true">⏟</mo></munder><mtext>new sample value</mtext></munder></mrow></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>α</mi><mo>≤</mo><mn>1</mn></mrow></math> 是 <strong>learning rate</strong>：越大，越看重<strong>当前样本</strong>。</p>
+<p><strong>同一个更新的另一种写法</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><munder><munder><mrow><mtext>sample</mtext><mo>−</mo><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mo stretchy="true">⏟</mo></munder><mtext>temporal difference</mtext></munder><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><p>（展开 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo><mi>V</mi><mo>+</mo><mi>α</mi><mo>⋅</mo><mtext>sample</mtext><mo>=</mo><mi>V</mi><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mtext>sample</mtext><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math>，两式相同。）括号里的差就是 <strong>temporal difference</strong>——「新估计」和「旧估计」在时间上的差。</p>
+<p><strong>这个形式像什么？</strong> <strong>Stochastic gradient update</strong>：把 sample 当作目标 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math>，对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>y</mi><mo>−</mo><mi>V</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math> 关于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 做一步梯度下降，就是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>←</mo><mi>V</mi><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mi>y</mi><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+<p><strong>和 direct evaluation 比</strong>：</p>
+<ul>
+<li><strong>收敛快得多</strong></li>
+<li>需要的 <strong>episode 更少</strong></li>
+</ul>
+<p>原因：TD 的 sample 里用的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>——<strong>利用了 state 之间的连接</strong>（Bellman 方程），而不是等到 episode 结束才算总 reward。</p>
+<p><strong>和 Bellman 的关系</strong>：policy evaluation 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo stretchy="false">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math>，要知道 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>；TD 用<strong>真实采到的</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 代替对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 的求和，再靠 running average 把多个样本平均起来——「mimicking Bellman updates with running sample averages」。</p>
+<h3>4.3 例：TD 手算（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>）</h3>
+<p>初始：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo><mo>=</mo><mn>8</mn></mrow></math>，其余全为 0。</p>
+<p><strong>转移 1：(B, east, C, −2)</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>←</mo><mn>0</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mo>−</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>×</mo><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo><mo>−</mo><mn>0</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo>+</mo><mn>0</mn><mo>−</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>转移 2：(C, east, D, −2)</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>V</mi><mi>π</mi></msup><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>←</mo><mn>0</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mo>−</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>×</mo><mi>V</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo><mo>−</mo><mn>0</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0</mn><mo>+</mo><mn>0.5</mn><mo>×</mo><mo stretchy="false">[</mo><mo>−</mo><mn>2</mn><mo>+</mo><mn>8</mn><mo>−</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>3</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p>结果：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo><mo>=</mo><mn>8</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math> 仍为 0。</p>
+<p><strong>做题套路</strong>：① 只更新<strong>转移的起点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math></strong>；② sample = 这一步的 reward + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>×</mo></mrow></math><strong>当前表里</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>；③ 新值 = 旧值 + <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math>(sample − 旧值)；④ 按转移的<strong>顺序</strong>依次更新，后面的转移用前面更新过的值。</p>
+<p>注意 B 的更新用的是<strong>更新前</strong>的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>；C 是后来才变成 3 的，B 不会自动跟着变——要等下次再经过 B。</p>
+<h2>5 · TD Value Learning 的问题 → Q-learning</h2>
+<ul>
+<li>TD value learning 是做 <strong>policy evaluation</strong> 的 model-free 方法：用 running sample average 模仿 Bellman 更新</li>
+<li><strong>但想把 value 变成（新的）policy 时卡住了</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>T</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mi>R</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></div><p>要算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 就要 <strong>transition probability <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>——而它是未知的</strong>（model-free）！</p>
+<ul>
+<li><strong>Idea：直接学 Q-values，而不是 values</strong></li>
+<li>这样 <strong>action selection 也是 model-free 的</strong>（off-policy）！——下一讲的 <strong>Q-learning</strong></li>
+</ul>
+<h2>6 · Summary</h2>
+<ul>
+<li><strong>Reinforcement learning</strong>（从经验学）：online planning 设定，学着在真实世界里采取行动</li>
+<li><strong>Model-based RL</strong>：从经验学 MDP 模型（转移和奖励），再解这个 MDP</li>
+<li><strong>Model-free RL</strong>：不学模型，直接学 state 的 value
+<ul>
+<li><strong>Value learning</strong>：在<strong>固定 policy</strong> 下学 value；两种方法：<strong>Direct Evaluation</strong> 或 <strong>TD Learning</strong></li>
+<li>预告 <strong>Q-learning</strong>：为最优 policy 学最优 Q-values</li>
+</ul>
+</li>
+</ul>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RL 设定</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math> 未知；只靠样本</td>
+</tr>
+<tr>
+<td>Offline vs online</td>
+<td>表格三条</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>robot locomotion、self-driving 的 state / action / reward</td>
+</tr>
+<tr>
+<td>Model-based</td>
+<td>两步；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover></mrow></math> = 计数比；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>R</mi><mo>^</mo></mover></mrow></math> = 观察到的 r</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover></mrow></math> 手算</td>
+<td>A–E 例：1.00、0.75、0.25</td>
+</tr>
+<tr>
+<td>Model-based 优缺点</td>
+<td>简单有效；要为每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math> 计数</td>
+</tr>
+<tr>
+<td>Direct evaluation</td>
+<td>每次访问记 sample，取平均</td>
+</tr>
+<tr>
+<td>Direct evaluation 手算</td>
+<td>A −10、B +8、C +4、D +10、E −2</td>
+</tr>
+<tr>
+<td>B 与 E 的问题</td>
+<td>真值应相同；样本少；没用 state 之间的连接</td>
+</tr>
+<tr>
+<td>Direct eval 优缺点</td>
+<td>不要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math>，最终正确；浪费连接信息、慢</td>
+</tr>
+<tr>
+<td>TD 更新</td>
+<td>sample；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo><mi>V</mi><mo>+</mo><mi>α</mi><mo>⋅</mo><mtext>sample</mtext></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mtext>sample</mtext><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi></mrow></math> 的含义</td>
+<td>越大越看重当前样本</td>
+</tr>
+<tr>
+<td>TD 手算</td>
+<td>−1、3</td>
+</tr>
+<tr>
+<td>TD 为什么快</td>
+<td>sample 用了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>SGD 形式</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>←</mo><mi>V</mi><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mi>y</mi><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>TD 的问题</td>
+<td>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 提 policy 要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> ⇒ 学 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li>Direct evaluation 的 sample 是<strong>从该 state 起到 episode 结束</strong>的总 reward，不是整条 episode 的总和（B 从第 1 步算，C 从第 2 步算）。</li>
+<li>同一个 state 在多个 episode 里出现，<strong>每次都算一个样本</strong>，分母是访问次数，不是 episode 数。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>T</mi><mo>^</mo></mover></mrow></math> 的分母是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 的次数，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 的次数。</li>
+<li>TD 只改<strong>转移起点</strong>的 value；sample 用的是表里<strong>当前</strong>的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math> 时 TD 新值 = 旧值和 sample 的<strong>平均</strong>。</li>
+<li>TD value learning 和 direct evaluation 都是<strong>固定 policy</strong> 下的 policy evaluation，不会改进 policy。</li>
+<li>「学了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 也选不出动作」的原因是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 要用未知的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>；学 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 就绕开了。</li>
+</ul>

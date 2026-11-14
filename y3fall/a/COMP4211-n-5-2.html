@@ -1,0 +1,117 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>MNIST</strong> 手写数字识别（10 类）</li>
+<li><strong>连续 / 离散卷积</strong>；交换律、结合律</li>
+<li><strong>2D 卷积</strong>；<strong>翻转核</strong>（convolution）vs <strong>不翻转</strong>（cross-correlation，神经网络常用）</li>
+<li><strong>滤波器</strong>：smoothing（averaging）、加权平均、sharpening（差分）、<strong>edge detector</strong></li>
+</ol>
+<blockquote>
+<p>必会计算：给一个小图和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow></math> 核，<strong>手算 2D 卷积输出</strong>（课件 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>×</mo><mn>3</mn></mrow></math> 输入 × <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math> 核 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>2</mn></mrow></math> 输出）；判断一个核是平滑还是求边缘。必会概念：flip 与不 flip 的区别；平滑 ↔ 积分、锐化 ↔ 微分。</p>
+</blockquote>
+<h2>1 · 动机：MNIST</h2>
+<p>手写数字识别：<strong>10 类</strong>（数字 0–9）；用 convolutional neural network。</p>
+<h2>2 · 卷积</h2>
+<h3>2.1 连续卷积</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="false">(</mo><mi>f</mi><mo>∗</mo><mi>g</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></msubsup><mi>f</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>g</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>τ</mi></mrow></math></div><ul>
+<li><strong>交换律</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>∗</mo><mi>g</mi><mo>=</mo><mi>g</mi><mo>∗</mo><mi>f</mi></mrow></math></li>
+<li><strong>结合律</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>∗</mo><mo stretchy="false">(</mo><mi>g</mi><mo>∗</mo><mi>h</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>f</mi><mo>∗</mo><mi>g</mi><mo stretchy="false">)</mo><mo>∗</mo><mi>h</mi></mrow></math></li>
+</ul>
+<h3>2.2 离散卷积</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo stretchy="false">(</mo><mi>f</mi><mo>∗</mo><mi>g</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>f</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mi>g</mi><mo stretchy="false">(</mo><mi>m</mi><mo>−</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></div><h3>2.3 2D 卷积</h3>
+<p>图像 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo></mrow></math>，核（mask）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>S</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>I</mi><mo>∗</mo><mi>K</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><munder><mo>∑</mo><mi>n</mi></munder><mi>I</mi><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">)</mo><mi>K</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mi>j</mi><mo>−</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></div><p>由交换律，等价地</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>S</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>K</mi><mo>∗</mo><mi>I</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><munder><mo>∑</mo><mi>n</mi></munder><mi>I</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mi>j</mi><mo>−</mo><mi>n</mi><mo stretchy="false">)</mo><mi>K</mi><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></math></div><p>（第二种更容易实现：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo separator="true">,</mo><mi>n</mi></mrow></math> 只在核的小范围内取值。）</p>
+<h3>2.4 翻转 vs 不翻转</h3>
+<ul>
+<li>上面的定义相对输入<strong>翻转了核</strong>——对写证明有用（交换律），但<strong>不是神经网络实现的重要性质</strong></li>
+<li><strong>更常见</strong>（神经网络里叫 convolution，数学上叫 <strong>cross-correlation</strong>）：<strong>不翻转</strong></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>S</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>K</mi><mo>∗</mo><mi>I</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><munder><mo>∑</mo><mi>n</mi></munder><mi>I</mi><mo stretchy="false">(</mo><mi>i</mi><mo>+</mo><mi>m</mi><mo separator="true">,</mo><mi>j</mi><mo>+</mo><mi>n</mi><mo stretchy="false">)</mo><mi>K</mi><mo stretchy="false">(</mo><mi>m</mi><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（核是学出来的，翻不翻转只是学到的核互为翻转，效果一样。）</p>
+<h3>2.5 课件例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>4</mn></mrow></math> 输入 × <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math> 核</h3>
+<p>输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>c</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>d</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>e</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>f</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>g</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>h</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>i</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>j</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>k</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>l</mi></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math>，核 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>w</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>z</mi></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math>，<strong>valid</strong>（不 padding）输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>3</mn></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>a</mi><mi>w</mi><mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>e</mi><mi>y</mi><mo>+</mo><mi>f</mi><mi>z</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>b</mi><mi>w</mi><mo>+</mo><mi>c</mi><mi>x</mi><mo>+</mo><mi>f</mi><mi>y</mi><mo>+</mo><mi>g</mi><mi>z</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>c</mi><mi>w</mi><mo>+</mo><mi>d</mi><mi>x</mi><mo>+</mo><mi>g</mi><mi>y</mi><mo>+</mo><mi>h</mi><mi>z</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>e</mi><mi>w</mi><mo>+</mo><mi>f</mi><mi>x</mi><mo>+</mo><mi>i</mi><mi>y</mi><mo>+</mo><mi>j</mi><mi>z</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>f</mi><mi>w</mi><mo>+</mo><mi>g</mi><mi>x</mi><mo>+</mo><mi>j</mi><mi>y</mi><mo>+</mo><mi>k</mi><mi>z</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>g</mi><mi>w</mi><mo>+</mo><mi>h</mi><mi>x</mi><mo>+</mo><mi>k</mi><mi>y</mi><mo>+</mo><mi>l</mi><mi>z</mi></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math></div><p>（核在输入上滑动，每个位置做<strong>逐元素乘再求和</strong>。输出大小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><mo>−</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>×</mo><mo stretchy="false">(</mo><mn>4</mn><mo>−</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn><mo>×</mo><mn>3</mn></mrow></math>。）</p>
+<p><strong>补充算例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math>（不翻转）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>S</mi><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>2</mn><mo>−</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo>−</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><h2>3 · 滤波器</h2>
+<h3>3.1 Smoothing（averaging）filter</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mn>1</mn><mn>9</mn></mfrac><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><ul>
+<li>每个像素换成邻域平均 → <strong>模糊（blur）</strong>、去噪</li>
+<li><strong>Window size</strong> 越大越模糊（课件：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>5</mn><mo separator="true">,</mo><mn>15</mn><mo separator="true">,</mo><mn>25</mn></mrow></math> 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></math> mask）</li>
+</ul>
+<h3>3.2 其他排列（加权平均）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mspace width="2em"/><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><p>越靠近中心权重越大——比均匀平均保留更多细节。（使用时除以权重和：分别为 10 和 40，保证亮度不变。）</p>
+<h3>3.3 Sharpening filters</h3>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>效果</th>
+<th>类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Averaging</strong></td>
+<td>blur</td>
+<td><strong>积分</strong>——和像素强度之<strong>和</strong>有关</td>
+</tr>
+<tr>
+<td><strong>Differentiation</strong></td>
+<td>与模糊相反：<strong>锐化</strong></td>
+<td><strong>微分</strong>——和强度之间的<strong>差</strong>有关</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一阶导数（离散）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>↔</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></p>
+<h3>3.4 Edge detector</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mspace width="2em"/><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></math></div><ul>
+<li>左：<strong>水平方向差分</strong> → 响应<strong>竖直边缘</strong></li>
+<li>右：<strong>竖直方向差分</strong> → 响应<strong>水平边缘</strong></li>
+<li>平坦区域输出 0（核元素和为 0）</li>
+</ul>
+<p>（这类核就是 CNN 第一层常学到的特征。）</p>
+<h2>4 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>卷积定义</td>
+<td>连续、离散、2D；交换 / 结合律</td>
+</tr>
+<tr>
+<td>翻转</td>
+<td>两种定义；NN 用不翻转</td>
+</tr>
+<tr>
+<td>手算</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math> 核滑动；输出大小 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo>−</mo><mi>K</mi><mo>+</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Smoothing</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>9</mn></mfrac></mrow></math> 全 1 核；窗口越大越模糊</td>
+</tr>
+<tr>
+<td>加权平均</td>
+<td>中心权重大；归一化</td>
+</tr>
+<tr>
+<td>Sharpening</td>
+<td>微分 ↔ 锐化；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Edge</td>
+<td>两个核分别检测哪个方向的边</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · 易错点</h2>
+<ul>
+<li>神经网络里的「卷积」<strong>不翻转核</strong>（cross-correlation）。</li>
+<li>竖条核 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>（水平方向差分）检测的是<strong>竖直</strong>边缘。</li>
+<li>平滑核要归一化（除以和），否则改变亮度。</li>
+<li>Valid 卷积输出比输入小：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>H</mi><mtext>out</mtext></msub><mo>=</mo><msub><mi>H</mi><mtext>in</mtext></msub><mo>−</mo><mi>K</mi><mo>+</mo><mn>1</mn></mrow></math>。</li>
+</ul>

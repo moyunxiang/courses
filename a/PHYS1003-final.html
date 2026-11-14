@@ -1,0 +1,1026 @@
+<h2>Scope</h2>
+<ul>
+<li><strong>Weight 55%.</strong> Syllabus: the final &quot;assesses students' ability to comprehend, explain and apply knowledge of <strong>topics covered in the entire course</strong> to solve problems (ILO 1–7)&quot;; graded on <strong>correctness of the answers</strong>.</li>
+<li><strong>Fri 2026-12-18, 16:30–19:30, S H Ho Sports Hall</strong> (ARO exam timetable).</li>
+<li><strong>AI:</strong> allowed for learning, <strong>not in the final exam</strong> (syllabus AI policy).</li>
+<li><strong>Maths level (L01 slide 6):</strong> high-school algebra / trig / geometry; calculus appears in some definitions, but &quot;you are <strong>not required to carry out calculus calculations</strong>&quot;. Expect formula → numbers → units, plus short explanations.</li>
+<li><strong>Explicitly excluded:</strong> circulation / Kutta condition / Kutta–Joukowski theorem in L10 (&quot;for airplane enthusiast only, excluded in exam&quot;).</li>
+<li>⚠️ <strong>Not announced yet:</strong> duration, open/closed book, formula sheet, calculator rules. L01 slide 12 says &quot;Final Exam Sample Paper: on Canvas Module&quot;, but it is <strong>not in the local mirror</strong> (<code>files/</code>, <code>modules.md</code>) — check Canvas Modules. The Nov 26 &quot;Final Review&quot; lecture will likely state the format.</li>
+<li><strong>Lectures released (L2 section): L01–L18</strong> (<code>files/Lecture Notes/L2 Lecture Notes/</code>).</li>
+<li><strong>Pending (v3 schedule)</strong> — add to this outline when the slides appear:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>v3 #</th>
+<th>Date</th>
+<th>Topic</th>
+<th>Preview material already on Canvas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>19</td>
+<td>Nov 12</td>
+<td>Daily life II: Embodied Energy &amp; AC</td>
+<td>HW L18–19 (embodied energy of phone / Al can, window U-value)</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Nov 17</td>
+<td>Environmental Impacts of Non-renewable Energy I</td>
+<td>HW L20–22 (excess deaths from PM / SO₂, CO₂ per kWh, carbon tax)</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Nov 19</td>
+<td>Environmental Impacts of Non-renewable Energy II</td>
+<td>HW L20–22 (PM2.5 / PM10 counts, I-131 radioactivity in Bq/m³)</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Nov 24</td>
+<td>Global Warming and Climate Change</td>
+<td>—</td>
+</tr>
+<tr>
+<td>—</td>
+<td>Nov 26</td>
+<td>Final Review</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The dashboard numbers these L19, L21, L22, L23 (old schedule; &quot;L20 Battery and Computation&quot; was dropped in v3 — battery charging is already in L18).</li>
+<li>Detailed Chinese notes for L1–L10 are on the site's lecture panel (<code>notes/l1.md</code>–<code>notes/l10.md</code>); this sheet only keeps what is needed for calculations and short answers.</li>
+</ul>
+<h2>Constants &amp; Conversions (used throughout)</h2>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy units</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> kWh</mtext><mo>=</mo><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mtext> J</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> Cal</mtext><mo>=</mo><mn>1</mn><mtext> kcal</mtext><mo>=</mo><mn>4184</mn><mtext> J</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> BTU</mtext><mo>=</mo><mn>1055</mn><mtext> J</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> toe</mtext><mo>=</mo><mn>42</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup><mtext> J</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> EJ</mtext><mo>=</mo><msup><mn>10</mn><mn>18</mn></msup><mtext> J</mtext><mo>=</mo><mn>2.8</mn><mo>×</mo><msup><mn>10</mn><mn>11</mn></msup><mtext> kWh</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> quad</mtext><mo>=</mo><msup><mn>10</mn><mn>15</mn></msup><mtext> BTU</mtext><mo>=</mo><mn>1.055</mn><mo>×</mo><msup><mn>10</mn><mn>18</mn></msup><mtext> J</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>Oil</td>
+<td>1 barrel = 42 US gal = 159 L ≈ 1700 kWh heat (6.12 GJ) ≈ 680 kWh electricity</td>
+</tr>
+<tr>
+<td>Power</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> W</mtext><mo>=</mo><mn>1</mn><mtext> J/s</mtext></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> hp</mtext><mo>=</mo><mn>746</mn><mtext> W</mtext></mrow></math>; 1 manpower ≈ 75 W; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>×</mo><mi>t</mi><mo>=</mo><mi>E</mi></mrow></math></td>
+</tr>
+<tr>
+<td>MacKay bulb</td>
+<td>40 W × 24 h = 0.96 kWh ≈ 1 kWh</td>
+</tr>
+<tr>
+<td>Gas</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>=</mo><mn>8.314</mn><mtext> </mtext><msup><mtext>J mol</mtext><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mtext>K</mtext><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mi>B</mi></msub><mo>=</mo><mn>1.381</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>23</mn></mrow></msup><mtext> J/K</mtext></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>A</mi></msub><mo>=</mo><mn>6.022</mn><mo>×</mo><msup><mn>10</mn><mn>23</mn></msup></mrow></math>; 1 atm <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>1.013</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup></mrow></math> Pa; 1 atm·L = 101.325 J</td>
+</tr>
+<tr>
+<td>Water</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>w</mi></msub><mo>=</mo><mn>4184</mn><mtext> </mtext><msup><mtext>J kg</mtext><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mtext>K</mtext><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> (≈ 4.2 kJ); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>L</mi><mi>f</mi></msub><mo>=</mo><mn>3.33</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup></mrow></math> J/kg; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>L</mi><mi>v</mi></msub><mo>=</mo><mn>2.257</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow></math> J/kg; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi><mo>=</mo><mn>1000</mn><mtext> </mtext><msup><mtext>kg/m</mtext><mn>3</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Air</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi><mo>≈</mo><mn>1.3</mn><mtext> </mtext><msup><mtext>kg/m</mtext><mn>3</mn></msup></mrow></math> (sea level); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>γ</mi><mtext>air</mtext></msub><mo>=</mo><mn>1.4</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Nuclear</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> amu</mtext><mo>=</mo><mn>1.661</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>27</mn></mrow></msup></mrow></math> kg (≈ 931.5 MeV); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> eV</mtext><mo>=</mo><mn>1.6</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>19</mn></mrow></msup></mrow></math> J; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mtext> MeV</mtext><mo>=</mo><mn>1.6</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>13</mn></mrow></msup></mrow></math> J; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mn>3</mn><mo>×</mo><msup><mn>10</mn><mn>8</mn></msup></mrow></math> m/s</td>
+</tr>
+<tr>
+<td>Charge</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>=</mo><mn>1.6</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>19</mn></mrow></msup></mrow></math> C</td>
+</tr>
+<tr>
+<td>Gravity</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>9.8</mn><mo>≈</mo><mn>10</mn><mtext> </mtext><msup><mtext>m/s</mtext><mn>2</mn></msup></mrow></math> (L13 uses 10)</td>
+</tr>
+</tbody>
+</table>
+<h2>Lecture-by-Lecture Sheet</h2>
+<h3>L01 · Energy &amp; Human Energy Consumption</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy</td>
+<td>ability to do work; potential (stored: chemical, elastic, gravitational, nuclear, electric) vs kinetic (in use: motion, heat, light, sound); total energy conserved</td>
+</tr>
+<tr>
+<td>Renewable vs non-renewable</td>
+<td>harvested again and again in a short time vs stored in matter, obtainable once in a lifetime</td>
+</tr>
+<tr>
+<td>8 questions to judge a source</td>
+<td>renewable? capital/operating cost? storage? conversion efficiency? scale? consumer cost? environmental impact? sustainable?</td>
+</tr>
+<tr>
+<td>Rule of 70</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mn>2</mn></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>70</mn><mrow><mi>r</mi><mtext> </mtext><mo stretchy="false">(</mo><mi mathvariant="normal">%</mi><mi mathvariant="normal">/</mi><mtext>yr</mtext><mo stretchy="false">)</mo></mrow></mfrac></mstyle></mrow></math>; exact: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>ln</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>N</mi><mi mathvariant="normal">/</mi><msub><mi>N</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mrow><mi>ln</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo stretchy="false">)</mo></mrow></mfrac></mstyle></mrow></math></td>
+</tr>
+<tr>
+<td>Growth</td>
+<td>population ×8, energy use ×30 (historical); Cook table: 2 → 230 ×1000 kcal/day (primitive → technological man)</td>
+</tr>
+<tr>
+<td>Climate treaties</td>
+<td>UNFCCC 1992; Kyoto 1997; Paris 2015: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>T</mi><mo>&lt;</mo><mn>1.5</mn><mtext>–</mtext><mn>2</mn><msup><mtext> </mtext><mo>∘</mo></msup></mrow></math>C</td>
+</tr>
+<tr>
+<td>Industrial revolutions</td>
+<td>1st 1781 (Watt steam engine, battery, motor, generator) · 2nd 1870 (Otto 1876, Diesel 1893, jet 1935) · 3rd 1970 (IT) · 4th 2000 (data)</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: unit conversion (barrels/day → kWh/person/day, Big Macs), doubling time / years to reach a population, &quot;effective efficiency&quot; = useful ÷ primary energy, work vs food Calories with muscle efficiency 25% (HW L1–2 Q6).</p>
+<h3>L02 · Fossil Fuels &amp; Temperature</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy density (MJ/kg)</td>
+<td>dung 10–12 · wood 15–17 · charcoal 28–29 · <strong>coal 20–26</strong> · <strong>crude 41–42</strong> · <strong>gasoline 44–45</strong> (12.5 kWh/kg) · <strong>natural gas 53–54</strong></td>
+</tr>
+<tr>
+<td>Share</td>
+<td>fossil &gt; 80% of TPES; coal 34% of world electricity (2024); 65% of oil → transport</td>
+</tr>
+<tr>
+<td>Bond energy</td>
+<td>net heat = bonds formed − bonds broken</td>
+</tr>
+<tr>
+<td>Coal estimate</td>
+<td>break C–C 171 + O=O 119 = 290 kcal/mol; form 2 C=O = 382 ⇒ <strong>92 kcal/mol ⇒ 32 MJ/kg</strong></td>
+</tr>
+<tr>
+<td>Methane (QoD L2)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>CH</mtext><mn>4</mn></msub><mo>+</mo><mn>2</mn><msub><mtext>O</mtext><mn>2</mn></msub><mo>→</mo><msub><mtext>CO</mtext><mn>2</mn></msub><mo>+</mo><mn>2</mn><msub><mtext>H</mtext><mn>2</mn></msub><mtext>O</mtext></mrow></math>: break 4(410)+2(498)=2636, form 2(799)+4(460)=3438 ⇒ <strong>802 kJ/mol</strong></td>
+</tr>
+<tr>
+<td>Why we love fossil fuels</td>
+<td>cheap &amp; abundant, high energy density, easy to store/transport, low catastrophic risk</td>
+</tr>
+<tr>
+<td>Temperature scales</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>F</mi></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>9</mn><mn>5</mn></mfrac></mstyle><msub><mi>T</mi><mi>C</mi></msub><mo>+</mo><mn>32</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>K</mi></msub><mo>=</mo><msub><mi>T</mi><mi>C</mi></msub><mo>+</mo><mn>273.15</mn></mrow></math>; triple point 273.16 K, 611 Pa; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mfrac><mi>p</mi><msub><mi>p</mi><mn>3</mn></msub></mfrac><mo>⋅</mo><mn>273.16</mn></mrow></math> K</td>
+</tr>
+<tr>
+<td>Zeroth law</td>
+<td>A ~ B and B ~ C in equilibrium ⇒ A ~ C (same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>)</td>
+</tr>
+<tr>
+<td>Ideal gas</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mi>V</mi><mo>=</mo><mi>n</mi><mi>R</mi><mi>T</mi><mo>=</mo><mi>N</mi><msub><mi>k</mi><mi>B</mi></msub><mi>T</mi></mrow></math>; Boyle <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mi>V</mi></mrow></math> = const (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> fixed); Gay-Lussac <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></math> = const (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> fixed)</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: moles from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mi>p</mi><mi>V</mi><mi mathvariant="normal">/</mi><mi>R</mi><mi>T</mi></mrow></math> then × bond energy → MJ/m³; scale conversion; why fossil fuels dominate.</p>
+<h3>L03 · Heat &amp; Internal Energy</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kinetic theory</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mi>V</mi><mo>=</mo><mi>N</mi><mi>m</mi><mo stretchy="false">⟨</mo><msubsup><mi>v</mi><mi>x</mi><mn>2</mn></msubsup><mo stretchy="false">⟩</mo></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>m</mi><mo stretchy="false">⟨</mo><msup><mi>v</mi><mn>2</mn></msup><mo stretchy="false">⟩</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>3</mn><mn>2</mn></mfrac></mstyle><msub><mi>k</mi><mi>B</mi></msub><mi>T</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Equipartition</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>j</mi><mn>2</mn></mfrac></mstyle><mi>N</mi><msub><mi>k</mi><mi>B</mi></msub><mi>T</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>j</mi><mn>2</mn></mfrac></mstyle><mi>n</mi><mi>R</mi><mi>T</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mo>=</mo><mn>3</mn></mrow></math> (monatomic), 5 (diatomic), 6 (polyatomic)</td>
+</tr>
+<tr>
+<td>Same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>U</mi><mtext>gas</mtext></msub><mo>&gt;</mo><msub><mi>U</mi><mtext>liquid</mtext></msub><mo>&gt;</mo><msub><mi>U</mi><mtext>solid</mtext></msub></mrow></math> (PE negative in condensed phases)</td>
+</tr>
+<tr>
+<td>Specific heat</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mi>m</mi><mi>c</mi><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Latent heat</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mi>m</mi><mi>L</mi></mrow></math> at constant <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Mars</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mn>4.77</mn></mrow></math> mmHg too low for liquid water</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: mixing / calorimetry (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mtext>gained</mtext></msub><mo>=</mo><msub><mi>Q</mi><mtext>lost</mtext></msub></mrow></math>, check the &quot;all ice melts&quot; assumption — QoD L3: 41.8 °C), ice → steam energy and heating time.</p>
+<h3>L04 · Thermodynamics I: Work &amp; 1st Law</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gas work</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>on</mtext></msub><mo>=</mo><mo>−</mo><msub><mi>W</mi><mtext>by</mtext></msub><mo>=</mo><mo>−</mo><mi>p</mi><mi mathvariant="normal">Δ</mi><mi>V</mi></mrow></math> (expansion: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>on</mtext></msub><mo>&lt;</mo><mn>0</mn></mrow></math>)</td>
+</tr>
+<tr>
+<td>p-V diagram</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>by</mtext></msub></mrow></math> = area under curve; path dependent</td>
+</tr>
+<tr>
+<td>1st law</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mi>Q</mi><mo>+</mo><msub><mi>W</mi><mtext>on</mtext></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Heat capacities</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>V</mi></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>j</mi><mn>2</mn></mfrac></mstyle><mi>R</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>P</mi></msub><mo>=</mo><msub><mi>C</mi><mi>V</mi></msub><mo>+</mo><mi>R</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><msub><mi>C</mi><mi>P</mi></msub><mi mathvariant="normal">/</mi><msub><mi>C</mi><mi>V</mi></msub></mrow></math> = 1.67 / 1.40 / 1.33</td>
+</tr>
+<tr>
+<td>Ideal gas <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mi mathvariant="normal">Δ</mi><mi>T</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>j</mi><mn>2</mn></mfrac></mstyle><mi mathvariant="normal">Δ</mi><mo stretchy="false">(</mo><mi>p</mi><mi>V</mi><mo stretchy="false">)</mo></mrow></math> (any process)</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: straight-line process on p-V (trapezoid area, QoD L4: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>=</mo><mn>3.04</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup></mrow></math> J, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mo>−</mo><mn>1.52</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup></mrow></math> J, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mo>−</mo><mn>4.56</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup></mrow></math> J); which path absorbs most heat; why <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>P</mi></msub><mo>&gt;</mo><msub><mi>C</mi><mi>V</mi></msub></mrow></math>.</p>
+<h3>L05 · Thermodynamics II: Processes &amp; Heat Engines</h3>
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>on</mtext></msub></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isochoric</td>
+<td>0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Isobaric</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>p</mi><mi mathvariant="normal">Δ</mi><mi>V</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><msub><mi>C</mi><mi>P</mi></msub><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Isothermal</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>n</mi><mi>R</mi><mi>T</mi><mi>ln</mi><mo>⁡</mo><mfrac><msub><mi>V</mi><mi>f</mi></msub><msub><mi>V</mi><mi>i</mi></msub></mfrac></mrow></math></td>
+<td>0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mi>R</mi><mi>T</mi><mi>ln</mi><mo>⁡</mo><mfrac><msub><mi>V</mi><mi>f</mi></msub><msub><mi>V</mi><mi>i</mi></msub></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td>Adiabatic</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><msub><mi>p</mi><mi>f</mi></msub><msub><mi>V</mi><mi>f</mi></msub><mo>−</mo><msub><mi>p</mi><mi>i</mi></msub><msub><mi>V</mi><mi>i</mi></msub></mrow><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><msub><mi>C</mi><mi>V</mi></msub><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math></td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Adiabatic: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><msup><mi>V</mi><mi>γ</mi></msup></mrow></math> = const, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><msup><mi>V</mi><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> = const, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>f</mi></msub><mo>=</mo><msub><mi>T</mi><mi>i</mi></msub><mo stretchy="false">(</mo><msub><mi>p</mi><mi>f</mi></msub><mi mathvariant="normal">/</mi><msub><mi>p</mi><mi>i</mi></msub><msup><mo stretchy="false">)</mo><mrow><mo stretchy="false">(</mo><mi>γ</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>γ</mi></mrow></msup></mrow></math>. Fire syringe: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn><mo>×</mo><msup><mn>10</mn><mn>0.4</mn></msup><mo>≈</mo><mn>754</mn></mrow></math> K ≈ 480 °C. Champagne cork (QoD 5): ≈ 194 K → fog.</li>
+<li>Engine cycle: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mn>0</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>eng</mtext></msub><mo>=</mo><msub><mi>Q</mi><mi>h</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>Q</mi><mi>c</mi></msub><msub><mi>Q</mi><mi>h</mi></msub></mfrac></mrow></math>. Clockwise = engine, anticlockwise = heat pump.</li>
+<li>Stirling (2 isotherms + 2 isochores): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>W</mi><mo stretchy="false">∣</mo><mo>=</mo><mi>n</mi><mi>R</mi><mo stretchy="false">(</mo><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub><mo stretchy="false">)</mo><mi>ln</mi><mo>⁡</mo><mfrac><msub><mi>V</mi><mi>b</mi></msub><msub><mi>V</mi><mi>a</mi></msub></mfrac></mrow></math>; real efficiency 15–30%; low-ΔT, solar / waste heat.</li>
+</ul>
+<p>Typical questions: fill the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi></mrow></math> table for each leg of a cycle (HW L3–5 Q4), adiabatic final temperature, isothermal work &amp; heat (HW L3–5 Q1).</p>
+<h3>L06 · Thermodynamics III: Entropy &amp; Carnot</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kelvin statement</td>
+<td>no perfect engine (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>&lt;</mo><mn>1</mn></mrow></math>)</td>
+</tr>
+<tr>
+<td>Clausius statement</td>
+<td>heat does not flow cold → hot without work</td>
+</tr>
+<tr>
+<td>Entropy</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mi>Q</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></math> (reservoir, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> in K); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>tot</mtext></msub><mo>=</mo><mn>0</mn></mrow></math> reversible, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>0</mn></mrow></math> irreversible, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mn>0</mn></mrow></math> impossible</td>
+</tr>
+<tr>
+<td>Heat conduction</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mi>Q</mi><mrow><mo fence="true">(</mo><mfrac><mn>1</mn><msub><mi>T</mi><mi>c</mi></msub></mfrac><mo>−</mo><mfrac><mn>1</mn><msub><mi>T</mi><mi>h</mi></msub></mfrac><mo fence="true">)</mo></mrow><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Carnot</td>
+<td>2 isotherms + 2 adiabats; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mi>C</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mi>T</mi><mi>h</mi></msub></mfrac></mrow></math> = upper bound for any engine</td>
+</tr>
+<tr>
+<td>Human body</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mfrac><mn>293.15</mn><mn>310.15</mn></mfrac><mo>=</mo><mn>5.5</mn><mi mathvariant="normal">%</mi></mrow></math> (actual 19–26% ⇒ body is not a heat engine)</td>
+</tr>
+<tr>
+<td>Slogans</td>
+<td>1st law: &quot;can't win&quot;; 2nd law: &quot;can't even break even&quot;; quantity vs quality of energy</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: reversible / irreversible / impossible from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><msub><mi>S</mi><mtext>tot</mtext></msub></mrow></math> (QoD 6), Carnot efficiency / power / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>h</mi></msub></mrow></math> per cycle (HW L3–5 Q2), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mi>h</mi></msub></mrow></math> from given max efficiency (HW L6–8 Q5), T-S diagram of Carnot.</p>
+<h3>L07 · Heat Pumps</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>=</mo><msub><mi>Q</mi><mi>h</mi></msub><mo>−</mo><msub><mi>Q</mi><mi>c</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>COP (cooling)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>Q</mi><mi>c</mi></msub><mi>W</mi></mfrac><mo>≤</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td>COP (heating)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>Q</mi><mi>h</mi></msub><mi>W</mi></mfrac><mo>≤</mo><mfrac><msub><mi>T</mi><mi>h</mi></msub><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td>Lecture examples</td>
+<td>heating 20 °C / −5 °C: 11.72; min work to remove 10 kJ (20 °C / 35 °C): 512 J; to deliver 10 kJ (20 °C / 10 °C): 341 J</td>
+</tr>
+<tr>
+<td>Real cycle</td>
+<td>compression → condensation (release heat) → throttling → evaporation (absorb heat)</td>
+</tr>
+<tr>
+<td>Applications</td>
+<td>dehumidifier = AC dumping heat into the same room; ground source COP 3–5 (ground ~8–12 °C at 10 m), high capital cost</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: COP at two thermostat settings and % energy saved (QoD 7: 24.6 vs 35.1 ⇒ ≈ 30%); minimum work; entropy bookkeeping for a non-ideal pump (HW L6–8 Q6).</p>
+<h3>L08 · Heat Engines (Otto, Diesel, Jet)</h3>
+<table>
+<thead>
+<tr>
+<th>Engine</th>
+<th>Cycle</th>
+<th>Key numbers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Otto (petrol)</td>
+<td>2 adiabats + 2 isochores; spark ignition</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mi>O</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>1</mn><msup><mi>r</mi><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mfrac></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><msub><mi>V</mi><mn>1</mn></msub><mi mathvariant="normal">/</mi><msub><mi>V</mi><mn>2</mn></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>8</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1.4</mn></mrow></math> ⇒ 56% ideal, ~20% real; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math> = 9–12 (knock-limited, high octane)</td>
+</tr>
+<tr>
+<td>Diesel</td>
+<td>adiabatic compression, <strong>isobaric</strong> combustion, adiabatic expansion, isochoric exhaust</td>
+<td>compression ignition; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math> = 15–24; 35–50% (big marine &gt; 50%); high cetane; slow 2-stroke for ships</td>
+</tr>
+<tr>
+<td>Jet / gas turbine</td>
+<td>Brayton: 2 adiabats + 2 isobars</td>
+<td>compressor (~40× pressure) → combustor → turbine; continuous; thrust needs exhaust speed &gt; inlet speed; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mi>B</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mn>1</mn></msub><msub><mi>T</mi><mn>2</mn></msub></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td>Prime movers</td>
+<td>Otto → cars; Diesel → shipping; jet → aviation; steam → electricity</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: Otto efficiency from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>; adiabatic compression temperature (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>300</mn><mo>×</mo><msup><mn>8</mn><mn>0.4</mn></msup><mo>=</mo><mn>689</mn></mrow></math> K, HW L6–8 Q2); Brayton vs Carnot bound from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>T</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>T</mi><mn>3</mn></msub></mrow></math> (QoD 8: ≈ 66% vs ≈ 87%); Diesel vs petrol statements (HW L9–10 Q9–11).</p>
+<h3>L09 · Road Transport</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><msub><mi>E</mi><mtext>loss</mtext></msub><mtext>distance</mtext></mfrac><mo>=</mo><munder><munder><mfrac><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><msub><mi>m</mi><mi>c</mi></msub><msup><mi>v</mi><mn>2</mn></msup></mrow><mi>d</mi></mfrac><mo stretchy="true">⏟</mo></munder><mtext>braking</mtext></munder><mo>+</mo><munder><munder><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>2</mn></msup></mrow><mo stretchy="true">⏟</mo></munder><mtext>air drag</mtext></munder><mo>+</mo><munder><munder><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi></mrow><mo stretchy="true">⏟</mo></munder><mtext>rolling</mtext></munder><mspace width="1em"/><mo stretchy="false">(</mo><mtext>J/m</mtext><mo stretchy="false">)</mo></mrow></math></div><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Drag power</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>car</mtext></msub><msup><mi>v</mi><mn>3</mn></msup></mrow></math> (power ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math>, energy/km ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>2</mn></msup></mrow></math>)</td>
+</tr>
+<tr>
+<td>Typical car</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>m</mi><mi>c</mi></msub><mo>=</mo><mn>1500</mn></mrow></math> kg, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub><mo>=</mo><mn>0.3</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mn>2</mn><mtext> </mtext><msup><mtext>m</mtext><mn>2</mn></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><mo>=</mo><mn>0.01</mn></mrow></math> (train 0.002, bike 0.005, truck 0.007)</td>
+</tr>
+<tr>
+<td>Lecture cases</td>
+<td>city 40 km/h, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi></mrow></math> = 200 m: 0.184 kWh/km (braking 70%); tunnel: 0.076; highway 110 km/h: 0.16 (drag 62%)</td>
+</tr>
+<tr>
+<td>Drag &gt; rolling</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>&gt;</mo><msqrt><mrow><mn>2</mn><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi><mo stretchy="false">)</mo></mrow></msqrt></mrow></math> ≈ 70 km/h</td>
+</tr>
+<tr>
+<td>Braking &gt; drag</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>&lt;</mo><msub><mi>d</mi><mi>c</mi></msub><mo>=</mo><mfrac><msub><mi>m</mi><mi>c</mi></msub><mrow><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi></mrow></mfrac><mo>≈</mo><mn>1923</mn></mrow></math> m ≈ 2 km</td>
+</tr>
+<tr>
+<td>Reality</td>
+<td>only ~22% of fuel energy moves the car; 1 L petrol ≈ 10 kWh</td>
+</tr>
+<tr>
+<td>EV</td>
+<td>regenerative braking, locally clean; making an EV emits ~80% more; life-cycle depends on grid mix</td>
+</tr>
+<tr>
+<td>Freight</td>
+<td>kWh/(t·km): container ship ≈ 0.01, truck ≈ 0.2 (lecture examples); sea ≈ 20× more efficient than road</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: dominant loss + kWh/(p·km) for highway vs city (QoD 9), power at 100 vs 125 km/h (factor <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>1.25</mn><mn>3</mn></msup><mo>=</mo><mn>1.95</mn></mrow></math>), ship energy per t·km (HW L9–10 Q6–8). Essay #1 used this model.</p>
+<h3>L10 · Airplanes</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lift</td>
+<td>Bernoulli: faster flow → lower pressure; cruise: thrust = drag, lift = weight; straw limit <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><msub><mi>p</mi><mtext>atm</mtext></msub><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><mi>g</mi><mo stretchy="false">)</mo><mo>≈</mo><mn>10.3</mn></mrow></math> m</td>
+</tr>
+<tr>
+<td>Power</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msup><mi>v</mi><mn>3</mn></msup><mo>+</mo><mfrac><mrow><mo stretchy="false">(</mo><mi>m</mi><mi>g</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><mn>2</mn><mi>ρ</mi><mi>v</mi><msub><mi>A</mi><mi>c</mi></msub></mrow></mfrac></mrow></math> (drag ↑ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math>, lift ↓ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>v</mi></mrow></math>)</td>
+</tr>
+<tr>
+<td>Optimum</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi><msubsup><mi>v</mi><mtext>opt</mtext><mn>2</mn></msubsup><mo>=</mo><mfrac><mrow><mi>m</mi><mi>g</mi></mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>A</mi><mi>p</mi></msub><msub><mi>A</mi><mi>c</mi></msub></mrow></msqrt></mfrac></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mi>min</mi><mo>⁡</mo></msub><mo>=</mo><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>A</mi></msub><mo>=</mo><msub><mi>A</mi><mi>p</mi></msub><mi mathvariant="normal">/</mi><msub><mi>A</mi><mi>c</mi></msub></mrow></math>; half the work keeps it up, half moves it forward</td>
+</tr>
+<tr>
+<td>747</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mo>≈</mo><mn>0.035</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>=</mo><mn>363</mn></mrow></math> t ⇒ ≈ 125 kN (real ≈ 200 kN); <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mtext>opt</mtext></msub><mo>≈</mo><mn>220</mn></mrow></math> m/s</td>
+</tr>
+<tr>
+<td>Range</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>ε</mi><msub><mi>f</mi><mtext>fuel</mtext></msub></mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt></mfrac><mo>⋅</mo><mfrac><mi>C</mi><mi>g</mi></mfrac></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mtext>fuel</mtext></msub><mo>=</mo><mi>C</mi><mi mathvariant="normal">/</mi><mi>g</mi><mo>≈</mo><mn>4000</mn></mrow></math> km ⇒ ≈ 13,000 km; size-independent</td>
+</tr>
+<tr>
+<td>Transport cost</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mi>ε</mi></mfrac><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>g</mi><mo>=</mo><mn>0.15</mn><mi>g</mi><mo>=</mo><mn>1.47</mn></mrow></math> N/kg = <strong>0.4 kWh/(t·km)</strong> (÷ 3.6); cargo only ≈ 1.2 kWh/(t·km)</td>
+</tr>
+<tr>
+<td>Per passenger</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mtext>L</mtext><mtext>p⋅km</mtext></mfrac><mo>=</mo><mfrac><mrow><msqrt><mrow><msub><mi>c</mi><mi>d</mi></msub><msub><mi>f</mi><mi>A</mi></msub></mrow></msqrt><mtext> </mtext><mi>m</mi><mi>g</mi></mrow><mrow><mi>ε</mi><mi>N</mi><mo stretchy="false">(</mo><mn>36</mn><mtext> MJ/L</mtext><mo stretchy="false">)</mo></mrow></mfrac></mrow></math>; plane ≈ 0.8 kWh/(p·km), car ≈ 0.5</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: 747 vs sedan kWh/(p·km) and break-even occupancy (QoD 10), range with extra payload (HW L9–10 Q3), &quot;why no speed limit for planes&quot;.</p>
+<h3>L11 · Physics of Electricity</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Charge</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mi>N</mi><mi>e</mi></mrow></math>; Coulomb <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>∝</mo><msub><mi>q</mi><mn>1</mn></msub><msub><mi>q</mi><mn>2</mn></msub><mi mathvariant="normal">/</mi><msup><mi>r</mi><mn>2</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Voltage / emf</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mi>U</mi><mi mathvariant="normal">/</mi><mi>q</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mi>q</mi><mi mathvariant="normal">Δ</mi><mi>V</mi></mrow></math>; emf <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mi>W</mi><mi mathvariant="normal">/</mi><mi>q</mi></mrow></math> (units V)</td>
+</tr>
+<tr>
+<td>Current, resistance</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>=</mo><mi>q</mi><mi mathvariant="normal">/</mi><mi>t</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mi>I</mi><mi>R</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>=</mo><msub><mi>ρ</mi><mi>r</mi></msub><mfrac><mi>L</mi><mi>S</mi></mfrac></mrow></math></td>
+</tr>
+<tr>
+<td>Power</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mi>I</mi><mi>V</mi><mo>=</mo><msup><mi>I</mi><mn>2</mn></msup><mi>R</mi><mo>=</mo><msup><mi>V</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>R</mi></mrow></math></td>
+</tr>
+<tr>
+<td>HK mains</td>
+<td>220 V rms, 50 Hz; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>p</mi></msub><mo>=</mo><mn>220</mn><msqrt><mn>2</mn></msqrt><mo>=</mo><mn>311</mn></mrow></math> V</td>
+</tr>
+<tr>
+<td>Magnetism</td>
+<td>Earth 25–65 μT; Oersted + right-hand rule; Lorentz force <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>F</mi><mo>⃗</mo></mover><mo>=</mo><mi>I</mi><mover accent="true"><mi>L</mi><mo>⃗</mo></mover><mo>×</mo><mover accent="true"><mi>B</mi><mo>⃗</mo></mover></mrow></math> (motor)</td>
+</tr>
+<tr>
+<td>Induction</td>
+<td>Faraday <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mi>N</mi><mi>A</mi><mfrac><mrow><mi mathvariant="normal">Δ</mi><mi>B</mi></mrow><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></mfrac></mrow></math>; Lenz: induced current opposes the change</td>
+</tr>
+<tr>
+<td>Water analogy</td>
+<td>pump ↔ battery, pressure ↔ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>, flow ↔ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi></mrow></math>, restriction ↔ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: induction stove (QoD 11: clockwise, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>39.3</mn></mrow></math> V, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><msup><mi>ε</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>R</mi><mo>≈</mo><mn>770</mn></mrow></math> W), Quick-Check T/F (doubling <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math> at fixed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> halves <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math>).</p>
+<h3>L12 · Electricity Generation &amp; Distribution</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generator</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mo>−</mo><mi>N</mi><mfrac><mrow><mi>d</mi><mi mathvariant="normal">Φ</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Φ</mi><mo>=</mo><msub><mi>B</mi><mo>⊥</mo></msub><mi>A</mi></mrow></math> ⇒ more turns, faster rotation, bigger coil; efficiency &gt; 98%</td>
+</tr>
+<tr>
+<td>Plants</td>
+<td>steam turbine prime movers ≈ 80% of world electricity; ~1 GW typical; gas hotter than coal ⇒ higher (Carnot) efficiency &amp; cleaner; single cycle ~33%, <strong>combined cycle 50–60%</strong></td>
+</tr>
+<tr>
+<td>Transmission</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>=</mo><mi>P</mi><mi mathvariant="normal">/</mi><mi>V</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mtext>loss</mtext></msub><mo>=</mo><msup><mi>I</mi><mn>2</mn></msup><mi>R</mi></mrow></math> ⇒ loss ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><msup><mi>V</mi><mn>2</mn></msup></mrow></math>; lecture: 100 W bulb via 100 Ω line — 10 V: 1% efficiency, 10 kV: 99.99%</td>
+</tr>
+<tr>
+<td>Transformer (HW L11–12)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>V</mi><mi>s</mi></msub><msub><mi>V</mi><mi>p</mi></msub></mfrac><mo>=</mo><mfrac><msub><mi>N</mi><mi>s</mi></msub><msub><mi>N</mi><mi>p</mi></msub></mfrac></mrow></math>; transfers power only; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mi>s</mi></msub><mo>=</mo><mi>η</mi><msub><mi>P</mi><mi>p</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>Grid</td>
+<td>~20 kV generated → step-up &gt; 400 kV → 10 kV → 220 V; supply must match demand instantly</td>
+</tr>
+<tr>
+<td>AC vs DC</td>
+<td>AC: cheap transformation, skin effect; HVDC: lower loss (1000 km: 5% DC vs 20% AC), undersea / underground, asynchronous links; ±800 kV Xiangjiaba–Shanghai, ±1100 kV Zhundong–Wannan</td>
+</tr>
+<tr>
+<td>Hong Kong 2024</td>
+<td>coal 20%, gas 55%, nuclear + RE 25%; capacity 12,269 MW, peak 9,591 MW, reserve margin <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mtext>cap</mtext><mo>−</mo><mtext>peak</mtext></mrow><mtext>peak</mtext></mfrac></mrow></math> = 27.9%; sales 46.3 billion kWh</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: current and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>I</mi><mn>2</mn></msup><mi>R</mi></mrow></math> ratio at 5 / 50 / 500 kV (HW L11–12 Q3: 100 : 1 : 0.01), line resistance from % loss (Q4: 0.91 Ω/km), transformer turns ratio (Q5), AC vs DC pros/cons.</p>
+<h3>L13 · Hydro &amp; Tidal Power</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Impoundment</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mi>η</mi><mi>ρ</mi><mi>g</mi><mi>h</mi><mo>⋅</mo><mtext>flow</mtext></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mtext>kW</mtext><mo stretchy="false">)</mo><mo>=</mo><mi>η</mi><mo>×</mo><mn>10</mn><mo>×</mo><mtext>head (m)</mtext><mo>×</mo><msup><mtext>flow (m</mtext><mn>3</mn></msup><mi mathvariant="normal">/</mi><mtext>s)</mtext></mrow></math></td>
+</tr>
+<tr>
+<td>Run-of-river</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><mi>A</mi><msup><mi>v</mi><mn>3</mn></msup></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mtext>kW</mtext><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>A</mi><msup><mi>v</mi><mn>3</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Pumped storage</td>
+<td>&quot;water battery&quot;; starts almost instantly (fossil ~0.5 h); round-trip ≥ 70%; Guangzhou 2400 MW</td>
+</tr>
+<tr>
+<td>Load factor</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mtext>actual output</mtext><mtext>max possible output</mtext></mfrac></mrow></math>; Three Gorges 2015: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>87</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup></mrow><mrow><mn>8760</mn><mo>×</mo><mn>22.5</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow></mfrac><mo>=</mo><mn>45</mn><mi mathvariant="normal">%</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Numbers</td>
+<td>hydro ≈ 14% of world electricity, 6% of energy; Three Gorges 22,500 MW (32 × 700 MW), Hoover 2080 MW; size classes large &gt; 100 MW, medium 15–100, small 1–15, mini 0.1–1 MW, micro &lt; 100 kW</td>
+</tr>
+<tr>
+<td>Pros / cons</td>
+<td>free once built, reliable, storable, full power in minutes, flood control / flooding, relocation, methane from rotting vegetation, fish migration, dam failure</td>
+</tr>
+<tr>
+<td>Tides</td>
+<td>period 12.4 h (ebb/flood 6.2 h); tide pool <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>P</mi><mi>A</mi></mfrac><mo>=</mo><mfrac><mrow><mn>2</mn><mi>ρ</mi><mi>g</mi><msup><mi>h</mi><mn>2</mn></msup></mrow><mrow><mn>6.2</mn><mtext> h</mtext></mrow></mfrac></mrow></math> ≈ 3 W/m² (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> = 2 m, 90%) ⇒ 1 GW needs ~300 km²; Sihwa 254 MW; tidal stream needs no barrage</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: run-of-river vs impoundment (QoD 13: 2.7 MW vs 60 MW), annual energy with load factor (HW L13–17 Q4), reservoir volume for a stored energy (Q5), &quot;which is not a disadvantage&quot; (Q11: reliability).</p>
+<h3>L14 · Wind Power</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Origin</td>
+<td>uneven solar heating; high → low pressure; Coriolis; ~2% of solar, ~2000 TW total</td>
+</tr>
+<tr>
+<td>Wind power</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><mi>A</mi><msup><mi>v</mi><mn>3</mn></msup></mrow></math>; 6 m/s ⇒ 140 W/m²</td>
+</tr>
+<tr>
+<td>Betz limit</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn><mi mathvariant="normal">/</mi><mn>27</mn><mo>≈</mo><mn>59</mn><mi mathvariant="normal">%</mi></mrow></math> at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mtext>out</mtext></msub><mo>=</mo><msub><mi>v</mi><mtext>in</mtext></msub><mi mathvariant="normal">/</mi><mn>3</mn></mrow></math>; use 50% in practice</td>
+</tr>
+<tr>
+<td>One turbine</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msup><mi>v</mi><mn>3</mn></msup><mo>⋅</mo><mi>π</mi><mo stretchy="false">(</mo><mi>d</mi><mi mathvariant="normal">/</mi><mn>2</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi></mrow></math> = 25 m, 6 m/s ⇒ 34 kW</td>
+</tr>
+<tr>
+<td>Wind farm</td>
+<td>spacing <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mi>d</mi></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>P</mi><mi>A</mi></mfrac><mo>=</mo><mfrac><mi>π</mi><mn>200</mn></mfrac><mo>⋅</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msup><mi>v</mi><mn>3</mn></msup><mo>≈</mo><mn>0.01</mn><msup><mi>v</mi><mn>3</mn></msup></mrow></math> W/m² (2.2 W/m² at 6 m/s), <strong>independent of turbine size</strong></td>
+</tr>
+<tr>
+<td>Scaling</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>∝</mo><msup><mi>d</mi><mn>2</mn></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>∝</mo><msup><mi>v</mi><mn>3</mn></msup></mrow></math>; doubling height: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi></mrow></math> +14.3% (+10% land) ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi></mrow></math> +49% (+33%)</td>
+</tr>
+<tr>
+<td>Numbers</td>
+<td>operating 3–25 m/s; ~4% of world electricity; Lamma 800 kW, 50 m rotor, load factor 13%; HK offshore winds weak; birds: turbines 0.01–0.02% of human-caused bird deaths</td>
+</tr>
+<tr>
+<td>Tidal stream</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>P</mi><mi>A</mi></mfrac><mo>≈</mo><mfrac><mi>π</mi><mn>400</mn></mfrac><mi>ρ</mi><msup><mi>v</mi><mn>3</mn></msup><mo>≈</mo><mn>8</mn><msup><mi>v</mi><mn>3</mn></msup></mrow></math> W/m² (800× wind at same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi></mrow></math>); slide: ≤ 20 W/m² (~10× wind)</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: turbine diameter and farm area for a target MW (QoD 14: 221 m, 24.5 km²), mean of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math> vs cube of mean <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi></mrow></math> (HW Q6), blade length for rated power (Q7), ratio <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mi>B</mi></msub><mi mathvariant="normal">/</mi><msub><mi>P</mi><mi>A</mi></msub><mo>=</mo><msup><mn>2</mn><mn>2</mn></msup><mo>×</mo><msup><mn>1.25</mn><mn>3</mn></msup><mo>≈</mo><mn>8</mn></mrow></math> (Q13), T/F list in slides.</p>
+<h3>L15 · Solar Power</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insolation chain</td>
+<td>1361 W/m² → (~50% reflected/absorbed) 681 → (cross-section <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><msup><mi>r</mi><mn>2</mn></msup></mrow></math> over day side <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>π</mi><msup><mi>r</mi><mn>2</mn></msup></mrow></math>) 341 → (day/night) <strong>171 W/m²</strong> = 4.08 kWh/m²/day</td>
+</tr>
+<tr>
+<td>Local</td>
+<td>Sahara 270, UK 110, <strong>HK 148.7 W/m²</strong> (12.85 MJ/m²/day), Alaska 75</td>
+</tr>
+<tr>
+<td>PV output</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mi>η</mi><mo>⋅</mo><mi>I</mi><mo>⋅</mo><mi>A</mi></mrow></math>; UK 20% × 10 m² × 110 = 220 W ≈ 5 kWh/d; HK 296 W ≈ 7 kWh/d; household ≈ 13 kWh/day</td>
+</tr>
+<tr>
+<td>PV physics</td>
+<td>p-layer (boron, holes), n-layer (phosphorus, electrons); absorption → separation by built-in field → extraction</td>
+</tr>
+<tr>
+<td>PV limits</td>
+<td>output falls above ~40 °C (needs cooling); DC→AC loss ~20%; efficiency 10–50% (record 47.6%)</td>
+</tr>
+<tr>
+<td>CSP</td>
+<td>trough 30–100×, ≥ 400 °C oil; dish up to 1000×, &gt; 750 °C, Stirling, ~20%; tower up to 1500×, ≥ 1000 °C, ~30%; CSP ≈ 0.1% of demand</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>PV ≈ 8.3% of world electricity; HKUST 8000 panels, 3 GWh/yr = 3.5%; &quot;renewables have to be country-sized&quot; (MacKay)</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: can a roof power a load (QoD 15: 669 W vs 200 W; housing block ≈ 11% of residents' use), area to replace HK's 10 GW (HW Q8: 313% of land), concentrator modules count (Q9), why not concentrate light on Si cells (Q14: efficiency drops at high T).</p>
+<h3>L16 · Nuclear Fission</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nucleus</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mrow></mrow><mi>Z</mi><mi>A</mi></msubsup></mrow></math>X: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> nucleons, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Z</mi></mrow></math> protons, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>−</mo><mi>Z</mi></mrow></math> neutrons</td>
+</tr>
+<tr>
+<td>Mass defect</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>m</mi><mo>=</mo><mo>∑</mo><msub><mi>m</mi><mtext>parts</mtext></msub><mo>−</mo><msub><mi>m</mi><mtext>nucleus</mtext></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>E</mi><mi>B</mi></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow></math>; deuterium: 0.0024 amu ⇒ 2.2 MeV</td>
+</tr>
+<tr>
+<td>Stability</td>
+<td>binding energy per nucleon peaks at Fe-56 / Ni-62 ⇒ heavy split, light fuse</td>
+</tr>
+<tr>
+<td>U-235 fission</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>+</mo><msup><mrow></mrow><mn>235</mn></msup><mtext>U</mtext><mo>→</mo><msup><mrow></mrow><mn>236</mn></msup><mtext>U</mtext><mo>→</mo></mrow></math> 2 lighter nuclei + 2–3 n; ~<strong>200 MeV</strong> per fission vs ~7 eV per C atom burned; fast n ~2 MeV (~10⁷ m/s), thermal n 0.02 eV (~10³ m/s)</td>
+</tr>
+<tr>
+<td>Fuel</td>
+<td>natural U: 99.284% U-238, 0.711% U-235; LEU 3–4% (reactors), HEU 90% (weapons); 2 g natural U ≈ 16 kg fossil fuel; HK 5 kg fossil/person/day ≈ 62.5 g U ore</td>
+</tr>
+<tr>
+<td>Reactors</td>
+<td>once-through (PWR, moderator = light / heavy water or graphite); fast breeder: U-238 → Pu-239; Gen III safety, Gen IV efficiency (GFR, LFR, SFR, MSR, SCWR, VHTR)</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>&gt; 400 plants, ~10% of world electricity; first grid plant Obninsk 1954</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: years the uranium reserve lasts (QoD 16: ≈ 59 yr ⇒ not sustainable by MacKay's 1000-yr rule), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow></math> for a given reaction (HW Q2: 196 MeV; 1 kg U-235 ≈ 2.2×10⁷ kWh), coal equivalent of 1 t U and load factor (Q1), which fuel is bred (Q10: Pu-239).</p>
+<h3>L17 · Nuclear Fusion</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mi>m</mi><mtext>parent</mtext></msub><mo>−</mo><msub><mi>m</mi><mtext>daughter</mtext></msub><mo stretchy="false">)</mo><msup><mi>c</mi><mn>2</mn></msup></mrow></math>; D + T → ⁴He + n + <strong>17.6 MeV</strong> (≈ 3.5 MeV/u vs 0.85 MeV/u for U-235)</td>
+</tr>
+<tr>
+<td>Stars</td>
+<td>gravity collapse heats core &gt; 10⁶ K; pp chain (Sun-size, ~10⁶–10⁷ K) vs CNO (≥ 1.3× Sun); nucleosynthesis</td>
+</tr>
+<tr>
+<td>Coulomb barrier</td>
+<td>need 1–10 keV ⇒ 10⁷–10⁸ K (Sun core 1.5×10⁷ K); tokamak ~10⁸ K plasma</td>
+</tr>
+<tr>
+<td>Conditions</td>
+<td>high <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>, high density <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>, long confinement <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi></mrow></math>; Lawson <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mi>τ</mi><mo>≥</mo><msup><mn>10</mn><mn>14</mn></msup></mrow></math> s/cm³ (D-T), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mn>16</mn></msup></mrow></math> (D-D)</td>
+</tr>
+<tr>
+<td>Confinement</td>
+<td>tokamak: magnetic, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>F</mi><mo>⃗</mo></mover><mo>=</mo><mi>q</mi><mover accent="true"><mi>v</mi><mo>⃗</mo></mover><mo>×</mo><mover accent="true"><mi>B</mi><mo>⃗</mo></mover></mrow></math> (WEST: 22 min, 2025); inertial (laser, NIF)</td>
+</tr>
+<tr>
+<td>Breakeven</td>
+<td>scientific <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mfrac><msub><mi>P</mi><mtext>fusion</mtext></msub><msub><mi>P</mi><mtext>heat input</mtext></msub></mfrac><mo>≥</mo><mn>1</mn></mrow></math> (NIF 2022, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> = 1.54); engineering (electricity out/in, ITER ~2035); economic (not yet)</td>
+</tr>
+<tr>
+<td>Pros</td>
+<td>no CO₂, no long-lived waste, no meltdown, hard to weaponise; 30 L seawater → 1 g D ≈ 9500 L gasoline; T bred from Li</td>
+</tr>
+<tr>
+<td>Overview</td>
+<td>nuclear: US, China, France, Russia, S. Korea = 73%; Japan / Germany decline; ~50% of electricity low-CO₂ (renewables + nuclear)</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: D-T energy from masses and per-mass comparison with fission (QoD 17), three conditions / Lawson criterion, three kinds of breakeven, pros vs remaining problems.</p>
+<h3>L18 · Energy Consumption in Daily Lives I (Lighting, Charging)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Formula / number</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HK per capita (2024)</td>
+<td>36.5 GJ/yr ≈ <strong>27.8 kWh/person/day</strong>; residential 8.3 GJ = 2305 kWh ≈ 6.3 kWh/person/day</td>
+</tr>
+<tr>
+<td>Fridge</td>
+<td>130 W × 8 h (33% duty) = 1.04 kWh/day</td>
+</tr>
+<tr>
+<td>Boil 1 L</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>×</mo><mn>4184</mn><mo>×</mo><mn>80</mn><mo>=</mo><mn>334.7</mn></mrow></math> kJ ≈ 0.093 kWh</td>
+</tr>
+<tr>
+<td>Shower</td>
+<td>15 min × 10 L/min = 150 kg, 15 → 40 °C: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>150</mn><mo>×</mo><mn>4.2</mn><mo>×</mo><mn>25</mn><mo>=</mo><mn>15,750</mn></mrow></math> kJ ≈ 4.4 kWh</td>
+</tr>
+<tr>
+<td>Appliances (W)</td>
+<td>coffee maker 500, oven 3000, kettle 2000, microwave 900, rice cooker 500, AC 1 hp 960, fan 75; minibus 0.12 kWh/(p·km)</td>
+</tr>
+<tr>
+<td>Battery</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><mi>q</mi><mi>V</mi></mrow></math>: 3500 mAh × 3.7 V ≈ 13 Wh; USB <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mi>V</mi><mi>I</mi></mrow></math>; charging loss 10% (slow) – 30% (fast / wireless), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>P</mi><mtext>loss</mtext></msub><mo>∼</mo><msup><mi>I</mi><mn>2</mn></msup><mi>R</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Photon</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>=</mo><mi>h</mi><mi>f</mi><mo>=</mo><mi>h</mi><mi>c</mi><mi mathvariant="normal">/</mi><mi>λ</mi></mrow></math>; two ways to make light: blackbody (any <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>&gt;</mo><mn>0</mn></mrow></math>) or excitation</td>
+</tr>
+<tr>
+<td>Lamp efficiency</td>
+<td>fire &lt; 0.1–1%; incandescent ~3.5% (filament 2000–3000 K); fluorescent ~20% (Hg UV → phosphor); LED 50–80% (e–h recombination at p-n junction)</td>
+</tr>
+<tr>
+<td>Luminous efficacy</td>
+<td>lm/W = visible luminous flux ÷ electric power: tungsten 8–14, CFL 46–75, LED 138, white-LED limit 260–300</td>
+</tr>
+</tbody>
+</table>
+<p>Typical questions: daily energy footprint (QoD 18 ≈ 8.8 kWh), why excitation lamps beat blackbody lamps, fluorescent tube without phosphor (HW L11–12 Q6: weak Hg visible lines), more current → incandescent brighter + colour shift, LED brighter but same colour (Q7).</p>
+<h2>Question Types → Templates</h2>
+<p>All examples below are <strong>自编题</strong> (self-made) with the course's typical values; numbers checked with python.</p>
+<p><strong>T1 Growth (L01).</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mn>2</mn></msub><mo>=</mo><mn>70</mn><mi mathvariant="normal">/</mi><mi>r</mi></mrow></math>. 自编题: energy demand grows 3.5%/yr → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mn>2</mn></msub><mo>=</mo><mn>70</mn><mi mathvariant="normal">/</mi><mn>3.5</mn><mo>=</mo></mrow></math> <strong>20 yr</strong>; in 60 yr: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>2</mn><mn>3</mn></msup><mo>=</mo></mrow></math> <strong>×8</strong>.</p>
+<p><strong>T2 Heating / calorimetry (L03, L18).</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mi>m</mi><mi>c</mi><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math> (+ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mi>L</mi></mrow></math> at phase change), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>Q</mi><mi mathvariant="normal">/</mi><mi>P</mi></mrow></math>. 自编题: 2 kW kettle, 2 L water 20 → 100 °C:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Q</mi><mo>=</mo><mi>m</mi><mi>c</mi><mi mathvariant="normal">Δ</mi><mi>T</mi><mo>=</mo><mn>2</mn><mo>×</mo><mn>4184</mn><mo>×</mo><mn>80</mn><mo>=</mo><mn>6.69</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup><mtext> J</mtext><mo separator="true">,</mo><mspace width="2em"/><mi>t</mi><mo>=</mo><mfrac><mi>Q</mi><mi>P</mi></mfrac><mo>=</mo><mfrac><mrow><mn>6.69</mn><mo>×</mo><msup><mn>10</mn><mn>5</mn></msup></mrow><mn>2000</mn></mfrac><mo>=</mo><mrow><mn>𝟑𝟑𝟓</mn><mtext> </mtext><mi>𝐬</mi></mrow><mtext> </mtext><mo stretchy="false">(</mo><mo>≈</mo><mn>5.6</mn><mtext> min</mtext><mo stretchy="false">)</mo></mrow></math></div><p><strong>T3 Ideal-gas process (L04–L05).</strong> Pick the row of the process table; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> in K. 自编题: 2 mol isothermal at 300 K, volume doubles:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>W</mi><mtext>on</mtext></msub><mo>=</mo><mo>−</mo><mi>n</mi><mi>R</mi><mi>T</mi><mi>ln</mi><mo>⁡</mo><mfrac><msub><mi>V</mi><mi>f</mi></msub><msub><mi>V</mi><mi>i</mi></msub></mfrac><mo>=</mo><mo>−</mo><mn>2</mn><mo stretchy="false">(</mo><mn>8.314</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>300</mn><mo stretchy="false">)</mo><mi>ln</mi><mo>⁡</mo><mn>2</mn><mo>=</mo><mrow><mo>−</mo><mn>𝟑.𝟒𝟔</mn><mtext> </mtext><mi>𝐤</mi><mi>𝐉</mi></mrow><mo separator="true">,</mo><mspace width="2em"/><mi>Q</mi><mo>=</mo><mo>−</mo><msub><mi>W</mi><mtext>on</mtext></msub><mo>=</mo><mrow><mo>+</mo><mn>𝟑.𝟒𝟔</mn><mtext> </mtext><mi>𝐤</mi><mi>𝐉</mi></mrow><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mn>0</mn></mrow></math></div><p><strong>T4 Adiabatic temperature (L05, L08).</strong> 自编题: Diesel, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>18</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>T</mi><mn>1</mn></msub><mo>=</mo><mn>300</mn></mrow></math> K, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1.4</mn></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>T</mi><mn>2</mn></msub><mo>=</mo><msub><mi>T</mi><mn>1</mn></msub><msup><mi>r</mi><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mn>300</mn><mo>×</mo><msup><mn>18</mn><mn>0.4</mn></msup><mo>=</mo><mrow><mn>𝟗𝟓𝟑</mn><mtext> </mtext><mi>𝐊</mi></mrow><mtext> </mtext><mo stretchy="false">(</mo><mn>680</mn><msup><mtext> </mtext><mo>∘</mo></msup><mtext>C</mtext><mo stretchy="false">)</mo></mrow></math></div><p><strong>T5 Efficiency bounds (L06–L08).</strong> 自编题: (a) plant 550 °C / 30 °C: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>e</mi><mi>C</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mn>303.15</mn><mn>823.15</mn></mfrac><mo>=</mo></mrow></math> <strong>63.2%</strong>. (b) Otto <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>10</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo>=</mo><mn>1</mn><mo>−</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>0.4</mn></mrow></msup><mo>=</mo></mrow></math> <strong>60.2%</strong>. (c) Heat pump 22 °C in, 2 °C out, deliver 5 kWh:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mtext>COP</mtext><mi>max</mi><mo>⁡</mo></msub><mo>=</mo><mfrac><msub><mi>T</mi><mi>h</mi></msub><mrow><msub><mi>T</mi><mi>h</mi></msub><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac><mo>=</mo><mfrac><mn>295.15</mn><mn>20</mn></mfrac><mo>=</mo><mn>14.8</mn><mo separator="true">,</mo><mspace width="2em"/><msub><mi>W</mi><mi>min</mi><mo>⁡</mo></msub><mo>=</mo><mfrac><msub><mi>Q</mi><mi>h</mi></msub><mtext>COP</mtext></mfrac><mo>=</mo><mfrac><mn>5</mn><mn>14.8</mn></mfrac><mo>=</mo><mrow><mn>𝟎.𝟑𝟒</mn><mtext> </mtext><mi>𝐤</mi><mi>𝐖</mi><mi>𝐡</mi></mrow></mrow></math></div><p><strong>T6 Entropy test (L06).</strong> Sum <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></math> over reservoirs (heat in +, out −): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>0</mn></mrow></math> irreversible, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0</mn></mrow></math> reversible, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mn>0</mn></mrow></math> impossible.</p>
+<p><strong>T7 Car energy budget (L09).</strong> 自编题: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>m</mi><mi>c</mi></msub><mo>=</mo><mn>1200</mn></mrow></math> kg, 50 km/h (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>=</mo><mn>13.9</mn></mrow></math> m/s), stop every 500 m, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi><mo>=</mo><mn>1.3</mn><mo stretchy="false">(</mo><mn>0.3</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.78</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><mo>=</mo><mn>0.01</mn></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>braking</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>1200</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>13.9</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mn>500</mn></mfrac><mo>=</mo><mn>231</mn><mtext> J/m</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>drag</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>0.78</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>13.9</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo><mn>75</mn><mtext> J/m</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>rolling</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.01</mn><mo stretchy="false">(</mo><mn>1200</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>9.8</mn><mo stretchy="false">)</mo><mo>=</mo><mn>118</mn><mtext> J/m</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>total</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>424</mn><mtext> J/m</mtext><mo>=</mo><mfrac><mrow><mn>424</mn><mo>×</mo><mn>1000</mn></mrow><mrow><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow></mfrac><mo>=</mo><mrow><mn>𝟎.𝟏𝟏𝟖</mn><mtext> </mtext><mi>𝐤</mi><mi>𝐖</mi><mi>𝐡</mi><mi mathvariant="bold">/</mi><mi>𝐤</mi><mi>𝐦</mi></mrow><mtext> </mtext><mo stretchy="false">(</mo><mtext>braking </mtext><mn>55</mn><mi mathvariant="normal">%</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>Check: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mn>500</mn><mtext> m</mtext><mo>&lt;</mo><msub><mi>d</mi><mi>c</mi></msub><mo>=</mo><mn>1200</mn><mi mathvariant="normal">/</mi><mn>0.78</mn><mo>=</mo><mn>1538</mn></mrow></math> m ⇒ braking dominates ✓. For fuel input divide by engine efficiency; per person divide by occupants.</p>
+<p><strong>T8 Induction / Ohm (L11).</strong> 自编题: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>100</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mn>0.01</mn><mtext> </mtext><msup><mtext>m</mtext><mn>2</mn></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>B</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>=</mo><mn>0.2</mn></mrow></math> T/s, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>=</mo><mn>0.5</mn><mtext> </mtext><mi mathvariant="normal">Ω</mi></mrow></math>:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>ε</mi><mo>=</mo><mi>N</mi><mi>A</mi><mfrac><mrow><mi mathvariant="normal">Δ</mi><mi>B</mi></mrow><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mn>100</mn><mo stretchy="false">(</mo><mn>0.01</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>0.2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.2</mn><mtext> V</mtext><mo separator="true">,</mo><mspace width="1em"/><mi>I</mi><mo>=</mo><mfrac><mi>ε</mi><mi>R</mi></mfrac><mo>=</mo><mn>0.4</mn><mtext> A</mtext><mo separator="true">,</mo><mspace width="1em"/><mi>P</mi><mo>=</mo><msup><mi>I</mi><mn>2</mn></msup><mi>R</mi><mo>=</mo><mrow><mn>𝟎.𝟎𝟖</mn><mtext> </mtext><mi>𝐖</mi></mrow></mrow></math></div><p><strong>T9 Transmission loss (L12).</strong> 自编题: 500 MW over a 4 Ω line:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>400</mn><mtext> kV</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mi>I</mi><mo>=</mo><mfrac><mi>P</mi><mi>V</mi></mfrac><mo>=</mo><mn>1250</mn><mtext> A</mtext><mo separator="true">,</mo><mtext> </mtext><msub><mi>P</mi><mtext>loss</mtext></msub><mo>=</mo><msup><mi>I</mi><mn>2</mn></msup><mi>R</mi><mo>=</mo><mn>6.25</mn><mtext> MW</mtext><mo>=</mo><mrow><mn>𝟏.𝟐𝟓</mn><mi mathvariant="bold">%</mi></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mn>100</mn><mtext> kV</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mi>I</mi><mo>=</mo><mn>5000</mn><mtext> A</mtext><mo separator="true">,</mo><mtext> </mtext><msub><mi>P</mi><mtext>loss</mtext></msub><mo>=</mo><mn>100</mn><mtext> MW</mtext><mo>=</mo><mrow><mn>𝟐𝟎</mn><mi mathvariant="bold">%</mi></mrow><mtext> </mtext><mo stretchy="false">(</mo><mo>×</mo><mn>16</mn><mo>=</mo><msup><mn>4</mn><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>T10 Renewable power estimates (L13–L15).</strong> 自编题:</p>
+<ul>
+<li>Hydro: head 50 m, flow 200 m³/s, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>0.9</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mn>0.9</mn><mo>×</mo><mn>10</mn><mo>×</mo><mn>50</mn><mo>×</mo><mn>200</mn><mo>=</mo></mrow></math> <strong>90 MW</strong>; load factor 0.5 ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>90</mn><mtext> MW</mtext><mo>×</mo><mn>8760</mn><mtext> h</mtext><mo>×</mo><mn>0.5</mn><mo>=</mo></mrow></math> <strong>394 GWh/yr</strong>.</li>
+<li>Wind: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><mn>100</mn></mrow></math> m, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>=</mo><mn>8</mn></mrow></math> m/s, 50%: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mn>0.5</mn><mo>⋅</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">(</mo><mn>1.3</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>8</mn><msup><mo stretchy="false">)</mo><mn>3</mn></msup><mo>⋅</mo><mi>π</mi><mo stretchy="false">(</mo><mn>50</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo></mrow></math> <strong>1.31 MW</strong>; farm density <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.01</mn><mo>×</mo><msup><mn>8</mn><mn>3</mn></msup><mo>≈</mo></mrow></math> <strong>5 W/m²</strong>.</li>
+<li>Solar: 30 m² roof in HK, 20%: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mn>0.2</mn><mo>×</mo><mn>148.7</mn><mo>×</mo><mn>30</mn><mo>=</mo></mrow></math> <strong>892 W</strong> ⇒ <strong>21.4 kWh/day</strong>.</li>
+</ul>
+<p><strong>T11 Mass–energy (L16–L17).</strong> 自编题: energy in 1 kg U-235 at 200 MeV per fission:</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>N</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1000</mn><mn>235</mn></mfrac><mo>×</mo><mn>6.022</mn><mo>×</mo><msup><mn>10</mn><mn>23</mn></msup><mo>=</mo><mn>2.56</mn><mo>×</mo><msup><mn>10</mn><mn>24</mn></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>E</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>N</mi><mo>×</mo><mn>200</mn><mo>×</mo><mn>1.6</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>13</mn></mrow></msup><mtext> J</mtext><mo>=</mo><mn>8.2</mn><mo>×</mo><msup><mn>10</mn><mn>13</mn></msup><mtext> J</mtext><mo>=</mo><mrow><mn>𝟐.𝟑</mn><mo>×</mo><msup><mn>𝟏𝟎</mn><mn>𝟕</mn></msup><mtext> </mtext><mi>𝐤</mi><mi>𝐖</mi><mi>𝐡</mi></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>coal (30 MJ/kg)</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mn>8.2</mn><mo>×</mo><msup><mn>10</mn><mn>13</mn></msup></mrow><mrow><mn>3</mn><mo>×</mo><msup><mn>10</mn><mn>7</mn></msup></mrow></mfrac><mo>=</mo><mn>2.7</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mtext> kg</mtext><mo>≈</mo><mrow><mn>𝟐𝟕𝟎𝟎</mn><mtext> </mtext><mi>𝐭</mi></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>T12 Daily footprint / lighting (L18).</strong> Sum <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>×</mo><mi>t</mi></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mi>c</mi><mi mathvariant="normal">Δ</mi><mi>T</mi></mrow></math> terms in kWh. 自编题: same 840 lm from a 60 W incandescent (14 lm/W) needs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>840</mn><mi mathvariant="normal">/</mi><mn>138</mn><mo>=</mo></mrow></math> <strong>6.1 W</strong> LED.</p>
+<p><strong>T13 Short explanations.</strong> Answer = claim + one physical reason (QoD style, 1–3 sentences): e.g. &quot;COP &gt; 1 does not violate energy conservation — heat is moved, not created&quot;; &quot;planes need no speed limit — they already fly at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mtext>opt</mtext></msub></mrow></math>&quot;; &quot;wind-farm W/m² does not depend on rotor size — spacing scales with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>d</mi><mn>2</mn></msup></mrow></math> too&quot;.</p>
+<h2>Common Mistakes</h2>
+<ul>
+<li>Temperatures in <strong>K</strong> for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mi>V</mi><mo>=</mo><mi>n</mi><mi>R</mi><mi>T</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>S</mi><mo>=</mo><mi>Q</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></math>, Carnot and COP (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mfrac><mn>20</mn><mn>37</mn></mfrac></mrow></math> is wrong).</li>
+<li>Sign of work: course uses <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>on</mtext></msub></mrow></math> in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>U</mi><mo>=</mo><mi>Q</mi><mo>+</mo><msub><mi>W</mi><mtext>on</mtext></msub></mrow></math>; expansion ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mtext>on</mtext></msub><mo>&lt;</mo><mn>0</mn></mrow></math>.</li>
+<li>Adiabatic exponents: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><msup><mi>V</mi><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><msup><mi>V</mi><mi>γ</mi></msup></mrow></math>; Otto uses <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>r</mi><mrow><mi>γ</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>.</li>
+<li>Otto burns at constant <strong>volume</strong>, Diesel and Brayton at constant <strong>pressure</strong>; cetane = easy ignition (Diesel), octane = knock resistance (petrol).</li>
+<li>Drag: energy per km ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>2</mn></msup></mrow></math>, power ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math>; use <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi></mrow></math>, not <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>; km/h → m/s (÷ 3.6).</li>
+<li>J/m → kWh/km: × 1000 ÷ 3.6×10⁶; N/kg → kWh/(t·km): ÷ 3.6.</li>
+<li>Transmission loss uses the <strong>line</strong> current <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>=</mo><mi>P</mi><mi mathvariant="normal">/</mi><mi>V</mi></mrow></math> (not <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>R</mi></mrow></math> with the full line voltage).</li>
+<li>Wind / water power ∝ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math>: average <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>v</mi><mn>3</mn></msup></mrow></math>, not cube the average speed.</li>
+<li>Load factor and efficiency are different multipliers — apply both when asked for annual energy.</li>
+<li>Mass defect: parents minus products, include every neutron; MeV ↔ J with 1.6×10⁻¹³.</li>
+</ul>
+<h2>Practice Sources (topic → material)</h2>
+<p>Paths are under <code>PHYS1003/files/</code>. Site answers = <code>PHYS1003/solutions/qodN.md</code> (QoD button on the course page). No official solution yet for QoD 12–18, HW L18–19, HW L20–22.</p>
+<table>
+<thead>
+<tr>
+<th>Lecture / topic</th>
+<th>QoD question</th>
+<th>Site answer</th>
+<th>Official QoD soln (<code>QoD Soln/</code>)</th>
+<th>Homework (<code>Homework &amp; Solution (…)/</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L01–L02 units, growth, fossil fuels</td>
+<td><code>Lec2_1.png</code>, <code>Lec2_2.png</code> (practice)</td>
+<td>—</td>
+<td><code>L2_QoD_solution_lecture2.pdf</code></td>
+<td><code>HW - Lecture 1-2.pdf</code> + <code>Soln</code></td>
+</tr>
+<tr>
+<td>L03 heat, calorimetry</td>
+<td><code>L2_Lec3_QoD.png</code> (practice)</td>
+<td>—</td>
+<td><code>…lecture3.pdf</code></td>
+<td><code>HW - Lecture 3-5.pdf</code> + <code>Soln</code></td>
+</tr>
+<tr>
+<td>L04 1st law, p-V work</td>
+<td><code>L2 Lec4 QoD.png</code> (practice)</td>
+<td>—</td>
+<td><code>…lecture4.pdf</code></td>
+<td>HW 3-5 Q3–4; <code>HW - Lecture 3-8.pdf</code> Q8, Q10</td>
+</tr>
+<tr>
+<td>L05 processes, adiabatic</td>
+<td>QoD 5 (no question PDF in <code>files/</code>)</td>
+<td><code>qod5.md</code></td>
+<td><code>…lecture5.pdf</code></td>
+<td>HW 3-5 Q1, Q4; HW 6-8 Q2</td>
+</tr>
+<tr>
+<td>L06 entropy, Carnot</td>
+<td><code>L2 L06 Thermodynamics III - QoD.pdf</code></td>
+<td><code>qod6.md</code></td>
+<td><code>…lecture6.pdf</code></td>
+<td>HW 3-5 Q2; <code>HW - Lecture 6-8.pdf</code> Q1, Q3, Q5 + <code>Soln</code></td>
+</tr>
+<tr>
+<td>L07 heat pumps, COP</td>
+<td><code>L2 L07 Heat Pumps … - QoD.pdf</code></td>
+<td><code>qod7.md</code></td>
+<td><code>…lecture7.pdf</code></td>
+<td>HW 6-8 Q4, Q6</td>
+</tr>
+<tr>
+<td>L08 Otto / Diesel / jet</td>
+<td><code>L2 L08 Heat Engines - QoD.pdf</code></td>
+<td><code>qod8.md</code></td>
+<td><code>…lecture8.pdf</code></td>
+<td>HW 6-8 Q2; HW 9-10 Q9–11</td>
+</tr>
+<tr>
+<td>L09 road transport</td>
+<td><code>L2 L09 - Transportation I - QoD.pdf</code></td>
+<td><code>qod9.md</code></td>
+<td><code>…lecture9.pdf</code></td>
+<td><code>HW - Lecture 9-10.pdf</code> Q1, Q6–8 + <code>Soln</code> (site <code>hw9-10.md</code>)</td>
+</tr>
+<tr>
+<td>L10 airplanes</td>
+<td><code>L2 L10 - Transportation II - QoD.pdf</code></td>
+<td><code>qod10.md</code></td>
+<td><code>…lecture10.pdf</code></td>
+<td>HW 9-10 Q3–5, Q7</td>
+</tr>
+<tr>
+<td>L11 electricity, induction</td>
+<td><code>L2 L11 Physics of Electricity - QoD.pdf</code></td>
+<td><code>qod11.md</code></td>
+<td><code>…lecture11.pdf</code></td>
+<td><code>HW - Lecture 11-12.pdf</code> Q5 + <code>Soln</code> (site <code>hw11-12.md</code>)</td>
+</tr>
+<tr>
+<td>L12 generation, grid</td>
+<td>— (no L2 QoD 12)</td>
+<td>—</td>
+<td>—</td>
+<td>HW 11-12 Q1–4</td>
+</tr>
+<tr>
+<td>L13 hydro, tides</td>
+<td><code>L2 L13 - Hydro Power - QoD.pdf</code></td>
+<td><code>qod13.md</code></td>
+<td>—</td>
+<td><code>HW - Lecture 13-17.pdf</code> Q4, Q5, Q11 + <code>Soln</code></td>
+</tr>
+<tr>
+<td>L14 wind</td>
+<td><code>L2 L14 - Wind Power - QoD.pdf</code></td>
+<td><code>qod14.md</code></td>
+<td>—</td>
+<td>HW 13-17 Q6, Q7, Q13</td>
+</tr>
+<tr>
+<td>L15 solar</td>
+<td><code>L2 L15 - Solar power - QoD.pdf</code></td>
+<td><code>qod15.md</code></td>
+<td>—</td>
+<td>HW 13-17 Q8, Q9, Q14</td>
+</tr>
+<tr>
+<td>L16 fission</td>
+<td><code>L2 L16 - Nuclear Energy Fission - QoD.pdf</code></td>
+<td><code>qod16.md</code></td>
+<td>—</td>
+<td>HW 13-17 Q1–3, Q10</td>
+</tr>
+<tr>
+<td>L17 fusion</td>
+<td><code>L2 L17 - Nuclear Energy Fusion - QoD.pdf</code></td>
+<td><code>qod17.md</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>L18 daily energy, lighting</td>
+<td><code>L2 L18 - Energy Consumption … - QoD.pdf</code></td>
+<td><code>qod18.md</code></td>
+<td>—</td>
+<td>HW 11-12 Q6–7; <code>HW - Lecture 18-19.pdf</code> (no soln)</td>
+</tr>
+<tr>
+<td>v3 L19–L22 (pending)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><code>HW - Lecture 18-19.pdf</code>, <code>HW - Lecture 20-22.pdf</code> (no soln)</td>
+</tr>
+</tbody>
+</table>
+<p>Other files:</p>
+<ul>
+<li><code>Lecture Notes/thermal_processes.pdf</code> — one-page summary table of ideal-gas processes (L04–L05).</li>
+<li><code>Lecture Notes/Comparison of units and scales.pdf</code> — 3-page unit / scale comparison (L01–L02).</li>
+<li><code>Lecture Notes/Book_PrinciplesOfPhysics_Thermal_Physics.pdf</code> — textbook chapters for L02–L06 (reference only); <code>Lecture Notes/otto_cycle.mp4</code> — Otto cycle animation (L08).</li>
+<li><code>Lecture Notes/Textbook and Reference/smil-article-…-2007.pdf</code> — Smil on Diesel engines and gas turbines (L08 background).</li>
+<li><code>Lecture Notes/L1 Lecture Notes/</code>, <code>Lecture Notes/L1 L0x …pdf</code> — the other section's slides (same topics).</li>
+<li><code>Others/Useful images/QoD_guide.png</code> — QoD answering format (not exam content).</li>
+<li>⚠️ HW L13–17 Q12 (half-life, Bq) and Q15 (radiated power vs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math>) are <strong>not in L01–L18 slides</strong>; radioactivity reappears in HW L20–22 Q6, so wait for the v3 L20–L22 slides before studying them.</li>
+</ul>

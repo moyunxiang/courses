@@ -1,0 +1,132 @@
+<h2>0 · 这个 lab 在练什么</h2>
+<ol>
+<li><strong>离散卷积</strong>：<code>conv</code> 算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mi>x</mi><mo>∗</mo><mi>h</mi></mrow></math>，<strong>自己定下标</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mi>y</mi></msub></mrow></math></li>
+<li><strong>系统连接</strong>：<strong>串联 ⇒ 卷积</strong>（结合律），<strong>并联相加 ⇒ 相加</strong>（分配律）——对应 2.2 讲 §1.2–1.3、2.3 讲的卷积和性质表</li>
+<li><strong>用 impulse response 做音频效果</strong>：时延 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mn>0</mn></msub></mrow></math> 秒 = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mn>0</mn></msub><msub><mi>f</mi><mi>s</mi></msub></mrow></math> 个零；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>a</mi><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></math> = 回声</li>
+<li><strong>二维卷积</strong>：<code>convn</code> 对图像做 3×3 滤波：边缘检测、恒等、锐化</li>
+</ol>
+<blockquote>
+<p>规则（Lab Instruction）：<strong>不能用 for / while / if-else</strong>；输出 inline；<strong>导出 PDF 交</strong>，只评 PDF；不收迟交。这次参数只有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> = 学号<strong>第 6 位</strong>（Lab 1 是第 5、6 位）。</p>
+</blockquote>
+<h2>1 · Part I：DT 卷积和下标</h2>
+<h3>1.1 输入</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 就是学号 8 位数字，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mi>x</mi></msub><mo>=</mo><mi>A</mi><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>A</mi><mo>+</mo><mn>7</mn></mrow></math>。MATLAB 里 <code>sid - '0'</code> 把字符串直接变成数字向量（字符减 <code>'0'</code> 的 ASCII 码），不用循环。</p>
+<h3>1.2 两个系统</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>4</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>A</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo>−</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>A</mi><mo>−</mo><mn>6</mn><mo stretchy="false">]</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>1</mn></msub></mrow></math>：在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>4</mn></mrow></math> 各一个 1。从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math> 开始写就是 <code>[0 1 0 0 1]</code></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>2</mn></msub></mrow></math>：两个阶跃相减 = 一段<strong>矩形窗</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mi>A</mi><mo>+</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>A</mi><mo>+</mo><mn>5</mn></mrow></math> 共 <strong>4 个 1</strong> ⇒ <code>ones(1,4)</code>（题目要求用 <code>ones</code>，不准用 <code>dirac</code> / <code>heaviside</code>）</li>
+</ul>
+<h3>1.3 串联 = 卷积</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>x</mi><mo>→</mo><msub><mi>h</mi><mn>1</mn></msub><mo>→</mo><msub><mi>h</mi><mn>2</mn></msub><mo>→</mo><mi>y</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>⇒</mo><mtext> </mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>y</mi><mo>=</mo><mo stretchy="false">(</mo><mi>x</mi><mo>∗</mo><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub><mo>=</mo><mi>x</mi><mo>∗</mo><mo stretchy="false">(</mo><msub><mi>h</mi><mn>1</mn></msub><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>⇒</mo><mtext> </mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>h</mi><mo>=</mo><msub><mi>h</mi><mn>1</mn></msub><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub></mrow></mstyle></mtd></mtr></mtable></math></div><h3>1.4 下标规则（关键）</h3>
+<p><code>conv</code> 只算数值，<strong>不知道下标</strong>。两条规则：</p>
+<ul>
+<li><strong>起点相加</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mi>y</mi></msub><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><msub><mi>n</mi><mi>x</mi></msub><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><msub><mi>n</mi><mi>h</mi></msub><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>终点相加</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mi>y</mi></msub><mo stretchy="false">(</mo><mtext>end</mtext><mo stretchy="false">)</mo><mo>=</mo><msub><mi>n</mi><mi>x</mi></msub><mo stretchy="false">(</mo><mtext>end</mtext><mo stretchy="false">)</mo><mo>+</mo><msub><mi>n</mi><mi>h</mi></msub><mo stretchy="false">(</mo><mtext>end</mtext><mo stretchy="false">)</mo></mrow></math></li>
+<li>长度自动对上：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>L</mi><mi>y</mi></msub><mo>=</mo><msub><mi>L</mi><mi>x</mi></msub><mo>+</mo><msub><mi>L</mi><mi>h</mi></msub><mo>−</mo><mn>1</mn></mrow></math></li>
+</ul>
+<p>为什么：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mo>∑</mo><mi>k</mi></msub><mi>x</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>k</mi><mo stretchy="false">]</mo></mrow></math> 非零要求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>−</mo><mi>k</mi></mrow></math> 都在各自范围内，最小的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 就是两个起点之和。</p>
+<p><strong>学号 21151084（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mn>0</mn></mrow></math>）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mi>h</mi></msub><mo>=</mo><mn>2..9</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi></mrow></math> 有 15 点，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mi>y</mi></msub><mo>=</mo><mn>2..16</mn></mrow></math>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 里的 2 来自 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>1</mn></msub></mrow></math> 的两个脉冲（间隔 3）各自把 4 点矩形窗搬过去，在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>6</mn></mrow></math> 处重叠。</p>
+<h3>1.5 画图</h3>
+<p><code>subplot(3,1,k)</code> 三行一列；<code>stem(n, x, 'b')</code> 蓝、<code>'r'</code> 红、<code>'g'</code> 绿；每张都要 <code>xlabel</code> / <code>ylabel</code>。<strong>横轴用自己的下标向量</strong>，不要省略（省略就从 1 开始，位置全错）。</p>
+<h2>2 · Part II：回声</h2>
+<h3>2.1 时延换成采样点</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>t</mi><mn>0</mn></msub><mo>=</mo><mn>0.18</mn><mtext> s</mtext><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>N</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub><msub><mi>f</mi><mi>s</mi></msub></mrow></math></div><p><code>song2a.wav</code> 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>s</mi></msub><mo>=</mo><mn>132300</mn></mrow></math> Hz（单声道），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>23814</mn></mrow></math>。用 <code>round</code> 防浮点误差。</p>
+<h3>2.2 CT → DT</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>→</mo><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.7</mn><mtext> </mtext><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>0.18</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>→</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0.7</mn><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><h3>2.3 并联相加 = 相加</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mn>0.7</mn><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>⇒</mo><mtext> </mtext><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mn>0.7</mn><mtext> </mtext><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>向量写法：<code>h1 = [1 zeros(1,N)]</code>，<code>h2 = [zeros(1,N) 0.7]</code>，<strong>两者要等长才能相加</strong>（都是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>+</mo><mn>1</mn></mrow></math>）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></math> 前面有 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 个零</strong>（下标 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0..</mn><mi>N</mi><mo>−</mo><mn>1</mn></mrow></math>），第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>+</mo><mn>1</mn></mrow></math> 个元素才是脉冲</li>
+</ul>
+<h3>2.4 听起来什么样</h3>
+<p>原声 + 0.18 s 后的 0.7 倍副本 ⇒ <strong>回声（echo）</strong>。0.18 s 刚好能分辨出两次声音。</p>
+<ul>
+<li><code>conv</code> 对 200 万点 × 2.4 万点的向量是直接算的，可能要跑几十秒，正常</li>
+<li>两个 <code>sound</code> 之间要 <code>pause</code>，否则会叠在一起播；输出可能略超 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>，<code>sound</code> 会削顶，影响不大</li>
+</ul>
+<h2>3 · Part III：二维滤波</h2>
+<h3>3.1 怎么算</h3>
+<ul>
+<li><code>convn(double(img), h, 'same')</code>：图像是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>600</mn><mo>×</mo><mn>600</mn><mo>×</mo><mn>3</mn></mrow></math>；2-D 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 会<strong>对每个颜色通道分别</strong>卷积</li>
+<li><strong>先转 <code>double</code></strong>：<code>uint8</code> 不能直接参与卷积，而且负数和大于 255 的值会被截断</li>
+<li><code>'same'</code>：输出和原图一样大（题目要求）</li>
+<li>显示时 <code>uint8(y)</code>：负数变 0，超过 255 变 255</li>
+</ul>
+<h3>3.2 三个核</h3>
+<table>
+<thead>
+<tr>
+<th>核</th>
+<th>系数和</th>
+<th>作用</th>
+<th>结果长什么样</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>1</mn></msub></mrow></math>：周围 −1、中间 8</td>
+<td>0</td>
+<td><strong>边缘检测</strong>（Laplacian，高通）</td>
+<td>平坦区域黑，边缘亮</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>2</mn></msub></mrow></math>：只有中间 1</td>
+<td>1</td>
+<td><strong>恒等</strong>（二维 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi></mrow></math>）</td>
+<td>和原图一样</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>3</mn></msub><mo>=</mo><msub><mi>h</mi><mn>1</mn></msub><mo>+</mo><msub><mi>h</mi><mn>2</mn></msub></mrow></math>：中间 9</td>
+<td>1</td>
+<td><strong>锐化</strong></td>
+<td>原图 + 边缘，轮廓更清楚</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么系数和决定平坦区域</strong>：平坦区域每个像素都约等于同一个值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi></mrow></math>，卷积结果 = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>×</mo></mrow></math>（系数和）。和为 0 ⇒ 变黑；和为 1 ⇒ 不变。</p>
+<p><strong>为什么 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>3</mn></msub></mrow></math> 是锐化</strong>：并联相加 ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mn>3</mn></msub><mo>=</mo><msub><mi>y</mi><mn>1</mn></msub><mo>+</mo><msub><mi>y</mi><mn>2</mn></msub></mrow></math> = 边缘 + 原图——和 Part II 的回声是同一个结构（恒等 + 另一个系统）。</p>
+<h2>4 · 和课堂内容的联系</h2>
+<table>
+<thead>
+<tr>
+<th>Lab 操作</th>
+<th>对应课堂概念</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conv</code> + 下标</td>
+<td>卷积和（2.3 讲）；图解法的起止点</td>
+</tr>
+<tr>
+<td>串联 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><msub><mi>h</mi><mn>1</mn></msub><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub></mrow></math></td>
+<td>结合律（2.2 讲 §1.3）</td>
+</tr>
+<tr>
+<td>并联 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><msub><mi>h</mi><mn>1</mn></msub><mo>+</mo><msub><mi>h</mi><mn>2</mn></msub></mrow></math></td>
+<td>分配律（2.2 讲 §1.2）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></math> = 延时</td>
+<td>与 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi></mrow></math> 卷积 = 平移（2.2 讲）</td>
+</tr>
+<tr>
+<td>回声</td>
+<td>LTI 系统由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 完全决定</td>
+</tr>
+<tr>
+<td>3×3 核</td>
+<td>二维卷积；高通 / 锐化（Ch3 频域再解释）</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · 易错点</h2>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math> 这次是学号<strong>第 6 位</strong>。</li>
+<li><code>conv</code> 不给下标：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>n</mi><mi>y</mi></msub></mrow></math> 起点 = 两个起点之和，终点 = 两个终点之和。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>2</mn></msub></mrow></math> 用 <code>ones</code>，不用 <code>dirac</code> / <code>heaviside</code>。</li>
+<li>并联时两个向量先补零到同样长度再相加。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>N</mi><mo stretchy="false">]</mo></mrow></math> 前面是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> 个零，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></math> 个。</li>
+<li><code>convn</code> 前先 <code>double</code>，显示时再 <code>uint8</code>；记得 <code>'same'</code>。</li>
+<li>颜色：输入蓝、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 红、输出绿；三张图都标轴。</li>
+<li>任何地方出现 for / while / if-else 都违规；交 PDF，先从头跑一遍。</li>
+</ul>

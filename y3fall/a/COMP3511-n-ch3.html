@@ -1,0 +1,1132 @@
+<h2>0 · 这一章在讲什么</h2>
+<ol>
+<li><strong>Process concept</strong>：四个基本概念、进程的组成、内存布局、<strong>状态图</strong>、<strong>PCB</strong>、线程初探、Linux 的 <code>task_struct</code></li>
+<li><strong>Basic scheduling</strong>：ready / wait queue、long / short / medium-term scheduler、<strong>context switch</strong>；<strong>interrupt、DMA、dual mode、三种 mode transfer</strong></li>
+<li><strong>Operations on processes</strong>：<strong><code>fork()</code> / <code>exec()</code> / <code>wait()</code> / <code>exit()</code></strong>、进程树、<strong>zombie / orphan</strong></li>
+<li><strong>IPC</strong>：shared memory（producer–consumer、bounded buffer）、message passing（direct / indirect、blocking / non-blocking、buffering）、<strong>pipes</strong></li>
+<li><strong>Client–server</strong>：sockets、RPC</li>
+</ol>
+<blockquote>
+<p><strong>本章是期中大头</strong>。往年考了：<strong>数 fork 产生的进程数 / 打印次数</strong>（选择题 + 大题，含求通式）、<strong>fork + exec 在成功 / 失败各种情况下的输出</strong>、<strong>用 pipe + dup 填空</strong>、context switch、ordinary pipe、<strong>zombie</strong>、什么事件让进程离开 running。DMA 和 interrupt 在本学期放在本章（往年放在 Ch1–2）。</p>
+</blockquote>
+<h2>1 · Process Concept</h2>
+<h3>1.1 四个基本 OS 概念</h3>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Process</strong></td>
+<td>一个<strong>正在执行的程序的实例</strong>——由一个<strong>地址空间</strong>和一个或多个<strong>控制线程</strong>组成</td>
+</tr>
+<tr>
+<td><strong>Thread</strong>（Ch4）</td>
+<td>一个唯一的执行上下文，完整描述程序状态——由 <strong>PC、registers、execution flags、stack</strong> 刻画</td>
+</tr>
+<tr>
+<td><strong>Address space</strong>（Ch9）</td>
+<td>程序在<strong>自己的</strong>地址空间执行，与其他程序的不同（logical / virtual address，Ch9–10）</td>
+</tr>
+<tr>
+<td><strong>Dual mode operation</strong></td>
+<td>基本保护：用户程序和 OS（kernel）在不同 mode 运行；只有 OS 能访问某些资源；<strong>OS 和硬件不受用户程序破坏</strong>；<strong>用户程序彼此隔离</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 进程的组成</h3>
+<ul>
+<li>OS 执行各种程序，每个作为一个 process 运行；process 的执行按顺序推进（von Neumann）</li>
+<li>一个 process 包含：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Text section</strong></td>
+<td>程序代码</td>
+</tr>
+<tr>
+<td><strong>Current activity / state</strong></td>
+<td><strong>PC</strong>、processor registers</td>
+</tr>
+<tr>
+<td><strong>Stack</strong></td>
+<td>调用函数时的临时数据：<strong>函数参数、返回地址、局部变量</strong></td>
+</tr>
+<tr>
+<td><strong>Data section</strong></td>
+<td><strong>全局变量</strong></td>
+</tr>
+<tr>
+<td><strong>Heap</strong></td>
+<td><strong>运行时动态分配</strong>的内存</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Program 是被动实体</strong>（磁盘上的可执行文件）；<strong>process 是主动实体</strong>，有一个 PC 指向下一条要取的指令，以及一组资源（含地址空间）</li>
+<li>process 有生命周期：从开始执行到终止</li>
+</ul>
+<h3>1.3 Program 怎样变成 process</h3>
+<ul>
+<li>可执行文件<strong>装入内存并准备运行</strong>时，program 就「变成」process（双击图标 / 在 shell 输入命令）</li>
+<li>程序在一个<strong>地址空间</strong>中执行，不同于真实的内存位置（logical address space）</li>
+<li><strong>一个程序可以被多个 process 执行</strong>（例如多个用户同时运行同一个编辑器）</li>
+<li>一个 process 本身可以是其他程序的执行环境，例如 Java 程序在 <strong>JVM</strong> 里执行</li>
+</ul>
+<p><strong>装入步骤</strong>：</p>
+<ol>
+<li>把<strong>代码和静态数据</strong>（如已初始化的变量）装入内存 / 地址空间</li>
+<li>为运行时 <strong>stack</strong> 分配内存（C 用它存局部变量、函数参数、返回地址）；填好 <code>main()</code> 的参数 <code>argc</code>、<code>argv</code></li>
+<li>OS 可能为 <strong>heap</strong> 分配内存（<code>malloc()</code> 申请，<code>free()</code> 显式释放）</li>
+<li>其他初始化，尤其是 I/O：UNIX 上每个 process 默认有<strong>三个打开的 file descriptor</strong>：<strong>standard input、output、error</strong>（0、1、2）</li>
+</ol>
+<h3>1.4 C 程序的内存布局</h3>
+<p>从<strong>低地址到高地址</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>例子（课件程序）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>text</strong></td>
+<td>代码</td>
+</tr>
+<tr>
+<td><strong>initialized data</strong></td>
+<td><code>int y = 15;</code>（已初始化的全局变量）</td>
+</tr>
+<tr>
+<td><strong>uninitialized data</strong></td>
+<td><code>int x;</code>（未初始化的全局变量）</td>
+</tr>
+<tr>
+<td><strong>heap</strong>（向上长）</td>
+<td><code>values = (int *)malloc(sizeof(int)*5);</code> 分配的空间</td>
+</tr>
+<tr>
+<td>↕</td>
+<td>（heap 和 stack 之间的空闲区）</td>
+</tr>
+<tr>
+<td><strong>stack</strong>（向下长）</td>
+<td><code>main</code> 里的局部变量 <code>int *values; int i;</code></td>
+</tr>
+<tr>
+<td><strong>argc, argv</strong>（最高）</td>
+<td><code>main</code> 的参数</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>global data 分成 <strong>initialized</strong> 和 <strong>uninitialized</strong> 两部分</li>
+<li><code>argc</code>、<code>argv</code> 有单独的区域</li>
+</ul>
+<blockquote>
+<p>判断题套路：<strong>指针变量本身</strong>（<code>values</code>）是局部变量在 <strong>stack</strong>；它<strong>指向的那块内存</strong>在 <strong>heap</strong>。</p>
+</blockquote>
+<h3>1.5 Process state（必考）</h3>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>New</strong></td>
+<td>正在创建——分配资源</td>
+</tr>
+<tr>
+<td><strong>Ready</strong></td>
+<td>等待被分配到一个 CPU core</td>
+</tr>
+<tr>
+<td><strong>Running</strong></td>
+<td>指令正在 CPU 上被取出和执行</td>
+</tr>
+<tr>
+<td><strong>Waiting</strong></td>
+<td>等待某个（些）事件发生</td>
+</tr>
+<tr>
+<td><strong>Terminated</strong></td>
+<td>执行结束——回收资源</td>
+</tr>
+</tbody>
+</table>
+<p><strong>转移</strong>：</p>
+<ul>
+<li>new → ready：<strong>admitted</strong></li>
+<li>ready → running：<strong>scheduler dispatch</strong></li>
+<li>running → ready：<strong>interrupt</strong>（如时间片用完）</li>
+<li>running → waiting：<strong>I/O or event wait</strong></li>
+<li>waiting → ready：<strong>I/O or event completion</strong>（注意回到 <strong>ready</strong>，不是直接 running）</li>
+<li>running → terminated：<strong>exit</strong></li>
+</ul>
+<blockquote>
+<p><strong>往年考法</strong>：什么事件<strong>典型地</strong>让进程离开 running 状态？——<strong>发出 I/O 请求</strong>（→ waiting）。调用普通函数、改局部变量、读 cache 都不会。</p>
+</blockquote>
+<p>（传统 Unix 每个 process 只有一个 thread，所以 process 的状态部分由它当前的活动决定。）</p>
+<h3>1.6 PCB（Process Control Block / task control block）</h3>
+<p>每个 process 的相关信息：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Process state</strong></td>
+<td>running、waiting 等</td>
+</tr>
+<tr>
+<td><strong>Program counter</strong></td>
+<td>下一条要执行的指令位置</td>
+</tr>
+<tr>
+<td><strong>CPU registers</strong></td>
+<td>accumulators、index registers、stack pointers、通用寄存器、condition codes</td>
+</tr>
+<tr>
+<td><strong>CPU scheduling information</strong></td>
+<td>优先级、指向调度队列的指针、调度参数</td>
+</tr>
+<tr>
+<td><strong>Memory-management information</strong></td>
+<td>分配给该进程的内存（复杂结构：paging / segmentation tables）</td>
+</tr>
+<tr>
+<td><strong>Accounting information</strong></td>
+<td>使用的 CPU、开始以来的时间、时间限制</td>
+</tr>
+<tr>
+<td><strong>I/O status information</strong></td>
+<td>分配的 I/O 设备、<strong>打开文件列表</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Linux</strong>：kernel 把进程列表存在一个<strong>循环双向链表</strong>（<strong>task list</strong>）里；每个元素是一个 process descriptor（PCB），类型 <strong><code>struct task_struct</code></strong>，含 <code>pid</code>、<code>state</code>、<code>time_slice</code>、<code>parent</code>、<code>children</code>、<code>files</code>（打开文件）、<code>mm</code>（地址空间）等。</p>
+<h3>1.7 Threads 初探</h3>
+<ul>
+<li>到目前为止假设 process 只有<strong>一个执行线程</strong>：从第一行到最后一行顺序执行</li>
+<li>thread 由 <strong>PC、registers、execution flags、stack</strong> 表示，是 process 的一部分；thread 在 CPU 上执行时，它的状态就在 CPU 的<strong>硬件寄存器</strong>里</li>
+<li>大多数现代 OS 允许一个 process 有<strong>多个 thread</strong>，同时做多件事（浏览器一个线程显示图片 / 文字，另一个从网络取数据）</li>
+<li>多核上，一个 process 的多个 thread 可以<strong>并行</strong>运行</li>
+<li>同一 process 的线程在<strong>同一地址空间</strong>运行（<strong>共享 code、data、files</strong>），<strong>每个线程有自己的状态</strong>（registers、stack、PC）</li>
+</ul>
+<h2>2 · Process Scheduling</h2>
+<h3>2.1 基本概念</h3>
+<ul>
+<li>现代 OS 都是 multiprogramming：主要目标是<strong>一直有 process 在 CPU 上运行，最大化 CPU 利用率</strong>（CPU 比其他设备快得多）</li>
+<li><strong>Process scheduler</strong>：OS 的一种 mechanism，从内存中可用的 process 里选一个在一个 CPU core 上执行</li>
+<li>调度准则：CPU 利用率、响应时间、公平、实时保证、延迟（Ch5）</li>
+<li>单 CPU 系统上，任何时刻<strong>最多只有一个</strong> process / thread 在 CPU 上运行</li>
+<li><strong>Degree of multiprogramming</strong>：当前在内存中的 process 数——决定资源消耗</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>I/O-bound process</th>
+<th>CPU-bound process</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>时间花在</td>
+<td>更多在 <strong>I/O</strong></td>
+<td>更多在<strong>计算</strong></td>
+</tr>
+<tr>
+<td>CPU burst</td>
+<td><strong>很多短的</strong></td>
+<td><strong>少数很长的</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>2.2 Scheduling queues</h3>
+<ul>
+<li><strong>Ready queue</strong>：在内存中、就绪、等待执行的 process</li>
+<li><strong>Wait queues</strong>：等待某个事件（如 I/O 完成）的 process</li>
+<li>process 一生中在各种队列之间<strong>迁移</strong></li>
+</ul>
+<p><strong>Queueing diagram</strong>：ready queue → CPU → 离开 CPU 有四种情况：</p>
+<ul>
+<li><strong>I/O request</strong> → I/O wait queue → I/O → 回 ready queue</li>
+<li><strong>time slice expired</strong> → 直接回 ready queue</li>
+<li><strong>create child process</strong> → child termination wait queue → child terminates → 回 ready queue</li>
+<li><strong>wait for an interrupt</strong> → interrupt wait queue → interrupt occurs → 回 ready queue</li>
+</ul>
+<h3>2.3 三种 scheduler</h3>
+<table>
+<thead>
+<tr>
+<th>Scheduler</th>
+<th>作用</th>
+<th>频率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Long-term</strong>（job scheduler）</td>
+<td>选哪些 process <strong>装入内存</strong>（分配内存、文件等资源之后）；有一个 <strong>job queue</strong> 存放提交给 mainframe 的作业；<strong>大型机 / 小型机用，PC 不用</strong></td>
+<td>很少（秒、分钟）⇒ 可以慢</td>
+</tr>
+<tr>
+<td><strong>Short-term</strong>（CPU scheduler）</td>
+<td>从 <strong>ready queue</strong> 选下一个执行的 process，分配一个 CPU core</td>
+<td><strong>非常频繁</strong>（毫秒）⇒ <strong>必须快</strong></td>
+</tr>
+<tr>
+<td><strong>Medium-term</strong></td>
+<td>需要降低 degree of multiprogramming 时加入：把 process <strong>移出内存存到磁盘</strong>，以后再<strong>移回来</strong>继续执行——<strong>swapping</strong>（磁盘上的 <strong>swap space</strong>）</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Long-term scheduler 决定 degree of multiprogramming</strong></li>
+<li>大型机的 long-term scheduler 追求好的 <strong>process mix</strong>：I/O-bound 和 CPU-bound 混合（全是 I/O-bound 则 ready queue 常空；全是 CPU-bound 则 I/O 设备闲着）</li>
+</ul>
+<h3>2.4 Context switch（往年选择题）</h3>
+<ul>
+<li>CPU 从一个 process 切换到另一个时，OS 必须<strong>保存旧 process 的状态</strong>、<strong>装入新 process 保存的状态</strong>——<strong>context switch</strong></li>
+<li>context 保存在 <strong>PCB</strong>（或 thread）里，通常包括 <strong>registers、PC、stack pointer</strong></li>
+<li>图：P0 执行 → interrupt 或 system call → OS <strong>save state into PCB0</strong> → <strong>reload state from PCB1</strong> → P1 执行（P0 idle）→ 再 interrupt / system call → save into PCB1 → reload from PCB0 → P0 执行</li>
+<li><strong>Context-switch time 是 overhead</strong>：切换期间系统<strong>不做有用的工作</strong>
+<ul>
+<li><strong>OS 和 PCB 越复杂，context switch 越长</strong></li>
+</ul>
+</li>
+<li>速度因机器而异：内存速度、要复制的寄存器数、是否有特殊指令（如一条指令 load / store 所有寄存器）</li>
+<li><strong>高度依赖底层硬件</strong>：有些处理器（如 SUN UltraSPARC）提供<strong>多组寄存器</strong>，context switch 只需<strong>改指针</strong>指向另一组寄存器——可以同时装入多个 context</li>
+</ul>
+<blockquote>
+<p><strong>往年考法</strong>：关于 context switch 正确的是「<strong>OS 保存一个 process / thread 的状态、恢复另一个</strong>」。错误选项：「context switch 就是从 user mode 切到 kernel mode」（那是 mode switch，不是 context switch）、「所有 CPU 架构需要相同硬件」、「OS 越复杂 context switch 越短」（反了）。</p>
+</blockquote>
+<h2>3 · I/O、Interrupt、DMA 与 Dual Mode</h2>
+<h3>3.1 I/O 的基本操作</h3>
+<ul>
+<li><strong>I/O 设备和 CPU 并发、异步执行</strong></li>
+<li>每个 <strong>device controller</strong> 负责一种设备，有一个 <strong>local buffer</strong></li>
+<li>device controller 负责在外设和它的 local buffer 之间移动数据（I/O 操作是<strong>设备 ↔ controller 的 local buffer</strong>）</li>
+<li><strong>CPU</strong> 在 main memory 和 local buffer 之间移动数据（通常是键盘、鼠标这类<strong>慢设备</strong>）</li>
+<li>device controller 通过 <strong>interrupt</strong> 通知 CPU 操作完成：输入设备 ⇒ local buffer 里有数据了；输出设备 ⇒ I/O 操作完成</li>
+</ul>
+<h3>3.2 Interrupt-driven I/O cycle</h3>
+<ol>
+<li>CPU：<strong>device driver 发起 I/O</strong></li>
+<li>→ I/O controller <strong>开始 I/O</strong></li>
+<li>I/O controller：<strong>input ready、output complete 或 error</strong>，产生 <strong>interrupt signal</strong></li>
+<li>→ CPU 在<strong>每条指令之间</strong>检查 interrupt；收到 interrupt 后把控制转给 <strong>interrupt handler</strong></li>
+<li><strong>interrupt handler 处理数据</strong>，从 interrupt 返回</li>
+<li>CPU <strong>恢复</strong>被中断任务的执行</li>
+<li>（回到第 1 步，CPU 继续执行并在指令之间检查中断）</li>
+</ol>
+<p><strong>Interrupt timeline</strong>：CPU 和设备并发；设备给 CPU 发信号触发 interrupt；CPU 处理完 interrupt 后<strong>回到被中断的那条指令</strong>。</p>
+<h3>3.3 Interrupt 的功能</h3>
+<ul>
+<li>现代 OS 广泛用 interrupt 处理<strong>异步事件</strong>（device controllers、硬件故障）</li>
+<li>interrupt 把控制转给 <strong>interrupt service routine / interrupt handler</strong>——kernel 代码的一部分</li>
+<li><strong>Interrupt priority levels</strong>：<strong>高优先级的 interrupt 可以抢占低优先级的 interrupt</strong> 的处理</li>
+<li><strong>Trap / exception</strong>：<strong>软件产生的</strong> interrupt，由<strong>错误</strong>（如算术错误）或<strong>用户请求</strong>（如 system call）引起</li>
+<li><strong>所有现代 OS 都是 interrupt-driven</strong>；现代计算机每秒发生数百次 interrupt</li>
+</ul>
+<blockquote>
+<p><strong>往年考法</strong>：关于 interrupt <strong>错误</strong>的是「所有 interrupt 都以完全相同的方式处理、没有优先级差别」——实际有 <strong>priority levels</strong>。interrupt 可由硬件产生、也可由软件异常 / trap 产生、由 kernel 处理——都对。</p>
+</blockquote>
+<h3>3.4 DMA（Direct Memory Access）</h3>
+<ul>
+<li><strong>Programmed I/O</strong>：CPU 运行特殊 I/O 指令，<strong>一次一个字节</strong>在内存和慢设备（键盘、鼠标）之间搬</li>
+<li>为避免 programmed I/O，对<strong>快设备</strong>和<strong>大量数据</strong>用 <strong>DMA controller</strong>：<strong>绕过 CPU</strong>，直接在 I/O 设备和内存之间传数据——CPU / OS <strong>初始化</strong> DMA controller，之后 DMA controller 负责搬数据，<strong>CPU 不参与</strong>
+<ul>
+<li>把 CPU 从慢速数据搬运中解放出来</li>
+</ul>
+</li>
+<li>OS 在内存中写 <strong>DMA command block</strong>：源地址和目的地址、读或写模式、传输字节数；把 command block 的位置写给 DMA controller</li>
+<li><strong>Bus mastering</strong>：DMA controller 从 CPU <strong>抢占 bus</strong></li>
+<li>完成后<strong>给 CPU 发 interrupt</strong> 表示完成</li>
+</ul>
+<p><strong>DMA 传输的六步</strong>：</p>
+<ol>
+<li>device driver 被告知要把磁盘数据传到地址 X 处的 buffer</li>
+<li>device driver 告诉 disk controller 从磁盘传 C 个字节到地址 X 的 buffer</li>
+<li>disk controller 发起 DMA 传输</li>
+<li>disk controller 把每个字节发给 DMA controller</li>
+<li>DMA controller 把字节传到 buffer X，内存地址递增、C 递减，直到 C = 0</li>
+<li>C = 0 时，DMA <strong>interrupt CPU</strong> 表示传输完成</li>
+</ol>
+<blockquote>
+<p><strong>往年考法</strong>：关于 DMA 正确的是「<strong>DMA 让设备与内存之间的数据传输更少需要 CPU 参与</strong>」。错误选项：「DMA 用于慢设备、CPU 用于快设备」（反了）、「DMA 完全消除了 interrupt」（完成时仍要 interrupt）、「CPU 和 DMA 不能并发执行」（可以）。</p>
+</blockquote>
+<h3>3.5 Dual-mode operation</h3>
+<ul>
+<li>让 OS 保护自己和其他系统组件：区分 <strong>OS（kernel）代码</strong>和<strong>用户代码</strong>的执行（applications、standard libs 在 <strong>user mode</strong>；kernel 在 <strong>kernel mode</strong>；下面是 hardware）</li>
+<li>基本手段：保护 OS 不被出错的用户破坏、保护用户之间互不破坏</li>
+<li><strong>硬件提供 mode bit</strong>：<strong>user mode = 1</strong>，<strong>kernel mode = 0</strong></li>
+<li>某些指令是 <strong>privileged</strong>，只能在 kernel mode 执行：<strong>I/O control、timer management、interrupt management</strong></li>
+<li>在 user mode 执行 privileged 指令 ⇒ 硬件视为非法，<strong>trap</strong> 到 OS</li>
+</ul>
+<p><strong>扩展到多于两个 mode</strong>：</p>
+<ul>
+<li>Intel 处理器有<strong>四个保护环</strong>：<strong>ring 0 = kernel mode，ring 3 = user mode</strong>；ring 1、2 可用于 OS 服务，实际很少用</li>
+<li>ARMv8 有 7 个 mode</li>
+<li>支持虚拟化的 CPU 常有单独的 mode 表示 <strong>VMM</strong> 在控制：VMM 的权限<strong>比用户进程多、比 kernel 少</strong></li>
+<li>类似 context switch，VMM 要在不同 VM 之间做 <strong>machine switch</strong>：保存一个 OS 的<strong>整个机器状态</strong>（registers、PC，并且<strong>不同于 context switch</strong>，还包括所有<strong>特权硬件状态</strong>），恢复新 VM 的机器状态，跳到新 VM 的 PC（可能在 OS 内部，也可能在用户进程里）</li>
+</ul>
+<p><strong>Mode 的转换</strong>：</p>
+<ul>
+<li>初始控制在 OS（kernel mode）；把控制交给用户程序时设为 user mode</li>
+<li>最终通过 <strong>interrupt、trap 或 system call</strong> 回到 OS</li>
+<li><strong>怎么保证用户程序一定会把控制还给 OS？——timer</strong>（定时产生 interrupt，防止死循环霸占 CPU）</li>
+<li>用户程序请求服务（system call）时，从 user mode 转到 kernel mode；从 system call 返回时重设为 user mode</li>
+</ul>
+<h3>3.6 三种 mode transfer</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>触发</th>
+<th>同步 / 异步</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>System call</strong></td>
+<td>用户进程<strong>请求</strong> OS 服务</td>
+<td>同步（程序主动）</td>
+<td><code>exit()</code>、<code>write()</code>、<code>read()</code>——像函数调用，但在用户进程「外面」</td>
+</tr>
+<tr>
+<td><strong>Interrupt</strong></td>
+<td><strong>外部</strong>事件</td>
+<td><strong>异步</strong>，与用户进程无关</td>
+<td>timer、I/O</td>
+</tr>
+<tr>
+<td><strong>Trap / Exception</strong></td>
+<td>进程<strong>内部</strong>事件</td>
+<td><strong>同步</strong></td>
+<td>protection violation（<strong>segmentation fault</strong>）、算法错误（<strong>除以 0</strong>）</td>
+</tr>
+</tbody>
+</table>
+<h2>4 · Operations on Processes</h2>
+<h3>4.1 Process tree</h3>
+<ul>
+<li>系统中的 process 并发执行，<strong>动态</strong>创建和删除；OS 要提供 <strong>process creation</strong> 和 <strong>process termination</strong> 的机制</li>
+<li>parent process 创建 child process，child 又可以创建 child ⇒ <strong>进程树</strong></li>
+<li>常见：桌面本身是 parent process，双击图标或在 shell 输入命令，就创建它的 child process</li>
+<li>Linux 进程树：根是 <strong>systemd（pid = 1）</strong>，下面有 logind、python、sshd 等；logind → bash → ps、vim；sshd → sshd → tcsh</li>
+</ul>
+<h3>4.2 Process creation</h3>
+<ul>
+<li>大多数 OS（UNIX、Linux、Windows）用唯一的 <strong>pid</strong>（整数）标识进程</li>
+<li>child 需要资源（CPU 时间、内存、文件、I/O 设备）；parent 可以给 child 传初始化数据</li>
+</ul>
+<p><strong>资源共享的三种选择</strong>：</p>
+<ul>
+<li>parent 和 children <strong>几乎共享所有资源</strong>——<code>fork()</code></li>
+<li>children 只共享 parent 的<strong>一部分</strong>资源——<code>clone()</code>（Ch4）</li>
+<li>parent 和 children <strong>不共享</strong>资源</li>
+</ul>
+<p><strong>执行的两种选择</strong>：</p>
+<ul>
+<li>parent 与 children <strong>并发</strong>执行（如 shell 运行 <code>a.out &amp;</code>）</li>
+<li>parent <strong>等待</strong>某些或全部 children 结束（如 shell 等 <code>a.out</code> 完成）</li>
+</ul>
+<p><strong>地址空间的两种选择</strong>：</p>
+<ul>
+<li>child 是 parent 的<strong>副本</strong>（同样的程序和数据）——Unix / Linux</li>
+<li>child 装入一个<strong>新程序</strong></li>
+</ul>
+<h3>4.3 fork() / exec() / wait()</h3>
+<ul>
+<li><strong><code>fork()</code></strong> 创建新进程，<strong>复制 parent 的整个地址空间</strong>；<strong>两个进程都从 <code>fork()</code> 之后的下一条指令继续执行</strong></li>
+<li><strong><code>exec()</code></strong> 在 <code>fork()</code> 之后用来<strong>用新程序替换</strong> child 的地址空间</li>
+<li>parent 调用 <strong><code>wait()</code></strong> 等待 child 结束</li>
+</ul>
+<p><strong><code>fork()</code> 的返回值（核心）</strong>：每个进程<strong>各收到一个</strong>返回值</p>
+<table>
+<thead>
+<tr>
+<th>返回值</th>
+<th>在哪个进程</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>&gt; 0</strong></td>
+<td>原来的 <strong>parent</strong></td>
+<td>这个正整数是新建 <strong>child 的 pid</strong></td>
+</tr>
+<tr>
+<td><strong>= 0</strong></td>
+<td>新建的 <strong>child</strong></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>&lt; 0</strong>（−1）</td>
+<td>原来的进程</td>
+<td><strong>出错</strong>，child <strong>没有</strong>创建成功（<code>errno</code> 指示原因）</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>child 复制 parent 的<strong>所有状态</strong>：内存（程序和数据）、file descriptors 等——每个进程有自己的一份程序和数据（<strong>耗时</strong>）</li>
+</ul>
+<p><strong>UNIX fork 的实现步骤</strong>：</p>
+<ol>
+<li>在 kernel 中创建并初始化 <strong>PCB</strong></li>
+<li>创建新的地址空间（分配内存）</li>
+<li>用 parent 地址空间的<strong>全部内容的副本</strong>初始化它（耗时）</li>
+<li>继承 parent 的执行上下文（如打开的文件）</li>
+<li>通知 CPU scheduler：新的 child 已经 ready</li>
+</ol>
+<p><strong>fork 之后 parent 与 child</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>相同（复制）</th>
+<th>不同</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address space</td>
+<td><strong>PID</strong></td>
+</tr>
+<tr>
+<td>global &amp; local variables</td>
+<td><strong><code>fork()</code> 的返回值</strong></td>
+</tr>
+<tr>
+<td>current working directory</td>
+<td>running time</td>
+</tr>
+<tr>
+<td>root directory</td>
+<td>running state</td>
+</tr>
+<tr>
+<td>process resources、resource limits</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Program Counter（PC）</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>其他 system calls</strong>：</p>
+<ul>
+<li><strong><code>exec()</code>、<code>execlp()</code>…</strong>：改变当前进程运行的程序，从可执行文件创建新的 process image</li>
+<li><strong><code>wait()</code></strong>：等待（child）进程结束，或一般地等待某个事件</li>
+<li><strong><code>exit()</code></strong>：终止当前进程并释放所有资源</li>
+<li><strong><code>signal()</code></strong>：给另一个进程发通知</li>
+</ul>
+<p><strong>典型程序</strong>：</p>
+<pre><code class="language-c">int main() {
+    pid_t pid = fork();            /* fork another process */
+    if (pid &lt; 0) {                 /* error occurred */
+        fprintf(stderr, &quot;Fork Failed&quot;);
+        exit(-1);
+    } else if (pid == 0) {         /* child process */
+        execlp(&quot;/bin/ls&quot;, &quot;ls&quot;, NULL);
+    } else {                       /* parent process */
+        wait(NULL);                /* wait for the child to complete */
+        printf(&quot;Child Complete&quot;);
+        exit(0);
+    }
+}
+</code></pre>
+<p><strong>实现一个 shell</strong>：循环读入并解析命令行 → <code>fork()</code> → child 里 <code>exec(prog, args)</code>（<strong>不会返回</strong>）→ parent <code>wait(child_pid)</code>。</p>
+<h3>4.4 数进程（考试重点）</h3>
+<p><strong>方法</strong>：画树，或者看「每个进程在每一轮变成几个」。</p>
+<p><strong>例 1</strong>（课件）：</p>
+<pre><code class="language-c">for (int i = 0; i &lt; 10; i++) {
+    fork();
+    fork();
+}
+</code></pre>
+<p>每轮：每个进程连 fork 两次 ⇒ 变成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>4</mn></mrow></math> 个，<strong>而且所有进程都继续循环</strong> ⇒ 共 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>4</mn><mn>10</mn></msup></mrow></math></strong> 个进程。</p>
+<p><strong>例 2</strong>（课件）：</p>
+<pre><code class="language-c">for (int i = 0; i &lt; 10; i++)
+    if (fork())
+        fork();
+</code></pre>
+<p>每轮：<code>fork()</code> 后，<strong>parent</strong>（返回值 &gt; 0）再 fork 一次；child（返回值 0）不再 fork ⇒ 每个进程变成 <strong>3</strong> 个，所有进程都继续循环 ⇒ 共 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>3</mn><mn>10</mn></msup></mrow></math></strong> 个。</p>
+<p><strong>例 3</strong>（往年选择题，改写）：</p>
+<pre><code class="language-c">for (i = 0; i &lt; 3; i++) {
+    if (fork() == 0) { fork(); printf(&quot;X &quot;); return 1; }
+}
+printf(&quot;Y &quot;);
+</code></pre>
+<ul>
+<li>只有<strong>原进程</strong>在循环：每轮它 fork 出一个 child；child 再 fork 一次，<strong>两个</strong>都打印 X 然后 return（不再循环）</li>
+<li>3 轮 ⇒ 新进程 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>6</mn></mrow></math> 个，各打印一次 X；原进程最后打印一次 Y</li>
+<li><strong>共 7 个进程，X 打印 6 次，Y 打印 1 次</strong></li>
+</ul>
+<p><strong>例 4</strong>（往年大题，改写）：</p>
+<pre><code class="language-c">for (int i = 0; i &lt; n; i++) {
+    if (fork()) fork();
+    else break;
+}
+</code></pre>
+<p>每轮，每个<strong>还在循环中</strong>的进程：</p>
+<ul>
+<li>第一次 <code>fork()</code> 产生的 child 进入 <code>else</code>，<strong>break</strong>（不再循环）</li>
+<li>parent 进入 <code>if</code>，再 <code>fork()</code> 一次；这次的 child（以及 parent）<strong>继续循环</strong></li>
+</ul>
+<p>⇒ 每个活跃进程：这一轮后变成 3 个，但只有 <strong>2 个</strong>继续。设第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 轮前活跃进程数为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>k</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mn>2</mn><msub><mi>A</mi><mi>k</mi></msub></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>k</mi></msub><mo>=</mo><msup><mn>2</mn><mi>k</mi></msup></mrow></math>。</p>
+<ul>
+<li>第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 轮 break 掉的新进程数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msup><mn>2</mn><mi>k</mi></msup></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 轮后：活跃的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow></math> 个；break 掉的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mo>⋯</mo><mo>+</mo><msup><mn>2</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>1</mn></mrow></math> 个</li>
+<li><strong>总进程数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mo>+</mo><mo stretchy="false">(</mo><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><msup><mn>2</mn><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow></math></strong>；break 执行次数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mo>−</mo><mn>1</mn></mrow></math></li>
+</ul>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>2</mn></mrow></math>：<strong>7 个进程，break 3 次</strong>（我用程序模拟验证：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn></mrow></math> 依次 3、7、15、31）。进程树：P0 的 children 是 P1、P2、P3、P4；P2 的 children 是 P5、P6。break 掉的是 P1、P3、P5（每次第一个 fork 出来的 child）。</p>
+<blockquote>
+<p><strong>数进程的套路</strong>：</p>
+<ol>
+<li>区分哪些进程<strong>继续循环</strong>、哪些 <code>break</code> / <code>return</code> / <code>exec</code> 了</li>
+<li>看每个继续循环的进程在一轮中<strong>变成几个</strong></li>
+<li>打印次数 = 执行到那条 <code>printf</code> 的进程数</li>
+</ol>
+</blockquote>
+<h3>4.5 fork + exec 的输出（往年大题，改写）</h3>
+<pre><code class="language-c">int ret = fork();
+if (ret == 0) {
+    printf(&quot;Hello1\n&quot;);
+    exec(&quot;some_executable&quot;);
+    printf(&quot;Hello2\n&quot;);
+} else if (ret &gt; 0) {
+    wait(NULL);
+    printf(&quot;Hello3\n&quot;);
+} else {
+    printf(&quot;Hello4\n&quot;);
+}
+</code></pre>
+<p><strong>要考虑 system call 成功和失败的所有情况</strong>（<code>exec</code> 成功则替换进程映像、<strong>不返回</strong>；失败返回 −1、继续往下执行）：</p>
+<table>
+<thead>
+<tr>
+<th>情况</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fork 成功、exec 成功</td>
+<td>Hello1、Hello3（Hello2 不会打印：程序已被替换）</td>
+</tr>
+<tr>
+<td>fork 成功、exec 失败</td>
+<td>Hello1、Hello2、Hello3</td>
+</tr>
+<tr>
+<td>fork 失败</td>
+<td>Hello4</td>
+</tr>
+</tbody>
+</table>
+<p>（因为 parent <code>wait</code> 了 child，Hello3 一定在 child 的输出之后。）</p>
+<h3>4.6 关于 fork 的补充</h3>
+<ul>
+<li><strong>Unix 的进程创建很特别</strong>：大多数 OS 在新地址空间创建进程、读入可执行文件、开始执行——<strong>一步完成</strong>；Unix 把它<strong>拆成两个</strong> system call：<code>fork()</code> 和 <code>exec()</code></li>
+<li><strong>Linux 用 copy-on-write（COW）实现 fork</strong>（Ch10）：不复制地址空间，parent 和 child <strong>共享一份</strong>，child「指向」parent 的地址空间
+<ul>
+<li>把复制<strong>推迟到内容被修改（写）时</strong>；如果从不写——例如 <strong><code>fork()</code> 后立刻 <code>exec()</code></strong>——就根本不用复制</li>
+<li>大大简化并加速进程创建</li>
+</ul>
+</li>
+<li>Linux 也通过 <strong><code>clone()</code></strong> 实现 fork：用一组 <strong>flags</strong> 指定 parent 和 child 共享哪些资源（Ch4）</li>
+</ul>
+<h3>4.7 Process termination</h3>
+<ul>
+<li>进程执行完最后一条语句，用 <strong><code>exit()</code></strong> 请求 OS 删除它
+<ul>
+<li>可以通过 parent 的 <strong><code>wait()</code></strong> 返回一个<strong>状态值</strong>（通常是整数）</li>
+<li>大部分资源（内存：program、data、heap、stack；打开的文件；I/O buffer）被 OS <strong>回收</strong></li>
+</ul>
+</li>
+<li>parent 可以终止 children：Unix / Linux 用 <strong><code>abort()</code></strong>，Windows 用 <code>TerminateProcess()</code>
+<ul>
+<li>parent 要知道 child 的 PID——创建时 <code>fork()</code> 正好把它返回给 parent</li>
+</ul>
+</li>
+<li>parent 终止 child 的原因：
+<ul>
+<li>child <strong>超出了分配的资源</strong></li>
+<li>分配给 child 的<strong>任务不再需要</strong></li>
+<li><strong>parent 要退出</strong>，而有的 OS 不允许 parent 终止后 child 继续存在</li>
+</ul>
+</li>
+</ul>
+<p><strong>Cascading termination</strong>：有的 OS 不允许没有 parent 的 child 存在——一个进程终止，<strong>它所有的 children 也必须终止</strong>，由 OS 发起。</p>
+<ul>
+<li>正常终止时会直接或间接调用 <code>exit()</code>（C runtime 库默认会调用 <code>exit()</code>）</li>
+<li>parent 用 <code>pid = wait(&amp;status);</code> 等待 child：得到 child 的<strong>退出状态</strong>和<strong>已终止 child 的 pid</strong>（知道是哪个 child 结束了）</li>
+</ul>
+<h3>4.8 Zombie 与 Orphan（往年选择题）</h3>
+<ul>
+<li>进程终止时资源被 OS 回收；但还有清理工作要由 parent 和 OS 完成：它在 <strong>process table</strong>（kernel 中记录所有进程的结构）里的条目<strong>要保留到 parent 调用 <code>wait()</code></strong>，因为条目里有该进程的<strong>退出状态</strong></li>
+</ul>
+<blockquote>
+<p><strong>Zombie process</strong>：<strong>已经终止、但 parent 还没调用 <code>wait()</code></strong> 的进程——它在 process table 中的条目、<strong>process ID、PCB 仍然存在</strong>，其他资源都已释放；<strong>不可运行</strong>（没有地址空间了，程序和数据都已删除）。</p>
+</blockquote>
+<ul>
+<li><strong>所有进程终止前都会经过 zombie 状态</strong>，但一般只存在很短时间</li>
+<li>parent 调用 <code>wait()</code> 后，zombie 的 pid、process table 条目和 PCB 才被释放</li>
+</ul>
+<blockquote>
+<p><strong>Orphan</strong>：parent <strong>没调用 <code>wait()</code> 就终止了</strong>，child 成为 orphan——它可能仍可运行（如果没有 cascading termination），或者最终成为 zombie。</p>
+</blockquote>
+<ul>
+<li>必须有机制给 orphan <strong>重新指定 parent</strong>，否则没有 parent 的已终止进程会<strong>永远是 zombie</strong>，浪费内存</li>
+<li><strong>init（或 systemd）</strong> 被指定为 orphan 的 parent，它<strong>定期调用 <code>wait()</code></strong>，收集 orphan 的退出状态并释放其 pid 和 process table 条目</li>
+</ul>
+<blockquote>
+<p><strong>往年考法</strong>：关于 zombie 正确的是「<strong>已经终止、但 parent 还没收集它的状态</strong>」。错误选项：「zombie 还在正常执行用户代码」、「<code>exec()</code> 失败时产生 zombie」、「zombie 没有 process identifier」（它的 pid <strong>还在</strong>）。</p>
+</blockquote>
+<h2>5 · Interprocess Communication（IPC）</h2>
+<h3>5.1 为什么要合作</h3>
+<ul>
+<li>进程可以是 <strong>independent</strong> 或 <strong>cooperating</strong>；cooperating 进程能影响或被其他进程影响（如共享数据）</li>
+<li>合作的理由（多线程进程中也自然存在）：
+<ul>
+<li><strong>Information sharing</strong>：多个应用对同一信息感兴趣（复制粘贴）</li>
+<li><strong>Computation speedup</strong>：并行执行任务 / 子任务（如机器学习）</li>
+<li><strong>Modularity</strong>：功能分到不同进程 / 线程</li>
+</ul>
+</li>
+<li>cooperating 进程需要 <strong>IPC</strong> 机制交换数据。两种模型：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Shared memory</strong></td>
+<td>共享一块内存区域，进程通过<strong>读写共享区域</strong>交换信息</td>
+</tr>
+<tr>
+<td><strong>Message passing</strong></td>
+<td>通过合作进程之间<strong>交换消息</strong>显式通信（消息经过 kernel 的 message queue）</td>
+</tr>
+</tbody>
+</table>
+<h3>5.2 Producer–Consumer（shared memory）</h3>
+<ul>
+<li>producer 产生信息，consumer 消费</li>
+<li><strong>unbounded buffer</strong>：buffer 大小没有实际限制；<strong>bounded buffer</strong>：固定大小</li>
+</ul>
+<p><strong>Bounded buffer 的共享数据</strong>：</p>
+<pre><code class="language-c">#define BUFFER_SIZE 10
+typedef struct { ... } item;
+item buffer[BUFFER_SIZE];
+int in = 0;   /* 下一个空位 */
+int out = 0;  /* 第一个满位 */
+</code></pre>
+<p><strong>Producer</strong>：</p>
+<pre><code class="language-c">while (true) {
+    /* produce an item in next_produced */
+    while (((in + 1) % BUFFER_SIZE) == out)
+        ; /* do nothing：buffer 满 */
+    buffer[in] = next_produced;
+    in = (in + 1) % BUFFER_SIZE;
+}
+</code></pre>
+<p><strong>Consumer</strong>：</p>
+<pre><code class="language-c">while (true) {
+    while (in == out)
+        ; /* do nothing：buffer 空 */
+    next_consumed = buffer[out];
+    out = (out + 1) % BUFFER_SIZE;
+    /* consume the item in next_consumed */
+}
+</code></pre>
+<ul>
+<li>这个方案简单且正确，但<strong>同一时刻最多只能有 <code>BUFFER_SIZE - 1</code> 个 item</strong></li>
+</ul>
+<p><strong>为什么少一个？</strong> 用 <code>in == out</code> 表示<strong>空</strong>；如果允许放满 <code>BUFFER_SIZE</code> 个，满的时候 <code>in</code> 也会追上 <code>out</code>，变成 <code>in == out</code>，和空无法区分。所以约定 <code>(in + 1) % BUFFER_SIZE == out</code> 就算满，空出一格。（加一个计数器就能用满全部格子——Ch6 会看到这又带来 race condition。）</p>
+<h3>5.3 Message passing</h3>
+<ul>
+<li>进程<strong>不共享地址空间</strong>就能通信和同步；在<strong>分布式环境</strong>中特别有用</li>
+<li>IPC facility 提供两个操作：<strong><code>send(message)</code></strong>、<strong><code>receive(message)</code></strong>；消息大小可以固定或可变</li>
+<li>（跨网络通信看起来就像文件 I/O：<code>write(wfd, wbuf, wlen)</code> / <code>read(rfd, rbuf, rmax)</code>）</li>
+<li>P 和 Q 要通信：<strong>建立 communication link</strong>，再用 <code>send()</code> / <code>receive()</code> 交换消息</li>
+</ul>
+<p>实现 link 和 send / receive 的几个维度：</p>
+<ul>
+<li><strong>Direct or indirect</strong> communication</li>
+<li><strong>Synchronous or asynchronous</strong> communication</li>
+<li><strong>Automatic or explicit buffering</strong></li>
+</ul>
+<h3>5.4 Direct vs Indirect communication</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Direct</th>
+<th>Indirect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原语</td>
+<td><code>send(P, message)</code>：发给进程 P；<code>receive(Q, message)</code>：从 Q 收</td>
+<td><code>send(A, message)</code>：发到 <strong>mailbox A</strong>；<code>receive(A, message)</code>：从 mailbox A 收</td>
+</tr>
+<tr>
+<td>link 的建立</td>
+<td>每对想通信的进程之间<strong>自动</strong>建立；只需知道对方身份</td>
+<td>只有两进程<strong>共享一个 mailbox</strong> 时才有 link</td>
+</tr>
+<tr>
+<td>一条 link 关联</td>
+<td><strong>恰好一对</strong>进程</td>
+<td>可以<strong>多于两个</strong>进程</td>
+</tr>
+<tr>
+<td>每对进程之间</td>
+<td><strong>恰好一条</strong> link</td>
+<td>可以有<strong>多条</strong> link（每条对应一个 mailbox）</td>
+</tr>
+<tr>
+<td>缺点</td>
+<td><strong>模块化差</strong>：改一个进程的 id，可能要检查所有合作进程</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>mailbox（也叫 port）每个有唯一 id；OS 要提供：<strong>创建</strong> mailbox、通过 mailbox <strong>收发</strong>消息、<strong>销毁</strong> mailbox</li>
+</ul>
+<p><strong>Mailbox sharing 问题</strong>：P1、P2、P3 共享 mailbox A，P1 发送，P2 和 P3 都 receive——谁收到？<strong>解决办法</strong>：</p>
+<ul>
+<li>一条 link 最多关联<strong>两个</strong>进程</li>
+<li>同一时刻只允许<strong>一个</strong>进程执行 <code>receive()</code></li>
+<li>让系统<strong>任意选</strong>一个接收者，并<strong>告诉 sender</strong> 接收者是谁</li>
+</ul>
+<h3>5.5 Synchronization（blocking / non-blocking）</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Blocking（<strong>synchronous</strong>）</th>
+<th>Non-blocking（<strong>asynchronous</strong>）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>send</td>
+<td>sender <strong>阻塞直到</strong>消息被接收进程或 mailbox 收到</td>
+<td>sender 发出消息后<strong>立即继续</strong></td>
+</tr>
+<tr>
+<td>receive</td>
+<td>receiver <strong>阻塞直到</strong>有消息可用</td>
+<td>receiver 取到一条有效消息<strong>或 null</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>send 和 receive 都 blocking 时，sender 和 receiver 之间形成 <strong>rendezvous</strong>（会合）</li>
+<li>这时 producer–consumer 问题<strong>变得很简单</strong>：producer 只管 <code>send(next_produced)</code>，consumer 只管 <code>receive(next_consumed)</code></li>
+</ul>
+<h3>5.6 Buffering</h3>
+<p>无论 direct 还是 indirect，消息都放在一个临时队列里，三种实现：</p>
+<table>
+<thead>
+<tr>
+<th>容量</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Zero capacity</strong></td>
+<td>队列里不存消息；sender <strong>必须等</strong> receiver（rendezvous）</td>
+</tr>
+<tr>
+<td><strong>Bounded capacity</strong></td>
+<td>长度有限 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>；link <strong>满时</strong> sender 要等</td>
+</tr>
+<tr>
+<td><strong>Unbounded capacity</strong></td>
+<td>无限长；sender <strong>从不等</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>5.7 Pipes</h3>
+<p>最早的 IPC 机制之一（早期 UNIX）。实现 pipe 要考虑四个问题：</p>
+<ol>
+<li><strong>单向</strong>还是<strong>双向</strong>？</li>
+<li>双向的话，是 <strong>half duplex</strong>（同一时刻只能一个方向）还是 <strong>full duplex</strong>（两个方向同时）？</li>
+<li>通信的进程之间必须有<strong>关系</strong>（如 parent–child）吗？</li>
+<li>能<strong>跨网络</strong>用，还是只能在同一台机器上？</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Ordinary pipes</strong></th>
+<th><strong>Named pipes</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>方向</td>
+<td><strong>单向</strong>（unidirectional）</td>
+<td><strong>双向</strong></td>
+</tr>
+<tr>
+<td>关系</td>
+<td>需要 <strong>parent–child</strong> 关系（parent 创建 pipe，再 <code>fork()</code> 出 child 来用）</td>
+<td><strong>不需要</strong> parent–child 关系；<strong>多个进程</strong>可以用（通常有多个 writer）</td>
+</tr>
+<tr>
+<td>访问</td>
+<td><strong>不能从创建它的进程外部访问</strong></td>
+<td>不需要亲缘关系就能访问</td>
+</tr>
+<tr>
+<td>生命周期</td>
+<td>进程通信完、终止后<strong>就不存在了</strong></td>
+<td>进程结束后<strong>仍存在</strong>，直到显式删除</td>
+</tr>
+<tr>
+<td>机器</td>
+<td>同一台机器</td>
+<td>UNIX：同一台；Windows：可以跨机器</td>
+</tr>
+<tr>
+<td>UNIX</td>
+<td><code>pipe(int fd[])</code>；<strong>写端 <code>fd[1]</code></strong>、<strong>读端 <code>fd[0]</code></strong></td>
+<td><strong>FIFO</strong>，用 <code>mkfifo()</code> 创建，在文件系统里像普通文件；<strong>只支持 half-duplex</strong>（双向同时传要用两个 FIFO）</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><strong>anonymous pipes</strong>，用 <code>ReadFile()</code> / <code>WriteFile()</code></td>
+<td><code>CreateNamedPipe()</code>；<strong>full-duplex</strong>，可以跨机器</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Ordinary pipe 的用法</strong>：</p>
+<ul>
+<li>标准 producer–consumer：<strong>producer 写写端 <code>fd[1]</code></strong>，<strong>consumer 读读端 <code>fd[0]</code></strong></li>
+<li>UNIX 把 pipe 当成<strong>特殊文件</strong>，用标准 <code>read()</code> / <code>write()</code>；child <strong>继承</strong> parent 的 pipe</li>
+<li>parent 先 <code>pipe()</code> 再 <code>fork()</code>，child 继承包括 pipe 在内的一切</li>
+<li><strong>如果 parent 写、child 读：parent 必须显式关闭读端，child 必须显式关闭写端</strong></li>
+</ul>
+<p><strong>为什么要关掉不用的那一端？</strong> 读端的 <code>read()</code> 只有在<strong>所有</strong>写端都关闭后才会返回 EOF；如果 reader 自己还开着写端，它永远等不到 EOF。</p>
+<pre><code class="language-c">int pfds[2]; char buf[30];
+pipe(pfds);                     /* create a message pipe */
+pid_t pid = fork();             /* 0 (child), non-zero (parent) */
+if (pid != 0) {
+    printf(&quot;PARENT: writing to pipe\n&quot;);
+    close(pfds[0]);             /* parent 不读，关读端 */
+    write(pfds[1], &quot;test&quot;, 5);
+    wait(NULL);                 /* wait until the child returns */
+    printf(&quot;PARENT: exiting\n&quot;);
+} else {
+    printf(&quot;CHILD: reading from pipe\n&quot;);
+    close(pfds[1]);             /* child 不写，关写端 */
+    read(pfds[0], buf, 5);
+    printf(&quot;CHILD: read \&quot;%s\&quot;\n&quot;, buf);
+}
+</code></pre>
+<blockquote>
+<p><strong>往年考法（选择）</strong>：关于 ordinary pipe <strong>错误</strong>的是「可以被<strong>任意</strong>进程访问」——ordinary pipe 不能从创建它的进程外部访问。可以像 file descriptor 一样访问、进程终止后消失、通常用于 parent–child——都对。</p>
+</blockquote>
+<blockquote>
+<p><strong>往年考法（填空，改写）</strong>：parent 和 child 各数一个文件里的偶数个数，child 通过 pipe 把结果传给 parent。关键空：</p>
+<ul>
+<li>把打开的文件变成标准输入，这样能用 <code>scanf</code>：先 <strong><code>close(0)</code></strong>，再 <strong><code>dup(fin)</code></strong>（<code>dup</code> 返回<strong>最小的空闲</strong> fd，也就是刚关掉的 0）</li>
+<li>计数：<code>if (number % 2 == 0) cnt++</code></li>
+<li>child 写：<code>write(fd[1], &amp;cnt, sizeof(int))</code>（写端、<strong>传地址</strong>）</li>
+<li>parent 读：<code>read(fd[0], &amp;child_cnt, sizeof(int))</code>（读端）</li>
+</ul>
+</blockquote>
+<h2>6 · Client–Server Communication</h2>
+<h3>6.1 Sockets</h3>
+<ul>
+<li><strong>Socket = 通信的端点</strong>；网络上通信的一对进程用<strong>一对 socket</strong></li>
+<li>socket 由 <strong>IP address + port number</strong> 唯一标识（port 指定 client 或 server 上的进程 / 应用）</li>
+<li>server（一直运行）<strong>监听</strong>指定（well-known）端口等待 client 请求；收到请求后可以 accept，建立 socket 连接</li>
+</ul>
+<p><strong>细节</strong>：</p>
+<ul>
+<li>服务器（SSH、FTP、HTTP）监听 <strong>well-known ports</strong>：<strong>SSH 22、FTP 21、HTTP 80</strong>；<strong>1024 以下</strong>的端口都是 well-known，保留给标准服务</li>
+<li>server 的地址（IP，或名字经 <strong>DNS</strong> 解析成 IP）和端口是公开的；server 总在等 client 联系</li>
+<li><strong>只有 client 能发起</strong>通信</li>
+<li>client 发起连接时知道自己的 IP，选一个<strong>大于 1024</strong>、未被使用的端口</li>
+<li>IP address 全球唯一：IPv4 32 位（如 128.32.244.172），IPv6 128 位</li>
+<li><strong>4-tuple（source IP, source port, destination IP, destination port）唯一确定一对通信</strong></li>
+</ul>
+<h3>6.2 RPC（Remote Procedure Call）</h3>
+<ul>
+<li>最常见的远程服务形式之一：在<strong>网络连接的系统之间</strong>使用的过程调用机制</li>
+<li><strong>基于消息</strong>的通信方案，提供远程服务</li>
+<li>常用于实现<strong>分布式文件系统</strong>（一组 RPC daemons 和 clients）</li>
+</ul>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>四个基本概念</td>
+<td>process、thread、address space、dual mode</td>
+</tr>
+<tr>
+<td>进程组成</td>
+<td>text / data / heap / stack / PC+registers；program vs process</td>
+</tr>
+<tr>
+<td>装入步骤</td>
+<td>代码 + 静态数据、stack（argc/argv）、heap、三个默认 fd</td>
+</tr>
+<tr>
+<td>内存布局</td>
+<td>各变量在哪个区（指针在 stack、指向的在 heap）</td>
+</tr>
+<tr>
+<td>状态图</td>
+<td>五个状态、六条转移及触发事件；waiting 回 ready</td>
+</tr>
+<tr>
+<td>PCB</td>
+<td>七类信息；Linux <code>task_struct</code></td>
+</tr>
+<tr>
+<td>Thread 初探</td>
+<td>共享 code/data/files，各自 registers/stack/PC</td>
+</tr>
+<tr>
+<td>I/O-bound vs CPU-bound</td>
+<td>burst 特点</td>
+</tr>
+<tr>
+<td>队列</td>
+<td>ready / wait；queueing diagram 四种离开 CPU 的方式</td>
+</tr>
+<tr>
+<td>三种 scheduler</td>
+<td>作用、频率；long-term 决定 degree；swapping</td>
+</tr>
+<tr>
+<td>Context switch</td>
+<td>保存 / 恢复 PCB；纯开销；影响因素；多组寄存器</td>
+</tr>
+<tr>
+<td>Interrupt</td>
+<td>中断驱动 I/O 七步；priority levels；trap</td>
+</tr>
+<tr>
+<td>DMA</td>
+<td>为什么；command block；bus mastering；六步；完成发 interrupt</td>
+</tr>
+<tr>
+<td>Dual mode</td>
+<td>mode bit（user 1 / kernel 0）；privileged 指令；rings；timer</td>
+</tr>
+<tr>
+<td>Mode transfer</td>
+<td>system call / interrupt / trap 的区别</td>
+</tr>
+<tr>
+<td>fork</td>
+<td>返回值三种；复制什么、不同什么；实现步骤；COW</td>
+</tr>
+<tr>
+<td>数进程</td>
+<td>课件 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>4</mn><mn>10</mn></msup></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>3</mn><mn>10</mn></msup></mrow></math>；往年 7 / 6 / 1；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>2</mn><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>fork + exec</td>
+<td>列出所有成功 / 失败情况的输出</td>
+</tr>
+<tr>
+<td>exit / wait</td>
+<td>状态值；cascading termination</td>
+</tr>
+<tr>
+<td>Zombie / orphan</td>
+<td>定义；为什么要 zombie；init / systemd 收养</td>
+</tr>
+<tr>
+<td>IPC 两模型</td>
+<td>shared memory vs message passing</td>
+</tr>
+<tr>
+<td>Bounded buffer</td>
+<td>代码；为什么只能放 SIZE−1 个</td>
+</tr>
+<tr>
+<td>Direct vs indirect</td>
+<td>原语；link 的性质；mailbox 共享问题的三种解决</td>
+</tr>
+<tr>
+<td>Blocking</td>
+<td>四种组合；rendezvous</td>
+</tr>
+<tr>
+<td>Buffering</td>
+<td>zero / bounded / unbounded</td>
+</tr>
+<tr>
+<td>Pipes</td>
+<td>ordinary vs named 全面对比；fd[0] 读 fd[1] 写；关闭不用的端</td>
+</tr>
+<tr>
+<td>pipe + dup</td>
+<td><code>close(0); dup(fin)</code> 重定向 stdin</td>
+</tr>
+<tr>
+<td>Sockets</td>
+<td>IP + port；well-known ports；4-tuple；RPC</td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li><strong>waiting 状态结束后回到 ready</strong>，不是直接回 running。</li>
+<li>running → ready 是 <strong>interrupt</strong>（时间片到），running → waiting 是 <strong>I/O / event wait</strong>。</li>
+<li>Context switch（换进程）≠ mode switch（user ↔ kernel）。</li>
+<li><strong>OS / PCB 越复杂，context switch 越慢</strong>。</li>
+<li><code>fork()</code> 在 child 返回 <strong>0</strong>，在 parent 返回 <strong>child 的 pid</strong>，失败返回 <strong>−1</strong>（此时没有 child）。</li>
+<li><code>exec()</code> 成功<strong>不返回</strong>，它后面的代码不会执行；失败才会继续往下走。</li>
+<li>Zombie <strong>还有 pid 和 PCB</strong>，只是其他资源都释放了；它不可运行。</li>
+<li>Ordinary pipe <strong>单向</strong>、要 parent–child、不能被外部进程访问；UNIX named pipe（FIFO）是 <strong>half-duplex</strong>。</li>
+<li>Pipe：<strong><code>fd[0]</code> 读，<code>fd[1]</code> 写</strong>。</li>
+<li>Mode bit：<strong>user = 1，kernel = 0</strong>。</li>
+<li>DMA 结束时<strong>仍然要 interrupt</strong> CPU。</li>
+<li>Bounded buffer 方案最多放 <strong>BUFFER_SIZE − 1</strong> 个。</li>
+</ul>
