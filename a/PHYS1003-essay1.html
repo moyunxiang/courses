@@ -1,0 +1,113 @@
+<p>Outline only. ⚠️ Course policy: data collection, analysis and conclusions must be your own work; generative AI may only polish the language. Every number below is a placeholder or a lecture value; replace it with your own data and cited sources.</p>
+<h2>Scope &amp; Format (15 pts)</h2>
+<ul>
+<li>Due <strong>Oct 20, 23:59</strong> on Canvas, as a PDF <strong>plus your GPX file</strong>. Late submissions lose 50%; nothing is accepted after 3 days.</li>
+<li>Formatting: 12 pt, single spacing, 1-inch margins. At most <strong>3 pages of text</strong> (calculations included), plus 1 page of figures/tables (max 3) and 1 page of references.</li>
+<li>At least <strong>one speed–time graph</strong> of your trip.</li>
+<li>Marks: presentation 4 · quality of work 8 · graphs/tables/references 3.</li>
+</ul>
+<h2>Before Writing: Collect the Data</h2>
+<ol>
+<li>Pick one bus, minibus or car ride (for example home → HKUST). It must stay above ground, so avoid the MTR (no GPS).</li>
+<li>Record it with GeoTracker (or similar) and export the <strong>GPX</strong>.</li>
+<li>Convert the GPX on the Canvas page &quot;GPS data conversion&quot; into a CSV of time, distance and speed.</li>
+<li>Write down the vehicle model, route number, the number of passengers on board (or an estimate), and the date and time.</li>
+</ol>
+<h2>1. Introduction (≈ 4–5 lines)</h2>
+<ul>
+<li>The trip: origin → destination, vehicle type and model, distance, duration.</li>
+<li>Research question: how much energy did the vehicle spend moving, compared with the fuel it burned, and what is my share?</li>
+<li>One line on the structure of the essay.</li>
+</ul>
+<h2>2. Methodology &amp; Data Collection</h2>
+<ul>
+<li>The app, how the GPX was converted, and the GPS sampling interval.</li>
+<li>How the trip is split into <strong>segments between stops</strong> (speed ≈ 0), and how the average speed of each segment is found.</li>
+<li>A list of the parameters you looked up, each with a citation [n]:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Where to look</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>m</mi><mi>c</mi></msub></mrow></math></td>
+<td>vehicle mass (kerb + passengers)</td>
+<td>manufacturer spec sheet; operator fleet page</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub></mrow></math></td>
+<td>drag coefficient</td>
+<td>spec sheet / engineering references (buses ≫ cars)</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math></td>
+<td>frontal area</td>
+<td>width × height from the spec sheet</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub></mrow></math></td>
+<td>rolling resistance</td>
+<td>Lecture 9 table (car tyre 0.010; truck tyre 0.007)</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi></mrow></math></td>
+<td>air density</td>
+<td>1.3 kg/m³ (Lecture 9)</td>
+</tr>
+<tr>
+<td>fuel use</td>
+<td>L/km or kWh/km</td>
+<td>operator / manufacturer data, government reports</td>
+</tr>
+<tr>
+<td>energy density</td>
+<td>kWh/L</td>
+<td>diesel ≈ 10 kWh/L (cite); for an EV, the battery kWh/km</td>
+</tr>
+</tbody>
+</table>
+<h2>3. Analysis (models, one equation per loss)</h2>
+<p>For each segment <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> (length <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mi>i</mi></msub></mrow></math>, average speed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>i</mi></msub></mrow></math>, one stop at the end):</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>E</mi><mrow><mi>d</mi><mi>r</mi><mi>a</mi><mi>g</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi><mtext> </mtext><msubsup><mi>v</mi><mi>i</mi><mn>2</mn></msubsup><mtext> </mtext><msub><mi>d</mi><mi>i</mi></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>E</mi><mrow><mi>r</mi><mi>o</mi><mi>l</mi><mi>l</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi><mtext> </mtext><msub><mi>d</mi><mi>i</mi></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>E</mi><mrow><mi>b</mi><mi>r</mi><mi>a</mi><mi>k</mi><mi>e</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><msub><mi>m</mi><mi>c</mi></msub><msubsup><mi>v</mi><mi>i</mi><mn>2</mn></msubsup><mspace width="1em"/><mo stretchy="false">(</mo><mtext>one stop</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>E</mi><mrow><mi>m</mi><mi>o</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mrow><mo fence="true">(</mo><msub><mi>E</mi><mrow><mi>d</mi><mi>r</mi><mi>a</mi><mi>g</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub><mo>+</mo><msub><mi>E</mi><mrow><mi>r</mi><mi>o</mi><mi>l</mi><mi>l</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub><mo>+</mo><msub><mi>E</mi><mrow><mi>b</mi><mi>r</mi><mi>a</mi><mi>k</mi><mi>e</mi><mo separator="true">,</mo><mi>i</mi></mrow></msub><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mspace width="2em"/><mn>1</mn><mtext> kWh</mtext><mo>=</mo><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mtext> J</mtext></mrow></math></div><ul>
+<li>Define every variable once, and state the assumptions: constant speed within a segment, every stop dissipates all kinetic energy, no regenerative braking (unless the vehicle has it), no gradient (or estimate <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mi>g</mi><mi>h</mi></mrow></math> from the elevation in the GPX).</li>
+<li>Fuel energy: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>E</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mo>=</mo><mo stretchy="false">(</mo><mtext>fuel per km</mtext><mo stretchy="false">)</mo><mo>×</mo><mo stretchy="false">(</mo><mtext>distance</mtext><mo stretchy="false">)</mo><mo>×</mo><mo stretchy="false">(</mo><mtext>energy density</mtext><mo stretchy="false">)</mo></mrow></math>.</li>
+</ul>
+<h2>4. Results</h2>
+<ul>
+<li><strong>Figure 1</strong>: speed vs time with the stops marked (required).</li>
+<li><strong>Table 1</strong>: per-segment <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mi>i</mi></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>i</mi></msub></mrow></math>, the three losses, and the totals.</li>
+<li>Report the following (your own numbers):
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>E</mi><mrow><mi>d</mi><mi>r</mi><mi>a</mi><mi>g</mi></mrow></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>E</mi><mrow><mi>r</mi><mi>o</mi><mi>l</mi><mi>l</mi></mrow></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>E</mi><mrow><mi>b</mi><mi>r</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub></mrow></math> and their shares of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>E</mi><mrow><mi>m</mi><mi>o</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>E</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></math> for the trip</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><msub><mi>E</mi><mrow><mi>m</mi><mi>o</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mi mathvariant="normal">/</mi><msub><mi>E</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow></math> (Lecture 9: a car is ≈ 22 %; compare yours)</li>
+<li>your share <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msub><mi>E</mi><mrow><mi>f</mi><mi>u</mi><mi>e</mi><mi>l</mi></mrow></msub><mi mathvariant="normal">/</mi><msub><mi>N</mi><mrow><mi>p</mi><mi>a</mi><mi>s</mi><mi>s</mi><mi>e</mi><mi>n</mi><mi>g</mi><mi>e</mi><mi>r</mi><mi>s</mi></mrow></msub></mrow></math>, in kWh per person and kWh/(p·km)</li>
+</ol>
+</li>
+</ul>
+<h2>5. Discussion</h2>
+<ul>
+<li>Which loss dominates, and why? Link it to your stop spacing and speed (Lecture 9: critical distance <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>d</mi><mi>c</mi></msub><mo>=</mo><msub><mi>m</mi><mi>c</mi></msub><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi><mo stretchy="false">)</mo></mrow></math>, critical speed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>v</mi><mo>=</mo><msqrt><mrow><mn>2</mn><msub><mi>C</mi><mrow><mi>r</mi><mi>r</mi></mrow></msub><msub><mi>m</mi><mi>c</mi></msub><mi>g</mi><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi><mo stretchy="false">)</mo></mrow></msqrt></mrow></math>).</li>
+<li>Compare your kWh/(p·km) with driving alone, the MTR, or walking/cycling (cite values).</li>
+<li>Sensitivity: how much do the results change if the passenger count or <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>d</mi></msub></mrow></math> is off by ±30 %?</li>
+<li>Limitations: GPS noise, average speed vs real acceleration, idling energy, air conditioning, gradient.</li>
+<li>Implication for your own travel habits (required).</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>Number them in the text ([1], [2] …); use the HKUST library style. Every looked-up number needs a source; give a justification for any value that has none.</li>
+</ul>
+<h2>Checklist Before Submitting</h2>
+<ul>
+<li>[ ] GPX uploaded with the PDF</li>
+<li>[ ] ≤ 3 text pages, 12 pt, single spacing, 1-inch margins</li>
+<li>[ ] speed–time graph labelled &quot;Figure 1&quot; and referred to in the text</li>
+<li>[ ] all five sections present</li>
+<li>[ ] every parameter cited or justified</li>
+<li>[ ] the share-per-person answer and the habit discussion are included</li>
+</ul>

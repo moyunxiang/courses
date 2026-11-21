@@ -1,0 +1,74 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>为什么要在 computer vision 里用 AI / CNN，以及典型应用。这一讲没有公式，是 5.2、5.3 的动机。</p>
+<blockquote>
+<p>考点：说出 CV 用 AI 的两个理由；典型任务是 object recognition；几个应用例子。</p>
+</blockquote>
+<h2>1 · 为什么 AI in Computer Vision</h2>
+<ol>
+<li><strong>一图胜千言</strong>（one picture worth a thousand words）——图像信息量巨大</li>
+<li><strong>大量的视频和图像数据</strong></li>
+</ol>
+<p><strong>典型任务</strong>：<strong>object recognition</strong>（识别物体和场景）。</p>
+<h2>2 · 进展与应用</h2>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Error rate</strong></td>
+<td>图像识别错误率逐年下降（深度 CNN 之后大幅下降）</td>
+</tr>
+<tr>
+<td><strong>Real-time object detection</strong></td>
+<td>实时检测图中多个物体（demo）</td>
+</tr>
+<tr>
+<td><strong>Self-driving trucks</strong></td>
+<td>MIT Technology Review 2017 十大突破技术之一</td>
+</tr>
+<tr>
+<td><strong>Face recognition</strong></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Paying with your face</strong></td>
+<td>2017 十大突破技术之一</td>
+</tr>
+<tr>
+<td><strong>Biometrics</strong></td>
+<td>更一般的生物特征识别</td>
+</tr>
+</tbody>
+</table>
+<h2>3 · 和后面内容的联系</h2>
+<ul>
+<li>图像是高维的（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo>×</mo><mi>W</mi><mo>×</mo><mi>C</mi></mrow></math>），全连接 MLP 参数太多 → 需要 <strong>sparse connectivity</strong> 和 <strong>parameter sharing</strong>（5.3）</li>
+<li>CNN 的核心运算是<strong>卷积</strong>（5.2）</li>
+</ul>
+<h2>4 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>两个理由</td>
+<td>一图胜千言；大量图像 / 视频</td>
+</tr>
+<tr>
+<td>典型任务</td>
+<td>object recognition</td>
+</tr>
+<tr>
+<td>应用</td>
+<td>detection、自动驾驶、人脸识别 / 支付、biometrics</td>
+</tr>
+</tbody>
+</table>

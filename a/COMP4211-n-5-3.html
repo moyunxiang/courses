@@ -1,0 +1,250 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Sparse connectivity</strong>、receptive field、feature hierarchy、growing receptive field</li>
+<li><strong>Shared weights / parameter sharing</strong>（平移鲁棒）</li>
+<li><strong>Convolutional layer</strong>：多个 feature map 沿 depth 叠起来；<strong>tensor view</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>×</mo><mn>1</mn></mrow></math> convolution</li>
+<li><strong>效率</strong>：参数共享大幅减少参数（课件 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>320</mn><mo>×</mo><mn>280</mn></mrow></math> 例）</li>
+<li><strong>Nonlinearity</strong>（ReLU）、<strong>padding</strong>、<strong>pooling</strong>、<strong>stride</strong></li>
+<li><strong>输出大小公式</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>H</mi><mtext>out</mtext></msub><mo>=</mo><mo stretchy="false">⌊</mo><mo stretchy="false">(</mo><msub><mi>H</mi><mtext>in</mtext></msub><mo>+</mo><mn>2</mn><mtext>pad</mtext><mo>−</mo><mi>K</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mtext>str</mtext><mo stretchy="false">⌋</mo><mo>+</mo><mn>1</mn></mrow></math>；网络组件；分类架构例</li>
+</ol>
+<blockquote>
+<p>必会计算：<strong>输出尺寸</strong>（三个课件例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>→</mo><mn>6</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>→</mo><mn>8</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>→</mo><mn>4</mn></mrow></math>）；<strong>参数量</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>o</mi></msub><mo>×</mo><msub><mi>C</mi><mi>i</mi></msub><mo>×</mo><msub><mi>K</mi><mi>h</mi></msub><mo>×</mo><msub><mi>K</mi><mi>w</mi></msub></mrow></math> + bias）；课件效率表（2 / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>8</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup></mrow></math> / 178,640）；架构例每层的尺寸（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>256</mn><mn>2</mn></msup><mo>×</mo><mn>3</mn><mo>→</mo><mo>⋯</mo><mo>→</mo><mn>16384</mn><mo>→</mo><mn>1000</mn></mrow></math>）。必会概念：为什么要 nonlinearity、padding、pooling；pooling 带来 spatial invariance；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>×</mo><mn>1</mn></mrow></math> conv 的用途。</p>
+</blockquote>
+<h2>1 · Sparse Connectivity</h2>
+<ul>
+<li>每个 hidden unit 只连到上一层的<strong>局部子集</strong>——它的 <strong>receptive field</strong></li>
+<li>对比全连接：每个输出连所有输入</li>
+</ul>
+<p><strong>Multi-channel inputs</strong>：彩色图有 RGB 三个通道，核也有三个通道，跨通道求和。</p>
+<p><strong>Feature hierarchy</strong>：低层学边缘 → 中层学部件 → 高层学物体（例：face recognition：边 → 眼鼻 → 脸）。</p>
+<p><strong>Growing receptive field</strong>：越深的层，间接覆盖的输入区域越大——深层单元能「看到」整张图。</p>
+<h2>2 · Shared Weights / Parameter Sharing</h2>
+<ul>
+<li>每个局部 receptive field 在<strong>整张图上复制</strong>；同色的权重<strong>共享</strong>（约束为相同）</li>
+<li>好处：<strong>不管特征出现在图中哪个位置都能检测到</strong> ⇒ 对输入的<strong>平移鲁棒</strong>（robustness to shifts）</li>
+</ul>
+<h2>3 · Convolutional Layer</h2>
+<ul>
+<li><strong>多个 feature maps</strong> 看输入的同一区域（每个 filter 检测一种特征）</li>
+<li>把所有 filter 的 activation maps <strong>沿 depth 维叠起来</strong></li>
+</ul>
+<h3>3.1 Tensor view</h3>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>形状</th>
+<th>课件例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Feature map（3-D tensor）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo>×</mo><mi>H</mi><mo>×</mo><mi>W</mi></mrow></math></td>
+<td>输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>64</mn><mo>×</mo><mn>64</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Filters（4-D tensor）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>o</mi></msub><mo>×</mo><msub><mi>C</mi><mi>i</mi></msub><mo>×</mo><msub><mi>K</mi><mi>h</mi></msub><mo>×</mo><msub><mi>K</mi><mi>w</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn><mo>×</mo><mn>3</mn><mo>×</mo><mn>3</mn><mo>×</mo><mn>3</mn></mrow></math></td>
+</tr>
+<tr>
+<td>输出</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>o</mi></msub><mo>×</mo><msub><mi>H</mi><mi>o</mi></msub><mo>×</mo><msub><mi>W</mi><mi>o</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn><mo>×</mo><mn>64</mn><mo>×</mo><mn>64</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi></mrow></math>：channels；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>o</mi></msub></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>i</mi></msub></mrow></math>：输出 / 输入通道；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>K</mi><mi>h</mi></msub><mo separator="true">,</mo><msub><mi>K</mi><mi>w</mi></msub></mrow></math>：filter 高宽。</p>
+<p><strong>参数量</strong>（补充）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn><mo>×</mo><mn>3</mn><mo>×</mo><mn>3</mn><mo>×</mo><mn>3</mn><mo>=</mo><mn>432</mn></mrow></math> 个权重 + 16 个 bias = 448。</p>
+<h3>3.2 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>×</mo><mn>1</mn></mrow></math> convolution</h3>
+<ul>
+<li>卷积时<strong>不看邻近像素</strong>（只在通道间做线性组合）</li>
+<li>用于 <strong>dimension reduction</strong>（减少通道数）</li>
+</ul>
+<h2>4 · 卷积的效率</h2>
+<p>课件例：输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>320</mn><mo>×</mo><mn>280</mn></mrow></math>，核 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>1</mn></mrow></math>（相邻两像素相减，检测边缘），输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>319</mn><mo>×</mo><mn>280</mn></mrow></math>。</p>
+<table>
+<thead>
+<tr>
+<th>实现</th>
+<th>存储的浮点数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Convolution</strong></td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td>Dense matrix</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>319</mn><mo>⋅</mo><mn>280</mn><mo>⋅</mo><mn>320</mn><mo>⋅</mo><mn>280</mn><mo>&gt;</mo><mn>8</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>Sparse matrix</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>⋅</mo><mn>319</mn><mo>⋅</mo><mn>280</mn><mo>=</mo><mn>178,640</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>参数共享</strong>极大减少了要学的自由参数。</p>
+</blockquote>
+<p>（核验：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>319</mn><mo>×</mo><mn>280</mn><mo>=</mo><mn>89,320</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>320</mn><mo>×</mo><mn>280</mn><mo>=</mo><mn>89,600</mn></mrow></math>，乘积 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≈</mo><mn>8.0</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup></mrow></math> ✓。）</p>
+<h2>5 · Nonlinearity</h2>
+<ul>
+<li><strong>卷积是线性运算</strong> ⇒ 需要非线性；否则 2 个卷积层不比 1 个强（同 4.4 的论证）</li>
+<li>常用 <strong>ReLU</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>z</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h2>6 · Padding</h2>
+<p><strong>不 padding</strong>：每层表示都会<strong>缩小</strong>，限制了层数。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>H</mi><mtext>out</mtext></msub><mo>=</mo><msub><mi>H</mi><mtext>in</mtext></msub><mo>−</mo><msub><mi>K</mi><mi>h</mi></msub><mo>+</mo><mn>1</mn><mspace width="2em"/><mtext>（例：</mtext><mn>8</mn><mo>×</mo><mn>8</mn><mtext> 输入，</mtext><mn>3</mn><mo>×</mo><mn>3</mn><mtext> 核 → </mtext><mn>6</mn><mo>×</mo><mn>6</mn><mtext>）</mtext></mrow></math></div><p><strong>Zero-padding</strong>：每层在边缘补 0 ⇒ 可以用任意深的卷积网络。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>H</mi><mtext>out</mtext></msub><mo>=</mo><msub><mi>H</mi><mtext>in</mtext></msub><mo>+</mo><mn>2</mn><msub><mtext>pad</mtext><mi>h</mi></msub><mo>−</mo><msub><mi>K</mi><mi>h</mi></msub><mo>+</mo><mn>1</mn><mspace width="2em"/><mtext>（例：</mtext><mn>8</mn><mo>×</mo><mn>8</mn><mtext>，pad 1，</mtext><mn>3</mn><mo>×</mo><mn>3</mn><mtext> → </mtext><mn>8</mn><mo>×</mo><mn>8</mn><mtext>）</mtext></mrow></math></div><h2>7 · Pooling</h2>
+<p><strong>动机</strong>：一旦检测到特征，只有它<strong>相对于其他特征的大致位置</strong>才重要。</p>
+<p>课件例：数字 7 的图像包含 (1) 左上方一段近似水平线段的端点、(2) 右上方一个角、(3) 下方一段近似竖直线段的端点——不同人写的 7 这些位置会变 ⇒ 需要 <strong>spatial invariance</strong>。</p>
+<ul>
+<li><strong>Max-pooling</strong>：每个子区域（如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math>）输出最大值</li>
+<li>也有 <strong>average pooling</strong></li>
+</ul>
+<p><strong>Pooling with downsampling</strong>（stride 2）：表示尺寸减半；减少下一层的<strong>计算和统计负担</strong>。</p>
+<p><strong>补充算例</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></math> max-pool stride 2 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math>。</p>
+<h2>8 · Stride 与输出尺寸公式</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>H</mi><mtext>out</mtext></msub><mo>=</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">⌊</mo><mfrac><mrow><msub><mi>H</mi><mtext>in</mtext></msub><mo>+</mo><mn>2</mn><msub><mtext>pad</mtext><mi>h</mi></msub><mo>−</mo><msub><mi>K</mi><mi>h</mi></msub></mrow><mtext>str</mtext></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">⌋</mo><mo>+</mo><mn>1</mn></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>课件例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mo>×</mo><mn>8</mn></mrow></math> 输入，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow></math> filter，stride 2（pad 1）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⌊</mo><mo stretchy="false">(</mo><mn>8</mn><mo>+</mo><mn>2</mn><mo>−</mo><mn>3</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">⌋</mo><mo>+</mo><mn>1</mn><mo>=</mo><mo stretchy="false">⌊</mo><mn>3.5</mn><mo stretchy="false">⌋</mo><mo>+</mo><mn>1</mn><mo>=</mo><mn>4</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>×</mo><mn>4</mn></mrow></math>。</p>
+<table>
+<thead>
+<tr>
+<th>输入</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math></th>
+<th>pad</th>
+<th>stride</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>0</td>
+<td>1</td>
+<td>6</td>
+</tr>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>8</td>
+</tr>
+<tr>
+<td>8</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<h2>9 · 网络组件与架构</h2>
+<p><strong>一个卷积层</strong>（complex layer terminology）= convolution stage（affine transform）→ detector stage（nonlinearity，如 ReLU）→ pooling stage。（simple layer terminology 把这三个各算一层。）</p>
+<p><strong>课件分类架构例</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>输出尺寸</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input image</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>256</mn><mo>×</mo><mn>256</mn><mo>×</mo><mn>3</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Convolution + ReLU</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>256</mn><mo>×</mo><mn>256</mn><mo>×</mo><mn>64</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Pooling, stride 4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>64</mn><mo>×</mo><mn>64</mn><mo>×</mo><mn>64</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Convolution + ReLU</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>64</mn><mo>×</mo><mn>64</mn><mo>×</mo><mn>64</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Pooling, stride 4</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn><mo>×</mo><mn>16</mn><mo>×</mo><mn>64</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Reshape to vector</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>16</mn><mo>×</mo><mn>16</mn><mo>×</mo><mn>64</mn><mo>=</mo><mn>16,384</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Matrix multiply</td>
+<td>1,000</td>
+</tr>
+<tr>
+<td>Softmax</td>
+<td>1,000 class probabilities</td>
+</tr>
+</tbody>
+</table>
+<p><strong>典型结构</strong>：低层是<strong>交替的卷积和 max-pooling 层</strong>；最后是<strong>全连接层</strong>（传统 MLP）；输出用 classification error / cross-entropy 训练。</p>
+<h2>10 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sparse connectivity</td>
+<td>receptive field；growing receptive field</td>
+</tr>
+<tr>
+<td>Parameter sharing</td>
+<td>好处：平移鲁棒、参数少</td>
+</tr>
+<tr>
+<td>Tensor view</td>
+<td>形状；参数量公式</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>×</mo><mn>1</mn></mrow></math> conv</td>
+<td>通道降维</td>
+</tr>
+<tr>
+<td>效率表</td>
+<td>2 / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>8</mn><mo>×</mo><msup><mn>10</mn><mn>9</mn></msup></mrow></math> / 178,640</td>
+</tr>
+<tr>
+<td>Nonlinearity</td>
+<td>线性叠加无用</td>
+</tr>
+<tr>
+<td>Padding</td>
+<td>为什么；公式</td>
+</tr>
+<tr>
+<td>Pooling</td>
+<td>动机（数字 7）；max / average；stride 降采样</td>
+</tr>
+<tr>
+<td>尺寸公式</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">⌊</mo><mo stretchy="false">(</mo><mi>H</mi><mo>+</mo><mn>2</mn><mi>p</mi><mo>−</mo><mi>K</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>s</mi><mo stretchy="false">⌋</mo><mo>+</mo><mn>1</mn></mrow></math>；三个例子</td>
+</tr>
+<tr>
+<td>架构</td>
+<td>每层尺寸；16,384</td>
+</tr>
+</tbody>
+</table>
+<h2>11 · 易错点</h2>
+<ul>
+<li>尺寸公式里 padding 是 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo></mrow></math>pad</strong>（两边），stride 除完要<strong>向下取整</strong>再 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math>。</li>
+<li>参数量与输入的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo separator="true">,</mo><mi>W</mi></mrow></math> <strong>无关</strong>，只和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>o</mi></msub><mo separator="true">,</mo><msub><mi>C</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>K</mi><mi>h</mi></msub><mo separator="true">,</mo><msub><mi>K</mi><mi>w</mi></msub></mrow></math> 有关。</li>
+<li>Pooling <strong>没有</strong>可学习参数。</li>
+<li>Stride 4 的 pooling 让每边缩小 4 倍（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>256</mn><mo>→</mo><mn>64</mn></mrow></math>）。</li>
+<li>Flatten 后的长度 = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo>×</mo><mi>W</mi><mo>×</mo><mi>C</mi></mrow></math>。</li>
+</ul>

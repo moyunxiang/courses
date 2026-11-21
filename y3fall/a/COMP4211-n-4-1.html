@@ -1,0 +1,119 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>生物神经元</strong>：dendrite、soma、axon、synapse；信号如何传递</li>
+<li><strong>人工神经网络</strong>：用大量简单计算单元组成的网络来模拟大脑</li>
+<li><strong>结构三要素</strong>：unit、link、weight；unit 分 input / hidden / output</li>
+<li><strong>学习 = 更新权重</strong>；<strong>feedforward vs feedback</strong></li>
+</ol>
+<blockquote>
+<p>这一讲是概念铺垫，考点主要是名词对应：生物 ↔ 人工的对应关系；三种 unit；学习改的是什么；feedforward 与 feedback 的区别。</p>
+</blockquote>
+<h2>1 · 生物神经元</h2>
+<ul>
+<li>人脑约 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mn>11</mn></msup></mrow></math>（100,000,000,000）个神经元；每个神经元接收约 <strong>1,000</strong> 个其他神经元的输入</li>
+<li>结构：<strong>dendrite</strong>（树突，接收）→ <strong>cell body / soma</strong>（胞体，含 nucleus）→ <strong>axon</strong>（轴突，输出）→ <strong>axonal arborization</strong> → <strong>synapse</strong>（突触，连接下一个细胞）</li>
+</ul>
+<p><strong>信号传递</strong>：</p>
+<ol>
+<li>多个脉冲<strong>同时</strong>到达</li>
+<li><strong>相加</strong></li>
+<li>足够强时，沿 axon 发出电脉冲</li>
+<li>到达 synapses，向其他细胞释放 transmitters</li>
+</ol>
+<h2>2 · 人工神经网络</h2>
+<blockquote>
+<p>用由<strong>简单计算单元</strong>组成的<strong>复杂网络</strong>作为数学模型，模仿大脑的功能。</p>
+</blockquote>
+<p><strong>结构三要素</strong>：(i) <strong>unit</strong>、(ii) <strong>link</strong>、(iii) <strong>weight</strong></p>
+<p>课件示意：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>I</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>I</mi><mn>2</mn></msub></mrow></math>（input）→ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>H</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>H</mi><mn>4</mn></msub></mrow></math>（hidden）→ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>O</mi><mn>5</mn></msub></mrow></math>（output），权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>13</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>14</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>23</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>24</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>35</mn></msub><mo separator="true">,</mo><msub><mi>w</mi><mn>45</mn></msub></mrow></math>。</p>
+<p><strong>Unit 类型</strong>：input units、hidden units、output units。</p>
+<table>
+<thead>
+<tr>
+<th>生物</th>
+<th>人工</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>神经元</td>
+<td>unit</td>
+</tr>
+<tr>
+<td>synapse 强度</td>
+<td>weight <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow></math></td>
+</tr>
+<tr>
+<td>脉冲相加</td>
+<td>加权求和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mi>j</mi></msub><msub><mi>w</mi><mi>j</mi></msub><msub><mi>I</mi><mi>j</mi></msub></mrow></math></td>
+</tr>
+<tr>
+<td>足够强才发放</td>
+<td>activation（threshold）function</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例子</strong>：deep learning。</p>
+<h2>3 · 学习</h2>
+<blockquote>
+<p>学习通常通过<strong>更新权重</strong>进行。</p>
+</blockquote>
+<p>Demo：TensorFlow Playground。</p>
+<h2>4 · Feedforward vs Feedback</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>连接</th>
+<th>输出依赖</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Feedforward</strong></td>
+<td>只从输入往输出方向，无环</td>
+<td>只依赖当前输入</td>
+</tr>
+<tr>
+<td><strong>Feedback</strong>（recurrent）</td>
+<td>有环，输出 / 状态回传</td>
+<td>也依赖之前的状态（见第 6 讲 RNN）</td>
+</tr>
+</tbody>
+</table>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>生物神经元</td>
+<td>四个部件；信号传递四步</td>
+</tr>
+<tr>
+<td>结构三要素</td>
+<td>unit / link / weight</td>
+</tr>
+<tr>
+<td>Unit 类型</td>
+<td>input / hidden / output</td>
+</tr>
+<tr>
+<td>学习</td>
+<td>更新 weights</td>
+</tr>
+<tr>
+<td>Feedforward / feedback</td>
+<td>有无环</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 易错点</h2>
+<ul>
+<li>学习改的是 <strong>weight</strong>，不是网络结构。</li>
+<li>Feedback 网络 = 有环（RNN）；feedforward 无环（perceptron、MLP、CNN）。</li>
+</ul>

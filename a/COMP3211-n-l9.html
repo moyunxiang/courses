@@ -1,0 +1,414 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap：Introduction to Local Search → <strong>Hill Climbing</strong> → <strong>Simulated Annealing</strong> → <strong>Local Beam Search</strong> → <strong>Genetic Algorithm</strong></p>
+<p><strong>Administrative</strong>：Mid-term exam <strong>Wednesday, Oct. 28, 7pm–10pm</strong>（系里已确认）。</p>
+<blockquote>
+<p>必考：local search 和之前的搜索有什么不同（只要 goal、complete states、常数内存）；hill climbing 为什么会卡住（local maxima、plateau、shoulder）；simulated annealing 接受坏步的概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></msup></mrow></math> 以及 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 大 / 小时的行为；local beam search 和「K 个独立搜索」的区别；<strong>genetic algorithm 手算</strong>：fitness（不互相攻击的 queen 对数，最大 28）、比例、single / two-point crossover、mutation。</p>
+</blockquote>
+<h2>1 · 回顾：CSP</h2>
+<ul>
+<li><strong>CSP</strong>：variables、domains、constraints
+<ul>
+<li><strong>Implicit</strong>（用函数 / 代码判断）、<strong>Explicit</strong>（列出合法 tuple）</li>
+<li>Unary / Binary / High-order</li>
+</ul>
+</li>
+<li><strong>Goals</strong>：这里是找<strong>任意一个</strong>满足全部约束的「complete」configuration；也可以是找全部、找最好的等</li>
+<li><strong>Backtracking = DFS + One-variable-at-a-time + Violation-checking</strong></li>
+<li><strong>Ordering</strong>：MRV（下一个赋值哪个变量）、LCV（按什么顺序试值）；两者结合让 1000-queens 可解</li>
+<li><strong>Filtering</strong>：forward checking（已赋值 → 未赋值）、arc consistency（未赋值之间，及早发现失败）</li>
+</ul>
+<h2>2 · Local Search 的动机</h2>
+<blockquote>
+<p><strong>Motivation of local search</strong></p>
+<ul>
+<li>很多优化问题里，<strong>path is irrelevant；the goal state itself is the solution</strong>
+<ul>
+<li>n-queens：找满足约束的 configuration（任意两个 queen 不同行、同列、同对角线）</li>
+<li><strong>TSP</strong>（travelling salesperson problem）：找<strong>最优</strong> configuration（每个城市只访问一次的最短回路）</li>
+<li><strong>State space = 一组「complete」configurations</strong></li>
+</ul>
+</li>
+<li>这时可以用 <strong>iterative improvement（local search）</strong>：<strong>keep a single &quot;current&quot; state, try to improve it</strong></li>
+</ul>
+</blockquote>
+<h3>2.1 例：n-queens</h3>
+<ul>
+<li><strong>Basic idea</strong>：
+<ul>
+<li>先给<strong>所有变量</strong>赋值（从 complete configuration 出发）</li>
+<li>再用 <strong>modification operators</strong> 把 configuration 往解的方向移，例如把一个有冲突的 queen <strong>移到同一列的另一格</strong></li>
+</ul>
+</li>
+<li>目标：move a queen to <strong>reduce number of conflicts（attacks）</strong></li>
+</ul>
+<h3>2.2 Local search 的特点</h3>
+<ul>
+<li>只维护<strong>一个 current node</strong>，一般只移动到它的 <strong>neighbors</strong></li>
+<li><strong>Very little memory</strong>（通常是常数）</li>
+<li>在很大的 state space 里也常常能找到<strong>还不错的解</strong></li>
+</ul>
+<p><strong>和 L6–L8 的对比</strong>：之前的搜索要维护 frontier、记录路径，保证找到（最优）解；local search 不记路径、不保证最优，但省内存、能处理巨大的空间。</p>
+<h2>3 · Hill Climbing</h2>
+<h3>3.1 思路</h3>
+<ul>
+<li><strong>Start</strong> wherever（任意起点）</li>
+<li><strong>Repeat</strong>：move to the <strong>best</strong> neighboring state</li>
+<li>If no neighbors better than current, <strong>quit</strong></li>
+<li><strong>only look at immediate neighbors</strong></li>
+</ul>
+<h3>3.2 算法</h3>
+<pre><code class="language-text">function HILL-CLIMBING(problem) returns a state that is a local maximum
+  inputs: problem, a problem
+  local variables: current, a node
+                   neighbor, a node
+  current &lt;- MAKE-NODE(INITIAL-STATE[problem])
+  loop do
+    neighbor &lt;- a highest-valued successor of current
+    if VALUE[neighbor] &lt;= VALUE[current] then return STATE[current]
+    current &lt;- neighbor
+  end
+</code></pre>
+<p>注意返回的是 <strong>local maximum</strong>：邻居都不比自己好就停，不管是不是全局最好。</p>
+<h3>3.3 State space landscape</h3>
+<p>横轴 state space，纵轴 objective function：</p>
+<ul>
+<li><strong>Global maximum</strong>：整个图最高点</li>
+<li><strong>Local maximum</strong>：比周围都高、但不是最高</li>
+<li><strong>Problem</strong>：会<strong>卡在 local maxima</strong>（not optimal），而且<strong>起点非常关键</strong></li>
+<li><strong>Flat local maximum</strong> 和 <strong>shoulder</strong>（平台但之后还能上升）都是 <strong>plateaus</strong>（平坦区域）：hill climbing 在 plateau 上找不到「更好」的邻居，会迷路（<strong>not complete</strong>）</li>
+</ul>
+<h3>3.4 8-queens 的例子</h3>
+<ul>
+<li>左图：一个 8-queens state，heuristic cost（互相攻击的 queen 对数）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>17</mn></mrow></math>。每格的数字是「把该列的 queen 移到这里后的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math>」；<strong>最好的几步都是 12</strong>。</li>
+<li>走 <strong>5 步</strong>后到右图：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>1</mn></mrow></math>，但<strong>每个 successor 的 cost 都更高</strong> → 这是一个 <strong>local minimum</strong>，hill climbing 卡在这里。</li>
+<li>结论：<strong>Hill climbing 在 n-queens 上可能到不了 goal state。</strong></li>
+</ul>
+<p>（这里是最小化 cost <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math>，所以叫 local minimum；和「最大化 objective」是同一件事反过来。）</p>
+<h3>3.5 怎么跳出 local optimum？</h3>
+<ul>
+<li><strong>Random restart</strong>（随机换个起点重来）：朴素的办法</li>
+<li>更好的办法？→ simulated annealing</li>
+</ul>
+<h2>4 · Simulated Annealing</h2>
+<h3>4.1 灵感</h3>
+<p><strong>Annealing（退火）</strong>：冶金里把金属或玻璃加热到高温，再<strong>慢慢冷却</strong>，让材料达到低能量的晶体状态。</p>
+<blockquote>
+<p><strong>Key idea</strong>：允许「<strong>bad</strong>」moves，概率取决于「<strong>temperature</strong>」</p>
+<ul>
+<li><strong>High temperature ⇒ more bad moves allowed</strong>，把系统从 local optimum 里「摇」出来</li>
+<li>按某个 <strong>schedule</strong> 逐渐降温</li>
+</ul>
+</blockquote>
+<h3>4.2 算法</h3>
+<pre><code class="language-text">function SIMULATED-ANNEALING(problem, schedule) returns a state
+  current &lt;- problem.initial-state
+  for t = 1 to infinity do
+    T &lt;- schedule(t)
+    if T = 0 then return current
+    next &lt;- a randomly selected successor of current
+    dE &lt;- next.value - current.value
+    if dE &gt; 0 then current &lt;- next
+    else current &lt;- next only with probability e^(dE/T)
+</code></pre>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mo>&gt;</mo><mn>0</mn></mrow></math>：next 更好 → <strong>一定接受</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mo>≤</mo><mn>0</mn></mrow></math>：next 更差（或一样）→ 以概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></msup></mrow></math> 接受</li>
+</ul>
+<p><strong>What is the range of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></msup></mrow></math>?</strong> —— <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>，因为这时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi><mo>≤</mo><mn>0</mn></mrow></math>。</p>
+<h3>4.3 温度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 的作用</h3>
+<ul>
+<li><strong>Large <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></math> 接近 0，概率接近 1 → 坏步<strong>很容易被接受</strong>（几乎随机游走）</li>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>→</mo><mn>0</mn></mrow></math></strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi><mo>→</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow></math>，概率 → 0 → 几乎不接受坏步，<strong>more or less like hill-climbing</strong></li>
+<li>坏得越多（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi></mrow></math> 越负），越不容易被接受</li>
+<li><strong>Can approximate global optimum if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> decreases slowly enough</strong></li>
+</ul>
+<p><strong>补充算例</strong>（帮助理解，课件没给数）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math> 时</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></msup></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>0.2</mn></mrow></msup><mo>≈</mo><mn>0.82</mn></mrow></math></td>
+</tr>
+<tr>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn></mrow></msup><mo>≈</mo><mn>0.14</mn></mrow></math></td>
+</tr>
+<tr>
+<td>0.1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>20</mn></mrow></msup><mo>≈</mo><mn>2</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>和 hill climbing 的区别</strong>：hill climbing 选<strong>最好</strong>的邻居、永不后退；SA 选<strong>随机</strong>的邻居，好的必接受、坏的按概率接受。</p>
+<h2>5 · Local Beam Search</h2>
+<blockquote>
+<p><strong>Basic idea</strong></p>
+<ul>
+<li>同时保留 <strong>K 份</strong> local search 的状态，随机初始化</li>
+<li>每轮：
+<ul>
+<li>从 K 个 current states 生成<strong>所有</strong> successors</li>
+<li>从这些 successors 里<strong>选最好的 K 个</strong>作为新的 current states</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p><strong>Why is this different from K local searches in parallel?</strong> —— <strong>The searches communicate!</strong></p>
+<ul>
+<li>K 个独立搜索：每条只管自己，差的那条一直在差的地方转。</li>
+<li>Beam search：K 个 state 的 successors <strong>放在一起比较</strong>，好区域的 successors 会挤掉差区域的——资源自动集中到有希望的地方。</li>
+</ul>
+<p><strong>What does this remind you of?</strong> —— <strong>Evolution!</strong>（→ genetic algorithm）</p>
+<h2>6 · Genetic Algorithm</h2>
+<h3>6.1 基本思路</h3>
+<ul>
+<li><strong>State 表示成有限字母表上的 string</strong>（数字、字母等）
+<ul>
+<li>8-queens：State = 8 个 queen 各自在哪一行，每列一个</li>
+<li>例：<code>[1, 6, 2, 5, 7, 4, 8, 3]</code>，或课件图里的 <code>86427531</code>（第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> 个数字 = 第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>i</mi></mrow></math> 列 queen 所在的行）</li>
+</ul>
+</li>
+<li><strong>Initialization</strong>：随机生成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 个 states（<strong>population</strong>）</li>
+<li><strong>Successor 由两个 parent states 组合产生</strong></li>
+<li><strong>Evaluation function（fitness function）</strong>：
+<ul>
+<li><strong>越好的 state 值越高</strong></li>
+<li>和 heuristic cost 方向相反，例如 8-queens 用<strong>不互相攻击的 queen 对数</strong></li>
+</ul>
+</li>
+<li>用「<strong>simulated evolution</strong>」产生下一代：<strong>random selection</strong>、<strong>crossover</strong>、<strong>random mutation</strong></li>
+</ul>
+<h3>6.2 完整手算例子（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mn>4</mn></mrow></math>，8-queens）</h3>
+<p><strong>Step A：Fitness</strong></p>
+<ul>
+<li>Fitness = <strong>number of non-attacking pairs of queens</strong></li>
+<li>min = 0，<strong>max <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mrow><mo fence="true">(</mo><mfrac linethickness="0px"><mn>8</mn><mn>2</mn></mfrac><mo fence="true">)</mo></mrow><mo>=</mo><mn>8</mn><mo>×</mo><mn>7</mn><mi mathvariant="normal">/</mi><mn>2</mn><mo>=</mo><mn>28</mn></mrow></math></strong>（8 个 queen 选 2 个的组合数；28 表示没有任何攻击，即是解）</li>
+</ul>
+<p><strong>Fitness proportion</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Pr</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>h</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mtext>Fitness</mtext><mo stretchy="false">(</mo><msub><mi>h</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mrow><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><mtext>Fitness</mtext><mo stretchy="false">(</mo><msub><mi>h</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow></math></div><table>
+<thead>
+<tr>
+<th>State</th>
+<th>Fitness</th>
+<th>比例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>24748552</td>
+<td>24</td>
+<td>24/78 = 31%</td>
+</tr>
+<tr>
+<td>32752411</td>
+<td>23</td>
+<td>23/78 = 29%</td>
+</tr>
+<tr>
+<td>24415124</td>
+<td>20</td>
+<td>20/78 = 26%</td>
+</tr>
+<tr>
+<td>32543213</td>
+<td>11</td>
+<td>11/78 = 14%</td>
+</tr>
+</tbody>
+</table>
+<p>（总和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>24</mn><mo>+</mo><mn>23</mn><mo>+</mo><mn>20</mn><mo>+</mo><mn>11</mn><mo>=</mo><mn>78</mn></mrow></math>）</p>
+<p><strong>Step B：Selection</strong></p>
+<ul>
+<li><strong>Fitness proportionate selection</strong>（<strong>roulette wheel selection</strong>，轮盘赌）：按上面的比例抽样</li>
+<li>好的个体可能被选好几次，差的可能一次都没选上</li>
+<li>课件抽到：32752411、24748552、32752411、24415124（32752411 被选了两次，32543213 没被选上）</li>
+</ul>
+<p><strong>Step C：Pairing</strong></p>
+<ul>
+<li>按概率独立抽样，每次抽一个当一个 parent，两次组成一对</li>
+<li>课件：(32752411, 24748552)、(32752411, 24415124)</li>
+</ul>
+<p><strong>Step D：Crossover</strong></p>
+<ul>
+<li>从两个 parent 各复制一部分，产生<strong>两个新 offspring</strong></li>
+<li><strong>Rationale</strong>：希望把好个体的优点组合起来</li>
+<li>课件第一对在第 3 位后切，第二对在第 5 位后切：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Parents</th>
+<th>切点</th>
+<th>Offspring</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>327 | 52411 与 247 | 48552</td>
+<td>第 3 位后</td>
+<td><strong>327</strong>48552、<strong>247</strong>52411</td>
+</tr>
+<tr>
+<td>32752 | 411 与 24415 | 124</td>
+<td>第 5 位后</td>
+<td><strong>32752</strong>124、<strong>24415</strong>411</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Single-point vs two-point crossover</strong>（课件另一组例子，parents 32752411、24748552）：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>切法</th>
+<th>Offspring</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single-point</td>
+<td>切一刀（第 3 位后），后半段互换</td>
+<td>32748552、24752411</td>
+</tr>
+<tr>
+<td>Two-point</td>
+<td>切两刀（第 3、5 位后），<strong>中间段</strong>互换</td>
+<td>32748411、24752552</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step E：Mutation</strong></p>
+<ul>
+<li>以一定概率随机改 string 里的某一位</li>
+<li>作用：保证搜索空间里<strong>没有状态的被访问概率为 0</strong>（<strong>increase variety</strong>）</li>
+<li>课件：32748552 → 3274815<strong>2</strong>（第 6 位 5→1）；24752411 不变；32752124 → 32<strong>2</strong>52124（第 3 位 7→2）；24415411 → 2441541<strong>7</strong>（第 8 位 1→7）</li>
+</ul>
+<h3>6.3 Summary of steps</h3>
+<ol>
+<li>Representing individuals（states）</li>
+<li>Generating an initial population（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> states）</li>
+<li>Applying a fitness function（quality of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> states）</li>
+<li>Selecting parents for pairing based on their fitness</li>
+<li>Crossover of parents to produce new generation</li>
+<li>Mutation of new generation to bring diversity</li>
+<li>Repeat step 3 to step 6 until solution is reached（iterative algorithm）</li>
+</ol>
+<p>整体：<strong>natural selection scheme（biologically inspired）</strong>——每步按 fitness 重新抽样（selection），两两 crossover 组合，再加 mutation 增加多样性。</p>
+<h3>6.4 Crossover 的效果</h3>
+<p>课件图：32752411 和 24748552 交叉得到 32748552——棋盘上看，左半边来自一个 parent、右半边来自另一个。<strong>Has the effect of &quot;jumping&quot; to a completely different new part of the search space（quite non-local optimization）</strong>。这和 hill climbing「只走一步到邻居」很不一样。</p>
+<h2>7 · Summary</h2>
+<ul>
+<li>很多 configuration 和 optimization 问题可以写成 local search</li>
+<li>四类算法：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hill-climbing</strong></td>
+<td>simple and general；会卡在 local maxima</td>
+</tr>
+<tr>
+<td><strong>Simulated annealing</strong></td>
+<td>靠 temperature 跳出 local optimum；降温够慢时可近似 global optimum</td>
+</tr>
+<tr>
+<td><strong>Local beam search</strong></td>
+<td>多个<strong>互相交流</strong>的搜索</td>
+</tr>
+<tr>
+<td><strong>Genetic algorithms</strong></td>
+<td>biologically inspired：select、pair、exchange（crossover）、mutate</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Many machine learning algorithms are local searches（gradient descent）!!</strong>——GD 就是在连续空间里沿着最陡方向「爬山」（下山）。</li>
+</ul>
+<h2>8 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local search 动机</td>
+<td>path 无关；complete configurations；单个 current state；常数内存</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>n-queens（满足约束）、TSP（最优）</td>
+</tr>
+<tr>
+<td>Hill climbing</td>
+<td>伪代码；best neighbor；没有更好就停</td>
+</tr>
+<tr>
+<td>Landscape</td>
+<td>global / local maximum、flat local maximum、shoulder、plateau</td>
+</tr>
+<tr>
+<td>8-queens 例子</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>17</mn></mrow></math> → 5 步 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>1</mn></mrow></math> 的 local minimum</td>
+</tr>
+<tr>
+<td>跳出 local optimum</td>
+<td>random restart；simulated annealing</td>
+</tr>
+<tr>
+<td>Simulated annealing</td>
+<td>伪代码；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mo>&gt;</mo><mn>0</mn></mrow></math> 接受；否则概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></msup><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 大 / 小</td>
+</tr>
+<tr>
+<td>Local beam search</td>
+<td>K 个状态、选全部 successors 中最好的 K；和并行 K 个搜索的区别</td>
+</tr>
+<tr>
+<td>GA 表示</td>
+<td>8 个数字表示每列 queen 的行</td>
+</tr>
+<tr>
+<td>Fitness</td>
+<td>non-attacking pairs，max 28；比例 24/78 = 31%</td>
+</tr>
+<tr>
+<td>Selection / pairing</td>
+<td>roulette wheel；好的可被选多次</td>
+</tr>
+<tr>
+<td>Crossover</td>
+<td>single-point、two-point，会手写 offspring</td>
+</tr>
+<tr>
+<td>Mutation</td>
+<td>为什么需要（避免零概率、增加多样性）</td>
+</tr>
+<tr>
+<td>GA 七步</td>
+<td>按顺序写出</td>
+</tr>
+</tbody>
+</table>
+<h2>9 · 易错点</h2>
+<ul>
+<li>Hill climbing 选的是<strong>最好的</strong>邻居；simulated annealing 选的是<strong>随机</strong>的邻居。</li>
+<li>SA 的接受概率是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></msup></mrow></math>，其中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi><mo>≤</mo><mn>0</mn></mrow></math>；不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi mathvariant="normal">Δ</mi><mi>E</mi><mi mathvariant="normal">/</mi><mi>T</mi></mrow></msup></mrow></math>（那会大于 1）。若题目是最小化 cost，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Δ</mi><mi>E</mi></mrow></math> 的符号要相应调整。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>→</mo><mn>0</mn></mrow></math> 时 SA 退化成（随机版的）hill climbing，不是随机游走；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 很大时才接近随机游走。</li>
+<li>Fitness 越大越好（和 cost <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi></mrow></math> 相反）；8-queens 的 fitness 最大值是 28，不是 8。</li>
+<li>Two-point crossover 交换的是<strong>中间段</strong>。</li>
+<li>Local beam search ≠ K 个独立的 hill climbing：它从<strong>所有</strong> successors 里统一选 K 个。</li>
+</ul>
