@@ -1,0 +1,172 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>第 2 章开头：<strong>linear transformation</strong>——向量空间之间「好」的映射。</p>
+<ol>
+<li>定义：保持加法和数乘</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math> 本身是 vector space；Hom / End 的叫法</li>
+<li><strong>T 由它在一组 basis 上的值唯一决定</strong></li>
+<li>例子：zero map、identity、restriction、inclusion、微分算子、Fourier 系数</li>
+<li>Worksheet 02 P1、P2：验证线性；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>≃</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>K</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ol>
+<blockquote>
+<p>必考：用定义验证一个映射是 linear（两条，或合并成一条）；「由 basis 的像唯一决定」的论证；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math> 的运算是怎么定义的。</p>
+</blockquote>
+<h2>1 · 动机</h2>
+<ul>
+<li><strong>Linear transformations = maps between vector spaces</strong></li>
+<li><strong>good：linear</strong> ← <strong>preserving algebraic structures of vector spaces</strong>（也叫 <strong>homomorphisms</strong>）</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>T</mi><mo>:</mo><mi><munder><mo><mi>V</mi></mo><mrow><mo stretchy="false">(</mo><mo>+</mo><mo separator="true">,</mo><mtext> </mtext><mo>⋅</mo><mo stretchy="false">)</mo></mrow></munder></mi><mo>⟶</mo><mi><munder><mo><mi>W</mi></mo><mrow><mo stretchy="false">(</mo><mo>+</mo><mo separator="true">,</mo><mtext> </mtext><mo>⋅</mo><mo stretchy="false">)</mo></mrow></munder></mi></mrow></math></div><ul>
+<li><strong>Rem</strong>：若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo separator="true">,</mo><mi>W</mi></mrow></math> finite dimensional ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> is just a matrix</strong>（L06 讲怎么对应）</li>
+</ul>
+<h2>2 · 定义</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo separator="true">,</mo><mi>W</mi></mrow></math> vector spaces over <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math>.</p>
+<blockquote>
+<p><strong>Def.</strong> A <strong>linear transformation</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> is a map（set map）<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>:</mo><mi>V</mi><mo>→</mo><mi>W</mi></mrow></math> s.t.</p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>=</mo><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>+</mo><mi>T</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi><mo>∈</mo><mi>V</mi></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>c</mi><mo>⋅</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mtext> </mtext><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>∈</mo><mi>K</mi></mrow></math></li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>：<strong>domain</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math>：<strong>target</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>Rem.</strong> Linearity <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext></mrow></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>c</mi><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>+</mo><mi>T</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi><mo>∈</mo><mi>V</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>∈</mo><mi>K</mi></mrow></math>.</p>
+</blockquote>
+<p><strong>注意左右两边的运算不一样</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math> 里的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 的加法，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>+</mo><mi>T</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math> 里的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> 的加法。</p>
+<p><strong>一个马上能推出的性质（讲义）</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mn>𝟎</mn><mo stretchy="false">)</mo><mo>=</mo><mn>𝟎</mn></mrow></math>。因为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mn>𝟎</mn><mo stretchy="false">)</mo><mo>=</mo><mi>T</mi><mo stretchy="false">(</mo><mn>0</mn><mo>⋅</mo><mn>𝟎</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>⋅</mo><mi>T</mi><mo stretchy="false">(</mo><mn>𝟎</mn><mo stretchy="false">)</mo><mo>=</mo><mn>𝟎</mn></mrow></math>。
+→ <strong>快速判断非线性</strong>：若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mn>𝟎</mn><mo stretchy="false">)</mo><mo mathvariant="normal">≠</mo><mn>𝟎</mn></mrow></math>，一定不是 linear（例如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mn>1</mn></mrow></math>）。</p>
+<h2>3 · <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math></h2>
+<blockquote>
+<p><strong>Def.</strong> The set of linear transformations from <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Prop.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math> is a vector space by：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo separator="true">,</mo><mi>T</mi><mo>∈</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>𝐯</mi><mo>∈</mo><mi>V</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>∈</mo><mi>K</mi></mrow></math></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>S</mi><mo>+</mo><mi>T</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>:</mo><mo>=</mo><mi>S</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>+</mo><mi>T</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>⋅</mo><mi>S</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>:</mo><mo>=</mo><mi>c</mi><mo>⋅</mo><mi>S</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>zero element：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>:</mo><mo>=</mo><mn>𝟎</mn><mo>∈</mo><mi>W</mi></mrow></math></li>
+</ul>
+</blockquote>
+<p>（左边的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⋅</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math> 里<strong>新定义的</strong>运算；右边的是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math> 里的运算。）</p>
+<p><strong>为什么 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>+</mo><mi>T</mi></mrow></math> 还是 linear？（补充）</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mi>S</mi><mo>+</mo><mi>T</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>c</mi><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>S</mi><mo stretchy="false">(</mo><mi>c</mi><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>+</mo><mi>T</mi><mo stretchy="false">(</mo><mi>c</mi><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>c</mi><mi>S</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>+</mo><mi>S</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>+</mo><mi>c</mi><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>+</mo><mi>T</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>c</mi><mo stretchy="false">(</mo><mi>S</mi><mo>+</mo><mi>T</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mi>S</mi><mo>+</mo><mi>T</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><blockquote>
+<p><strong>Rem.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math> is also called <strong>homomorphism</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Hom</mtext><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math> is also called <strong>endomorphism</strong>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>End</mtext><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math>.</p>
+</blockquote>
+<h2>4 · 由 basis 的像唯一决定</h2>
+<blockquote>
+<p><strong>Prop.</strong> Any <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>∈</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math> is <strong>uniquely determined by image of a basis of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math></strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>T</mi><mo stretchy="false">(</mo><msub><mi>𝐛</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>:</mo><msub><mi>𝐛</mi><mi>i</mi></msub><mo>∈</mo><mi>ℬ</mi><mo stretchy="false">}</mo></mrow></math>.</p>
+</blockquote>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>T</mi><mo stretchy="false">(</mo><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐛</mi><mn>1</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>n</mi></msub><msub><mi>𝐛</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>c</mi><mn>1</mn></msub><mi>T</mi><mo stretchy="false">(</mo><msub><mi>𝐛</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>n</mi></msub><mi>T</mi><mo stretchy="false">(</mo><msub><mi>𝐛</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>怎么理解</strong>：</p>
+<ul>
+<li>每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi></mrow></math> 唯一写成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐛</mi><mn>1</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>c</mi><mi>n</mi></msub><msub><mi>𝐛</mi><mi>n</mi></msub></mrow></math>（unique representation）</li>
+<li>由线性，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math> 完全由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><msub><mi>𝐛</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>T</mi><mo stretchy="false">(</mo><msub><mi>𝐛</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></math> 和系数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>c</mi><mi>i</mi></msub></mrow></math> 决定</li>
+<li>所以两个线性映射若在 basis 上一致，就处处相等</li>
+<li><strong>反过来（讲义）</strong>：随便指定 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><msub><mi>𝐛</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msub><mi>𝐰</mi><mi>i</mi></msub></mrow></math>（任意 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐰</mi><mi>i</mi></msub><mo>∈</mo><mi>W</mi></mrow></math>），按上式扩展就得到一个 linear map</li>
+<li>这就是「线性映射 = 矩阵」的根源：矩阵的列就是 basis 的像</li>
+</ul>
+<h2>5 · 例子</h2>
+<table>
+<thead>
+<tr>
+<th>例子</th>
+<th>定义</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Zero map</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi><mo>:</mo><mi>V</mi><mo>→</mo><mi>W</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi><mo>↦</mo><mn>𝟎</mn></mrow></math></td>
+<td>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>↦</mo></mrow></math> 读作 maps to）</td>
+</tr>
+<tr>
+<td><strong>Identity map</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo>:</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>:</mo><mo>=</mo><mi>𝐯</mi></mrow></math></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Restriction</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi><mo>⊂</mo><mi>V</mi></mrow></math> subspace，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>∈</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><msub><mi mathvariant="normal">∣</mi><mi>U</mi></msub><mo>∈</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>U</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>↦</mo><mi>T</mi><mo stretchy="false">(</mo><mi>𝐮</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>∈</mo><mi>U</mi></mrow></math> 当成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 里的向量</td>
+</tr>
+<tr>
+<td><strong>Inclusion</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi><msub><mi mathvariant="normal">∣</mi><mi>U</mi></msub><mo>∈</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>U</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>∈</mo><mi>U</mi><mo>↦</mo><mi>𝐮</mi><mo>∈</mo><mi>V</mi></mrow></math></td>
+<td>记作 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi><mo>↪</mo><mi>V</mi></mrow></math></td>
+</tr>
+<tr>
+<td><strong>Differential operator</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>f</mi><mo>+</mo><mi>g</mi><msup><mo stretchy="false">)</mo><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><msup><mi>g</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>c</mi><mi>f</mi><msup><mo stretchy="false">)</mo><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mi>c</mi><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Fourier series</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mi>π</mi><mo stretchy="false">]</mo></mrow></math> 上 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>↦</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>n</mi></msub><mo>:</mo><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mrow><mn>2</mn><mi>π</mi></mrow></msubsup><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>cos</mi><mo>⁡</mo><mi>n</mi><mi>t</mi><mtext> </mtext><mi>d</mi><mi>t</mi></mrow></math></td>
+<td>积分是线性的</td>
+</tr>
+</tbody>
+</table>
+<p>Fourier 例子的线性：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>∫</mo><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mi>g</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>cos</mi><mo>⁡</mo><mi>n</mi><mi>t</mi><mtext> </mtext><mi>d</mi><mi>t</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>∫</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>cos</mi><mo>⁡</mo><mi>n</mi><mi>t</mi><mtext> </mtext><mi>d</mi><mi>t</mi><mo>+</mo><mo>∫</mo><mi>g</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>cos</mi><mo>⁡</mo><mi>n</mi><mi>t</mi><mtext> </mtext><mi>d</mi><mi>t</mi></mrow></mstyle></mtd></mtr></mtable></math></div><p>数乘同理（etc.）。</p>
+<h2>6 · Worksheet 02</h2>
+<h3>P1（Example 2.4、2.5）：验证是 linear transformation</h3>
+<p><strong>(a) Evaluation</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mtext>Ev</mtext><msub><mi>t</mi><mn>0</mn></msub></msub><mo>:</mo><msub><mi>K</mi><mi>n</mi></msub><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo>→</mo><mi>K</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>↦</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math>（在固定的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mn>0</mn></msub><mo>∈</mo><mi>K</mi></mrow></math> 处取值）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>Ev</mtext><mo stretchy="false">(</mo><mi>p</mi><mo>+</mo><mi>q</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mi>p</mi><mo>+</mo><mi>q</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>+</mo><mi>q</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext>Ev</mtext><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo><mo>+</mo><mtext>Ev</mtext><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>Ev</mtext><mo stretchy="false">(</mo><mi>c</mi><mo>⋅</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mi>c</mi><mo>⋅</mo><mi>p</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>c</mi><mo>⋅</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mo>⋅</mo><mtext>Ev</mtext><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>(b) Trace</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Tr</mtext><mo>:</mo><msub><mi>M</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msub><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo><mo>→</mo><mi>K</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Tr</mtext><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>:</mo><mo>=</mo><msub><mi>a</mi><mn>11</mn></msub><mo>+</mo><msub><mi>a</mi><mn>22</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>a</mi><mrow><mi>n</mi><mi>n</mi></mrow></msub></mrow></math>（sum the diagonal entries）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>Tr</mtext><mo stretchy="false">(</mo><mi>A</mi><mo>+</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mn>11</mn></msub><mo>+</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="false">)</mo><mo>+</mo><mo>⋯</mo><mo>+</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mrow><mi>n</mi><mi>n</mi></mrow></msub><mo>+</mo><msub><mi>b</mi><mrow><mi>n</mi><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mn>11</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>a</mi><mrow><mi>n</mi><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mo stretchy="false">(</mo><msub><mi>b</mi><mn>11</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>b</mi><mrow><mi>n</mi><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext>Tr</mtext><mi>A</mi><mo>+</mo><mtext>Tr</mtext><mi>B</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>Tr</mtext><mo stretchy="false">(</mo><mi>c</mi><mi>A</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>c</mi><msub><mi>a</mi><mn>11</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><mi>c</mi><msub><mi>a</mi><mrow><mi>n</mi><mi>n</mi></mrow></msub><mo>=</mo><mi>c</mi><mtext> </mtext><mtext>Tr</mtext><mi>A</mi></mrow></mstyle></mtd></mtr></mtable></math></div><h3>P2：canonical isomorphism <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>≃</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>K</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math></h3>
+<p>（canonical = <strong>不依赖 basis 的选取</strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 可以是无穷维。isomorphism 的定义见 L06。）</p>
+<p><strong>关键观察</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>K</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math> 里的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 由 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> 被送到哪里</strong>决定：若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>↦</mo><mi>𝐯</mi></mrow></math>，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mi>c</mi><mo>⋅</mo><mn>1</mn><mo>↦</mo><mi>c</mi><mi>𝐯</mi></mrow></math>。（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>1</mn><mo stretchy="false">}</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 的 basis，用第 4 节。）</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">Φ</mi><mo>:</mo><mi>V</mi><mo>→</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>K</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>𝐯</mi><mo>↦</mo><mo stretchy="false">(</mo><mi>T</mi><mo>:</mo><mn>1</mn><mo>↦</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>linear</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo>↦</mo><mo stretchy="false">(</mo><mi>T</mi><mo>:</mo><mn>1</mn><mo>↦</mo><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>↦</mo><mi>𝐮</mi><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>↦</mo><mi>𝐯</mi><mo stretchy="false">)</mo></mrow></math>，etc.</li>
+<li><strong>injective</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>K</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math> 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math> 就是 zero map <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>↦</mo><mn>𝟎</mn><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Φ</mi><mo stretchy="false">(</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>=</mo><mi>O</mi><mtext>  </mtext><mo>⟺</mo><mtext>  </mtext><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow></math>，即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Ker</mtext><mtext> </mtext><mi mathvariant="normal">Φ</mi><mo>=</mo><mo stretchy="false">{</mo><mn>𝟎</mn><mo stretchy="false">}</mo></mrow></math></li>
+<li><strong>surjective</strong> ✓：任何 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>∈</mo><mi>ℒ</mi><mo stretchy="false">(</mo><mi>K</mi><mo separator="true">,</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></math> 都等于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Φ</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<p>整个构造没有用到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 的 basis → canonical。</p>
+<h2>7 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定义</td>
+<td>两条 / 合并一条；domain、target</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mn>𝟎</mn><mo stretchy="false">)</mo><mo>=</mo><mn>𝟎</mn></mrow></math></td>
+<td>推导；用来快速排除</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>加法、数乘、零元的定义；为什么还是 linear</td>
+</tr>
+<tr>
+<td>Hom / End</td>
+<td>名称</td>
+</tr>
+<tr>
+<td>Basis 决定 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math></td>
+<td>公式 + 解释；任意指定 basis 的像都能扩展</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>zero、identity、restriction、inclusion、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mi mathvariant="normal">/</mi><mi>d</mi><mi>t</mi></mrow></math>、Fourier</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Ev、Tr 的验证</td>
+</tr>
+<tr>
+<td>P2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">Φ</mi></mrow></math> 的构造；linear / injective / surjective</td>
+</tr>
+</tbody>
+</table>
+<h2>8 · 易错点</h2>
+<ul>
+<li>验证线性<strong>两条都要写</strong>（或写合并的那条），不能只验加法。</li>
+<li>平移 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>↦</mo><mi>x</mi><mo>+</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>↦</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></math> 都不是 linear。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℒ</mi><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math> 的零元是 <strong>zero map</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>O</mi></mrow></math>，不是数字 0。</li>
+<li>Restriction <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><msub><mi mathvariant="normal">∣</mi><mi>U</mi></msub></mrow></math> 的 domain 变了，target 不变；inclusion 的 target 是更大的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>。</li>
+</ul>

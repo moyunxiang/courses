@@ -1,0 +1,397 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>线性代数研究的是**「域 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 上的向量空间」**。为了把「数」这件事说清楚，先用公理定义：</p>
+<ol>
+<li><strong>Group</strong>（群）：一种运算，能「乘」也能「除」</li>
+<li><strong>Ring</strong>（环）：两种运算，能加、减、乘，但不一定能除</li>
+<li><strong>Field</strong>（域）：能加减乘除（除数非 0）的「数系」</li>
+<li><strong>Vector space</strong> 定义的开头（下一讲继续）</li>
+</ol>
+<blockquote>
+<p>这是本课<strong>唯一</strong>讲 abstract algebra 的地方（讲义 §1.1）。考试常见形式：<strong>判断某个集合加上某种运算是不是 group / ring / field，并说明违反了哪条公理</strong>；以及 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℚ</mi><mo stretchy="false">(</mo><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mi>p</mi><mi>ℤ</mi></mrow></math> 里的具体运算（求逆元）。</p>
+</blockquote>
+<h2>1 · Group</h2>
+<blockquote>
+<p><strong>Def.</strong> A <strong>group</strong> is a set <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi></mrow></math> with a binary operation（product）
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo>∗</mo><mo>:</mo><mi>G</mi><mo>×</mo><mi>G</mi><mo>→</mo><mi>G</mi></mrow></math></div>
+s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi><mo>∈</mo><mi>G</mi></mrow></math>:</p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>∗</mo><mi>b</mi><mo stretchy="false">)</mo><mo>∗</mo><mi>c</mi><mo>=</mo><mi>a</mi><mo>∗</mo><mo stretchy="false">(</mo><mi>b</mi><mo>∗</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math> —— <strong>associativity</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mtext> </mtext><mn>1</mn><mo>∈</mo><mi>G</mi></mrow></math> s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>∗</mo><mn>1</mn><mo>=</mo><mn>1</mn><mo>∗</mo><mi>a</mi><mo>=</mo><mi>a</mi></mrow></math> —— <strong>identity</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi><mo>∈</mo><mi>G</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mtext> </mtext><mi>b</mi><mo>∈</mo><mi>G</mi></mrow></math> s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>∗</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>∗</mo><mi>a</mi><mo>=</mo><mn>1</mn></mrow></math> —— <strong>inverse</strong>，记 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><msup><mi>a</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math></li>
+</ol>
+</blockquote>
+<p><strong>要点</strong>：</p>
+<ul>
+<li><strong>binary operation</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>×</mo><mi>G</mi><mo>→</mo><mi>G</mi></mrow></math> 本身就包含了「<strong>封闭</strong>」：两个元素运算的结果必须还在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi></mrow></math> 里。判断题里先看这一条。</li>
+<li>注意没有要求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>∗</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>∗</mo><mi>a</mi></mrow></math>。</li>
+</ul>
+<h3>1.1 例：Permutation（置换）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo><mo>∘</mo><mo stretchy="false">(</mo><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo><mo>∘</mo><mo stretchy="false">(</mo><mn>3</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>怎么算</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∘</mo></mrow></math> 是函数复合，<strong>从右往左</strong>作用。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo></mrow></math> 先作用，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo></mrow></math> 后作用：</p>
+<table>
+<thead>
+<tr>
+<th>起点</th>
+<th>经 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo></mrow></math></th>
+<th>再经 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo></mrow></math></th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1 → 2</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3</td>
+<td>1</td>
+<td>2 → 1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>3</td>
+<td>3 → 3</td>
+</tr>
+</tbody>
+</table>
+<p>所以结果是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mo stretchy="false">)</mo></mrow></math>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>1</mn><mo stretchy="false">)</mo></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>3</mn><mo stretchy="false">)</mo></mrow></math> 反着转，两者复合回到恒等，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>3</mn><msup><mo stretchy="false">)</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mo stretchy="false">(</mo><mn>3</mn><mtext> </mtext><mn>2</mn><mtext> </mtext><mn>1</mn><mo stretchy="false">)</mo></mrow></math>。</p>
+<h3>1.2 例：Invertible <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></math> matrices</h3>
+<ul>
+<li>可逆（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>）矩阵的乘积 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mi>B</mi></mrow></math> <strong>仍可逆</strong> → 运算封闭</li>
+<li>单位元 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>I</mi></mrow></math>；逆元 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>⋅</mo><msup><mi>A</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mi>I</mi></mrow></math></li>
+<li>这个群叫 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><msub><mi>L</mi><mi>n</mi></msub><mo stretchy="false">(</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math>，<strong>general linear group</strong></li>
+</ul>
+<p>课件旁边的反例说明它<strong>不交换</strong>（两个结果不相等）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></mrow></mstyle></mtd></mtr></mtable></math></div><h3>1.3 Abelian group</h3>
+<blockquote>
+<p>A group is <strong>abelian</strong> if
+4. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>∗</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>∗</mo><mi>a</mi><mspace width="1em"/><mi mathvariant="normal">∀</mi><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo>∈</mo><mi>G</mi></mrow></math></p>
+</blockquote>
+<p><strong>记号约定</strong>：abelian group 习惯用加法记号：</p>
+<table>
+<thead>
+<tr>
+<th>一般 group</th>
+<th>abelian group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>∗</mo><mi>b</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>a</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>例</strong>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>ℤ</mi><mo separator="true">,</mo><mo>+</mo><mo stretchy="false">)</mo></mrow></math> integers</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mn>12</mn><mi>ℤ</mi></mrow></math> <strong>modular arithmetic</strong>（钟表加法）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mn>6</mn><mo>ˉ</mo></mover><mo>+</mo><mover accent="true"><mn>8</mn><mo>ˉ</mo></mover><mo>=</mo><mover accent="true"><mn>14</mn><mo stretchy="true">‾</mo></mover><mo>=</mo><mover accent="true"><mn>2</mn><mo>ˉ</mo></mover><mspace></mspace><mspace width="0.4444em"/><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mspace width="0.3333em"/><mn>12</mn><mo stretchy="false">)</mo></mrow></math></li>
+<li>讲义还列了：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msup><mi>e</mi><mi>k</mi></msup><mo>:</mo><mi>k</mi><mo>∈</mo><mi>ℤ</mi><mo stretchy="false">}</mo></mrow></math> 在乘法下</li>
+</ul>
+<p><strong>Non-abelian 例</strong>：permutations（3 个或更多元素，复合）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><msub><mi>L</mi><mi>n</mi></msub><mo stretchy="false">(</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mi>L</mi><mo stretchy="false">(</mo><mi>n</mi><mo separator="true">,</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>det</mi><mo>⁡</mo><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>≥</mo><mn>2</mn></mrow></math>）。</p>
+<h2>2 · Ring</h2>
+<blockquote>
+<p><strong>Def.</strong> A <strong>ring</strong> is a set <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math> with 2 binary operations：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>+</mo><mo>:</mo><mi>R</mi><mo>×</mo><mi>R</mi><mo>→</mo><mi>R</mi><mtext> (addition)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>⋅</mo><mo>:</mo><mi>R</mi><mo>×</mo><mi>R</mi><mo>→</mo><mi>R</mi><mtext> (product)</mtext></mrow></mstyle></mtd></mtr></mtable></math></div>
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi><mo>∈</mo><mi>R</mi></mrow></math>:</p>
+<p><strong>加法部分</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math> 下是 <strong>abelian group</strong>）：</p>
+<ul>
+<li>(+1) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo><mo>+</mo><mi>c</mi><mo>=</mo><mi>a</mi><mo>+</mo><mo stretchy="false">(</mo><mi>b</mi><mo>+</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>(+2) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mtext> </mtext><mn>0</mn><mo>∈</mo><mi>R</mi></mrow></math> s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mn>0</mn><mo>=</mo><mn>0</mn><mo>+</mo><mi>a</mi><mo>=</mo><mi>a</mi></mrow></math></li>
+<li>(+3) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi><mo>∈</mo><mi>R</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mtext> </mtext><mi>b</mi><mo>∈</mo><mi>R</mi></mrow></math> s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>+</mo><mi>a</mi><mo>=</mo><mn>0</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mo>−</mo><mi>a</mi></mrow></math>）</li>
+<li>(+4) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>+</mo><mi>a</mi></mrow></math></li>
+</ul>
+<p><strong>乘法部分</strong>：</p>
+<ul>
+<li>(·1) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>⋅</mo><mi>b</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>c</mi><mo>=</mo><mi>a</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>b</mi><mo>⋅</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>(·2) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mtext> </mtext><mn>1</mn><mo>∈</mo><mi>R</mi></mrow></math> s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>⋅</mo><mn>1</mn><mo>=</mo><mn>1</mn><mo>⋅</mo><mi>a</mi><mo>=</mo><mi>a</mi></mrow></math> —— identity（<strong>no inverse</strong>！）</li>
+<li>(·3) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mo>⋅</mo><mi>a</mi><mo>+</mo><mi>c</mi><mo>⋅</mo><mi>b</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>c</mi><mo>=</mo><mi>a</mi><mo>⋅</mo><mi>c</mi><mo>+</mo><mi>b</mi><mo>⋅</mo><mi>c</mi></mrow></math> —— <strong>distributive law</strong></li>
+</ul>
+<p>另外若 (·4) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>⋅</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>⋅</mo><mi>a</mi></mrow></math>，叫 <strong>commutative ring</strong>。</p>
+</blockquote>
+<p><strong>和 field 的区别一句话</strong>：ring 能加、减、乘，<strong>不要求能除</strong>（乘法没有逆元公理）。</p>
+<p><strong>为什么分配律要写两条？</strong> 乘法不一定交换，左乘和右乘要分别规定。</p>
+<h3>2.1 例</h3>
+<table>
+<thead>
+<tr>
+<th>Ring</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi></mrow></math></td>
+<td>commutative ring；<strong>no inverse in general</strong>（2 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi></mrow></math> 里没有乘法逆元）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℚ</mi><mo separator="true">,</mo><mi>ℝ</mi><mo separator="true">,</mo><mi>ℂ</mi></mrow></math></td>
+<td>都是 ring（其实是 field）</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><msub><mi>a</mi><mi>n</mi></msub><msup><mi>t</mi><mi>n</mi></msup><mo>+</mo><msub><mi>a</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub><msup><mi>t</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>a</mi><mn>1</mn></msub><mi>t</mi><mo>+</mo><msub><mi>a</mi><mn>0</mn></msub><mo>:</mo><msub><mi>a</mi><mi>i</mi></msub><mo>∈</mo><mi>ℝ</mi><mo stretchy="false">}</mo></mrow></math></td>
+<td>多项式环，commutative</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>M</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msub><mo stretchy="false">(</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math>（square matrices）</td>
+<td><strong>noncommutative ring</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mi>B</mi><mo mathvariant="normal">≠</mo><mi>B</mi><mi>A</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>≥</mo><mn>2</mn></mrow></math>）</td>
+</tr>
+</tbody>
+</table>
+<h2>3 · Field</h2>
+<blockquote>
+<p><strong>Def.</strong> A <strong>field</strong> is a set <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> with 2 binary operations <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mo>:</mo><mi>K</mi><mo>×</mo><mi>K</mi><mo>→</mo><mi>K</mi></mrow></math>（addition）、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⋅</mo><mo>:</mo><mi>K</mi><mo>×</mo><mi>K</mi><mo>→</mo><mi>K</mi></mrow></math>（product）s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi><mo>∈</mo><mi>K</mi></mrow></math>:</p>
+<ul>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> is an abelian group under <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math></strong> ← can add / subtract
+<ul>
+<li>(+1) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo><mo>+</mo><mi>c</mi><mo>=</mo><mi>a</mi><mo>+</mo><mo stretchy="false">(</mo><mi>b</mi><mo>+</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math>；(+2) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mn>0</mn><mo>=</mo><mn>0</mn><mo>+</mo><mi>a</mi><mo>=</mo><mi>a</mi></mrow></math>；(+3) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mi>b</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>+</mo><mi>a</mi><mo>=</mo><mn>0</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><mo>−</mo><mi>a</mi></mrow></math>）；(+4) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>+</mo><mi>a</mi></mrow></math></li>
+</ul>
+</li>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>∖</mo><mo stretchy="false">{</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> is an abelian group under <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⋅</mo></mrow></math></strong> ← can multiply / divide（by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>）
+<ul>
+<li>(·1) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>⋅</mo><mi>b</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>c</mi><mo>=</mo><mi>a</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>b</mi><mo>⋅</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math>；(·2) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>⋅</mo><mn>1</mn><mo>=</mo><mn>1</mn><mo>⋅</mo><mi>a</mi><mo>=</mo><mi>a</mi></mrow></math>；(·3) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>a</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mi>b</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi>b</mi><mo>=</mo><mi>b</mi><mi>a</mi><mo>=</mo><mn>1</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>=</mo><msup><mi>a</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>）；(·4) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>⋅</mo><mi>b</mi><mo>=</mo><mi>b</mi><mo>⋅</mo><mi>a</mi></mrow></math></li>
+</ul>
+</li>
+<li><strong>Distributive</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mo>⋅</mo><mi>a</mi><mo>+</mo><mi>c</mi><mo>⋅</mo><mi>b</mi></mrow></math></li>
+</ul>
+</blockquote>
+<p><strong>几个细节（讲义 Def 1.1）</strong>：</p>
+<ul>
+<li>讲义的 (∗2) 明确要求 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math></strong>——所以只有一个元素的集合 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> 不是 field。课件写成「<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>∖</mo><mo stretchy="false">{</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> 是群」，也蕴含这一点（群非空，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math> 至少有 0 和 1 两个元素）。</li>
+<li>为什么是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>∖</mo><mo stretchy="false">{</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math>？0 没有乘法逆元（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>⋅</mo><mi>b</mi><mo>=</mo><mn>0</mn><mo mathvariant="normal">≠</mo><mn>1</mn></mrow></math>），必须去掉。</li>
+<li>一句话：<strong>field = 允许除法（非零元有逆）的 commutative ring</strong>。</li>
+</ul>
+<h3>3.1 例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℚ</mi><mo separator="true">,</mo><mi>ℝ</mi><mo separator="true">,</mo><mi>ℂ</mi></mrow></math></h3>
+<p>本课主要用这三个（特别是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℂ</mi></mrow></math>）。</p>
+<h3>3.2 例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℚ</mi><mo stretchy="false">(</mo><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">{</mo><mi>a</mi><mo>+</mo><mi>b</mi><msqrt><mn>2</mn></msqrt><mo>:</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo>∈</mo><mi>ℚ</mi><mo stretchy="false">}</mo></mrow></math></h3>
+<p>难点是<strong>除法封闭</strong>：两个这种数相除，结果还能写成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi><msqrt><mn>2</mn></msqrt></mrow></math> 吗？方法是<strong>分母有理化</strong>（乘共轭）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mn>2</mn><mo>+</mo><mn>3</mn><msqrt><mn>2</mn></msqrt></mrow><mrow><mn>4</mn><mo>+</mo><mn>5</mn><msqrt><mn>2</mn></msqrt></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mo stretchy="false">(</mo><mn>2</mn><mo>+</mo><mn>3</mn><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>4</mn><mo>−</mo><mn>5</mn><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo></mrow><mrow><mo stretchy="false">(</mo><mn>4</mn><mo>+</mo><mn>5</mn><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>4</mn><mo>−</mo><mn>5</mn><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mn>8</mn><mo>−</mo><mn>10</mn><msqrt><mn>2</mn></msqrt><mo>+</mo><mn>12</mn><msqrt><mn>2</mn></msqrt><mo>−</mo><mn>30</mn></mrow><mrow><mn>16</mn><mo>−</mo><mn>50</mn></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mo>−</mo><mn>22</mn><mo>+</mo><mn>2</mn><msqrt><mn>2</mn></msqrt></mrow><mrow><mo>−</mo><mn>34</mn></mrow></mfrac><mo>=</mo><mfrac><mn>11</mn><mn>17</mn></mfrac><mo>−</mo><mfrac><mn>1</mn><mn>17</mn></mfrac><msqrt><mn>2</mn></msqrt><mo>∈</mo><mi>ℚ</mi><mo stretchy="false">(</mo><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>一般地</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mi>b</mi><msqrt><mn>2</mn></msqrt><msup><mo stretchy="false">)</mo><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>a</mi><mo>−</mo><mi>b</mi><msqrt><mn>2</mn></msqrt></mrow><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>−</mo><mn>2</mn><msup><mi>b</mi><mn>2</mn></msup></mrow></mfrac></mstyle></mrow></math>。分母 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>−</mo><mn>2</mn><msup><mi>b</mi><mn>2</mn></msup><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>（只要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo separator="true">,</mo><mi>b</mi></mrow></math> 不全为 0），因为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mn>2</mn></msqrt></mrow></math> 是无理数——若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>=</mo><mn>2</mn><msup><mi>b</mi><mn>2</mn></msup></mrow></math> 且 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>，则 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msqrt><mn>2</mn></msqrt><mo>=</mo><mi mathvariant="normal">∣</mi><mi>a</mi><mi mathvariant="normal">/</mi><mi>b</mi><mi mathvariant="normal">∣</mi><mo>∈</mo><mi>ℚ</mi></mrow></math>，矛盾。</p>
+<h3>3.3 例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mn>7</mn><mi>ℤ</mi><mo>=</mo><mo stretchy="false">{</mo><mover accent="true"><mn>0</mn><mo>ˉ</mo></mover><mo separator="true">,</mo><mover accent="true"><mn>1</mn><mo>ˉ</mo></mover><mo separator="true">,</mo><mover accent="true"><mn>2</mn><mo>ˉ</mo></mover><mo separator="true">,</mo><mover accent="true"><mn>3</mn><mo>ˉ</mo></mover><mo separator="true">,</mo><mover accent="true"><mn>4</mn><mo>ˉ</mo></mover><mo separator="true">,</mo><mover accent="true"><mn>5</mn><mo>ˉ</mo></mover><mo separator="true">,</mo><mover accent="true"><mn>6</mn><mo>ˉ</mo></mover><mo stretchy="false">}</mo><mspace></mspace><mspace width="0.4444em"/><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mspace width="0.3333em"/><mn>7</mn><mo stretchy="false">)</mo></mrow></math></h3>
+<p>运算举例：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mn>2</mn><mo>ˉ</mo></mover><mo>⋅</mo><mover accent="true"><mn>5</mn><mo>ˉ</mo></mover><mo>=</mo><mover accent="true"><mn>3</mn><mo>ˉ</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mn>2</mn><mo>ˉ</mo></mover><mo>+</mo><mover accent="true"><mn>5</mn><mo>ˉ</mo></mover><mo>=</mo><mover accent="true"><mn>0</mn><mo>ˉ</mo></mover></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mover accent="true"><mn>2</mn><mo>ˉ</mo></mover><mo>⋅</mo><mover accent="true"><mn>4</mn><mo>ˉ</mo></mover><mo>=</mo><mover accent="true"><mn>1</mn><mo>ˉ</mo></mover><mspace></mspace><mspace width="1em"/><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mspace width="0.3333em"/><mn>7</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>乘法逆元表（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>⋅</mo><msup><mi>a</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mn>1</mn><mspace></mspace><mspace width="0.4444em"/><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mspace width="0.3333em"/><mn>7</mn><mo stretchy="false">)</mo></mrow></math>）：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math></th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math></td>
+<td>1</td>
+<td>4</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p>（验算：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>⋅</mo><mn>4</mn><mo>=</mo><mn>8</mn><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>⋅</mo><mn>5</mn><mo>=</mo><mn>15</mn><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn><mo>⋅</mo><mn>6</mn><mo>=</mo><mn>36</mn><mo>=</mo><mn>1</mn></mrow></math>，都 mod 7。）</p>
+<p><strong>一般结论</strong>（讲义 Example 1.1）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mi>p</mi><mi>ℤ</mi></mrow></math> 当 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 是素数</strong>时是 field（finite field）。</p>
+<p><strong>为什么要素数？</strong> 反例 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mn>12</mn><mi>ℤ</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mn>3</mn><mo>ˉ</mo></mover><mo>⋅</mo><mover accent="true"><mn>4</mn><mo>ˉ</mo></mover><mo>=</mo><mover accent="true"><mn>12</mn><mo>ˉ</mo></mover><mo>=</mo><mover accent="true"><mn>0</mn><mo>ˉ</mo></mover></mrow></math>。如果 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mn>3</mn><mo>ˉ</mo></mover></mrow></math> 有逆元 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math>，两边乘 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> 得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mn>4</mn><mo>ˉ</mo></mover><mo>=</mo><mover accent="true"><mn>0</mn><mo>ˉ</mo></mover></mrow></math>，矛盾。所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mi>n</mi><mi>ℤ</mi></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 合数）只是 commutative ring，不是 field。</p>
+<h3>3.4 其他例子（讲义）</h3>
+<ul>
+<li>实系数的有理函数（rational functions）</li>
+</ul>
+<h2>4 · 三者关系总表</h2>
+<table>
+<thead>
+<tr>
+<th>结构</th>
+<th>运算</th>
+<th>加法</th>
+<th>乘法</th>
+<th>能做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Group</td>
+<td>1 种</td>
+<td>——</td>
+<td>结合、单位元、逆元</td>
+<td>「乘」和「除」</td>
+</tr>
+<tr>
+<td>Abelian group</td>
+<td>1 种</td>
+<td>——</td>
+<td>再加交换</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>Ring</td>
+<td>2 种</td>
+<td>abelian group</td>
+<td>结合、单位元、分配律</td>
+<td>加、减、乘</td>
+</tr>
+<tr>
+<td>Commutative ring</td>
+<td>2 种</td>
+<td>abelian group</td>
+<td>再加交换</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>Field</td>
+<td>2 种</td>
+<td>abelian group</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>∖</mo><mo stretchy="false">{</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> 是 abelian group + 分配律</td>
+<td>加、减、乘、除</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判断题套路</strong>：按顺序检查</p>
+<ol>
+<li>运算<strong>封闭</strong>吗？（结果在集合里吗）</li>
+<li>结合律</li>
+<li>单位元存在吗？（<strong>在这个集合里</strong>）</li>
+<li>逆元存在吗？（<strong>每个</strong>元素的，且在集合里）</li>
+<li>需要的话：交换律、分配律</li>
+</ol>
+<p>一条不满足就举出具体反例。例如：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>ℕ</mi><mo separator="true">,</mo><mo>+</mo><mo stretchy="false">)</mo></mrow></math> 不是 group：没有加法逆元（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo mathvariant="normal">∉</mo><mi>ℕ</mi></mrow></math>）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>ℤ</mi><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo></mrow></math> 不是 group：2 没有乘法逆元</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi></mrow></math> 不是 field，是 commutative ring</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>M</mi><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow></msub><mo stretchy="false">(</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math> 不是 field：不交换，且非零矩阵 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow></math> 不可逆</li>
+</ul>
+<h2>5 · Vector space 的引入</h2>
+<p><strong>Vectors</strong> 的两个基本操作（课件图）：</p>
+<ul>
+<li><strong>can add / subtract</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi></mrow></math>（平行四边形法则）</li>
+<li><strong>can scale</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mi>𝐯</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>𝐯</mi></mrow></math></li>
+</ul>
+<blockquote>
+<p><strong>Def.</strong> A <strong>vector space over a field <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi></mrow></math></strong> is a set <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> with 2 binary operations：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>+</mo><mo>:</mo><mi>V</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi><mtext> (addition)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>⋅</mo><mo>:</mo><mi>K</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi><mtext> (scalar multiplication)</mtext></mrow></mstyle></mtd></mtr></mtable></math></div>
+satisfying <strong>similar axioms to rings!</strong></p>
+</blockquote>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>𝐮</mi><mo separator="true">,</mo><mi>𝐯</mi><mo separator="true">,</mo><mi>𝐰</mi><mo>∈</mo><mi>V</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo separator="true">,</mo><mi>d</mi><mo>∈</mo><mi>K</mi></mrow></math>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>公理</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(+1)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>+</mo><mi>𝐰</mi><mo>=</mo><mi>𝐮</mi><mo>+</mo><mo stretchy="false">(</mo><mi>𝐯</mi><mo>+</mo><mi>𝐰</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td></td>
+</tr>
+<tr>
+<td>(+2)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mtext> </mtext><mn>𝟎</mn><mo>∈</mo><mi>V</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>+</mo><mn>𝟎</mn><mo>=</mo><mn>𝟎</mn><mo>+</mo><mi>𝐮</mi><mo>=</mo><mi>𝐮</mi></mrow></math></td>
+<td><strong>Abelian group</strong></td>
+</tr>
+<tr>
+<td>(+3)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∀</mi><mi>𝐮</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∃</mi><mtext> </mtext><mi>𝐯</mi></mrow></math> s.t. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo>=</mo><mi>𝐯</mi><mo>+</mo><mi>𝐮</mi><mo>=</mo><mn>𝟎</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐯</mi><mo>=</mo><mo>−</mo><mi>𝐮</mi></mrow></math>）</td>
+<td></td>
+</tr>
+<tr>
+<td>(+4)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo>=</mo><mi>𝐯</mi><mo>+</mo><mi>𝐮</mi></mrow></math></td>
+<td></td>
+</tr>
+<tr>
+<td>(·1)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>⋅</mo><mi>d</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>𝐮</mi><mo>=</mo><mi>c</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>d</mi><mo>⋅</mo><mi>𝐮</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td></td>
+</tr>
+<tr>
+<td>(·2)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>⋅</mo><mi>𝐮</mi><mo>=</mo><mi>𝐮</mi></mrow></math></td>
+<td></td>
+</tr>
+<tr>
+<td>(·3)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>𝐮</mi><mo>+</mo><mi>𝐯</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi><mo>⋅</mo><mi>𝐮</mi><mo>+</mo><mi>c</mi><mo>⋅</mo><mi>𝐯</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>𝐮</mi><mo>=</mo><mi>c</mi><mo>⋅</mo><mi>𝐮</mi><mo>+</mo><mi>d</mi><mo>⋅</mo><mi>𝐮</mi></mrow></math></td>
+<td><strong>Distributive law</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>和 ring 的区别</strong>：乘法不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>，而是 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math></strong>——标量乘向量。两个向量之间没有「乘法」。</p>
+<p>（这部分在 Lecture 02 继续：性质、例子、反例。）</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Group 定义</td>
+<td>三条公理 + 封闭；会写出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> 的含义</td>
+</tr>
+<tr>
+<td>Abelian</td>
+<td>加交换律；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>a</mi></mrow></math> 的记号</td>
+</tr>
+<tr>
+<td>Group 例子</td>
+<td>置换复合（从右往左算）、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><msub><mi>L</mi><mi>n</mi></msub><mo stretchy="false">(</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>ℤ</mi><mo separator="true">,</mo><mo>+</mo><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mi>n</mi><mi>ℤ</mi></mrow></math></td>
+</tr>
+<tr>
+<td>Ring 定义</td>
+<td>加法 abelian group + 乘法结合、单位元、分配律；<strong>无逆元</strong></td>
+</tr>
+<tr>
+<td>Ring 例子</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℝ</mi><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>M</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msub><mo stretchy="false">(</mo><mi>ℝ</mi><mo stretchy="false">)</mo></mrow></math>（不交换）</td>
+</tr>
+<tr>
+<td>Field 定义</td>
+<td>两个 abelian group + 分配律；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℚ</mi><mo stretchy="false">(</mo><msqrt><mn>2</mn></msqrt><mo stretchy="false">)</mo></mrow></math></td>
+<td>有理化求商 / 逆元；为什么分母不为 0</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mi>p</mi><mi>ℤ</mi></mrow></math></td>
+<td>模运算；逆元表；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 合数时为什么不是 field</td>
+</tr>
+<tr>
+<td>判断题</td>
+<td>封闭 → 结合 → 单位元 → 逆元 → 交换 / 分配，给反例</td>
+</tr>
+<tr>
+<td>Vector space 公理</td>
+<td>8 条，分成 abelian group 和标量乘法两组</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>置换复合 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo>∘</mo><mi>τ</mi></mrow></math> 是<strong>先 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi></mrow></math> 后 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math></strong>。</li>
+<li>Ring 的乘法<strong>不要求逆元</strong>；field 的乘法逆元只对<strong>非零</strong>元素要求。</li>
+<li>只说「有单位元 / 有逆元」不够，要说明它们<strong>在这个集合里</strong>。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ℤ</mi><mi mathvariant="normal">/</mi><mi>n</mi><mi>ℤ</mi></mrow></math> 只有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> 为素数时才是 field。</li>
+<li>Vector space 的标量乘法是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>×</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow></math>。</li>
+<li>Field 要求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math>。</li>
+</ul>

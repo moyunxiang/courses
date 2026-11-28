@@ -1,0 +1,367 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>离散版本的 2.1–2.2：</p>
+<ol>
+<li><strong>差分方程</strong>（参考）：<strong>迭代法</strong>、经典法、零输入 + 零状态</li>
+<li><strong>单位冲激（样值）响应 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></strong>：定义、求法（方框图直接读 / 差分方程用等效初始条件）、<strong>由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 判断因果和稳定</strong></li>
+<li><strong>卷积和</strong>：定义（推导）、性质、计算（解析法、图解法、利用性质、对位相乘求和）；<strong>结果的范围和长度</strong></li>
+</ol>
+<blockquote>
+<p>必考计算：<strong>迭代法</strong>算前几项；<strong>差分方程求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></strong>（课件例 2：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>0.8</mn><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>）；<strong>卷积和</strong>（解析法：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>α</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>；图解法：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>5</mn></msub><mo>∗</mo><msub><mi>R</mi><mn>5</mn></msub></mrow></math>；性质法：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>3</mn></msub><mo>∗</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">}</mo></mrow></math>）；<strong>结果长度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>x</mi></msub><mo>+</mo><msub><mi>N</mi><mi>h</mi></msub><mo>−</mo><mn>1</mn></mrow></math></strong>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 稳定 ⟺ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo><mo>&lt;</mo><mn>1</mn></mrow></math>。</p>
+</blockquote>
+<h2>1 · 差分方程（参考）</h2>
+<p>解法：</p>
+<ul>
+<li><strong>Iterative method</strong>（迭代法）</li>
+<li><strong>经典时域法</strong>：齐次解 + 特解（和连续系统类似）</li>
+<li><strong>零输入响应 + 零状态响应</strong>（类似）；用<strong>卷积和</strong>求零状态响应</li>
+<li><strong>Z-transform</strong>（Chapter 6）→ 反变换 → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></li>
+</ul>
+<h3>1.1 迭代法</h3>
+<ul>
+<li>差分方程<strong>本身就是递推关系</strong></li>
+<li>但<strong>得不到输出序列的解析式</strong></li>
+<li>适合用计算机求解</li>
+</ul>
+<p><strong>例 1</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0.9</mn><mtext> </mtext><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math>：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></th>
+<th>计算</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.9</mn><mo>⋅</mo><mn>0</mn><mo>+</mo><mn>1</mn></mrow></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.9</mn><mo>⋅</mo><mn>1</mn><mo>+</mo><mn>1</mn></mrow></math></td>
+<td>1.9</td>
+</tr>
+<tr>
+<td>2</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.9</mn><mo>⋅</mo><mn>1.9</mn><mo>+</mo><mn>1</mn></mrow></math></td>
+<td>2.71</td>
+</tr>
+<tr>
+<td>3</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.9</mn><mo>⋅</mo><mn>2.71</mn><mo>+</mo><mn>1</mn></mrow></math></td>
+<td>3.439</td>
+</tr>
+</tbody>
+</table>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mi><munder><mo><mn>1</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>1.9</mn><mo separator="true">,</mo><mn>2.71</mn><mo separator="true">,</mo><mn>3.439</mn><mo separator="true">,</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">}</mo></mrow></math></p>
+<p>（补充：通式 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><msup><mn>0.9</mn><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow><mrow><mn>1</mn><mo>−</mo><mn>0.9</mn></mrow></mfrac><mo>=</mo><mn>10</mn><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msup><mn>0.9</mn><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>≥</mo><mn>0</mn></mrow></math>，趋于 10——正是 3.2 例的特例。）</p>
+<h2>2 · 单位冲激响应 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></h2>
+<h3>2.1 定义</h3>
+<blockquote>
+<p>系统在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 激励下的<strong>零状态响应</strong>，记为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>。
+零状态：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mo>−</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mi>N</mi></mrow></math></p>
+</blockquote>
+<h3>2.2 例 1：从方框图（无反馈）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math></div><p>（<strong>无反馈</strong>时直接把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 换成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 是<strong>有限长</strong>的：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn></mrow></math> 处各为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>。）</p>
+<h3>2.3 例 2：从差分方程（有反馈）</h3>
+<p>因果系统 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>0.8</mn><mtext> </mtext><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>，求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>。</p>
+<p>令 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>0.8</mn><mtext> </mtext><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></div><p><strong>等效初始条件法</strong>：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>&gt;</mo><mn>0</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math>，方程变成<strong>齐次</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>0.8</mn><mtext> </mtext><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math></li>
+<li>把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 的作用<strong>转化成初始条件</strong>：由零状态 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math>，迭代出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>0.8</mn><mo>⋅</mo><mn>0</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>1</mn></mrow></math></li>
+<li>特征方程 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>−</mo><mn>0.8</mn><mo>=</mo><mn>0</mn></mrow></math>，特征根 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mn>0.8</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>C</mi><mo stretchy="false">(</mo><mn>0.8</mn><msup><mo stretchy="false">)</mo><mi>n</mi></msup></mrow></math></li>
+<li>代入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo>=</mo><mn>1</mn></mrow></math></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msup><mn>0.8</mn><mi>n</mi></msup><mtext> </mtext><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（<strong>有反馈</strong>时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 一般是<strong>无限长</strong>的。）</p>
+<h3>2.4 由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 判断因果和稳定</h3>
+<ul>
+<li><strong>因果系统</strong>：任何时刻的输出<strong>只取决于当前和过去</strong>的输入，不取决于未来的输入</li>
+</ul>
+<blockquote>
+<p>LTI 系统<strong>因果</strong>的充要条件：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mspace width="1em"/><mi>n</mi><mo>&lt;</mo><mn>0</mn></mrow></math></div></p>
+</blockquote>
+<blockquote>
+<p>LTI 系统<strong>稳定</strong>的充要条件：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> <strong>绝对可和</strong>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mo stretchy="false">∣</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo stretchy="false">∣</mo><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math></div></p>
+</blockquote>
+<p><strong>例 4</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msup><mi>a</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></p>
+<ol>
+<li><strong>因果</strong>：单边序列，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>&lt;</mo><mn>0</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math> ⇒ 因果</li>
+<li><strong>稳定</strong>：</li>
+</ol>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mo stretchy="false">∣</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo stretchy="false">∣</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></munderover><mo stretchy="false">∣</mo><mi>a</mi><msup><mo stretchy="false">∣</mo><mi>n</mi></msup><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo></mrow></mfrac></mstyle><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo><mo>&lt;</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi mathvariant="normal">∞</mi><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo><mo>≥</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p>⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo><mo>&lt;</mo><mn>1</mn></mrow></math> 时稳定</strong>（例 2 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>0.8</mn><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 稳定）</p>
+<h2>3 · 卷积和</h2>
+<h3>3.1 定义（推导，和连续一样）</h3>
+<p>任何序列可以表示成加权、平移的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 的线性组合：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></div><p>（例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mn>1.5</mn><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>−</mo><mn>3</mn><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math>。）</p>
+<p>送进 LTI 系统：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left" columnspacing="0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>已知：</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>→</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>时不变：</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>→</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>齐次性：</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>→</mo><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>可加性：</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>→</mo><munder><mo>∑</mo><mi>m</mi></munder><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 把输入和输出联系起来——这是<strong>零状态响应</strong></li>
+</ul>
+<h3>3.2 性质</h3>
+<table>
+<thead>
+<tr>
+<th>性质</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>交换律</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>结合律</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>∗</mo><msub><mi>h</mi><mn>1</mn></msub><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub><mo>=</mo><mi>x</mi><mo>∗</mo><mo stretchy="false">(</mo><msub><mi>h</mi><mn>1</mn></msub><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></math>（串联）</td>
+</tr>
+<tr>
+<td>分配律</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>∗</mo><mo stretchy="false">(</mo><msub><mi>h</mi><mn>1</mn></msub><mo>+</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mi>x</mi><mo>∗</mo><msub><mi>h</mi><mn>1</mn></msub><mo>+</mo><mi>x</mi><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub></mrow></math>（并联）</td>
+</tr>
+<tr>
+<td>与冲激序列卷积</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 计算方法</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi></mrow></math> 的范围由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> <strong>共同决定</strong></li>
+<li>过程：<strong>反转 → 平移 → 相乘 → 求和</strong></li>
+<li>四种方法：(1) 解析法；(2) 图解法；(3) 利用性质；(4) <strong>对位相乘求和</strong>（sum of pairwise multiplication）</li>
+</ul>
+<h3>3.4 例 1：解析法</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msup><mi>α</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>α</mi><mo>&lt;</mo><mn>1</mn></mrow></math>），求<strong>单位阶跃响应</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><msup><mi>α</mi><mi>m</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></div><p><strong>定求和范围</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>≥</mo><mn>0</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo mathvariant="normal">≠</mo><mn>0</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>m</mi><mo>≤</mo><mi>n</mi></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>m</mi><mo>≤</mo><mi>n</mi></mrow></math>（要求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>≥</mo><mn>0</mn></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></munderover><msup><mi>α</mi><mi>m</mi></msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><msup><mi>α</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow><mrow><mn>1</mn><mo>−</mo><mi>α</mi></mrow></mfrac><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></div><p>（等比数列求和：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></msubsup><msup><mi>α</mi><mi>m</mi></msup><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><msup><mi>α</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow><mrow><mn>1</mn><mo>−</mo><mi>α</mi></mrow></mfrac></mrow></math>。<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></math> 时趋于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mn>1</mn><mo>−</mo><mi>α</mi></mrow></mfrac></mrow></math>。）</p>
+<h3>3.5 例 2：图解法 / 对位相乘求和</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>n</mi><mo>≤</mo><mn>4</mn></mrow></math>），否则 0（即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>5</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>）。求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>。</p>
+<p>反转一个、逐步右移、和另一个对齐的部分相乘求和：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>重叠点数</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn><mo>⋅</mo><mn>1</mn><mo>=</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn><mo>⋅</mo><mn>1</mn><mo>+</mo><mn>1</mn><mo>⋅</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow></math>，…，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mn>9</mn><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math>。两个等长矩形序列卷积得<strong>三角形</strong>序列。）</p>
+<h3>3.6 结果的范围和长度（必背）</h3>
+<p>若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><msub><mi>N</mi><mrow><mn>1</mn><mi>min</mi><mo>⁡</mo></mrow></msub><mo separator="true">,</mo><msub><mi>N</mi><mrow><mn>1</mn><mi>max</mi><mo>⁡</mo></mrow></msub><mo stretchy="false">]</mo></mrow></math>（长 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>x</mi></msub></mrow></math>），<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><msub><mi>N</mi><mrow><mn>2</mn><mi>min</mi><mo>⁡</mo></mrow></msub><mo separator="true">,</mo><msub><mi>N</mi><mrow><mn>2</mn><mi>max</mi><mo>⁡</mo></mrow></msub><mo stretchy="false">]</mo></mrow></math>（长 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>h</mi></msub></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>N</mi><mrow><mn>1</mn><mi>min</mi><mo>⁡</mo></mrow></msub><mo>+</mo><msub><mi>N</mi><mrow><mn>2</mn><mi>min</mi><mo>⁡</mo></mrow></msub><mo>≤</mo><mi>n</mi><mo>≤</mo><msub><mi>N</mi><mrow><mn>1</mn><mi>max</mi><mo>⁡</mo></mrow></msub><mo>+</mo><msub><mi>N</mi><mrow><mn>2</mn><mi>max</mi><mo>⁡</mo></mrow></msub><mspace linebreak="newline"></mspace><mtext>长度</mtext><mo>=</mo><msub><mi>N</mi><mi>x</mi></msub><mo>+</mo><msub><mi>N</mi><mi>h</mi></msub><mo>−</mo><mn>1</mn></mrow></mstyle></mstyle></mstyle></menclose></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>下限 1 + 下限 2 ≤ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> ≤ 上限 1 + 上限 2</strong></li>
+<li>例 2：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo>+</mo><mn>0</mn><mo separator="true">,</mo><mn>4</mn><mo>+</mo><mn>4</mn><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>8</mn><mo stretchy="false">]</mo></mrow></math>，长度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>+</mo><mn>5</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>9</mn></mrow></math> ✓</li>
+</ul>
+<p><strong>为什么是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>？</strong> 连续情况宽度直接相加；离散情况长度是<strong>点数</strong>，区间 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">]</mo></mrow></math> 有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi><mo>−</mo><mi>a</mi><mo>+</mo><mn>1</mn></mrow></math> 个点：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>N</mi><mrow><mn>1</mn><mi>max</mi><mo>⁡</mo></mrow></msub><mo>+</mo><msub><mi>N</mi><mrow><mn>2</mn><mi>max</mi><mo>⁡</mo></mrow></msub><mo stretchy="false">)</mo><mo>−</mo><mo stretchy="false">(</mo><msub><mi>N</mi><mrow><mn>1</mn><mi>min</mi><mo>⁡</mo></mrow></msub><mo>+</mo><msub><mi>N</mi><mrow><mn>2</mn><mi>min</mi><mo>⁡</mo></mrow></msub><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn><mo>=</mo><mo stretchy="false">(</mo><msub><mi>N</mi><mi>x</mi></msub><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><msub><mi>N</mi><mi>h</mi></msub><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></math>。</p>
+<h3>3.7 例 3：利用性质</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>R</mi><mn>3</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">{</mo><mi><munder><mo><mn>1</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">}</mo></mrow></math>，求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>∗</mo><mi>h</mi></mrow></math>。</p>
+<p>写成冲激的和：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mn>2</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mn>3</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>用分配律和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>=</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>x</mi><mo>∗</mo><mi>h</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mn>2</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mn>3</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mn>2</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mn>3</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>3</mn><mo stretchy="false">]</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mn>2</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>3</mn><mo stretchy="false">]</mo><mo>+</mo><mn>3</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>4</mn><mo stretchy="false">]</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mn>3</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>+</mo><mn>6</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>2</mn><mo stretchy="false">]</mo><mo>+</mo><mn>5</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>3</mn><mo stretchy="false">]</mo><mo>+</mo><mn>3</mn><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>4</mn><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>即 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi><munder><mo><mn>1</mn></mo><mo lspace="0em" rspace="0em">↑</mo></munder></mi><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>6</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">}</mo></mrow></math>（长度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>+</mo><mn>3</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>5</mn></mrow></math> ✓；数值验算一致）。</p>
+<blockquote>
+<p><strong>对位相乘求和（竖式）</strong>：把两个序列像**多项式乘法（不进位）**一样排：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>×</td>
+<td></td>
+<td></td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>=</td>
+<td>1</td>
+<td>3</td>
+<td>6</td>
+<td>5</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>起点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> = 两个起点之和。有限长序列卷积用这个最快。</p>
+</blockquote>
+<h2>4 · 小结</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></munderover><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mtext> </mtext><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></div><p>计算方法：(1) 解析法；(2) 图解法；(3) 利用性质；(4) 对位相乘求和。</p>
+<p><strong>连续 vs 离散对照</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>连续</th>
+<th>离散</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>冲激</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>（广义函数）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn></mrow></math>）</td>
+</tr>
+<tr>
+<td>冲激分解</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mo>∫</mo><mi>e</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo>∑</mo><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>零状态响应</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∫</mo><mi>e</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>h</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>因果</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>&lt;</mo><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>&lt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td>稳定</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∫</mo><mo stretchy="false">∣</mo><mi>h</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">∣</mo><mi>d</mi><mi>t</mi><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><mo stretchy="false">∣</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo stretchy="false">∣</mo><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math></td>
+</tr>
+<tr>
+<td>结果范围</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mi>A</mi><mo>+</mo><mi>C</mi><mo separator="true">,</mo><mi>B</mi><mo>+</mo><mi>D</mi><mo stretchy="false">]</mo></mrow></math>，宽度相加</td>
+<td>同样相加，长度 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>x</mi></msub><mo>+</mo><msub><mi>N</mi><mi>h</mi></msub><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>5 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>迭代法</td>
+<td>例 1 前四项</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 定义</td>
+<td>零状态；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 激励</td>
+</tr>
+<tr>
+<td>无反馈求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td>直接把 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 换成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi></mrow></math></td>
+</tr>
+<tr>
+<td>有反馈求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td>等效初始条件 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math> + 特征根；例 2</td>
+</tr>
+<tr>
+<td>因果 / 稳定</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mn>0</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>&lt;</mo><mn>0</mn></mrow></math>）；绝对可和；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 稳定 ⟺ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo><mo>&lt;</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>卷积和推导</td>
+<td>时不变 → 齐次 → 可加</td>
+</tr>
+<tr>
+<td>性质</td>
+<td>交换、结合、分配、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>∗</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>解析法</td>
+<td>例 1：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>1</mn><mo>−</mo><msup><mi>α</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow><mrow><mn>1</mn><mo>−</mo><mi>α</mi></mrow></mfrac><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math></td>
+</tr>
+<tr>
+<td>图解法</td>
+<td>例 2：1,2,3,4,5,4,3,2,1</td>
+</tr>
+<tr>
+<td>范围 / 长度</td>
+<td>下限相加、上限相加；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>x</mi></msub><mo>+</mo><msub><mi>N</mi><mi>h</mi></msub><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td>性质法 / 竖式</td>
+<td>例 3：1,3,6,5,3</td>
+</tr>
+</tbody>
+</table>
+<h2>6 · 易错点</h2>
+<ul>
+<li>离散卷积结果长度是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>x</mi></msub><mo>+</mo><msub><mi>N</mi><mi>h</mi></msub><mo>−</mo><mn>1</mn></mrow></math>（<strong>减 1</strong>），连续卷积宽度直接相加。</li>
+<li>有反馈的系统 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 是<strong>无限长</strong>的，用等效初始条件 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">[</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math> 定系数。</li>
+<li>稳定性看<strong>绝对值</strong>之和；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> 要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∣</mo><mi>a</mi><mo stretchy="false">∣</mo><mo>&lt;</mo><mn>1</mn></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mo>−</mo><mn>0.5</mn></mrow></math> 也稳定）。</li>
+<li>求和范围由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">]</mo></mrow></math> 同时决定：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>≤</mo><mi>m</mi><mo>≤</mo><mi>n</mi></mrow></math>。</li>
+<li>竖式法<strong>不进位</strong>；结果起点 = 两序列起点之和。</li>
+<li>等比数列求和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></msubsup><msup><mi>α</mi><mi>m</mi></msup><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><msup><mi>α</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow><mrow><mn>1</mn><mo>−</mo><mi>α</mi></mrow></mfrac></mrow></math>（上标是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></math>）。</li>
+</ul>

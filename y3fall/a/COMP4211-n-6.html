@@ -1,0 +1,206 @@
+<h2>0 · 这一讲在讲什么</h2>
+<ol>
+<li><strong>Feedforward 的局限</strong>：输出只依赖当前输入；序列数据需要 <strong>feedback</strong></li>
+<li><strong>RNN</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>f</mi><mi>W</mi></msub><mo stretchy="false">(</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>；<strong>unfolding</strong>；权重在各时间步共享</li>
+<li><strong>Simple RNN</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>W</mi><mrow><mi>x</mi><mi>h</mi></mrow></msub><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>y</mi></mrow></msub><msub><mi>h</mi><mi>t</mi></msub></mrow></math>；计算图（Goodfellow 记号）</li>
+<li><strong>BPTT</strong>；<strong>vanishing / exploding gradients</strong></li>
+<li><strong>LSTM</strong>：cell state、input / forget / output gate</li>
+<li><strong>Gradient clipping</strong>；<strong>stacked RNN</strong>；与 CNN 结合（image captioning）、activity recognition、machine translation</li>
+</ol>
+<blockquote>
+<p>必会：simple RNN 的两条公式；为什么会梯度消失 / 爆炸（同一个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mrow></math> 反复相乘）；<strong>LSTM 全部公式</strong>及每个 gate 的作用；cell state 为什么缓解梯度消失；clipping 公式。</p>
+</blockquote>
+<h2>1 · 为什么需要 RNN</h2>
+<ul>
+<li><strong>Feedforward</strong>：输出<strong>只依赖当前输入</strong></li>
+<li><strong>序列学习</strong>：video processing、machine translation、speech recognition（连续时间帧的声学特征）</li>
+<li>序列数据需要 <strong>feedback 机制</strong>：hidden layers 和输出依赖于<strong>之前的</strong> hidden states</li>
+</ul>
+<h2>2 · RNN</h2>
+<p><strong>Unfolding</strong>：展开成同一个网络的<strong>多份拷贝</strong>，每份把旧的 state 传给下一份。</p>
+<ul>
+<li><strong>State</strong>：保存过去序列的一些重要方面</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>f</mi><mi>W</mi></msub><mo stretchy="false">(</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>新状态 = 函数（旧状态，当前时间步输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mi>t</mi></msub></mrow></math>）。</p>
+<blockquote>
+<p><strong>同一组权重</strong>用于不同时间步的神经元。</p>
+</blockquote>
+<h2>3 · Simple RNN</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>W</mi><mrow><mi>x</mi><mi>h</mi></mrow></msub><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>y</mi></mrow></msub><msub><mi>h</mi><mi>t</mi></msub></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>每个时间步重用同一个权重矩阵</strong>。（RNN 有很多变体。）</p>
+<p><strong>计算图</strong>（Goodfellow 等 <em>Deep Learning</em> 的记号）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>𝐚</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝐛</mi><mo>+</mo><mi>W</mi><msup><mi>𝐬</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo>+</mo><mi>U</mi><msup><mi>𝐱</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>𝐬</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msup><mi>𝐚</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>𝐨</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>𝐜</mi><mo>+</mo><mi>V</mi><msup><mi>𝐬</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mover accent="true"><mi>𝐲</mi><mo>^</mo></mover><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext>softmax</mtext><mo stretchy="false">(</mo><msup><mi>𝐨</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>U</mi></mrow></math>：input → state；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi></mrow></math>：state → state；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>：state → output。此例中<strong>每个时间步都算 loss</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>L</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mrow></math>（label <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></msup></mrow></math>），总 loss 是各步之和。</p>
+<h2>4 · BPTT 与梯度问题</h2>
+<p><strong>Backpropagation through time (BPTT)</strong>：在展开的计算图上做 backprop；所有时间步的 loss 汇总；共享权重的梯度是<strong>各时间步梯度之和</strong>（分支处梯度相加，4.6）。</p>
+<h3>4.1 Vanishing gradients</h3>
+<p><strong>传话游戏</strong>：每个人都含糊一点点，传到最后信息全没了。</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>W</mi><mrow><mi>x</mi><mi>h</mi></mrow></msub><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></li>
+<li>反向时，梯度信号在<strong>每个时间步</strong>都乘以<strong>同一个</strong>矩阵 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mrow></math>（还有 tanh 的导数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mn>1</mn></mrow></math>）</li>
+<li>梯度变得极小 ⇒ 学习变得很慢甚至停止 ⇒ 学不到<strong>长程依赖</strong></li>
+</ul>
+<h3>4.2 Exploding gradients</h3>
+<p><strong>传话游戏</strong>：每个人都夸大一点点。</p>
+<ul>
+<li>梯度信号变得极大 ⇒ <strong>数值不稳定</strong>（如 loss 变成 <code>NaN</code>）</li>
+</ul>
+<blockquote>
+<p>Simple RNN <strong>不适合长序列</strong>。</p>
+</blockquote>
+<p>（直觉补充：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> 步后梯度大致 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∝</mo><msubsup><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow><mi>T</mi></msubsup></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mrow></math> 的最大特征值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mn>1</mn></mrow></math> ⇒ 消失，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&gt;</mo><mn>1</mn></mrow></math> ⇒ 爆炸。）</p>
+<h2>5 · LSTM（Long Short-Term Memory）</h2>
+<h3>5.1 Input gate：是否写入 cell</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mover accent="true"><mi>C</mi><mo>~</mo></mover><mi>t</mi></msub><mo>=</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mi>C</mi></msub><mo stretchy="false">[</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>C</mi></msub><mo stretchy="false">)</mo><mspace width="1em"/><mtext>（候选向量，可加到状态上）</mtext></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>i</mi><mi>t</mi></msub><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mi>i</mi></msub><mo stretchy="false">[</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mspace width="1em"/><mtext>（input gate）</mtext></mrow></math></div><p>允许输入信号<strong>改变</strong> memory cell 的状态，或<strong>阻止</strong>它。</p>
+<h3>5.2 Cell state</h3>
+<blockquote>
+<p>让梯度<strong>直接沿 cell state 回传</strong>，不会被非线性激活反复压缩，也不会反复乘主权重矩阵。</p>
+</blockquote>
+<p>（这就是 LSTM 缓解梯度消失的关键：cell state 的更新是<strong>加法</strong>。）</p>
+<h3>5.3 Forget gate：是否擦除 cell</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mi>t</mi></msub><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mi>f</mi></msub><mo stretchy="false">[</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>f</mi></msub><mo stretchy="false">)</mo></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>C</mi><mi>t</mi></msub><mo>=</mo><msub><mi>f</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>C</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>i</mi><mi>t</mi></msub><mo>⊙</mo><msub><mover accent="true"><mi>C</mi><mo>~</mo></mover><mi>t</mi></msub></mrow></mstyle></mstyle></mstyle></menclose><mo separator="true">,</mo><mspace width="1em"/><mo>⊙</mo><mtext>：逐元素乘</mtext></mrow></math></div><ul>
+<li>让 cell <strong>记住或忘记</strong>之前的状态</li>
+<li><strong>只要 forget gate 开着</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>t</mi></msub><mo>≈</mo><mn>1</mn></mrow></math>），信息就留在 cell 里</li>
+</ul>
+<h3>5.4 Output gate</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>o</mi><mi>t</mi></msub><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mi>o</mi></msub><mo stretchy="false">[</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>o</mi></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mi>t</mi></msub><mo>⊙</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>C</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>允许 / 阻止 memory cell 的状态影响其他神经元。</p>
+<h3>5.5 汇总</h3>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>公式</th>
+<th>激活</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>候选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mover accent="true"><mi>C</mi><mo>~</mo></mover><mi>t</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mi>C</mi></msub><mo stretchy="false">[</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>C</mi></msub><mo stretchy="false">)</mo></mrow></math></td>
+<td>tanh</td>
+<td>要写入的新内容</td>
+</tr>
+<tr>
+<td>Input <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>i</mi><mi>t</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mi>i</mi></msub><mo stretchy="false">[</mo><mo>⋅</mo><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></math></td>
+<td>sigmoid</td>
+<td>写多少</td>
+</tr>
+<tr>
+<td>Forget <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>t</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mi>f</mi></msub><mo stretchy="false">[</mo><mo>⋅</mo><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>f</mi></msub><mo stretchy="false">)</mo></mrow></math></td>
+<td>sigmoid</td>
+<td>留多少旧状态</td>
+</tr>
+<tr>
+<td>Output <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>o</mi><mi>t</mi></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mi>o</mi></msub><mo stretchy="false">[</mo><mo>⋅</mo><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>o</mi></msub><mo stretchy="false">)</mo></mrow></math></td>
+<td>sigmoid</td>
+<td>输出多少</td>
+</tr>
+<tr>
+<td>Cell</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>t</mi></msub><mo>=</mo><msub><mi>f</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>C</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>i</mi><mi>t</mi></msub><mo>⊙</mo><msub><mover accent="true"><mi>C</mi><mo>~</mo></mover><mi>t</mi></msub></mrow></math></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Hidden</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mi>t</mi></msub><mo>⊙</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>C</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>（gate 用 sigmoid：输出在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>，像「开关的开度」。）</p>
+<h2>6 · Gradient Clipping（解决梯度爆炸）</h2>
+<p>在更新权重<strong>之前</strong>把梯度显式限制在一个最大阈值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi></mrow></math>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>𝐠</mi><mo>←</mo><mi>c</mi><mo>⋅</mo><mfrac><mi>𝐠</mi><mrow><mo stretchy="false">∥</mo><mi>𝐠</mi><mo stretchy="false">∥</mo></mrow></mfrac><mspace width="1em"/><mtext>if </mtext><mo stretchy="false">∥</mo><mi>𝐠</mi><mo stretchy="false">∥</mo><mo>&gt;</mo><mi>c</mi></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>（方向不变，只缩小长度。补充例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐠</mi><mo>=</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mn>1</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">∥</mo><mi>𝐠</mi><mo stretchy="false">∥</mo><mo>=</mo><mn>5</mn><mo>&gt;</mo><mn>1</mn></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐠</mi><mo>←</mo><mo stretchy="false">(</mo><mn>0.6</mn><mo separator="true">,</mo><mn>0.8</mn><mo stretchy="false">)</mo></mrow></math>。）</p>
+<h2>7 · Multi-layer (Stacked) RNN</h2>
+<ul>
+<li>标准 RNN：「深」在<strong>时间</strong>上</li>
+<li>Stacked RNN：多层 RNN 叠起来，增加<strong>空间</strong>上的深度</li>
+<li>学习<strong>层次化表示</strong>：低层学低级、局部的序列动态；高层学复杂、高级的抽象</li>
+<li>很少叠超过 <strong>2–4 层</strong>（否则计算昂贵、梯度不稳定）</li>
+</ul>
+<h2>8 · 与其他网络结合 / 应用</h2>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>输入 → 输出</th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Image captioning</strong></td>
+<td>图像 → 词序列</td>
+<td>CNN 提取图像特征，LSTM 接在 CNN 的卷积层之后</td>
+</tr>
+<tr>
+<td><strong>Activity recognition</strong></td>
+<td>图像序列 → 活动</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Machine translation</strong></td>
+<td>词序列 → 词序列</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>9 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>为什么 RNN</td>
+<td>序列；feedback；状态</td>
+</tr>
+<tr>
+<td>递推</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>f</mi><mi>W</mi></msub><mo stretchy="false">(</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>；权重共享</td>
+</tr>
+<tr>
+<td>Simple RNN</td>
+<td>tanh 公式；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>y</mi></mrow></msub><msub><mi>h</mi><mi>t</mi></msub></mrow></math>；Goodfellow 四式</td>
+</tr>
+<tr>
+<td>BPTT</td>
+<td>展开图上 backprop；共享权重梯度求和</td>
+</tr>
+<tr>
+<td>消失 / 爆炸</td>
+<td>同一 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub></mrow></math> 反复相乘；传话游戏；后果</td>
+</tr>
+<tr>
+<td>LSTM</td>
+<td>全部公式；四个 gate 作用；cell state 加法更新</td>
+</tr>
+<tr>
+<td>Clipping</td>
+<td>公式；只缩长度</td>
+</tr>
+<tr>
+<td>Stacked</td>
+<td>层次表示；2–4 层</td>
+</tr>
+<tr>
+<td>应用</td>
+<td>captioning（CNN + LSTM）等</td>
+</tr>
+</tbody>
+</table>
+<h2>10 · 易错点</h2>
+<ul>
+<li>所有时间步<strong>共享</strong>同一组 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mrow><mi>h</mi><mi>h</mi></mrow></msub><mo separator="true">,</mo><msub><mi>W</mi><mrow><mi>x</mi><mi>h</mi></mrow></msub><mo separator="true">,</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>y</mi></mrow></msub></mrow></math>。</li>
+<li>Gate 用 <strong>sigmoid</strong>，候选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mover accent="true"><mi>C</mi><mo>~</mo></mover><mi>t</mi></msub></mrow></math> 和输出前的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>t</mi></msub></mrow></math> 用 <strong>tanh</strong>。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mi>t</mi></msub></mrow></math> 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>C</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></math> <strong>加</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>i</mi><mi>t</mi></msub><mo>⊙</mo><msub><mover accent="true"><mi>C</mi><mo>~</mo></mover><mi>t</mi></msub></mrow></math>（加法，这是梯度能流动的原因）。</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><msub><mi>o</mi><mi>t</mi></msub><mo>⊙</mo><mi>tanh</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>C</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>，不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>o</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>C</mi><mi>t</mi></msub></mrow></math>。</li>
+<li>Clipping 解决的是<strong>爆炸</strong>；LSTM 主要解决<strong>消失</strong>。</li>
+</ul>

@@ -1,0 +1,272 @@
+<h2>Scope</h2>
+<p>⚠️ Scope is inferred, not announced. No Quiz 5 announcement or Canvas page exists yet (as of 11/22).</p>
+<ul>
+<li><strong>Date</strong>: the Course Schedule marks Quiz 5 in <strong>Week 13 (23–27 Nov)</strong>. For L2 that means <strong>Tue 11/24 or Thu 11/26</strong>, 13:30, Rm 2407. Quizzes 1–4 were each announced the weekend before, as &quot;L2 (date A or date B)&quot;.</li>
+<li><strong>Format</strong> (same for L2_Quiz 1–4): <strong>6 minutes, 5 MC questions, 1 pt each</strong>, Canvas online, <strong>locked after answering</strong> (one at a time, no going back). Bring a device that can log in to Canvas and open it before 13:30.</li>
+<li><strong>Likely material</strong>: whatever was lectured after Quiz 4 (11/12). Quizzes 1–4 each followed one chapter (Q1 wk 4, Q2 wk 6, Q3 wk 9, Q4 wk 11).
+<ul>
+<li><strong>Ch 5 Laplace (core)</strong>: <code>Chapter5_ROC.pdf</code> was posted 11/12, <code>Chapter5.3</code> updated 11/14, <code>Chapter5_Initial_Final.pdf</code> posted 11/19, <code>Table_Laplace</code> updated 11/18, and tutorial <code>T12</code> (Laplace properties, ROC, PFE) on 11/20.</li>
+<li><strong>End of Ch 4 (possible)</strong>: DFT and circular convolution (<code>Chapter4.3</code> §7, tutorial <code>T11</code>, 11/13).</li>
+<li>HW3 (posted 11/18) covers both: Q1–2 are DFS/DFT/circular convolution, Q3–5 are Laplace.</li>
+</ul>
+</li>
+</ul>
+<h2>Formula Sheet</h2>
+<p><strong>Definition / ROC</strong></p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></msubsup><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>s</mi><mi>t</mi></mrow></msup><mi>d</mi><mi>t</mi><mo separator="true">,</mo><mspace width="1em"/><mi>s</mi><mo>=</mo><mi>σ</mi><mo>+</mo><mi>j</mi><mi>ω</mi></mrow></math></div><table>
+<thead>
+<tr>
+<th>Signal type</th>
+<th>ROC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>right-sided</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><msub><mi>σ</mi><mn>1</mn></msub></mrow></math> (right of the rightmost pole)</td>
+</tr>
+<tr>
+<td>left-sided</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&lt;</mo><msub><mi>σ</mi><mn>2</mn></msub></mrow></math> (left of the leftmost pole)</td>
+</tr>
+<tr>
+<td>two-sided</td>
+<td>strip <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>σ</mi><mn>1</mn></msub><mo>&lt;</mo><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&lt;</mo><msub><mi>σ</mi><mn>2</mn></msub></mrow></math> (intersection, may be empty)</td>
+</tr>
+<tr>
+<td>finite duration</td>
+<td>entire s-plane</td>
+</tr>
+</tbody>
+</table>
+<p>ROC never contains a pole.</p>
+<p><strong>Pairs</strong></p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th>ROC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+<td>all <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mi>s</mi></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>t</mi><mi>n</mi></msup><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>n</mi><mo stretchy="false">!</mo></mrow><msup><mi>s</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>α</mi><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mi>α</mi></mrow></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mi>α</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>α</mi><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mi>α</mi></mrow></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&lt;</mo><mo>−</mo><mi>α</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>α</mi><mi>t</mi></mrow></msup><mi>cos</mi><mo>⁡</mo><msub><mi>ω</mi><mn>0</mn></msub><mi>t</mi><mtext> </mtext><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>s</mi><mo>+</mo><mi>α</mi></mrow><mrow><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mi>α</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><msubsup><mi>ω</mi><mn>0</mn><mn>2</mn></msubsup></mrow></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mi>α</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>α</mi><mi>t</mi></mrow></msup><mi>sin</mi><mo>⁡</mo><msub><mi>ω</mi><mn>0</mn></msub><mi>t</mi><mtext> </mtext><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msub><mi>ω</mi><mn>0</mn></msub><mrow><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mi>α</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><msubsup><mi>ω</mi><mn>0</mn><mn>2</mn></msubsup></mrow></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mi>α</mi></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th>ROC / condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>time shift</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>s</mi><msub><mi>t</mi><mn>0</mn></msub></mrow></msup><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>same</td>
+</tr>
+<tr>
+<td>s-shift</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>α</mi><mi>t</mi></mrow></msup><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mi>α</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>shifted by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>α</mi></mrow></math></td>
+</tr>
+<tr>
+<td>scaling</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi>a</mi><mi mathvariant="normal">∣</mi></mrow></mfrac><mi>F</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mfrac><mi>s</mi><mi>a</mi></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></td>
+<td>scaled by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math></td>
+</tr>
+<tr>
+<td>shift + scale</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo>−</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mi>a</mi></mfrac><mi>F</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mfrac><mi>s</mi><mi>a</mi></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>s</mi><mi>b</mi><mi mathvariant="normal">/</mi><mi>a</mi></mrow></msup></mrow></math></td>
+<td>scaled by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math></td>
+</tr>
+<tr>
+<td>convolution</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mn>1</mn></msub><mo>∗</mo><msub><mi>f</mi><mn>2</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub><msub><mi>F</mi><mn>2</mn></msub></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⊇</mo><msub><mi>R</mi><mn>1</mn></msub><mo>∩</mo><msub><mi>R</mi><mn>2</mn></msub></mrow></math></td>
+</tr>
+<tr>
+<td>differentiation</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> (unilateral: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false">(</mo><msup><mn>0</mn><mo>−</mo></msup><mo stretchy="false">)</mo></mrow></math>)</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⊇</mo><mi>R</mi></mrow></math></td>
+</tr>
+<tr>
+<td>integration</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi>t</mi></msubsup><mi>f</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mi>s</mi></mfrac></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⊇</mo><mi>R</mi><mo>∩</mo><mo stretchy="false">{</mo><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math></td>
+</tr>
+<tr>
+<td>s-differentiation</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mfrac><mrow><mi>d</mi><mi>F</mi></mrow><mrow><mi>d</mi><mi>s</mi></mrow></mfrac></mrow></math></td>
+<td>same</td>
+</tr>
+<tr>
+<td>IVT</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><msup><mn>0</mn><mo>+</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>s</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></msub><mi>s</mi><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi></mrow></math> strictly proper</td>
+</tr>
+<tr>
+<td>FVT</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="normal">∞</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>s</mi><mo>→</mo><mn>0</mn></mrow></msub><mi>s</mi><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>all poles of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mi>F</mi></mrow></math> in LHP</td>
+</tr>
+<tr>
+<td>real signal</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><msup><mi>f</mi><mo>∗</mo></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>F</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo>∗</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td>poles in conjugate pairs</td>
+</tr>
+<tr>
+<td>real + even</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>F</mi><mo stretchy="false">(</mo><mo>−</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td>poles mirrored about the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mi>ω</mi></mrow></math>-axis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Systems</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>Y</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>X</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>)</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msub><mi>a</mi><mi>k</mi></msub><msup><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mo>∑</mo><msub><mi>b</mi><mi>k</mi></msub><msup><mi>x</mi><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></msup></mrow></math> ⇔ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mo>∑</mo><msub><mi>b</mi><mi>k</mi></msub><msup><mi>s</mi><mi>k</mi></msup></mrow><mrow><mo>∑</mo><msub><mi>a</mi><mi>k</mi></msub><msup><mi>s</mi><mi>k</mi></msup></mrow></mfrac></mrow></math>.</li>
+<li>Causal ⇔ ROC is a right half-plane. Stable ⇔ ROC contains the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mi>ω</mi></mrow></math>-axis. For a causal system: stable ⇔ all poles in the LHP.</li>
+<li>Second-order denominator <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><mi>b</mi><mi>s</mi><mo>+</mo><mi>c</mi></mrow></math>, with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mo>−</mo><mi>α</mi><mo>±</mo><msqrt><mrow><msup><mi>α</mi><mn>2</mn></msup><mo>−</mo><msubsup><mi>ω</mi><mn>0</mn><mn>2</mn></msubsup></mrow></msqrt></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>b</mi><mn>2</mn></mfrac></mstyle></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><msqrt><mi>c</mi></msqrt></mrow></math>:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Poles</th>
+<th>Damping</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 distinct real (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>&gt;</mo><msub><mi>ω</mi><mn>0</mn></msub></mrow></math>)</td>
+<td>over-damped</td>
+<td>sum of decaying exponentials, no oscillation</td>
+</tr>
+<tr>
+<td>double real (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><msub><mi>ω</mi><mn>0</mn></msub></mrow></math>)</td>
+<td>critically damped</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><msup><mi>e</mi><mrow><mo>−</mo><mi>α</mi><mi>t</mi></mrow></msup></mrow></math>, no oscillation</td>
+</tr>
+<tr>
+<td>complex, LHP (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>&lt;</mo><mi>α</mi><mo>&lt;</mo><msub><mi>ω</mi><mn>0</mn></msub></mrow></math>)</td>
+<td>under-damped</td>
+<td>decaying oscillation</td>
+</tr>
+<tr>
+<td>on the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mi>ω</mi></mrow></math>-axis (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow></math>)</td>
+<td>undamped</td>
+<td>sustained oscillation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>DFT / circular convolution</strong> (if included)</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>X</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><msubsup><mi>W</mi><mi>N</mi><mrow><mi>n</mi><mi>k</mi></mrow></msubsup><mo separator="true">,</mo><mspace width="1em"/><msub><mi>W</mi><mi>N</mi></msub><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi mathvariant="normal">/</mi><mi>N</mi></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mi>N</mi></mfrac></mstyle><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>X</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><msubsup><mi>W</mi><mi>N</mi><mrow><mo>−</mo><mi>n</mi><mi>k</mi></mrow></msubsup></mrow></math></div><ul>
+<li>DFS coefficient: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>X</mi><mo>~</mo></mover><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mi>N</mi></mfrac></mstyle><mo>×</mo></mrow></math> (DFT of one period).</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>4</mn></msub><mo>=</mo><mo>−</mo><mi>j</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>W</mi><mn>4</mn><mn>2</mn></msubsup><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>W</mi><mn>4</mn><mn>3</mn></msubsup><mo>=</mo><mi>j</mi></mrow></math>.</li>
+<li>Parseval: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><mi mathvariant="normal">∣</mi><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mi>N</mi></mfrac></mstyle><mo>∑</mo><mi mathvariant="normal">∣</mi><mi>X</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup></mrow></math>.</li>
+<li>Circular convolution: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>⊛</mo><mi>h</mi><mo stretchy="false">)</mo><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mi>x</mi><mo stretchy="false">[</mo><mi>m</mi><mo stretchy="false">]</mo><mi>h</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><msub><mo stretchy="false">)</mo><mi>N</mi></msub><mo stretchy="false">]</mo></mrow></math> ⇔ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><mi>H</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo></mrow></math>.</li>
+<li>Equals linear convolution when <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>≥</mo><msub><mi>N</mi><mn>1</mn></msub><mo>+</mo><msub><mi>N</mi><mn>2</mn></msub><mo>−</mo><mn>1</mn></mrow></math>. Otherwise the linear result is wrapped: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mi>c</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mo>∑</mo><mi>r</mi></msub><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mi>r</mi><mi>N</mi><mo stretchy="false">]</mo></mrow></math>.</li>
+</ul>
+<h2>Question Types → Templates</h2>
+<h3>T1 · ROC of a signal</h3>
+<p>Steps: split into right-sided and left-sided terms → right term gives Re &gt; (its pole), left term gives Re &lt; (its pole) → intersect.</p>
+<p>Example: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mn>0</mn></msubsup><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo><mi>t</mi></mrow></msup><mi>d</mi><mi>t</mi></mrow></math> converges only for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&lt;</mo><mo>−</mo><mn>2</mn></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mn>2</mn></mrow></mfrac></mrow></math>, ROC <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&lt;</mo><mo>−</mo><mn>2</mn></mrow></math></strong>.</p>
+<p>Example: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mn>5</mn><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> needs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mn>2</mn></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mo>−</mo><mn>5</mn></mrow></math> ⇒ <strong>empty, so there is no Laplace transform</strong>.</p>
+<h3>T2 · Transform via properties</h3>
+<p>Steps: rewrite as a table pair with a shift, modulation or scale → apply the property → update the ROC.</p>
+<p>Example: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn></mrow></msup><mtext> </mtext><msup><mi>e</mi><mrow><mo>−</mo><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mn>1</mn></mrow></math></strong>.</p>
+<p>Example (HW3 Q3d): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>F</mi><mo stretchy="false">(</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mi>s</mi><mn>2</mn></mfrac></mstyle><mo stretchy="false">)</mo></mrow></math>; ROC <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mn>2</mn></mrow></math> becomes <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mn>4</mn></mrow></math></strong>.</p>
+<h3>T3 · Inverse transform (partial fractions)</h3>
+<p>Steps: improper → long-divide first → factor the denominator → cover-up <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mi>i</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mi>s</mi><mo>−</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi mathvariant="normal">∣</mi><mrow><mi>s</mi><mo>=</mo><msub><mi>p</mi><mi>i</mi></msub></mrow></msub></mrow></math> → table → check the ROC (right-sided ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> terms).</p>
+<ul>
+<li>Real poles: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>s</mi><mo>+</mo><mn>4</mn></mrow><mrow><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mfrac><mn>3</mn><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mo>−</mo><mfrac><mn>2</mn><mrow><mi>s</mi><mo>+</mo><mn>2</mn></mrow></mfrac></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>3</mn><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mo>−</mo><mn>2</mn><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mi>t</mi></mrow></msup><mo stretchy="false">)</mo><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></strong></li>
+<li>Complex poles (complete the square): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>s</mi><mo>+</mo><mn>3</mn></mrow><mrow><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>s</mi><mo>+</mo><mn>5</mn></mrow></mfrac><mo>=</mo><mfrac><mrow><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mn>2</mn></mrow><mrow><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><msup><mn>2</mn><mn>2</mn></msup></mrow></mfrac></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mo stretchy="false">(</mo><mi>cos</mi><mo>⁡</mo><mn>2</mn><mi>t</mi><mo>+</mo><mi>sin</mi><mo>⁡</mo><mn>2</mn><mi>t</mi><mo stretchy="false">)</mo><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></strong></li>
+<li>Double pole: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mi>s</mi><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mi>s</mi></mfrac><mo>−</mo><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mo>−</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mo>−</mo><mi>t</mi><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mo stretchy="false">)</mo><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></strong></li>
+<li>Improper: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><msup><mi>s</mi><mn>2</mn></msup><mrow><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mo>−</mo><mfrac><mn>4</mn><mrow><mi>s</mi><mo>+</mo><mn>2</mn></mrow></mfrac></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mo>−</mo><mn>4</mn><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mi>t</mi></mrow></msup><mo stretchy="false">)</mo><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math></strong></li>
+</ul>
+<h3>T4 · Initial / final value</h3>
+<p>Steps: IVT needs a strictly proper <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi></mrow></math> (otherwise drop the polynomial part). FVT only if every pole of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> is in the LHP.</p>
+<p>Example: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>=</mo><mfrac><mrow><mi>s</mi><mo>+</mo><mn>2</mn></mrow><mrow><mi>s</mi><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>4</mn><mo stretchy="false">)</mo></mrow></mfrac></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><msup><mn>0</mn><mo>+</mo></msup><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>s</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></msub><mfrac><mrow><mi>s</mi><mo>+</mo><mn>2</mn></mrow><mrow><mi>s</mi><mo>+</mo><mn>4</mn></mrow></mfrac><mo>=</mo></mrow></math> <strong>1</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="normal">∞</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>s</mi><mo>→</mo><mn>0</mn></mrow></msub><mfrac><mrow><mi>s</mi><mo>+</mo><mn>2</mn></mrow><mrow><mi>s</mi><mo>+</mo><mn>4</mn></mrow></mfrac><mo>=</mo></mrow></math> <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle></mrow></math></strong>. Check: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><msup><mi>e</mi><mrow><mo>−</mo><mn>4</mn><mi>t</mi></mrow></msup></mrow></math>.</p>
+<p>Trap: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>=</mo><mfrac><mn>2</mn><mrow><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn></mrow></mfrac></mrow></math> gives <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi>sin</mi><mo>⁡</mo><mn>2</mn><mi>t</mi></mrow></math>, which has poles on the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mi>ω</mi></mrow></math>-axis ⇒ <strong>no final value</strong>, even though <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>lim</mi><mo>⁡</mo><mi>s</mi><mi>F</mi><mo>=</mo><mn>0</mn></mrow></math>.</p>
+<h3>T5 · System function: ODE, poles, stability, damping</h3>
+<p>Steps: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> ↔ ODE (coefficients map directly) → factor → causal ⇒ ROC right of the rightmost pole → stable? → oscillatory / damping from the pole type.</p>
+<p>Example: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>H</mi><mo>=</mo><mfrac><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow><mrow><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><mn>6</mn><mi>s</mi><mo>+</mo><mn>25</mn></mrow></mfrac></mrow></math>, causal ⇒ ODE <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>y</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><mo>+</mo><mn>6</mn><msup><mi>y</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><mn>25</mn><mi>y</mi><mo>=</mo><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><mi>x</mi></mrow></math></strong>; zero <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math>; poles <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>3</mn><mo>±</mo><mi>j</mi><mn>4</mn></mrow></math></strong>; ROC <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mn>3</mn></mrow></math> ⇒ <strong>stable, oscillatory, under-damped</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>3</mn><mo>&lt;</mo><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>5</mn></mrow></math>).</p>
+<h3>T6 · Pole pattern / ROC from facts (T12)</h3>
+<ul>
+<li>Real <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math> ⇒ complex poles come in conjugate pairs.</li>
+<li>Real and even ⇒ also mirrored (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>p</mi><mo>∗</mo></msup></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>p</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><msup><mi>p</mi><mo>∗</mo></msup></mrow></math>). The signal is two-sided, so the ROC is a strip containing the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mi>ω</mi></mrow></math>-axis.</li>
+<li>Convolution can cancel a pole: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub><mo>=</mo><mfrac><mrow><mi>s</mi><mo>+</mo><mn>3</mn></mrow><mrow><mi>s</mi><mo>+</mo><mn>10</mn></mrow></mfrac></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>2</mn></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mn>3</mn></mrow></mfrac></mrow></math> (both right-sided) ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo>=</mo><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mn>10</mn></mrow></mfrac></mrow></math>, <strong>ROC <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mn>10</mn></mrow></math></strong> (larger than <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mn>1</mn></msub><mo>∩</mo><msub><mi>R</mi><mn>2</mn></msub></mrow></math>).</li>
+<li>Differentiation can cancel a pole at 0: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo>=</mo><mfrac><mn>1</mn><mrow><mi>s</mi><mo stretchy="false">(</mo><mi>s</mi><mo>+</mo><mn>3</mn><mo stretchy="false">)</mo></mrow></mfrac></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo>=</mo><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Y</mi><mo>=</mo><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mn>3</mn></mrow></mfrac></mrow></math>, <strong>ROC <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo stretchy="false">{</mo><mi>s</mi><mo stretchy="false">}</mo><mo>&gt;</mo><mo>−</mo><mn>3</mn></mrow></math></strong>.</li>
+</ul>
+<h3>T7 · DFT value / circular convolution (if Ch 4 end is included)</h3>
+<p>Example: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>X</mi><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><mo>=</mo><mn>1</mn><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mi>j</mi><msup><mo stretchy="false">)</mo><mi>k</mi></msup></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo>−</mo><mi>j</mi><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo>+</mo><mi>j</mi><mo stretchy="false">}</mo></mrow></math></strong>.</p>
+<p>Example: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">}</mo><msub><mo>⊛</mo><mn>4</mn></msub><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">}</mo></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mi>h</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><msub><mo stretchy="false">)</mo><mn>4</mn></msub><mo stretchy="false">]</mo></mrow></math> ⇒ <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>5</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>7</mn><mo stretchy="false">}</mo></mrow></math></strong>. Check: linear <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mn>1</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>7</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">}</mo></mrow></math>, then wrap <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn></mrow></math> onto <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math>.</p>
+<h2>Common Mistakes</h2>
+<ol>
+<li>Forgetting the ROC: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>a</mi><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>a</mi><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mo>−</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> have the <strong>same</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>. Only the ROC tells them apart.</li>
+<li>Scaling: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>a</mi><mi>t</mi><mo stretchy="false">)</mo><mo>→</mo><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi>a</mi><mi mathvariant="normal">∣</mi></mrow></mfrac><mi>F</mi><mo stretchy="false">(</mo><mfrac><mi>s</mi><mi>a</mi></mfrac><mo stretchy="false">)</mo></mrow></math>, and the ROC boundary is <strong>multiplied</strong> by <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>. Don't use <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mi>F</mi><mo stretchy="false">(</mo><mi>a</mi><mi>s</mi><mo stretchy="false">)</mo></mrow></math>.</li>
+<li>Shifted step: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi></mrow></msup><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> is not <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mi>s</mi></mrow></msup><mfrac><mn>1</mn><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></math>; the missing factor is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn></mrow></msup></mrow></math>.</li>
+<li>Applying FVT when poles are on the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mi>ω</mi></mrow></math>-axis or in the RHP (e.g. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mrow><mi>s</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow></math> or <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>ω</mi><mrow><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><msup><mi>ω</mi><mn>2</mn></msup></mrow></mfrac></mrow></math>). Its answer is meaningless.</li>
+<li>IVT on an improper <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>F</mi></mrow></math>: remove the polynomial (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>δ</mi></mrow></math>) part first.</li>
+<li>Stability: check that the <strong>ROC includes the <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>j</mi><mi>ω</mi></mrow></math>-axis</strong>. LHP poles alone imply stability only for causal systems. A RHP <strong>zero</strong> does not affect stability.</li>
+<li>Damping: real distinct poles ⇒ over-damped (not oscillatory). Complex LHP ⇒ under-damped (oscillatory).</li>
+<li>Circular convolution: wrap index <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><msub><mo stretchy="false">)</mo><mi>N</mi></msub></mrow></math>. Pad both sequences to the same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi></mrow></math> first.</li>
+</ol>
+<h2>HW / Tutorial Correspondence</h2>
+<ul>
+<li>HW3 Q3 (IVT/FVT, shift/scale with ROC) → T2, T4.</li>
+<li>HW3 Q4 (table transforms, pole-zero plot, ROC of a finite pulse = entire plane) → T1, T6.</li>
+<li>HW3 Q5 (ODE, poles, stability, damping, output via PFE) → T3, T5.</li>
+<li>HW3 Q1–2 (DFS/DFT, circular convolution) → T7.</li>
+<li>T12 pp. 2–16 (ROC of left/right signals, scaling, real/even pole patterns, ROC after convolution/differentiation, PFE of all types) → T1–T6.</li>
+</ul>

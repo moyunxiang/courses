@@ -1,0 +1,381 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>Roadmap 两部分：</p>
+<ol>
+<li><strong>Neural networks</strong>：从「手选 non-linear feature」到「让网络自己学 feature」</li>
+<li><strong>Backpropagation</strong>：在 computation graph 上用 chain rule 自动算 gradient</li>
+</ol>
+<blockquote>
+<p>和前两讲的关系：L2 的框架（hypothesis class → loss → gradient descent）<strong>完全不变</strong>，只是 hypothesis class 换成神经网络；而神经网络的 gradient 手推太难，所以要 backpropagation。</p>
+</blockquote>
+<h2>1 · Neural Networks</h2>
+<h3>1.1 从 linear 到 non-linear predictors</h3>
+<table>
+<thead>
+<tr>
+<th>Predictor</th>
+<th>公式</th>
+<th>feature 从哪来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linear</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td>手选</td>
+</tr>
+<tr>
+<td>Quadratic（L3）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo separator="true">,</mo><msup><mi>x</mi><mn>2</mn></msup><mo stretchy="false">]</mo></mrow></math></td>
+<td>手选非线性 feature</td>
+</tr>
+<tr>
+<td><strong>Neural network</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>f</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>V</mi><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td><strong>从数据中学</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Neural network：<strong>从输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math> 中学到高度紧凑（compact）且非线性的 feature</strong>。</li>
+</ul>
+<h3>1.2 结构：intermediate features</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>V</mi><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p>各部分的含义：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>：<strong>input</strong>（原始数据或已提取的 input features）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>：用来<strong>学 feature 的参数 / 权重</strong>（一个矩阵）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math>：<strong>non-linear activation function</strong>，例如 sigmoid <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>z</mi></mrow></msup></mrow></mfrac></mrow></math>，逐元素作用</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>：<strong>hidden feature representation</strong>（隐藏层）</li>
+</ul>
+<p><strong>Predictor（classification）</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mrow><mi>V</mi><mo separator="true">,</mo><mi>w</mi></mrow></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>w</mi><mo>⋅</mo><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></div><blockquote>
+<p><strong>Interpret <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> as a learned feature representation!</strong>
+对比 L3：L3 里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 是人手设计的；这里 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math> 是网络通过学习 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 自动得到的 feature，后面再接一个 linear classifier <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi></mrow></math>。</p>
+</blockquote>
+<p><strong>为什么一定要非线性的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math>？</strong> 如果没有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>w</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>V</mi><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><msup><mi>V</mi><mi mathvariant="normal">⊤</mi></msup><mi>w</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>，又退化成一个 linear predictor，叠多少层都一样。非线性激活才让网络比线性模型强。</p>
+<h3>1.3 Deep neural networks（多层）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>1-layer</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mtext>score</mtext><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>2-layer</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mtext>score</mtext><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>σ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>V</mi><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>3-layer</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mtext>score</mtext><mo>=</mo><mi>w</mi><mo>⋅</mo><mi>σ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>V</mi><mn>2</mn></msub><mtext> </mtext><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>V</mi><mn>1</mn></msub><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>规律：每多一层，就多一个「线性变换 + 非线性激活」。</li>
+<li>注意计数：1-layer 就是 linear classifier；「几层」数的是有几个权重矩阵（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>V</mi><mn>2</mn></msub><mo separator="true">,</mo><mi>w</mi></mrow></math>）。</li>
+</ul>
+<h3>1.4 层代表不同层次的抽象</h3>
+<p>以人脸为例（figure from Honglak Lee），从下往上：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>学到的东西</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pixels</td>
+<td>原始像素</td>
+</tr>
+<tr>
+<td>Earlier layers</td>
+<td><strong>Edges</strong>（边缘）</td>
+</tr>
+<tr>
+<td>Middle layers</td>
+<td><strong>Object parts</strong>（眼睛、鼻子等部件）</td>
+</tr>
+<tr>
+<td>Deep layers</td>
+<td><strong>Object</strong>（整张脸）</td>
+</tr>
+</tbody>
+</table>
+<h3>1.5 Why depth?</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>→</mo><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>→</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>→</mo><msub><mi>h</mi><mn>3</mn></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>→</mo><msub><mi>h</mi><mn>4</mn></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>→</mo><mtext>score</mtext></mrow></math></div><p>Intuitions：</p>
+<ul>
+<li><strong>Multiple levels of abstraction</strong>（多层抽象）</li>
+<li>能建模输入和输出之间的<strong>复杂关系</strong></li>
+<li><strong>Empirically works well</strong>（实践效果好）</li>
+<li><strong>Theory is still incomplete</strong>（理论还不完整）</li>
+</ul>
+<h3>1.6 例：3-layer feed-forward computation</h3>
+<p>结构：input layer（3 个）→ hidden layer 1（4 个）→ hidden layer 2（4 个）→ output layer（1 个），权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>W</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>W</mi><mn>3</mn></msub></mrow></math>。</p>
+<pre><code class="language-python"># activation function (sigmoid)
+f = lambda x: 1.0/(1.0 + np.exp(-x))
+# random input vector of three numbers (3x1)
+x = np.random.randn(3, 1)
+# first hidden layer activations (4x1)
+h1 = f(np.dot(W1, x) + b1)
+# second hidden layer activations (4x1)
+h2 = f(np.dot(W2, h1) + b2)
+# output neuron (1x1)
+out = np.dot(W3, h2) + b3
+</code></pre>
+<ul>
+<li>维度：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>1</mn></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mn>4</mn><mo>×</mo><mn>3</mn></mrow></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>2</mn></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mn>4</mn><mo>×</mo><mn>4</mn></mrow></msup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>W</mi><mn>3</mn></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mn>1</mn><mo>×</mo><mn>4</mn></mrow></msup></mrow></math>。</li>
+<li>输出层<strong>不加激活</strong>，直接输出 score。</li>
+</ul>
+<h3>1.7 训练一个 2-layer 网络的完整实现（约 20 行）</h3>
+<pre><code class="language-python">import numpy as np
+from numpy.random import randn
+
+N, D_in, H, D_out = 64, 1000, 100, 10
+# 1. define network input and output
+x, y = randn(N, D_in), randn(N, D_out)
+w1, w2 = randn(D_in, H), randn(H, D_out)
+
+for t in range(2000):
+    # 2. feed-forward computation
+    h = 1 / (1 + np.exp(-x.dot(w1)))
+    y_pred = h.dot(w2)
+    loss = np.square(y_pred - y).sum()
+    print(t, loss)
+
+    # 3. analytical gradient calculation
+    grad_y_pred = 2.0 * (y_pred - y)
+    grad_w2 = h.T.dot(grad_y_pred)
+    grad_h = grad_y_pred.dot(w2.T)
+    grad_w1 = x.T.dot(grad_h * h * (1 - h))
+
+    # 4. gradient descent to update parameters
+    w1 -= 1e-4 * grad_w1
+    w2 -= 1e-4 * grad_w2
+</code></pre>
+<p>四步对应：</p>
+<ol>
+<li>定义 network 的输入 / 输出和参数</li>
+<li><strong>Feed-forward</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><msub><mi>w</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mi>h</mi><msub><mi>w</mi><mn>2</mn></msub></mrow></math>，loss = squared loss 之和</li>
+<li><strong>手推 gradient</strong>：
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo stretchy="false">(</mo><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>−</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mn>2</mn></msub><mo>=</mo><msup><mi>h</mi><mi mathvariant="normal">⊤</mi></msup><mo>⋅</mo><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mover accent="true"><mi>y</mi><mo>^</mo></mover></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>h</mi><mo>=</mo><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>⋅</mo><msubsup><mi>w</mi><mn>2</mn><mi mathvariant="normal">⊤</mi></msubsup></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><msup><mi>x</mi><mi mathvariant="normal">⊤</mi></msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>h</mi><mo>⊙</mo><mi>h</mi><mo>⊙</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>h</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>h</mi><mo stretchy="false">)</mo></mrow></math> 就是 sigmoid 的导数）</li>
+</ul>
+</li>
+<li><strong>Gradient descent</strong>：learning rate <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></mrow></math></li>
+</ol>
+<h2>2 · 为什么需要 Backpropagation</h2>
+<h3>2.1 (Bad) idea：在纸上推 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi mathvariant="normal">∇</mi><mi>W</mi></msub><mi>L</mi></mrow></math></h3>
+<p>对一个很复杂的网络（从 input image 到 loss 上百层）：</p>
+<ul>
+<li><strong>Very tedious</strong>：大量 matrix calculus，要写很多页纸</li>
+<li><strong>换个 loss 就要重来</strong>：比如把 logistic loss 换成 hinge loss，得从头推</li>
+<li>对每个复杂模型都这么推，<strong>不可行</strong></li>
+</ul>
+<h3>2.2 (Good) idea：Computational graphs + Backpropagation</h3>
+<p>把计算拆成一个个简单节点组成的图，例如 linear classifier + hinge loss + 正则：</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo separator="true">,</mo><mi>W</mi><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mtext> </mtext><mo>∗</mo><mtext> </mtext></mrow></mpadded></mover><mi>s</mi><mo>=</mo><mi>W</mi><mi>x</mi></mrow></math>（scores）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mtext>hinge loss</mtext></mpadded></mover><msub><mi>L</mi><mi>i</mi></msub><mo>=</mo><mo>∑</mo><mi>max</mi><mo>⁡</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo>−</mo><mo stretchy="false">(</mo><mi>W</mi><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo><msub><mi>y</mi><mi>i</mi></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>L</mi><mi>i</mi></msub><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mrow><mtext> </mtext><mo>+</mo><mtext> </mtext></mrow></mpadded></mover><mi>L</mi></mrow></math></li>
+</ul>
+<p>另一支：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>→</mo><mi>R</mi><mo stretchy="false">(</mo><mi>W</mi><mo stretchy="false">)</mo></mrow></math>（<strong>weights regularization</strong>）也加进 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi></mrow></math>。</p>
+<ul>
+<li>每个节点只需要知道<strong>自己的 local gradient</strong>，整张图的 gradient 用 chain rule 自动串起来。</li>
+</ul>
+<h2>3 · Backpropagation</h2>
+<h3>3.1 单个节点：local / upstream / downstream gradient</h3>
+<p>节点 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi></mrow></math>：输入 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo separator="true">,</mo><mi>y</mi></mrow></math>，输出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></math>，最终 loss 为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi></mrow></math>。</p>
+<ul>
+<li><strong>Local gradient</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac></mstyle><mo separator="true">,</mo><mtext> </mtext><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac></mstyle></mrow></math>（只和这个节点自己的运算有关）</li>
+<li><strong>Upstream gradient</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac></mstyle></mrow></math>（从后面传回来的）</li>
+<li><strong>Downstream gradient</strong>：要求的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac></mstyle><mo separator="true">,</mo><mtext> </mtext><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac></mstyle></mrow></math></li>
+</ul>
+<p><strong>Chain rule</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>downstream</mtext><mo>=</mo><mtext>upstream</mtext><mo>×</mo><mtext>local</mtext></mrow></math></div><ul>
+<li>每个节点都这样做，从输出往输入<strong>一路往回传</strong> → 这就是 backpropagation。</li>
+</ul>
+<h3>3.2 简单例子：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></math>（必会）</h3>
+<p>取 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><mi>y</mi><mo>=</mo><mn>5</mn><mo separator="true">,</mo><mtext> </mtext><mi>z</mi><mo>=</mo><mo>−</mo><mn>4</mn></mrow></math>。拆成两个节点：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>q</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo separator="true">,</mo><mspace width="2em"/><mi>f</mi><mo>=</mo><mi>q</mi><mi>z</mi></mrow></math></div><p><strong>Forward pass</strong>（从左往右算值）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>q</mi><mo>=</mo><mo>−</mo><mn>2</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mspace width="2em"/><mi>f</mi><mo>=</mo><mn>3</mn><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>4</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>12</mn></mrow></math></div><p><strong>Local gradients</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>q</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>f</mi><mo>=</mo><mi>q</mi><mi>z</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>:</mo><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mo>=</mo><mi>z</mi><mo separator="true">,</mo><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>=</mo><mi>q</mi></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Backward pass</strong>（从右往左，想要 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo separator="true">,</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo separator="true">,</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mspace width="1em"/><mo stretchy="false">(</mo><mtext>base case</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>q</mi><mo>=</mo><mn>3</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>z</mi><mo>=</mo><mo>−</mo><mn>4</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><munder><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mo stretchy="true">⏟</mo></munder><mtext>upstream</mtext></munder><mo>⋅</mo><munder><munder><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo stretchy="true">⏟</mo></munder><mtext>local</mtext></munder><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>4</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>4</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>f</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>q</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>4</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>4</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>检验</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></math> 直接求导，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>f</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>x</mi><mo>=</mo><mi>z</mi><mo>=</mo><mo>−</mo><mn>4</mn></mrow></math> ✓，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>f</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>z</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>3</mn></mrow></math> ✓。</p>
+<h3>3.3 Patterns in gradient flow（四种门，必背）</h3>
+<table>
+<thead>
+<tr>
+<th>门</th>
+<th>名字</th>
+<th>规则</th>
+<th>课件例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>add</strong></td>
+<td>gradient <strong>distributor</strong></td>
+<td>把 upstream <strong>原样分给</strong>每个输入</td>
+<td>输入 3、4，输出 7；upstream 2 → 两个输入都得 <strong>2</strong></td>
+</tr>
+<tr>
+<td><strong>mul</strong></td>
+<td>“<strong>swap multiplier</strong>”</td>
+<td>每个输入的 gradient = upstream × <strong>另一个</strong>输入的值</td>
+<td>输入 2、3，输出 6；upstream 5 → 第一个得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>×</mo><mn>3</mn><mo>=</mo></mrow></math> <strong>15</strong>，第二个得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>×</mo><mn>5</mn><mo>=</mo></mrow></math> <strong>10</strong></td>
+</tr>
+<tr>
+<td><strong>copy</strong></td>
+<td>gradient <strong>adder</strong></td>
+<td>一个值被用到多处，各分支传回的 gradient <strong>相加</strong></td>
+<td>7 复制成两份，回传 4 和 2 → 得 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>+</mo><mn>2</mn><mo>=</mo></mrow></math> <strong>6</strong></td>
+</tr>
+<tr>
+<td><strong>max</strong></td>
+<td>gradient <strong>router</strong></td>
+<td>只有<strong>较大</strong>的那个输入拿到 upstream，另一个得 0</td>
+<td>输入 4、5，max = 5；upstream 9 → 5 得 <strong>9</strong>，4 得 <strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么</strong>：</p>
+<ul>
+<li>add：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>z</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>x</mi><mo>=</mo><mi mathvariant="normal">∂</mi><mi>z</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>y</mi><mo>=</mo><mn>1</mn></mrow></math>，所以 downstream = upstream × 1。</li>
+<li>mul：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo>=</mo><mi>x</mi><mi>y</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>z</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>z</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>y</mi><mo>=</mo><mi>x</mi></mrow></math>，所以是「交换」后相乘。</li>
+<li>copy：多元 chain rule，一个变量影响 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi></mrow></math> 的所有路径要加起来。</li>
+<li>max：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>z</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></math>，对较大的那个导数是 1，另一个是 0。</li>
+</ul>
+<h3>3.4 完整例子：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi><mo>=</mo><mtext>Sigmoid</mtext><mo stretchy="false">(</mo><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></math></h3>
+<p>取 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>3</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>2</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>=</mo><mo>−</mo><mn>3</mn></mrow></math>。</p>
+<p><strong>Forward pass</strong>（代码 <code>def L(x0, x1, w0, w1, w2)</code>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>0</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>w</mi><mn>0</mn></msub><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mo>−</mo><mn>2</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>w</mi><mn>1</mn></msub><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mn>6</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>2</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>s</mi><mn>0</mn></msub><mo>+</mo><msub><mi>s</mi><mn>1</mn></msub><mo>=</mo><mn>4</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>3</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>s</mi><mn>2</mn></msub><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>L</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></mfrac></mstyle><mo>=</mo><mn>0.73</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Backward pass</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>base case</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow></mfrac><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>sigmoid</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>3</mn></msub></mrow></mfrac><mo>=</mo><mn>1</mn><mo>⋅</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="2em"/><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mn>0.20</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Add gate</strong>（原样分发）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mn>2</mn></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>2</mn></msub></mrow></mfrac><mo>=</mo><mn>0.20</mn><mo separator="true">,</mo><mspace width="2em"/><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>0</mn></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>1</mn></msub></mrow></mfrac><mo>=</mo><mn>0.20</mn></mrow></math></div><p><strong>Multiply gate</strong>（乘另一个输入）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mn>0</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.20</mn><mo>×</mo><msub><mi>x</mi><mn>0</mn></msub><mo>=</mo><mn>0.20</mn><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>0.20</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>0</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.20</mn><mo>×</mo><msub><mi>w</mi><mn>0</mn></msub><mo>=</mo><mn>0.20</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>0.40</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mn>1</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.20</mn><mo>×</mo><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mn>0.20</mn><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>0.40</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>x</mi><mn>1</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.20</mn><mo>×</mo><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><mn>0.20</mn><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>3</mn><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>0.60</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>对应代码</strong>：</p>
+<pre><code class="language-python"># forward pass: compute outputs
+s0 = w0 * x0
+s1 = w1 * x1
+s2 = s0 + s1
+s3 = s2 + w2
+L = sigmoid(s3)
+# backward pass: compute gradients
+# base case
+grad_L = 1.0
+# sigmoid
+grad_s3 = grad_L * (1 - L) * L
+# add gate
+grad_w2 = grad_s3
+grad_s2 = grad_s3
+# add gate
+grad_s0 = grad_s2
+grad_s1 = grad_s2
+# multiply gate
+grad_w0 = grad_s0 * x0
+grad_x0 = grad_s0 * w0
+grad_w1 = grad_s1 * x1
+grad_x1 = grad_s1 * w1
+</code></pre>
+<ul>
+<li>注意 sigmoid 的导数直接用了 <strong>forward 时算好的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>L</mi></mrow></math></strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><msub><mi>s</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mi>L</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>L</mi><mo stretchy="false">)</mo></mrow></math>，不用重新算 exp。这就是为什么要先 forward 存下中间值。</li>
+</ul>
+<h3>3.5 把 sigmoid 再拆开（课件问：Can we further decompose the Sigmoid?）</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><mi>exp</mi><mo>⁡</mo><mo stretchy="false">(</mo><mo>−</mo><msub><mi>s</mi><mn>3</mn></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow></math></div><p>拆成四个节点：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>→</mo><mi>exp</mi><mo>⁡</mo><mo>→</mo><mo>+</mo><mn>1</mn><mo>→</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math>。</p>
+<p><strong>Forward</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>4</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><msub><mi>s</mi><mn>3</mn></msub><mo>=</mo><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>5</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msup><mi>e</mi><msub><mi>s</mi><mn>4</mn></msub></msup><mo>=</mo><mn>0.37</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>6</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>s</mi><mn>5</mn></msub><mo>+</mo><mn>1</mn><mo>=</mo><mn>1.37</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mn>7</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><msub><mi>s</mi><mn>6</mn></msub></mfrac></mstyle><mo>=</mo><mn>0.73</mn></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Backward</strong>（从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>7</mn></msub><mo>=</mo><mn>1</mn></mrow></math> 开始）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>6</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><msub><mi>s</mi><mn>6</mn></msub></mfrac><msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><msubsup><mi>s</mi><mn>6</mn><mn>2</mn></msubsup></mfrac><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><msup><mn>1.37</mn><mn>2</mn></msup></mfrac><mo>=</mo><mo>−</mo><mn>0.53</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>5</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>0.53</mn><mo stretchy="false">)</mo><mo>⋅</mo><mo stretchy="false">(</mo><msub><mi>s</mi><mn>5</mn></msub><mo>+</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mo>−</mo><mn>0.53</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>4</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>0.53</mn><mo stretchy="false">)</mo><mo>⋅</mo><msup><mi>e</mi><msub><mi>s</mi><mn>4</mn></msub></msup><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>0.53</mn><mo stretchy="false">)</mo><mtext> </mtext><msup><mi>e</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mo>−</mo><mn>0.20</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><msub><mi>s</mi><mn>3</mn></msub></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mn>0.20</mn><mo stretchy="false">)</mo><mo>⋅</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.20</mn></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>结果和直接用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">)</mo></mrow></math> 得到的 <strong>0.20 一样</strong> → 节点怎么拆都可以，只要每个节点的 local gradient 会算。</li>
+<li>之后的 add / multiply gate 和 3.4 完全相同。</li>
+</ul>
+<p><strong>各节点的 local gradient 速查</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>前向</th>
+<th>local gradient</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mi>x</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>exp</mi><mo>⁡</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mi>x</mi></msup></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>e</mi><mi>x</mi></msup></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mi mathvariant="normal">/</mi><msup><mi>x</mi><mn>2</mn></msup></mrow></math></td>
+</tr>
+<tr>
+<td>sigmoid</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h2>4 · 总结 &amp; 考点</h2>
+<h3>4.1 Overall summary</h3>
+<ul>
+<li><strong>Neural networks</strong>：学习<strong>分层的 feature representation</strong></li>
+<li><strong>Backpropagation</strong>：基于 computation graph 计算 gradient 的<strong>通用算法</strong>（也帮助可视化、理解 gradient）</li>
+<li>下一讲：unsupervised learning、stochastic gradient descent、generalization、ML best practices</li>
+</ul>
+<h3>4.2 考点清单</h3>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NN 公式</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><mi>V</mi><mi>ϕ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>f</mi><mo>=</mo><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>w</mi><mo>⋅</mo><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>；各符号含义</td>
+</tr>
+<tr>
+<td>为什么要非线性激活</td>
+<td>否则多层退化成一个 linear predictor</td>
+</tr>
+<tr>
+<td>Deep NN</td>
+<td>1 / 2 / 3-layer 的 score 公式</td>
+</tr>
+<tr>
+<td>层次抽象</td>
+<td>pixels → edges → object parts → object</td>
+</tr>
+<tr>
+<td>Why depth</td>
+<td>多层抽象、复杂关系、经验有效、理论不完整</td>
+</tr>
+<tr>
+<td>手推 gradient 的问题</td>
+<td>繁琐、换 loss 要重来、复杂模型不可行</td>
+</tr>
+<tr>
+<td>Chain rule</td>
+<td>downstream = upstream × local</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></math> 例题</td>
+<td>forward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mi>f</mi><mo>=</mo><mo>−</mo><mn>12</mn></mrow></math>；backward <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mo>−</mo><mn>4</mn><mo separator="true">,</mo><mn>3</mn></mrow></math></td>
+</tr>
+<tr>
+<td>四种门</td>
+<td>add 分发、mul 交换相乘、copy 相加、max 路由</td>
+</tr>
+<tr>
+<td>Sigmoid 例题</td>
+<td>会画图、forward、backward 每个数（0.73、0.20、−0.20、0.40、−0.40、−0.60）</td>
+</tr>
+<tr>
+<td>拆 sigmoid</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>、exp、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>x</mi></mrow></math> 的 local gradient，结果仍是 0.20</td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 易错点</h3>
+<ul>
+<li>Mul gate 乘的是<strong>另一个</strong>输入的值，不是自己的。</li>
+<li>Copy（分支）处 gradient 是<strong>相加</strong>，add gate 处是<strong>复制</strong>，两者别搞反。</li>
+<li>Max gate 只有大的那一支有 gradient。</li>
+<li>Backward 前必须先 forward，因为 local gradient 要用 forward 的中间值（例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>σ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mi>L</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>L</mi><mo stretchy="false">)</mo></mrow></math>）。</li>
+<li>Sigmoid 导数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false">)</mo></mrow></math>，在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mn>3</mn></msub><mo>=</mo><mn>1</mn></mrow></math> 时是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.73</mn><mo>×</mo><mn>0.27</mn><mo>≈</mo><mn>0.20</mn></mrow></math>。</li>
+</ul>

@@ -1,0 +1,97 @@
+<p>Notebook: <code>pa_COMP4211_Assignment.ipynb</code> (rename to <code>YourID_COMP4211_Assignment.ipynb</code>). Text below = the ≤2-page PDF. Numbers are checkpoint (best-validation-epoch) accuracies; &quot;ep&quot; = checkpoint epoch.</p>
+<h2>Step 3</h2>
+<p><strong>Experiment 1 — Learning rate (Table 3.1a/b, Figure 3.1a/b)</strong></p>
+<ul>
+<li><strong>0.001:</strong> slowest but smoothest; loss still falling at epoch 20 (MLP ep 20, CNN ep 17) → under-trained. MLP <strong>0.5168</strong> (best for MLP), CNN 0.7081 (train 0.7256, underfits).</li>
+<li><strong>0.01:</strong> fastest drop. CNN train loss &lt; 0.1 by ep 19, val <strong>0.7901</strong> (best for CNN), but val loss rises after ep 7 (overfitting). MLP loss oscillates by ±0.1–0.2 per epoch (step too large for 12,288 inputs; with momentum 0.9 the effective step is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mn>0.9</mn><mo stretchy="false">)</mo><mo>=</mo><mn>10</mn><mi>η</mi></mrow></math>) → 0.5015, below 0.001.</li>
+<li><strong>0.1:</strong> diverges in epoch 1 for both: loss stuck at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ln</mi><mo>⁡</mo><mn>10</mn><mo>≈</mo><mn>2.30</mn></mrow></math> and accuracy 0.1111 = always predicting one class (AnnualCrop, 2100/18900) → no learning.</li>
+</ul>
+<p><strong>Experiment 2 — Batch size (Table 3.2a/b, Figure 3.2a/b)</strong></p>
+<p>Updates per epoch: 591 / 296 / 148 for 32 / 64 / 128; smaller batch = more, noisier updates at the same <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi></mrow></math>.</p>
+<ul>
+<li><strong>MLP:</strong> bs 32 is unstable (loss ≈ 1.8–2.0 throughout, best ep 2, <strong>0.3175</strong>); bs 128 gives the smoothest, lowest loss (≈ 1.25 at ep 20) and best val <strong>0.5183</strong> (bs 64: 0.5015).</li>
+<li><strong>CNN:</strong> bs 32 lowers training loss fastest but its val loss bottoms at ep 5 and then rises most → 0.7607; bs 128 learns slower, reaches the lowest val loss (≈ 0.62) → <strong>0.7983</strong> (best).</li>
+<li>Same data seen, so the difference is update count × gradient noise: fewer, less noisy steps avoid divergence (MLP) and delay overfitting (CNN).</li>
+</ul>
+<p><strong>Experiment 3 — MLP width (Table 3.3, Figure 3.3)</strong></p>
+<ul>
+<li>Params 787,146 / 1,574,282 / 3,148,554 (first layer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12288</mn><mo>×</mo><mi>w</mi></mrow></math> dominates).</li>
+<li>Extra units do <strong>not</strong> reduce training loss: all three end at ≈ 1.3–1.55 with the same oscillation; checkpoint train acc 0.5381 / 0.5262 / 0.4949.</li>
+<li>Val acc 0.5106 / 0.5015 / 0.4758 → no improvement; best <strong>64</strong>. The MLP is limited by unstable optimisation at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>0.01</mn></mrow></math>, not by capacity, so more parameters do not help.</li>
+</ul>
+<p><strong>Experiment 4 — MLP depth (Table 3.4, Figure 3.4)</strong></p>
+<ul>
+<li>Params 1,574,282 / 1,590,794 / 1,623,818 (+16,512 per <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>128</mn><mo>×</mo><mn>128</mn></mrow></math> layer).</li>
+<li>Deeper nets lower training loss faster and more steadily: ≈ 1.13–1.18 at ep 20 (min 1.10) vs ≈ 1.3–1.6 for 1 layer.</li>
+<li>Lower training loss <strong>does</strong> improve validation: train 0.5262 / 0.5932 / 0.6149, val 0.5015 / 0.5637 / <strong>0.5847</strong> (best 4 layers); train–val gap stays ≈ 0.03 because the MLPs underfit.</li>
+</ul>
+<p><strong>Experiment 5 — CNN filters (Table 3.5, Figure 3.5)</strong></p>
+<ul>
+<li>Params 264,250 / 530,090 / 1,068,682: doubling filters roughly doubles parameters (FC input <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msub><mi>f</mi><mn>2</mn></msub><mo>⋅</mo><mn>16</mn><mo>⋅</mo><mn>16</mn></mrow></math>).</li>
+<li>More feature maps → more features per location → training loss lower (≈ 0.09 at ep 20 for (32,64)); checkpoint train 0.8737 / 0.9772 / 0.9475.</li>
+<li>Val loss bottoms at ep 7–12 for all and then rises; val 0.7593 / <strong>0.7901</strong> / 0.7901 → 8→16 filters helps, 16→32 doubles parameters with <strong>no</strong> gain (overfits). Best (16, 32) (tie, first listed).</li>
+</ul>
+<p><strong>Experiment 6 — Kernel size (Table 3.6, Figure 3.6)</strong></p>
+<ul>
+<li>Params 530,090 / 539,050 / 552,490 (conv weights <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∝</mo><msup><mi>k</mi><mn>2</mn></msup></mrow></math>: 5,088 → 14,048 → 27,488; FC unchanged).</li>
+<li>Receptive field of each FC input after two conv+pool blocks: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math> = 10, 16, 22 pixels.</li>
+<li>Training loss is similar or lower for larger kernels (5×5 ≈ 0.06 at ep 20), but their val loss climbs faster after ep 8 (≈ 1.3–1.4 vs 1.09 at ep 20); val <strong>0.7901</strong> / 0.7647 / 0.7462 → wider neighbourhoods do <strong>not</strong> help. EuroSAT classes are distinguished by local texture/colour, so 3×3 already sees enough; the extra <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>k</mi><mn>2</mn></msup></mrow></math> weights mostly fit training noise. Best 3×3.</li>
+</ul>
+<h2>Step 4 (item 4)</h2>
+<p>Final models (Tables 4.1–4.3): <strong>MLP</strong> 4 hidden layers × 128, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>0.01</mn></mrow></math>, bs 64, ep 18; <strong>CNN</strong> baseline architecture, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>η</mi><mo>=</mo><mn>0.01</mn></mrow></math>, bs 128, ep 19.</p>
+<ul>
+<li><strong>vs baselines (val):</strong> MLP 0.5015 → <strong>0.5847</strong> (+8.3 pts); CNN 0.7901 → <strong>0.7983</strong> (+0.8 pts). Test: MLP 0.5847, CNN 0.8119.</li>
+<li><strong>Train gains vs val gains:</strong> MLP train 0.5262 → 0.6149 transfers almost one-to-one (gap ≈ 0.03, underfitting). CNN does not: baseline train 0.9772 &gt; final 0.9281 yet lower val; more filters / bs 32 raised train acc (0.9475 / 0.9409) but not val. CNN train–val gap ≈ 0.13–0.19, val loss rising after ep ≈ 7 (Fig 2.1c) → overfitting.</li>
+<li><strong>MLP vs CNN:</strong> CNN is <strong>+21 pts</strong> on val with <strong>3.1× fewer parameters</strong> (530,090 vs 1,623,818).
+<ul>
+<li>Local connectivity: each conv unit sees only a 3×3 neighbourhood → learns edges/textures; the MLP flattens the image and its first layer (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>12288</mn><mo>×</mo><mn>128</mn></mrow></math> = 1,572,864 weights, 99.9% of the baseline MLP) ties every weight to one pixel position, ignoring spatial structure.</li>
+<li>Parameter sharing: one 3×3 filter is reused at all positions (only 5,088 conv parameters) → the same pattern is detected anywhere; the MLP must relearn it at every location → it plateaus at loss ≈ 1.1–1.5 with large oscillations (Fig 2.1a, 3.4), while the CNN reaches train loss &lt; 0.2 (Fig 2.1c).</li>
+<li>Misclassified images (Fig 4.1): MLP errors follow global colour (Highway → River, a grey curve on green; PermanentCrop → Pasture; AnnualCrop → Industrial); the CNN classifies the first two correctly and fails only on texture-poor, ambiguous images (AnnualCrop field boundaries → Highway / River, uniform dark Forest → HerbaceousVegetation).</li>
+</ul>
+</li>
+</ul>
+<h2>Core code (in the notebook)</h2>
+<pre><code class="language-python">class MLP(nn.Module):
+    def __init__(self, width=128, depth=1):
+        super().__init__()
+        layers, d = [nn.Flatten()], 3 * 64 * 64
+        for _ in range(depth):
+            layers += [nn.Linear(d, width, bias=True), nn.ReLU()]
+            d = width
+        self.net = nn.Sequential(*layers, nn.Linear(d, 10, bias=True))
+
+    def forward(self, x):
+        return self.net(x)
+
+
+class CNN(nn.Module):
+    def __init__(self, filters=(16, 32), kernel=3):
+        super().__init__()
+        f1, f2 = filters
+        p = {3: 1, 5: 2, 7: 3}[kernel]
+        self.net = nn.Sequential(
+            nn.Conv2d(3, f1, kernel, stride=1, padding=p, bias=True), nn.ReLU(), nn.MaxPool2d(2, 2),
+            nn.Conv2d(f1, f2, kernel, stride=1, padding=p, bias=True), nn.ReLU(), nn.MaxPool2d(2, 2),
+            nn.Flatten(), nn.Linear(f2 * 16 * 16, 64, bias=True), nn.ReLU(), nn.Linear(64, 10, bias=True))
+
+    def forward(self, x):
+        return self.net(x)
+</code></pre>
+<pre><code class="language-python">g = reset_seed(42)
+model = MODELS[kind](**arch).to(device)
+train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, generator=g)
+optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+for epoch in range(1, EPOCHS + 1):
+    for xb, yb in train_loader:
+        xb, yb = xb.to(device), yb.to(device)
+        optimizer.zero_grad()
+        criterion(model(xb), yb).backward()
+        optimizer.step()
+    tl, ta = evaluate(model, train_eval_loader)
+    vl, va = evaluate(model, val_eval_loader)
+    if va &gt; best_acc:
+        best_acc, best_epoch = va, epoch
+        torch.save(model.state_dict(), path)
+    model.train()
+</code></pre>
+<p><code>evaluate</code> = <code>model.eval()</code> + <code>torch.no_grad()</code>, summed <code>CrossEntropyLoss(reduction=&quot;sum&quot;)</code> / N and correct / N over the non-shuffled loader; parameters = <code>sum(p.numel() for p in model.parameters())</code>.</p>

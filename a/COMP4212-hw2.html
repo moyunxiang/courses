@@ -1,0 +1,56 @@
+<p>Executed notebook: <code>solutions/hw2_assignment2.ipynb</code> (seed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>42</mn></mrow></math>, no errors).</p>
+<h2>1. Sarsa vs Q-Learning</h2>
+<p><strong>TODO 1</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></p>
+<pre><code class="language-python">s, s_next = self._state_to_idx(state), self._state_to_idx(next_state)
+td_target = reward + self.gamma * self.q_table[s_next, next_action]
+self.q_table[s, action] += self.alpha * (td_target - self.q_table[s, action])
+</code></pre>
+<p><strong>TODO 2</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mi>r</mi><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></math></p>
+<pre><code class="language-python">s, s_next = self._state_to_idx(state), self._state_to_idx(next_state)
+td_target = reward + self.gamma * np.max(self.q_table[s_next])
+self.q_table[s, action] += self.alpha * (td_target - self.q_table[s, action])
+</code></pre>
+<p><strong>TODO 3</strong></p>
+<pre><code class="language-python">next_state, reward, done = env.step(action)
+next_action = sarsa_agent.select_action(next_state)
+sarsa_agent.update(state, action, reward, next_state, next_action)
+state, action = next_state, next_action
+episode_reward += reward
+</code></pre>
+<p><strong>TODO 4</strong></p>
+<pre><code class="language-python">action = q_agent.select_action(state)
+next_state, reward, done = env.step(action)
+q_agent.update(state, action, reward, next_state)
+state = next_state
+episode_reward += reward
+</code></pre>
+<p><strong>Results</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>50</mn></mrow></math> runs × <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>500</mn></mrow></math> episodes)</p>
+<ul>
+<li>Mean reward, ep. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>451</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>500</mn></mrow></math>: <strong>Sarsa <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>22.3</mn></mrow></math></strong>, <strong>Q-learning <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>45.8</mn></mrow></math></strong> (ep. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>50</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>184.7</mn></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>190.8</mn></mrow></math>).</li>
+<li>Greedy path: Sarsa safe, via row <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn></mrow></math> steps, return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>14</mn></mrow></math>); Q-learning optimal, along row <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn></mrow></math> by the cliff (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>13</mn></mrow></math> steps, return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>12</mn></mrow></math>).</li>
+<li>Q-learning learns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>q</mi><mo>∗</mo></msub></mrow></math> but ε-exploration near the cliff falls off → lower online reward; Sarsa learns <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>q</mi><mi>π</mi></msub></mrow></math> of ε-greedy → safer path.</li>
+</ul>
+<h2>2. DQN vs Double DQN</h2>
+<p><strong>TODO 5</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Y</mi><mi>t</mi></msub><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>d</mi><mo stretchy="false">)</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">;</mo><msup><mi>θ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></p>
+<pre><code class="language-python">next_q_max = self.target_net(next_state_batch).max(1)[0]
+target_q = reward_batch + self.gamma * next_q_max * (1 - done_batch)
+</code></pre>
+<p><strong>TODO 6</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo>∗</mo></msup><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">;</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Y</mi><mi>t</mi></msub><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>d</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo>∗</mo></msup><mo separator="true">;</mo><msup><mi>θ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></p>
+<pre><code class="language-python">best_next_a = self.policy_net(next_state_batch).argmax(1, keepdim=True)
+next_q = self.target_net(next_state_batch).gather(1, best_next_a).squeeze(1)
+target_q = reward_batch + self.gamma * next_q * (1 - done_batch)
+</code></pre>
+<p><strong>TODO 7</strong></p>
+<pre><code class="language-python">action = agent.select_action(state, epsilon)
+next_state, reward, done, truncated, _ = env.step(action)
+agent.store_transition(state, action, reward, next_state, done)
+agent.update(batch_size)
+state = next_state
+episode_reward += reward
+</code></pre>
+<p><strong>Results</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn></mrow></math> runs × <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>500</mn></mrow></math> episodes)</p>
+<ul>
+<li>Mean success rate, ep. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>401</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>500</mn></mrow></math>: <strong>DQN <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.868</mn></mrow></math></strong>, <strong>Double DQN <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.914</mn></mrow></math></strong> (ep. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn></mrow></math>–<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>100</mn></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.036</mn></mrow></math> / <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.054</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ε</mi><mn>500</mn></msub><mo>=</mo><msup><mn>0.995</mn><mn>500</mn></msup><mo>≈</mo><mn>0.082</mn></mrow></math>).</li>
+<li>Both greedy policies optimal: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math> steps (D, D, R, D, R, R), <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>≈</mo><msup><mi>γ</mi><mn>5</mn></msup><mo>=</mo><mn>0.951</mn></mrow></math>.</li>
+<li>Double DQN ≥ DQN (less overestimation); small gap on this deterministic <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>×</mo><mn>4</mn></mrow></math> map.</li>
+</ul>

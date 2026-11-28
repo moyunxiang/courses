@@ -1,0 +1,195 @@
+<p>Fully executed notebook: <code>a3_assignment_3.ipynb</code> (same folder). PDF: 1.1, 1.4, 2.1, 2.3, 3(a)–(d). Notebook: 1.2, 1.3, 2.2, 3(e) (the 1.4 results tables are also filled in the notebook). Submit both together: <code>StudentID_assignment_3.pdf</code> + <code>StudentID_assignment_3.ipynb</code>.</p>
+<h2>Q1 MDP and Reinforcement Learning</h2>
+<h3>1.1</h3>
+<p><strong>Value Iteration</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msub><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>P</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mtext> </mtext><mo stretchy="false">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math>)</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mtext>  </mtext><mn>0.5</mn><mo>⋅</mo><mn>8</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn></mrow></math> → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo separator="true">,</mo><mi>B</mi><mo separator="true">,</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mn>4</mn><mo separator="true">,</mo><mtext> </mtext><mn>4</mn><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo stretchy="false">)</mo></mrow></math></strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0.8</mn><mo>⋅</mo><mn>4</mn><mo separator="true">,</mo><mtext>  </mtext><mn>0.8</mn><mo>⋅</mo><mn>4</mn><mo stretchy="false">)</mo><mo>=</mo><mn>3.2</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mtext>  </mtext><mn>0.8</mn><mo>⋅</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mtext>  </mtext><mn>4</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>0.8</mn><mo>⋅</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn></mrow></math> → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo>=</mo><mo stretchy="false">(</mo><mn>3.2</mn><mo separator="true">,</mo><mtext> </mtext><mn>4</mn><mo separator="true">,</mo><mtext> </mtext><mn>4</mn><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo stretchy="false">)</mo></mrow></math></strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mtext>safe</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>+</mo><mn>0.8</mn><mo>⋅</mo><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo></mrow></math> <strong>3.2</strong>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mtext>risky</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>+</mo><mn>0.8</mn><mo>⋅</mo><msup><mi>V</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo></mrow></math> <strong>3.2</strong></li>
+<li>Tie → first action in the table: <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>safe</mtext></mrow></math></strong>.</li>
+</ul>
+<p><strong>TD Q-learning</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mtext> </mtext><mo stretchy="false">[</mo><mi>r</mi><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.5</mn></mrow></math>)</p>
+<ol>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>B</mi><mo separator="true">,</mo><mtext>try</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>+</mo><mn>0.5</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>8</mn><mo>+</mo><mn>0</mn><mo>−</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo></mrow></math> <strong>4</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mtext>risky</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>+</mo><mn>0.5</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mn>0.8</mn><mo>⋅</mo><mn>4</mn><mo>−</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo></mrow></math> <strong>1.6</strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>B</mi><mo separator="true">,</mo><mtext>try</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn><mo>+</mo><mn>0.5</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>0</mn><mo>+</mo><mn>0.8</mn><mo>⋅</mo><mn>1.6</mn><mo>−</mo><mn>4</mn><mo stretchy="false">)</mo><mo>=</mo></mrow></math> <strong>2.64</strong></li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi></mrow></math> is terminal: the episode ends, no further actions or rewards follow (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>), so the target is just <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>; the positive reward is already counted in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math> itself.</p>
+<h3>1.2 (notebook)</h3>
+<pre><code class="language-python">def value_iteration(transitions, gamma=0.8, tol=1e-8, max_iterations=1000):
+    def q_value(values, state, action):
+        return sum(p * (r + gamma * values[s2]) for p, s2, r in transitions[state][action])
+
+    values = {s: 0.0 for s in transitions}
+    iterations = 0
+    while iterations &lt; max_iterations:
+        updated = {
+            s: max(q_value(values, s, a) for a in transitions[s]) if transitions[s] else 0.0
+            for s in transitions
+        }
+        iterations += 1
+        delta = max(abs(updated[s] - values[s]) for s in transitions)
+        values = updated
+        if delta &lt;= tol:
+            break
+
+    policy = {}
+    for s in transitions:
+        best_action, best_q = None, None
+        for a in transitions[s]:
+            q = q_value(values, s, a)
+            if best_q is None or q &gt; best_q:
+                best_action, best_q = a, q
+        policy[s] = best_action
+    return values, policy, iterations
+</code></pre>
+<h3>1.3 (notebook)</h3>
+<pre><code class="language-python">def epsilon_greedy(q_table, state, epsilon, rng):
+    row = q_table[state]
+    if rng.random() &lt; epsilon:
+        return rng.choice(list(row))
+    return max(row, key=row.get)
+
+def q_learning_update(q_table, state, action, reward, next_state, done, alpha, gamma):
+    target = reward if done else reward + gamma * max(q_table[next_state].values())
+    q_table[state][action] += alpha * (target - q_table[state][action])
+    return q_table[state][action]
+
+def train_q_learning(episodes=5000, alpha=0.1, gamma=0.8, epsilon=0.2, seed=0, max_steps=100):
+    rng = random.Random(seed)
+    env = SampleMDP(rng)
+    q_table = initial_q_table()
+    returns = []
+    for _ in range(episodes):
+        state = env.reset()
+        total, discount = 0.0, 1.0
+        for _ in range(max_steps):
+            action = epsilon_greedy(q_table, state, epsilon, rng)
+            next_state, reward, done = env.step(action)
+            q_learning_update(q_table, state, action, reward, next_state, done, alpha, gamma)
+            total += discount * reward
+            discount *= gamma
+            state = next_state
+            if done:
+                break
+        returns.append(total)
+    return q_table, returns
+</code></pre>
+<h3>1.4</h3>
+<p><strong>Value Iteration</strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.8</mn></mrow></math>, tol <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>8</mn></mrow></msup></mrow></math>): <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><mn>4.7059</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mn>4.0000</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mn>5.8824</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.0000</mn></mrow></math></strong>; <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>risky</mtext></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>finish</mtext></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>try</mtext></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mtext>None</mtext></mrow></math></strong>; <strong>37 iterations</strong>.</p>
+<p><strong>Q-learning</strong> (5000 episodes, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.1</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>0.8</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ϵ</mi><mo>=</mo><mn>0.2</mn></mrow></math>, 100 steps):</p>
+<table>
+<thead>
+<tr>
+<th>Seed</th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th style="text-align:right"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></th>
+<th style="text-align:right"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>risky</td>
+<td>finish</td>
+<td>try</td>
+<td style="text-align:right">4.4695</td>
+<td style="text-align:right">4.7059</td>
+</tr>
+<tr>
+<td>1</td>
+<td>risky</td>
+<td>finish</td>
+<td>try</td>
+<td style="text-align:right">4.4135</td>
+<td style="text-align:right">4.7059</td>
+</tr>
+<tr>
+<td>2</td>
+<td>risky</td>
+<td>finish</td>
+<td>try</td>
+<td style="text-align:right">4.3766</td>
+<td style="text-align:right">4.7059</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Discussion.</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> is a finite-sample estimate: with constant <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.1</mn></mrow></math> it is a weighted average of recent noisy sampled targets (random outcome of <code>try</code>) that bootstrap on other still-inaccurate Q-values, so it has not converged. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></math> is the exact expected return of the greedy policy computed from the model; the greedy policy can already be optimal (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>V</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><mn>4.7059</mn></mrow></math>) while its Q-values are still off.</p>
+<h2>Q2 Games</h2>
+<h3>2.1</h3>
+<p><strong>(a)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mtext>MAX</mtext><mo stretchy="false">)</mo></mrow></math>: MIN took the last stone → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></strong>. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mtext>MIN</mtext><mo stretchy="false">)</mo></mrow></math>: MAX took the last stone → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></strong>.</p>
+<p><strong>(b)</strong></p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>A</mtext><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mtext>MIN</mtext><mo stretchy="false">)</mo></mrow></math>: MIN takes <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>B</mtext><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></math> and wins → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>B</mtext><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mtext>MIN</mtext><mo stretchy="false">)</mo></mrow></math>: MIN must take one stone, MAX takes the last → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math></strong></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>B</mtext><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mtext>MIN</mtext><mo stretchy="false">)</mo></mrow></math>: MIN takes <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>A</mtext><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> and wins → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn></mrow></math></strong></li>
+<li><strong>Best first move: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mtext>B</mtext><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math>, minimax value <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math>.</strong></li>
+</ul>
+<h3>2.2 (notebook)</h3>
+<pre><code class="language-python">def legal_actions(state):
+    a, b, _ = state
+    return [(pile, n) for pile, size in (('A', a), ('B', b)) for n in (1, 2) if n &lt;= size]
+
+def next_state(state, action):
+    a, b, player = state
+    pile, n = action
+    if pile == 'A':
+        a -= n
+    else:
+        b -= n
+    return (a, b, 'MIN' if player == 'MAX' else 'MAX')
+
+def terminal_utility(state):
+    a, b, player = state
+    if a == 0 and b == 0:
+        return -1 if player == 'MAX' else 1
+    return None
+
+def minimax(state):
+    utility = terminal_utility(state)
+    if utility is not None:
+        return utility, None
+    best_score, best_action = None, None
+    for action in legal_actions(state):
+        score, _ = minimax(next_state(state, action))
+        if (best_score is None
+                or (state[2] == 'MAX' and score &gt; best_score)
+                or (state[2] == 'MIN' and score &lt; best_score)):
+            best_score, best_action = score, action
+    return best_score, best_action
+</code></pre>
+<p>Output: <code>Minimax for (1, 2, 'MAX'): (1, ('B', 1))</code>, matches 2.1(b).</p>
+<h3>2.3</h3>
+<p><strong>(a)</strong> <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>b</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>b</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>c</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>c</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>c</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>c</mi><mn>4</mn></msub></mrow></math></strong></p>
+<p><strong>(b)</strong></p>
+<ul>
+<li>Cutoff 1 at <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>A</mi><mn>2</mn></msub></mrow></math></strong> (MAX, entered with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mo>−</mo><mi mathvariant="normal">∞</mi><mo separator="true">,</mo><mi>β</mi><mo>=</mo><mn>5</mn></mrow></math>): after <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>3</mn></msub><mo>=</mo><mn>6</mn></mrow></math>, <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>6</mn><mo>≥</mo><mi>β</mi><mo>=</mo><mn>5</mn></mrow></math></strong> → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>4</mn></msub></mrow></math> pruned</strong>.</li>
+<li>Cutoff 2 at <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi></mrow></math></strong> (MIN, entered with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>5</mn><mo separator="true">,</mo><mi>β</mi><mo>=</mo><mo>+</mo><mi mathvariant="normal">∞</mi></mrow></math>): after <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>=</mo><mn>2</mn></mrow></math>, <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>5</mn><mo>≥</mo><mi>β</mi><mo>=</mo><mn>2</mn></mrow></math></strong> → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>B</mi><mn>2</mn></msub></mrow></math> (with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>b</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>b</mi><mn>4</mn></msub></mrow></math>) pruned</strong>.</li>
+<li>No cutoff under <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mn>1</mn></msub><mo>=</mo><mn>7</mn></mrow></math> gives <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>β</mi><mo>=</mo><mn>7</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mn>2</mn></msub></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>5</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn><mo>&lt;</mo><mn>7</mn></mrow></math>.</li>
+</ul>
+<p><strong>(c)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>5</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">)</mo><mo>=</mo><mn>5</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi><mo>=</mo><mn>2</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo>=</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>7</mn><mo separator="true">,</mo><mn>6</mn><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn></mrow></math> → <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>R</mi><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn></mrow></math>, best first move <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>→</mo><mi>C</mi></mrow></math></strong>.</p>
+<h2>Q3 Probabilistic Reasoning</h2>
+<p>Factorization: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>P</mi><mo separator="true">,</mo><mi>M</mi><mo separator="true">,</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo>=</mo><mi>P</mi><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>P</mi><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>P</mi><mo stretchy="false">(</mo><mi>S</mi><mo>∣</mo><mi>P</mi><mo separator="true">,</mo><mi>M</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>P</mi><mo stretchy="false">(</mo><mi>A</mi><mo>∣</mo><mi>S</mi><mo separator="true">,</mo><mi>M</mi><mo stretchy="false">)</mo></mrow></math>.</p>
+<p><strong>(a)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mo>+</mo><mi>s</mi><mo separator="true">,</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mo>+</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi>P</mi><mo stretchy="false">(</mo><mo>−</mo><mi>p</mi><mo stretchy="false">)</mo><mi>P</mi><mo stretchy="false">(</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><mi>P</mi><mo stretchy="false">(</mo><mo>+</mo><mi>s</mi><mo>∣</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><mi>P</mi><mo stretchy="false">(</mo><mo>+</mo><mi>a</mi><mo>∣</mo><mo>+</mo><mi>s</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.4</mn><mo>⋅</mo><mn>0.6</mn><mo>⋅</mo><mn>0.01</mn><mo>⋅</mo><mn>0.8</mn><mo>=</mo></mrow></math> <strong>0.00192</strong></p>
+<p><strong>(b)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mo>−</mo><mi>s</mi><mo separator="true">,</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mo>+</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.4</mn><mo>⋅</mo><mn>0.6</mn><mo>⋅</mo><mn>0.99</mn><mo>⋅</mo><mn>0.00</mn><mo>=</mo></mrow></math> <strong>0</strong></p>
+<p><strong>(c)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mo>+</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∑</mo><mi>s</mi></msub><mi>P</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mo>+</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.00192</mn><mo>+</mo><mn>0</mn><mo>=</mo></mrow></math> <strong>0.00192</strong></p>
+<p><strong>(d)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo stretchy="false">(</mo><mo>+</mo><mi>s</mi><mo>∣</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mo>+</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>P</mi><mo stretchy="false">(</mo><mo>+</mo><mi>s</mi><mo separator="true">,</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mo>+</mo><mi>a</mi><mo stretchy="false">)</mo></mrow><mrow><mi>P</mi><mo stretchy="false">(</mo><mo>−</mo><mi>p</mi><mo separator="true">,</mo><mo>−</mo><mi>m</mi><mo separator="true">,</mo><mo>+</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mfrac></mstyle><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>0.00192</mn><mn>0.00192</mn></mfrac></mstyle><mo>=</mo></mrow></math> <strong>1</strong></p>
+<p><strong>(e)</strong> (notebook)</p>
+<pre><code class="language-python">def compute_prior(X, y):
+    return np.array([np.mean(y == c) for c in (0, 1)])
+
+def compute_likelihood(X, y):
+    likelihood = np.zeros((X.shape[1], 2, 2))
+    for c in (0, 1):
+        for v in (0, 1):
+            likelihood[:, v, c] = np.mean(X[y == c] == v, axis=0)
+    return likelihood
+
+def predict(prior, likelihood, query):
+    joint = prior * np.prod(likelihood[np.arange(len(query)), query], axis=0)
+    posterior = joint / joint.sum()
+    return int(np.argmax(posterior)), posterior
+</code></pre>
+<p>Prior <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>0.75</mn><mo separator="true">,</mo><mtext> </mtext><mn>0.25</mn><mo stretchy="false">)</mo></mrow></math>. Output: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></math> → posterior <strong>[0.25773196 0.74226804]</strong>, class <strong>1</strong>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">]</mo></mrow></math> → posterior <strong>[1. 0.]</strong>, class <strong>0</strong> (matches the expected output).</p>

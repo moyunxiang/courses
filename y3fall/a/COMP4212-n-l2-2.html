@@ -1,0 +1,628 @@
+<h2>0 · 这一讲在讲什么</h2>
+<p>上一讲是 model-free <strong>prediction</strong>（估 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>），这一讲是 model-free <strong>control</strong>（找最优 policy）。</p>
+<ol>
+<li><strong>On-policy MC control</strong>：为什么改用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>；exploring starts；<strong>ε-greedy policy improvement 定理</strong>；<strong>GLIE</strong></li>
+<li><strong>Off-policy MC control</strong>：on / off-policy；<strong>importance sampling</strong>（ordinary vs weighted）；无穷方差的例子</li>
+<li><strong>On-policy TD control</strong>：<strong>SARSA</strong>；收敛条件；Windy Gridworld；n-step SARSA、SARSA(λ)</li>
+<li><strong>Off-policy TD control</strong>：off-policy TD 的 importance sampling；<strong>Q-learning</strong>；为什么 Q-learning 不需要 importance sampling；<strong>Expected SARSA</strong>；Cliff Walking；DP 与 TD 的对应</li>
+<li><strong>Q-learning variants</strong>：<strong>maximization bias</strong>、<strong>Double Q-learning</strong></li>
+</ol>
+<blockquote>
+<p>必考：<strong>SARSA、Q-learning、Expected SARSA 的更新式和区别</strong>（on / off-policy）；为什么 control 要用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 不用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>；ε-greedy 改进定理的证明；GLIE 的两个条件；importance sampling ratio <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi></mrow></math> 的推导（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 抵消）；ordinary vs weighted IS 的 bias / variance；off-policy TD 只需一步的 ratio；Q-learning 为什么不需要 IS；Cliff Walking 中 SARSA 和 Q-learning 走哪条路及原因；maximization bias 与 Double Q-learning。</p>
+</blockquote>
+<h2>1 · On-Policy MC Control</h2>
+<h3>1.1 回顾 Policy Iteration，换成 MC</h3>
+<ul>
+<li>Policy evaluation：估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>（iterative policy evaluation）</li>
+<li>Policy improvement：产生 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>≥</mo><mi>π</mi></mrow></math>（greedy）</li>
+</ul>
+<p><strong>MC 版本</strong>：policy evaluation 用 MC policy evaluation——<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><msub><mi>V</mi><mi>π</mi></msub></mrow></math>？policy improvement 用 greedy——可以吗？</p>
+<h3>1.2 为什么要用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 而不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math>（关键）</h3>
+<ul>
+<li>对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 做 greedy improvement <strong>需要 MDP 的 model</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></math></div><ul>
+<li>对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 做 greedy improvement 是 <strong>model-free</strong> 的：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></div><p>所以：<strong>policy evaluation：MC policy evaluation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><msub><mi>Q</mi><mi>π</mi></msub></mrow></math>！</strong></p>
+<h3>1.3 Greedy policy 与收敛性</h3>
+<ul>
+<li>对任意 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math>，<strong>greedy policy</strong> 在每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> <strong>确定地</strong>选 action value 最大的 action：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math> 取为对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><msub><mi>π</mi><mi>k</mi></msub></msub></mrow></math> 的 greedy policy；greedy improvement 得到 deterministic policy</li>
+<li>满足 policy improvement 条件：对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math></li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>Q</mi><msub><mi>π</mi><mi>k</mi></msub></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>π</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><msub><mi>Q</mi><msub><mi>π</mi><mi>k</mi></msub></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>s</mi><mo separator="true">,</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><msub><mi>Q</mi><msub><mi>π</mi><mi>k</mi></msub></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>≥</mo><msub><mi>Q</mi><msub><mi>π</mi><mi>k</mi></msub></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><msub><mi>π</mi><mi>k</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></div><p>所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>≥</mo><msub><mi>π</mi><mi>k</mi></msub></mrow></math></p>
+<h3>1.4 MC control 收敛的两个假设</h3>
+<ol>
+<li><strong>每个 state（对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math>）或 state-action 对（对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math>）都被访问到</strong></li>
+<li><strong>Policy evaluation 用无穷多个 episode</strong></li>
+</ol>
+<p>第 2 个问题，和 DP 一样有两种办法：</p>
+<ul>
+<li>每次 evaluation 走足够多步，使误差足够小（需要太多 episode，不实用）</li>
+<li>像 value iteration 那样，只把 value function <strong>往</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><msub><mi>π</mi><mi>k</mi></msub></msub></mrow></math> <strong>挪一点</strong>（不求精确）</li>
+</ul>
+<p>第 1 个问题：<strong>用 deterministic policy 能做到吗？</strong> 不能——deterministic policy 在每个 state 只选一个 action，其他 action 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 永远估计不到。</p>
+<h3>1.5 Exploration problem 的三种解决方案</h3>
+<p>一直按 deterministic policy 收集经验，可能永远没机会看到并评估其他 action。</p>
+<ol>
+<li><strong>Exploring starts</strong>：每个 state-action 对都有非零概率作为<strong>起点</strong></li>
+<li><strong>Stochastic policies</strong>：放弃 deterministic policy，只在 stochastic / <strong>soft</strong> policy 中搜索（如 ε-greedy）</li>
+<li><strong>Off-policy learning</strong>：用<strong>另一个</strong> policy 收集经验，评估我们关心的 policy</li>
+</ol>
+<h3>1.6 Solution 1：Monte Carlo ES</h3>
+<blockquote>
+<p><strong>Monte Carlo ES（Exploring Starts）, for estimating <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo>≈</mo><msub><mi>π</mi><mo>∗</mo></msub></mrow></math></strong></p>
+<p>初始化：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 任意；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 任意；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo></mrow></math> 空列表</p>
+<p>Loop forever（for each episode）：</p>
+<ul>
+<li>随机选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>0</mn></msub></mrow></math>，使所有对的概率 &gt; 0</li>
+<li>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>0</mn></msub></mrow></math> 出发按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 生成 episode：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>S</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>A</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>R</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>S</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>A</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>R</mi><mi>T</mi></msub></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>←</mo><mn>0</mn></mrow></math>；Loop <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>T</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn></mrow></math>：
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>←</mo><mi>γ</mi><mi>G</mi><mo>+</mo><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math></li>
+<li>Unless 对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 在之前出现过：Append <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi></mrow></math> to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mtext>average</mtext><mo stretchy="false">(</mo><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3>1.7 Solution 2：MC with ε-greedy</h3>
+<ul>
+<li>ε-greedy 保证<strong>持续 exploration</strong>：所有 action 都以非零概率被试
+<ul>
+<li>以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow></math> 选 greedy action；以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi></mrow></math> 随机选</li>
+</ul>
+</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mstyle scriptlevel="0" displaystyle="true"><mfrac><mi>ε</mi><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></mfrac></mstyle><mo>+</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>if </mtext><msup><mi>a</mi><mo>∗</mo></msup><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mstyle scriptlevel="0" displaystyle="true"><mfrac><mi>ε</mi><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></mfrac></mstyle><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>otherwise</mtext></mstyle></mtd></mtr></mtable></mrow></mrow></math></div><p><strong>Q：这满足 policy improvement 的要求吗？</strong></p>
+<h3>1.8 ε-Greedy Policy Improvement Theorem（证明）</h3>
+<blockquote>
+<p><strong>Theorem.</strong> 对任意 ε-greedy policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>，关于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub></mrow></math> 的 ε-greedy policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 是改进：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>≥</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></p>
+</blockquote>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mi>ε</mi><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo stretchy="false">)</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>≥</mo><mfrac><mi>ε</mi><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo stretchy="false">)</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>−</mo><mfrac><mi>ε</mi><mrow><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></mfrac></mrow><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow></mfrac><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><mrow><mi>a</mi><mo>∈</mo><mi>𝒜</mi></mrow></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>关键一步（≥）的 trick</strong>：权重 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>−</mo><mi>ε</mi><mi mathvariant="normal">/</mi><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow></mfrac></mstyle></mrow></math> <strong>非负且和为 1</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 是 ε-greedy，所以每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>≥</mo><mi>ε</mi><mi mathvariant="normal">/</mi><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></math>；求和 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi>ε</mi></mrow></mfrac><mo>=</mo><mn>1</mn></mrow></math>），所以是一个<strong>加权平均</strong>，一定 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo></mrow></math> 最大值。</p>
+<p><strong>最后一步</strong>：展开后 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mi mathvariant="normal">/</mi><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">∣</mo></mrow></math> 项抵消，只剩 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mi>a</mi></msub><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+<p>然后由 <strong>policy improvement theorem</strong>（1.4 讲）：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>≥</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><msup><mi>π</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>≥</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>。</p>
+<h3>1.9 MC policy iteration 与算法框</h3>
+<ul>
+<li>Policy evaluation：MC policy evaluation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><msub><mi>Q</mi><mi>π</mi></msub></mrow></math></li>
+<li>Policy improvement：<strong>ε-greedy</strong> policy improvement</li>
+</ul>
+<blockquote>
+<p><strong>On-policy first-visit MC control（for ε-soft policies）</strong></p>
+<p>参数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo>←</mo></mrow></math> 任意 ε-soft policy；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 任意；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo></mrow></math> 空</p>
+<p>Repeat forever（for each episode）：</p>
+<ul>
+<li>按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 生成 episode；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>←</mo><mn>0</mn></mrow></math></li>
+<li>Loop <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi><mo>=</mo><mi>T</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>0</mn></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi><mo>←</mo><mi>γ</mi><mi>G</mi><mo>+</mo><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math>；若 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math> 之前没出现过：
+<ul>
+<li>Append <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>G</mi></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mtext>average</mtext><mo stretchy="false">(</mo><mi>R</mi><mi>e</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi><mi>s</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo>∗</mo></msup><mo>←</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>（ties broken arbitrarily）</li>
+<li>对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><msub><mi>S</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo>+</mo><mi>ε</mi><mi mathvariant="normal">/</mi><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">∣</mo></mrow></math> if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><msup><mi>A</mi><mo>∗</mo></msup></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mi mathvariant="normal">/</mi><mo stretchy="false">∣</mo><mi>𝒜</mi><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">∣</mo></mrow></math> otherwise</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3>1.10 GLIE</h3>
+<blockquote>
+<p><strong>Definition（GLIE：Greedy in the Limit with Infinite Exploration）</strong></p>
+<ul>
+<li>所有 state-action 对被探索<strong>无穷多次</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>k</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></msub><msub><mi>N</mi><mi>k</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></math></li>
+<li>policy <strong>收敛到 greedy policy</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>k</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow></msub><msub><mi>π</mi><mi>k</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>𝟙</mn><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>a</mi><mo>=</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><msub><mi>Q</mi><mi>k</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></math></li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>Theorem（GLIE Convergence）.</strong> GLIE model-free control 收敛到 optimal action-value function：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>→</mo><msup><mi>Q</mi><mo>∗</mo></msup></mrow></math></p>
+<p><strong>ε-greedy 可以做成 GLIE</strong>：让 ε 衰减到 0，如 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ε</mi><mi>k</mi></msub><mo>=</mo><mfrac><mn>1</mn><mi>k</mi></mfrac></mrow></math></p>
+</blockquote>
+<p><strong>为什么要两个条件？</strong> 第一条保证每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 都估得准（exploration）；第二条保证最终的 policy 是最优的贪心 policy（不再乱走）。常数 ε 满足第一条不满足第二条。</p>
+<p><strong>GLIE Monte-Carlo Control</strong>：</p>
+<ul>
+<li>用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 采样第 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi></mrow></math> 个 episode：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><msub><mi>s</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>a</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>s</mi><mi>T</mi></msub><mo stretchy="false">}</mo><mo>∼</mo><mi>π</mi></mrow></math></li>
+<li>对 episode 中每个 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></math>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>N</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>N</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>1</mn><mrow><mi>N</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li>用新的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 改进 policy：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>←</mo><mfrac><mn>1</mn><mi>k</mi></mfrac></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo>←</mo><mi>ε</mi><mtext>-greedy</mtext><mo stretchy="false">(</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li>收敛到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>→</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h2>2 · Off-Policy MC Control</h2>
+<h3>2.1 On-policy vs Off-policy</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>On-policy learning</th>
+<th>Off-policy learning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>比喻</td>
+<td>「<strong>Learn on the job</strong>」</td>
+<td>「<strong>Look over someone's shoulder</strong>」</td>
+</tr>
+<tr>
+<td>学什么</td>
+<td>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 采样的经验学<strong>behavior policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math></strong></td>
+<td>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi></mrow></math> 采样的经验学 <strong>target policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math></strong></td>
+</tr>
+<tr>
+<td>一句话</td>
+<td>评估 / 改进<strong>用来做决定的那个</strong> policy</td>
+<td>评估 / 改进的 policy <strong>不同于</strong>产生数据的 policy</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Off-policy 可以「counterfactually」学：「如果我左转会怎样？」</li>
+<li><strong>Q：前面的 Monte Carlo ES 是 on-policy 还是 off-policy？</strong> <strong>A：On-policy！</strong>（生成数据的就是被改进的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math>）</li>
+</ul>
+<h3>2.2 为什么 off-policy 重要</h3>
+<ul>
+<li>评估 target policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 来计算 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，同时用 <strong>behavior policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></strong> 产生 action（课件写成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>s</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 是笔误）</li>
+<li>用途：
+<ul>
+<li>从观察人类或其他 agent 学（如 <strong>logged data</strong>）</li>
+<li><strong>重用旧 policy 的经验</strong></li>
+<li>跟随一个 policy 时学<strong>多个</strong> policy</li>
+<li>跟随 <strong>exploratory</strong> policy 时学 <strong>greedy</strong> policy</li>
+</ul>
+</li>
+</ul>
+<p><strong>Off-policy 的难点</strong>：两种不匹配</p>
+<ul>
+<li>target policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 和 behavior policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 的 action 选择概率不同</li>
+<li>多步之后 <strong>trajectory 分布</strong>也不同</li>
+</ul>
+<h3>2.3 Importance Sampling</h3>
+<p><strong>一般想法</strong>：从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></math> 独立采样 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>z</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>z</mi><mi>N</mi></msub></mrow></math> 来近似期望：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>𝔼</mi><mrow><mi>z</mi><mo>∼</mo><mi>p</mi></mrow></msub><mo stretchy="false">[</mo><mi>f</mi><mo stretchy="false">]</mo><mo>=</mo><mo>∫</mo><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>z</mi><mo>≈</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>f</mi><mo stretchy="false">(</mo><msub><mi>z</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></math></div><p><strong>Q：如果很难从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></math> 采样呢？</strong> 用一个容易采样的 <strong>proposal distribution <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></math></strong>（要求 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>&gt;</mo><mn>0</mn></mrow></math> 时 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>&gt;</mo><mn>0</mn></mrow></math>）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>𝔼</mi><mrow><mi>z</mi><mo>∼</mo><mi>p</mi></mrow></msub><mo stretchy="false">[</mo><mi>f</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>∫</mo><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>z</mi><mo>=</mo><mo>∫</mo><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mfrac><mi>q</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>z</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>z</mi><mo>∼</mo><mi>q</mi></mrow></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo><mo>≈</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>z</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>q</mi><mo stretchy="false">(</mo><msub><mi>z</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mi>f</mi><mo stretchy="false">(</mo><msub><mi>z</mi><mi>n</mi></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="1em"/><msub><mi>z</mi><mi>n</mi></msub><mo>∼</mo><mi>q</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>w</mi><mi>n</mi></msub><mo>=</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>z</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>q</mi><mo stretchy="false">(</mo><msub><mi>z</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mstyle></mrow></math> 是 <strong>importance weights</strong></li>
+</ul>
+<h3>2.4 用于 off-policy RL</h3>
+<p>用 behavior policy 采样的 trajectory 估计 target policy 下的期望 return：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>𝔼</mi><mrow><mi>τ</mi><mo>∼</mo><mi>π</mi></mrow></msub><mo stretchy="false">[</mo><mi>G</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>∫</mo><mi>μ</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow></mfrac><mi>G</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mtext> </mtext><mi>d</mi><mi>τ</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>τ</mi><mo>∼</mo><mi>μ</mi></mrow></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow></mfrac><mi>G</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo><mo>≈</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><msub><mi>τ</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><msub><mi>τ</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mi>G</mi><mo stretchy="false">(</mo><msub><mi>τ</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><h3>2.5 Importance sampling ratio（推导要会）</h3>
+<p>从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow></math> 出发，后续 trajectory <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>s</mi><mi>T</mi></msub></mrow></math> 在 policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 下的概率：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>s</mi><mi>T</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>a</mi><mrow><mi>t</mi><mo>:</mo><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>∼</mo><mi>π</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>⋯</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>T</mi></msub><mo>∣</mo><msub><mi>s</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>k</mi><mo>=</mo><mi>t</mi></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mtext> </mtext><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p><strong>Importance sampling ratio</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><msubsup><mi>ρ</mi><mi>t</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mo>=</mo><mfrac><mrow><munderover><mo>∏</mo><mrow><mi>k</mi><mo>=</mo><mi>t</mi></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><mrow><munderover><mo>∏</mo><mrow><mi>k</mi><mo>=</mo><mi>t</mi></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>μ</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><munderover><mo>∏</mo><mrow><mi>k</mi><mo>=</mo><mi>t</mi></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></munderover><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>关键</strong>：<strong>转移概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 上下抵消</strong>——所以算 ratio <strong>不需要知道 model</strong>，仍然是 model-free。</p>
+<p><strong>性质</strong>：</p>
+<ul>
+<li>每个 ratio 的期望是 1：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>𝔼</mi><mrow><msub><mi>a</mi><mi>k</mi></msub><mo>∼</mo><mi>μ</mi></mrow></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><mi>a</mi></munder><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><mi>a</mi></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>Importance sampling 可能有很高（甚至无穷）的方差</strong></li>
+<li>我们手上只有 behavior policy 的 return：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>V</mi><mi>μ</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>；乘上 ratio 才对：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><msubsup><mi>ρ</mi><mi>t</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>G</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h3>2.6 Ordinary vs Weighted IS</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒯</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>：访问 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 的时间步集合（every-visit：所有访问；first-visit：每个 episode 第一次访问）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 之后第一次终止的时刻；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>G</mi><mi>t</mi></msub></mrow></math>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>t</mi></mrow></math> 到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math> 的 return。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Ordinary IS:</mtext><mspace width="1em"/><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mrow><mi>t</mi><mo>∈</mo><mi>𝒯</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></munder><msubsup><mi>ρ</mi><mi>t</mi><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>G</mi><mi>t</mi></msub></mrow><mrow><mo stretchy="false">∣</mo><mi>𝒯</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">∣</mo></mrow></mfrac></mrow></math></div><div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Weighted IS:</mtext><mspace width="1em"/><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mrow><mi>t</mi><mo>∈</mo><mi>𝒯</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></munder><msubsup><mi>ρ</mi><mi>t</mi><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>G</mi><mi>t</mi></msub></mrow><mrow><munder><mo>∑</mo><mrow><mi>t</mi><mo>∈</mo><mi>𝒯</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></munder><msubsup><mi>ρ</mi><mi>t</mi><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mn>1</mn></mrow></msubsup></mrow></mfrac></mrow></math></div><table>
+<thead>
+<tr>
+<th></th>
+<th>Ordinary IS</th>
+<th>Weighted IS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bias</td>
+<td><strong>unbiased</strong>（first-visit 时期望总是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>）</td>
+<td><strong>biased</strong>（first-visit、只有一个 return 时，估计就等于那个 return，期望是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>μ</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 而不是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math>）</td>
+</tr>
+<tr>
+<td>Variance</td>
+<td>一般<strong>无界</strong></td>
+<td>任何单个 return 的最大权重是 <strong>1</strong>，方差小得多</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么 weighted 只有一个 return 时有偏？</strong> 分子分母的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi></mrow></math> 约掉，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>G</mi><mi>t</mi></msub></mrow></math>，ratio 完全没起作用，估计的是 behavior policy 的 value。</p>
+<p><strong>Blackjack 例子</strong>（S&amp;B p.106）：庄家明牌 2、玩家点数 13、有 usable ace。<strong>Mean square error vs episodes</strong>：weighted IS 一开始误差就低得多，ordinary IS 开始误差很大，两者最后都趋于 0。</p>
+<h3>2.7 例：Infinite Variance（S&amp;B p.107）</h3>
+<p>一个非终止 state <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>，两个 action：</p>
+<ul>
+<li><strong>right</strong>：终止，reward 0</li>
+<li><strong>left</strong>：以 0.9 回到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math>（reward 0），以 0.1 终止（reward +1）</li>
+</ul>
+<p>Target policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi><mo stretchy="false">(</mo><mtext>left</mtext><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></math>（所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></math>）；behavior policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi><mo stretchy="false">(</mo><mtext>left</mtext><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math>。</p>
+<p><strong>只有「一直选 left」的 episode 的 ratio 非零</strong>，长度为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math> 的这种 episode：ratio <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mi mathvariant="normal">/</mi><mn>0.5</mn><msup><mo stretchy="false">)</mo><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>=</mo><msup><mn>2</mn><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow></math>，return <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>1</mn></mrow></math>。</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left right left" columnspacing="0em 1em 0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>𝔼</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mo>∏</mo><mfrac><mi>π</mi><mi>μ</mi></mfrac><msub><mi>G</mi><mn>0</mn></msub><msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mn>2</mn></msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>0.1</mn><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><mn>0.5</mn></mfrac><msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mn>2</mn></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>(长度 1)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>0.9</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>0.1</mn><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><mn>0.5</mn></mfrac><mo>⋅</mo><mfrac><mn>1</mn><mn>0.5</mn></mfrac><msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mn>2</mn></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>(长度 2)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>0.9</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>0.9</mn><mo>⋅</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⋅</mo><mn>0.1</mn><mo>⋅</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><mn>0.5</mn></mfrac><msup><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo><mn>6</mn></msup><mo>+</mo><mo>⋯</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext>(长度 3)</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0.1</mn><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msup><mn>0.9</mn><mi>k</mi></msup><mo>⋅</mo><msup><mn>2</mn><mi>k</mi></msup><mo>⋅</mo><mn>2</mn><mo>=</mo><mn>0.2</mn><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msup><mn>1.8</mn><mi>k</mi></msup><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></mstyle></mtd></mtr></mtable></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Var</mtext><mo stretchy="false">[</mo><mi>X</mi><mo stretchy="false">]</mo><mo>=</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msup><mi>X</mi><mn>2</mn></msup><mo stretchy="false">]</mo><mo>−</mo><msup><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover><mn>2</mn></msup></mrow></math>，二阶矩无穷 ⇒ 方差无穷。）图：ordinary IS 的 10 次独立运行即使到几百万个 episode 也<strong>不收敛</strong>到 1。</p>
+<h2>3 · On-Policy TD Control</h2>
+<h3>3.1 MC vs TD control</h3>
+<p>TD 比 MC 有几个优点：<strong>lower variance、online、incomplete sequences</strong>。</p>
+<p><strong>自然的想法</strong>：在 control 循环里用 TD 代替 MC：</p>
+<ul>
+<li>把 TD 用在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></math> 上</li>
+<li>用 ε-greedy policy improvement</li>
+<li><strong>每个 time step 都更新</strong></li>
+</ul>
+<h3>3.2 SARSA</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><p><strong>名字来自用到的五元组</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo separator="true">,</mo><mi>R</mi><mo separator="true">,</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>——从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 出发，得到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi></mrow></math>，到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>，<strong>再按当前 policy 选出 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></strong>。</p>
+<p><strong>On-policy control with SARSA</strong>（每个 time step）：</p>
+<ul>
+<li>Policy evaluation：SARSA，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>≈</mo><msub><mi>Q</mi><mi>π</mi></msub></mrow></math></li>
+<li>Policy improvement：ε-greedy</li>
+</ul>
+<blockquote>
+<p><strong>SARSA algorithm</strong></p>
+<p>初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 任意，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mtext>terminal</mtext><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></p>
+<p>Repeat（for each episode）：</p>
+<ul>
+<li>初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math>；用由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 导出的 policy（如 ε-greedy）从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> 选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math></li>
+<li>Repeat（for each step）：
+<ul>
+<li>执行 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>，观察 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+<li>用由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 导出的 policy 从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>←</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>←</mo><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+</ul>
+</li>
+<li>until <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> is terminal</li>
+</ul>
+</blockquote>
+<p><strong>注意</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 选出来后<strong>下一步真的执行它</strong>——更新用的 action 和实际执行的 action 是同一个，所以是 on-policy。</p>
+<h3>3.3 SARSA 的收敛</h3>
+<blockquote>
+<p><strong>Theorem.</strong> SARSA 收敛到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>→</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，条件：</p>
+<ul>
+<li><strong>GLIE</strong> 的 policy 序列 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>π</mi><mi>t</mi></msub><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Robbins–Monro</strong> step size 序列 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>α</mi><mi>t</mi></msub></mrow></math>：
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msub><mi>α</mi><mi>t</mi></msub><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi mathvariant="normal">∞</mi></munderover><msubsup><mi>α</mi><mi>t</mi><mn>2</mn></msubsup><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></mstyle></mtd></mtr></mtable></math></div></li>
+</ul>
+</blockquote>
+<p>⚠️ 课件第二个条件印成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></math>，应为 <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math></strong>。</p>
+<p><strong>两个条件的直觉</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msub><mi>α</mi><mi>t</mi></msub><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></math> 保证步长总和够大，能从任意初值走到目标；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msubsup><mi>α</mi><mi>t</mi><mn>2</mn></msubsup><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math> 保证步长最终足够小，噪声被平均掉、能稳定下来。例：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>α</mi><mi>t</mi></msub><mo>=</mo><mfrac><mn>1</mn><mi>t</mi></mfrac></mrow></math> 满足。</p>
+<h3>3.4 例：Windy Gridworld（S&amp;B p.130）</h3>
+<ul>
+<li>Actions：up、down、right、left</li>
+<li><strong>Wind</strong>：某些列会把下一个 state <strong>往上推</strong>，每列风力：0 0 0 1 1 1 2 2 1 0</li>
+<li>每步 reward −1，直到到达 goal G；undiscounted</li>
+</ul>
+<p><strong>SARSA</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo>=</mo><mn>0</mn></mrow></math> 初始化，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>0.1</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.5</mn></mrow></math>）：episodes 对 time steps 的曲线一开始很平（前几个 episode 很慢），之后越来越陡（每个 episode 越来越快完成）。</p>
+<p><strong>Q：policy 会不会导致无限循环？MC policy iteration 会怎样？</strong></p>
+<ul>
+<li>如果 policy 让 agent 陷入无限循环，<strong>MC control 会卡住</strong>：episode 永远不结束，永远拿不到 return，无法更新</li>
+<li><strong>TD control 每一步都在更新</strong>：在循环中 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 不断变小（每步 −1），很快就会切换到别的 policy，跳出循环</li>
+</ul>
+<h3>3.5 n-step SARSA 与 SARSA(λ)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step Q-return（对应 2.1 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>-step return）：</p>
+<table>
+<thead>
+<tr>
+<th><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>（TD，即 SARSA）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>Q</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>Q</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="normal">∞</mi></mrow></math></td>
+<td>（MC）</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>Q</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">∞</mi><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msubsup><mi>Q</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></msubsup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msup><mi>γ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><msup><mi>γ</mi><mi>n</mi></msup><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mi>n</mi></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（课件把倒数第二项写成 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>n</mi></mrow></msub></mrow></math>，按上面 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn></mrow></math> 的规律应为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></math>。）</p>
+<ul>
+<li><strong>n-step SARSA</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><msubsup><mi>Q</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></msubsup><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></li>
+<li><strong>Forward-view SARSA(λ)</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>Q</mi><mi>t</mi><mi>λ</mi></msubsup><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><msubsup><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi mathvariant="normal">∞</mi></msubsup><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><msubsup><mi>Q</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></msubsup></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><msubsup><mi>Q</mi><mi>t</mi><mi>λ</mi></msubsup><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></li>
+</ul>
+<h2>4 · Off-Policy TD Control</h2>
+<h3>4.1 Off-policy MC vs off-policy TD 的 importance sampling</h3>
+<p><strong>Off-policy MC</strong>：整条 episode 上多个 importance sampling 修正相乘：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="center" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msubsup><mi>ρ</mi><mi>t</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mo>=</mo><munderover><mo>∏</mo><mrow><mi>k</mi><mo>=</mo><mi>t</mi></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></munderover><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>b</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>k</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>←</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msubsup><mi>ρ</mi><mi>t</mi><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>G</mi><mi>t</mi></msub><mo>−</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>b</mi></mrow></math> 就是 behavior policy <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi></mrow></math>。）</p>
+<p><strong>Off-policy TD</strong>：用 importance sampling 加权 TD target <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>，<strong>只需要一个</strong>修正：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>←</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>b</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>−</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>方差比 MC importance sampling 低得多</strong>（一个 ratio vs 一串 ratio 的乘积）</li>
+<li>两个 policy <strong>只需要在一步上相似</strong></li>
+</ul>
+<p><strong>Off-policy TD target 的均值等于 on-policy TD target</strong>（证明）：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><msub><mi>𝔼</mi><mi>μ</mi></msub><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><msub><mi>a</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>−</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mtext> </mtext><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">∣</mo><mtext> </mtext><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><mi>a</mi></munder><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mfrac><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">]</mo><mo>−</mo><munder><mo>∑</mo><mi>a</mi></munder><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><munder><mo>∑</mo><mi>a</mi></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">]</mo><mo>−</mo><munder><mo>∑</mo><mi>a</mi></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>𝔼</mi><mi>π</mi></msub><mo stretchy="false">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（第三行：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mi>a</mi></msub><mi>μ</mi><mo>=</mo><msub><mo>∑</mo><mi>a</mi></msub><mi>π</mi><mo>=</mo><mn>1</mn></mrow></math>，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 前面的权重可以换。）</p>
+<h3>4.2 Q-learning</h3>
+<p>另一种 off-policy 学 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 的方法，<strong>不需要 importance sampling</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><blockquote>
+<p><strong>Q-learning algorithm</strong></p>
+<p>初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 任意，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mtext>terminal</mtext><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></p>
+<p>Repeat（for each episode）：</p>
+<ul>
+<li>初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math></li>
+<li>Repeat（for each step）：
+<ul>
+<li>用由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 导出的 policy（如 ε-greedy）从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> 选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math></li>
+<li>执行 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>，观察 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></math></li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>←</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+</ul>
+</li>
+<li>until <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> is terminal</li>
+</ul>
+</blockquote>
+<p><strong>对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>更新 target</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Q-learning</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>off-policy</strong>：behavior = ε-greedy，target = <strong>greedy</strong></td>
+</tr>
+<tr>
+<td><strong>SARSA</strong></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>on-policy</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 是实际要执行的（ε-greedy 选出的）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>和 SARSA 算法框的结构差别</strong>：SARSA 在循环外先选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>，循环里选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 并执行它；Q-learning 每步才选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>，更新时用 max（不管下一步实际选什么）。</p>
+<h3>4.3 为什么 Q-learning 不需要 importance sampling</h3>
+<p><strong>短答</strong>：Q-learning 不对 <strong>policy 分布</strong>求期望。</p>
+<ul>
+<li><strong>当前步 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></strong>：更新是<strong>以 behavior policy 实际采取的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 为条件</strong>的。我们直接更新这个特定对的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>，所以 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi></mrow></math> 是怎么被选出来的<strong>不需要修正</strong></li>
+<li><strong>下一步 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></strong>：target 用的是 deterministic 的 greedy 选择 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math>，<strong>直接</strong>取最大值，不从任何分布里采样 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+<li>两步都不涉及对 target policy 的 action 求期望 ⇒ 比值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><mrow><mi>μ</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow></math> 不需要</li>
+</ul>
+<p><strong>另一种理解</strong>：回忆 value iteration 的 Bellman optimality backup</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∈</mo><mi>𝒮</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></munder><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>Q-learning 是 value iteration 的采样版本</strong>：不用对转移 dynamics 求期望，而用环境中采到的样本：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>≈</mo><mi>r</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></li>
+<li>期望是对<strong>转移分布</strong>（不是 policy 分布）取的，而 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 本来就是从真实转移采样的，所以<strong>不需要对不同的 policy 分布做修正</strong></li>
+</ul>
+<p>（对比：off-policy TD 估 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub></mrow></math> 时，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math> 本身包含了「在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi></mrow></math> 按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 选 action」的期望，而数据中的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mi>t</mi></msub></mrow></math> 是按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>μ</mi></mrow></math> 选的，所以要修正。）</p>
+<h3>4.4 Expected SARSA</h3>
+<p><strong>用下一 state value 的期望代替样本值</strong>：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>←</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mi>𝔼</mi><mo stretchy="false">[</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>∣</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">]</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">]</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">[</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><munder><mo>∑</mo><mi>a</mi></munder><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>−</mo><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">]</mo></mrow></mstyle></mtd></mtr></mtable></math></div><ul>
+<li><strong>比 SARSA 表现更好（但计算更多）。为什么？</strong> 消除了随机选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math> 带来的方差（对所有 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 取了期望），代价是每步要对所有 action 求和</li>
+<li><strong>on-policy 还是 off-policy？</strong> <strong>都可以</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 可以是 behavior policy 本身，也可以是别的 target policy）</li>
+<li><strong>如果 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> 是 greedy deterministic policy？</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mi>a</mi></msub><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mo>∣</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>——<strong>就是 Q-learning</strong>。所以 Expected SARSA 有时叫「<strong>General Q-learning</strong>」</li>
+</ul>
+<h3>4.5 补充算例：三种更新的对比</h3>
+<p>设 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>，观察到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mo>=</mo><mo>−</mo><mn>1</mn></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msub><mi>a</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msub><mi>a</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mn>5</mn></mrow></math>；ε-greedy（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>0.1</mn></mrow></math>，2 个 action）这次在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math> 选出了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>1</mn></msub></mrow></math>（探索）；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>α</mi><mo>=</mo><mn>0.5</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi><mo>=</mo><mn>1</mn></mrow></math>。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>target</th>
+<th>新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SARSA</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>+</mo><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>s</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msub><mi>a</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mo>−</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>1</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>+</mo><mn>0.5</mn><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0.5</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Q-learning</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>+</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>5</mn><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn><mo>+</mo><mn>0.5</mn><mo>⋅</mo><mn>4</mn><mo>=</mo><mn>2</mn></mrow></math></td>
+</tr>
+<tr>
+<td>Expected SARSA</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>−</mo><mn>1</mn><mo>+</mo><mo stretchy="false">(</mo><mn>0.05</mn><mo>⋅</mo><mn>2</mn><mo>+</mo><mn>0.95</mn><mo>⋅</mo><mn>5</mn><mo stretchy="false">)</mo><mo>=</mo><mn>3.85</mn></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.925</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>（ε-greedy 下 greedy action <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>2</mn></msub></mrow></math> 的概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>1</mn><mo>−</mo><mn>0.1</mn><mo>+</mo><mn>0.05</mn><mo>=</mo><mn>0.95</mn></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>a</mi><mn>1</mn></msub></mrow></math> 是 0.05。）</p>
+<h3>4.6 例：Cliff Walking（S&amp;B p.132）</h3>
+<ul>
+<li>网格最下面一行是<strong>悬崖</strong>（掉下去 reward −100，回到起点），其余每步 −1</li>
+<li>两条路：<strong>optimal path</strong> 紧贴悬崖走（最短）；<strong>safe path</strong> 绕远离悬崖</li>
+<li>SARSA 和 Q-learning 都用 ε-greedy，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ε</mi><mo>=</mo><mn>0.1</mn></mrow></math></li>
+</ul>
+<p><strong>Observations</strong>：</p>
+<ul>
+<li><strong>Q-learning</strong> 学到的是 <strong>optimal policy 的 value</strong>（贴着悬崖），但因为 ε-greedy 的随机动作<strong>偶尔掉下悬崖</strong>，所以<strong>在线表现</strong>（sum of rewards during episode）反而<strong>比 SARSA 差</strong></li>
+<li><strong>SARSA</strong> 学到的是<strong>它实际执行的 ε-greedy policy</strong> 的 value，知道贴着悬崖走时随机一步就会掉下去，所以选了<strong>safe path</strong>，在线表现更好</li>
+<li><strong>如果 ε 逐渐减小</strong>，两种方法都会渐近收敛到 optimal policy</li>
+</ul>
+<p><strong>为什么差别？</strong> SARSA 的 target 用实际（可能是随机）的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>，把探索的风险算进了 value；Q-learning 的 target 用 max，假设以后都走最优，忽略了探索的风险。</p>
+<h3>4.7 DP 与 TD 的对应</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Full Backup（DP）</th>
+<th>Sample Backup（TD）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bellman Expectation Equation for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>v</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>Iterative Policy Evaluation</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>←</mo><mi>𝔼</mi><mo stretchy="false">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>∣</mo><mi>s</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td><strong>TD Learning</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mover><mo stretchy="true" minsize="3.0em">←</mo><mpadded width="+0.6em" lspace="0.3em"><mi>α</mi></mpadded></mover><mi>R</mi><mo>+</mo><mi>γ</mi><mi>V</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Bellman Expectation Equation for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>q</mi><mi>π</mi></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>Q-Policy Iteration</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mi>𝔼</mi><mo stretchy="false">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td><strong>SARSA</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mover><mo stretchy="true" minsize="3.0em">←</mo><mpadded width="+0.6em" lspace="0.3em"><mi>α</mi></mpadded></mover><mi>R</mi><mo>+</mo><mi>γ</mi><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>A</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+<tr>
+<td>Bellman Optimality Equation for <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>q</mi><mo>∗</mo></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td><strong>Q-Value Iteration</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>←</mo><mi>𝔼</mi><mo stretchy="false">[</mo><mi>R</mi><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>∣</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></math></td>
+<td><strong>Q-Learning</strong>：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mover><mo stretchy="true" minsize="3.0em">←</mo><mpadded width="+0.6em" lspace="0.3em"><mi>α</mi></mpadded></mover><mi>R</mi><mo>+</mo><mi>γ</mi><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub><mi>Q</mi><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mover><mo stretchy="true" minsize="3.0em">←</mo><mpadded width="+0.6em" lspace="0.3em"><mi>α</mi></mpadded></mover><mi>y</mi></mrow></math> 表示 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>←</mo><mi>x</mi><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mi>y</mi><mo>−</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></math>。）</p>
+<h2>5 · Q-Learning Variants</h2>
+<h3>5.1 Maximization Bias</h3>
+<ul>
+<li>经常要对 value 的<strong>估计</strong>取最大，估计的最大值有 <strong>maximization bias</strong></li>
+<li>例：某个 state 所有 action 的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>，但估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 不确定，有正有负 ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>&gt;</mo><mn>0</mn></mrow></math>，而真值 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msup><mi>Q</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>——<strong>被高估</strong></li>
+<li><strong>Jensen's inequality</strong> 的直觉：<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>i</mi></msub><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="false">]</mo><mo>≥</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>i</mi></msub><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="false">]</mo></mrow></math></li>
+<li><strong>原因</strong>：<strong>用同一个估计 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 既选 argmax 又评估它的值</strong>——哪个 action 碰巧被高估就会被选中，而它的值正好是被高估的</li>
+</ul>
+<h3>5.2 Double Q-Learning</h3>
+<ul>
+<li>训练<strong>两个</strong> action-value function <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math></li>
+<li>两者都做 Q-learning，但<strong>不在同一个 time step 更新</strong>（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 独立）；每步随机选一个更新</li>
+<li><strong>更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math> 时，用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math> 选 action，用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 评估</strong>：</li>
+</ul>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>←</mo><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>+</mo><mi>α</mi><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><mi>γ</mi><mtext> </mtext><msub><mi>Q</mi><mn>2</mn></msub><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></munder><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo>−</mo><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mrow></mstyle></mtd></mtr></mtable></math></div><p>（课件公式漏了 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>γ</mi></mrow></math>；更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 时把 1、2 对调）</p>
+<ul>
+<li><strong>Inference（选 action）</strong>：对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub><mo>+</mo><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 做 ε-greedy</li>
+</ul>
+<blockquote>
+<p><strong>Double Tabular Q-learning（算法框）</strong></p>
+<p>初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math> 任意，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mtext>terminal</mtext><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>=</mo><msub><mi>Q</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mtext>terminal</mtext><mo separator="true">,</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math></p>
+<p>Repeat（for each episode）：初始化 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math>；Repeat（for each step）：</p>
+<ul>
+<li>用由 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 导出的 policy（如对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub><mo>+</mo><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 的 ε-greedy）从 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> 选 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi></mrow></math>；执行，观察 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi></mrow></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math></li>
+<li>以 0.5 的概率：更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math>，target 为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>+</mo><mi>γ</mi><msub><mi>Q</mi><mn>2</mn></msub><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></li>
+<li>否则：更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math>，target 为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>R</mi><mo>+</mo><mi>γ</mi><msub><mi>Q</mi><mn>1</mn></msub><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>arg</mi><mo>⁡</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>a</mi></msub><msub><mi>Q</mi><mn>2</mn></msub><mo stretchy="false">(</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math></li>
+<li>（更新形式都是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo>←</mo><msub><mi>Q</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo>+</mo><mi>α</mi><mo stretchy="false">(</mo><mtext>target</mtext><mo>−</mo><msub><mi>Q</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>S</mi><mo separator="true">,</mo><mi>A</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></math>）</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>←</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>；until <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi></mrow></math> is terminal</li>
+</ul>
+</blockquote>
+<p><strong>为什么能去掉偏差？</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math> 碰巧高估的那个 action，在独立的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 里没有被系统性高估，所以用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 评估得到的是无偏（甚至偏低）的值：</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Double-Q estimation</mtext><mo>≤</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>i</mi></munder><mi>𝔼</mi><mo stretchy="false">[</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false">]</mo><mo>≤</mo><mi>𝔼</mi><mo stretchy="false">[</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>i</mi></munder><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false">]</mo><mspace width="1em"/><mtext>(single-Q estimation)</mtext></mrow></math></div><p>（<em>Double Q-learning</em>，NIPS 2010）</p>
+<h3>5.3 例：Double Q-learning vs Q-learning</h3>
+<ul>
+<li>MDP：从 A 出发，<strong>right</strong> 直接终止（reward 0）；<strong>left</strong> 到 B（reward 0），B 有很多 action，reward 都来自 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝒩</mi><mo stretchy="false">(</mo><mo>−</mo><mn>0.1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> 然后终止</li>
+<li>真实最优：在 A 选 right（left 的期望 −0.1）；ε-greedy（ε = 0.1）下最优的 left 比例是 <strong>5%</strong></li>
+<li><strong>Q-learning</strong>：初期 left 比例冲到 ~90%，之后很慢才降下来——因为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>max</mi><mo>⁡</mo></mrow></math> 了 B 的很多噪声估计，高估了 left</li>
+<li><strong>Double Q-learning</strong>：left 比例很快接近 5%</li>
+</ul>
+<p><strong>Extra reading</strong>：Sutton &amp; Barto Ch 5、Ch 6；<em>Double Q-learning</em>（NIPS 2010）。</p>
+<h2>6 · 考点清单</h2>
+<table>
+<thead>
+<tr>
+<th>考点</th>
+<th>至少要会</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>为什么用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math></td>
+<td>对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi></mrow></math> 贪心要 model，对 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Q</mi></mrow></math> 贪心不要</td>
+</tr>
+<tr>
+<td>MC control 两个假设</td>
+<td>每对都访问；无穷 episode；对应的处理</td>
+</tr>
+<tr>
+<td>Exploration 三方案</td>
+<td>exploring starts、soft policy、off-policy</td>
+</tr>
+<tr>
+<td>MC ES</td>
+<td>算法框</td>
+</tr>
+<tr>
+<td>ε-greedy policy</td>
+<td>概率公式</td>
+</tr>
+<tr>
+<td>ε-greedy 改进定理</td>
+<td>证明，特别是加权平均 trick</td>
+</tr>
+<tr>
+<td>GLIE</td>
+<td>两个条件；<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>ε</mi><mi>k</mi></msub><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>k</mi></mrow></math>；GLIE MC control 更新式</td>
+</tr>
+<tr>
+<td>On / off-policy</td>
+<td>定义、比喻；MC ES 是 on-policy</td>
+</tr>
+<tr>
+<td>Off-policy 用途</td>
+<td>四条</td>
+</tr>
+<tr>
+<td>Importance sampling</td>
+<td>推导；importance weight</td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>ρ</mi></mrow></math></td>
+<td>推导，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi></mrow></math> 抵消；期望为 1</td>
+</tr>
+<tr>
+<td>Ordinary vs weighted</td>
+<td>公式；bias、variance 对比及原因</td>
+</tr>
+<tr>
+<td>无穷方差例</td>
+<td>级数 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.2</mn><mo>∑</mo><msup><mn>1.8</mn><mi>k</mi></msup></mrow></math></td>
+</tr>
+<tr>
+<td>SARSA</td>
+<td>更新式；五元组；算法框；为什么 on-policy</td>
+</tr>
+<tr>
+<td>SARSA 收敛</td>
+<td>GLIE + Robbins–Monro（<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><mi>α</mi><mo>=</mo><mi mathvariant="normal">∞</mi></mrow></math>，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msup><mi>α</mi><mn>2</mn></msup><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>）</td>
+</tr>
+<tr>
+<td>Windy gridworld</td>
+<td>MC 卡在循环、TD 能跳出</td>
+</tr>
+<tr>
+<td>n-step SARSA / SARSA(λ)</td>
+<td>公式</td>
+</tr>
+<tr>
+<td>Off-policy TD</td>
+<td>单个 ratio；方差低；均值等于 on-policy target 的证明</td>
+</tr>
+<tr>
+<td>Q-learning</td>
+<td>更新式；算法框；off-policy</td>
+</tr>
+<tr>
+<td>不需要 IS</td>
+<td>两条理由；value iteration 的采样版本</td>
+</tr>
+<tr>
+<td>Expected SARSA</td>
+<td>公式；为什么更好；on / off 都可；greedy 时即 Q-learning</td>
+</tr>
+<tr>
+<td>三种更新算例</td>
+<td>能算出 target</td>
+</tr>
+<tr>
+<td>Cliff walking</td>
+<td>Q-learning 贴崖、在线表现差；SARSA 走安全路；原因</td>
+</tr>
+<tr>
+<td>DP vs TD 表</td>
+<td>3×2</td>
+</tr>
+<tr>
+<td>Maximization bias</td>
+<td>例子；Jensen；同一估计既选又评</td>
+</tr>
+<tr>
+<td>Double Q</td>
+<td>更新式；为什么有效；A/B 例子</td>
+</tr>
+</tbody>
+</table>
+<h2>7 · 易错点</h2>
+<ul>
+<li>SARSA 用的是<strong>实际执行</strong>的 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow></math>；Q-learning 用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><msup><mi>a</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></msub></mrow></math>，不管实际执行哪个。</li>
+<li>Q-learning 的 behavior policy 仍是 ε-greedy（要探索），只是 <strong>target policy 是 greedy</strong>。</li>
+<li>Off-policy MC 要整条 trajectory 的 ratio <strong>乘积</strong>；off-policy TD 只要<strong>一步</strong>的 ratio；Q-learning <strong>不要</strong> ratio。</li>
+<li>Ordinary IS 无偏、方差可能无穷；weighted IS 有偏、方差小。</li>
+<li>Robbins–Monro 是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>∑</mo><msubsup><mi>α</mi><mi>t</mi><mn>2</mn></msubsup><mo>&lt;</mo><mi mathvariant="normal">∞</mi></mrow></math>（课件印错）。</li>
+<li>Cliff walking 里 Q-learning 学到的 value 是最优的，但<strong>在线 reward 更低</strong>——别说成 Q-learning「学错了」。</li>
+<li>Double Q-learning 更新 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math> 时：<strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>1</mn></msub></mrow></math> 选 action，<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Q</mi><mn>2</mn></msub></mrow></math> 评估</strong>。</li>
+<li>Expected SARSA 在 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>π</mi></mrow></math> = greedy 时就是 Q-learning。</li>
+</ul>

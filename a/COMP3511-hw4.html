@@ -1,0 +1,402 @@
+<h2>1. Multiple Choices</h2>
+<p><strong>C B B D C D A A D A</strong></p>
+<h2>2. Main Memory</h2>
+<h3>1) Paging and address translation</h3>
+<p><strong>(a)</strong> Offset: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mn>2048</mn><mo>=</mo></mrow></math> <strong>11 bits</strong>; page number: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>15</mn><mo>−</mo><mn>11</mn><mo>=</mo></mrow></math> <strong>4 bits</strong>; page table has <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>2</mn><mn>4</mn></msup><mo>=</mo></mrow></math> <strong>16 entries</strong>.</p>
+<p><strong>(b)</strong> Physical address = frame × 2048 + offset.</p>
+<table>
+<thead>
+<tr>
+<th>Logical address</th>
+<th>Page number</th>
+<th>Offset</th>
+<th>Physical address or result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x0A3C</td>
+<td>1</td>
+<td>0x23C (572)</td>
+<td>frame 9 → <strong>0x4A3C</strong> (19004)</td>
+</tr>
+<tr>
+<td>0x1F00</td>
+<td>3</td>
+<td>0x700 (1792)</td>
+<td>frame 2 → <strong>0x1700</strong> (5888)</td>
+</tr>
+<tr>
+<td>0x2C15</td>
+<td>5</td>
+<td>0x415 (1045)</td>
+<td>frame 0 → <strong>0x0415</strong> (1045)</td>
+</tr>
+<tr>
+<td>0x3456</td>
+<td>6</td>
+<td>0x456 (1110)</td>
+<td><strong>invalid (i) → trap to OS, addressing error</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>2) Two-level paging and the TLB</h3>
+<p><strong>(a)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>d</mi><mo>=</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msub><mn>8192</mn><mo>=</mo><mn>13</mn></mrow></math>; one inner table = <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8</mn><mtext> KB</mtext><mi mathvariant="normal">/</mi><mn>4</mn><mtext> B</mtext><mo>=</mo><msup><mn>2</mn><mn>11</mn></msup></mrow></math> entries → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mn>2</mn></msub><mo>=</mo><mn>11</mn></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>=</mo><mn>32</mn><mo>−</mo><mn>11</mn><mo>−</mo><mn>13</mn><mo>=</mo><mn>8</mn></mrow></math>.
+<strong>p1 = 8 bits, p2 = 11 bits, d = 13 bits</strong></p>
+<p><strong>(b)</strong> One inner table maps <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>2</mn><mn>11</mn></msup><mo>×</mo><mn>8</mn><mtext> KB</mtext><mo>=</mo><mn>16</mn></mrow></math> MB.
+Code: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>64</mn><mi mathvariant="normal">/</mi><mn>16</mn><mo>=</mo><mn>4</mn></mrow></math> inner tables; stack: 8 MB lies in the top 16 MB → 1 inner table; plus 1 outer table.
+Total <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>6</mn><mo>×</mo><mn>8</mn><mtext> KB</mtext><mo>=</mo></mrow></math> <strong>48 KB</strong>.
+Single-level: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>2</mn><mrow><mn>32</mn><mo>−</mo><mn>13</mn></mrow></msup><mo>×</mo><mn>4</mn><mtext> B</mtext><mo>=</mo><msup><mn>2</mn><mn>19</mn></msup><mo>×</mo><mn>4</mn><mtext> B</mtext><mo>=</mo></mrow></math> <strong>2 MB</strong>.</p>
+<p><strong>(c)</strong> Hit: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>+</mo><mn>100</mn><mo>=</mo><mn>105</mn></mrow></math> ns; miss: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>5</mn><mo>+</mo><mn>3</mn><mo>×</mo><mn>100</mn><mo>=</mo><mn>305</mn></mrow></math> ns.
+(i) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>EAT</mtext><mo>=</mo><mn>0.95</mn><mo>×</mo><mn>105</mn><mo>+</mo><mn>0.05</mn><mo>×</mo><mn>305</mn><mo>=</mo><mn>99.75</mn><mo>+</mo><mn>15.25</mn><mo>=</mo></mrow></math> <strong>115 ns</strong>
+(ii) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>105</mn><mi>h</mi><mo>+</mo><mn>305</mn><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>h</mi><mo stretchy="false">)</mo><mo>≤</mo><mn>110</mn><mo>⇒</mo><mn>305</mn><mo>−</mo><mn>200</mn><mi>h</mi><mo>≤</mo><mn>110</mn><mo>⇒</mo><mi>h</mi><mo>≥</mo><mn>195</mn><mi mathvariant="normal">/</mi><mn>200</mn><mo>=</mo></mrow></math> <strong>0.975 (97.5%)</strong></p>
+<h2>3. Virtual Memory</h2>
+<h3>1) Page-replacement algorithms</h3>
+<p><strong>(a) FIFO</strong></p>
+<table>
+<thead>
+<tr>
+<th>Reference</th>
+<th>7</th>
+<th>6</th>
+<th>4</th>
+<th>1</th>
+<th>7</th>
+<th>1</th>
+<th>4</th>
+<th>2</th>
+<th>4</th>
+<th>1</th>
+<th>3</th>
+<th>2</th>
+<th>7</th>
+<th>0</th>
+<th>4</th>
+<th>2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frame 1</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Frame 2</td>
+<td></td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Frame 3</td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Page fault</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td></td>
+<td></td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+</tr>
+</tbody>
+</table>
+<p>Total page faults: <strong>14</strong></p>
+<p><strong>(b) LRU</strong></p>
+<table>
+<thead>
+<tr>
+<th>Reference</th>
+<th>7</th>
+<th>6</th>
+<th>4</th>
+<th>1</th>
+<th>7</th>
+<th>1</th>
+<th>4</th>
+<th>2</th>
+<th>4</th>
+<th>1</th>
+<th>3</th>
+<th>2</th>
+<th>7</th>
+<th>0</th>
+<th>4</th>
+<th>2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frame 1</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Frame 2</td>
+<td></td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Frame 3</td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Page fault</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td></td>
+<td></td>
+<td>PF</td>
+<td></td>
+<td></td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+</tr>
+</tbody>
+</table>
+<p>Total page faults: <strong>12</strong></p>
+<p><strong>(c) Optimal (OPT)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Reference</th>
+<th>7</th>
+<th>6</th>
+<th>4</th>
+<th>1</th>
+<th>7</th>
+<th>1</th>
+<th>4</th>
+<th>2</th>
+<th>4</th>
+<th>1</th>
+<th>3</th>
+<th>2</th>
+<th>7</th>
+<th>0</th>
+<th>4</th>
+<th>2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frame 1</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Frame 2</td>
+<td></td>
+<td>6</td>
+<td>6</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Frame 3</td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Page fault</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td>PF</td>
+<td></td>
+<td></td>
+<td></td>
+<td>PF</td>
+<td></td>
+<td></td>
+<td>PF</td>
+<td></td>
+<td>PF</td>
+<td>PF</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Total page faults: <strong>8</strong></p>
+<h3>2) Effective access time with demand paging</h3>
+<p>Average fault service time <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0.7</mn><mo>×</mo><mn>10</mn><mo>+</mo><mn>0.3</mn><mo>×</mo><mn>22</mn><mo>=</mo><mn>13.6</mn></mrow></math> ms <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>13.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow></math> ns.</p>
+<p><strong>(a)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><mn>500000</mn><mo>=</mo><mn>2</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>EAT</mtext><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo stretchy="false">)</mo><mo>×</mo><mn>150</mn><mo>+</mo><mi>p</mi><mo>×</mo><mn>13.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mo>=</mo><mn>149.9997</mn><mo>+</mo><mn>27.2</mn><mo>≈</mo></mrow></math> <strong>177 ns</strong> (177.2 ns)</p>
+<p><strong>(b)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo stretchy="false">)</mo><mo>×</mo><mn>150</mn><mo>+</mo><mi>p</mi><mo>×</mo><mn>13.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mo>≤</mo><mn>165</mn></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>p</mi><mo>≤</mo><mstyle scriptlevel="0" displaystyle="true"><mfrac><mn>15</mn><mrow><mn>13.6</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup><mo>−</mo><mn>150</mn></mrow></mfrac></mstyle><mo>=</mo></mrow></math> <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.10</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow></math></strong> (at most 1 fault per ≈ 906,657 accesses)</p>
+<h3>3) Working sets and thrashing</h3>
+<p><strong>(a)</strong> WS(7) = pages at t = 4..7 = <strong>{1, 2, 5, 6}</strong>; WS(10) = pages at t = 7..10 = <strong>{3, 5, 6}</strong>, size <strong>3</strong>.</p>
+<p><strong>(b)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>D</mi><mo>=</mo><mn>4</mn><mo>+</mo><mn>6</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>15</mn><mo>&gt;</mo><mn>14</mn></mrow></math> frames → <strong>thrashing expected</strong>.
+The OS should <strong>suspend (swap out) one process</strong>, give its frames to the others, and restart it later when enough frames are free.</p>
+<h2>4. Mass-Storage Systems</h2>
+<h3>1) Disk access time</h3>
+<p><strong>(a)</strong> Rotation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>60</mn><mi mathvariant="normal">/</mi><mn>6000</mn><mo>=</mo><mn>10</mn></mrow></math> ms → latency <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>5</mn></mrow></math> ms; transfer <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>0.5</mn><mi mathvariant="normal">/</mi><mn>200</mn></mrow></math> s <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>2.5</mn></mrow></math> ms.
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>T</mi><mo>=</mo><mn>5</mn><mo>+</mo><mn>5</mn><mo>+</mo><mn>2.5</mn><mo>+</mo><mn>0.2</mn><mo>=</mo></mrow></math> <strong>12.7 ms</strong></p>
+<p><strong>(b)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.5</mn><mtext> MB</mtext><mi mathvariant="normal">/</mi><mn>12.7</mn><mtext> ms</mtext><mo>=</mo></mrow></math> <strong>39.4 MB/s</strong></p>
+<h3>2) Disk-scheduling algorithms</h3>
+<p><strong>FCFS:</strong> 1043 → 1470 → 912 → 1801 → 133 → 1288 → 607 → 1095 → 1956 → 480 → 54; total <strong>8629 cylinders</strong></p>
+<p><strong>SSTF:</strong> 1043 → 1095 → 912 → 607 → 480 → 133 → 54 → 1288 → 1470 → 1801 → 1956; total <strong>2995 cylinders</strong></p>
+<p><strong>SCAN:</strong> 1043 → 912 → 607 → 480 → 133 → 54 → (0) → 1095 → 1288 → 1470 → 1801 → 1956; total <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1043</mn><mo>+</mo><mn>1956</mn><mo>=</mo></mrow></math> <strong>2999 cylinders</strong></p>
+<p><strong>C-LOOK:</strong> 1043 → 912 → 607 → 480 → 133 → 54 → 1956 → 1801 → 1470 → 1288 → 1095; total <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>1043</mn><mo>−</mo><mn>54</mn><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1956</mn><mo>−</mo><mn>54</mn><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1956</mn><mo>−</mo><mn>1095</mn><mo stretchy="false">)</mo><mo>=</mo><mn>989</mn><mo>+</mo><mn>1902</mn><mo>+</mo><mn>861</mn><mo>=</mo></mrow></math> <strong>3752 cylinders</strong></p>
+<h2>5. File Systems</h2>
+<h3>1) Combined indexed allocation</h3>
+<p>Pointers per block <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>2048</mn><mi mathvariant="normal">/</mi><mn>4</mn><mo>=</mo><mn>512</mn></mrow></math>.</p>
+<p><strong>(a)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><mn>10</mn><mo>+</mo><mn>512</mn><mo>+</mo><msup><mn>512</mn><mn>2</mn></msup><mo>+</mo><msup><mn>512</mn><mn>3</mn></msup><mo stretchy="false">)</mo><mo>×</mo><mn>2048</mn><mo>=</mo><mn>134,480,394</mn><mo>×</mo><mn>2048</mn><mo>=</mo></mrow></math> <strong>275,415,846,912 bytes ≈ 256.50 GB</strong></p>
+<p><strong>(b)</strong> Block index <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mo stretchy="false">⌊</mo><mtext>offset</mtext><mi mathvariant="normal">/</mi><mn>2048</mn><mo stretchy="false">⌋</mo></mrow></math>; direct 0–9, single 10–521, double 522–262,665, triple ≥ 262,666.
+(i) 15,000 → block 7 → <strong>direct, 1 read</strong>
+(ii) 1,000,000 → block 488 → <strong>single indirect, 2 reads</strong>
+(iii) 600,000,000 → block 292,968 → <strong>triple indirect, 4 reads</strong></p>
+<p><strong>(c)</strong> Data blocks <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>5,263,360</mn><mi mathvariant="normal">/</mi><mn>2048</mn><mo>=</mo></mrow></math> <strong>2570</strong>.
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2570</mn><mo>=</mo><mn>10</mn><mo>+</mo><mn>512</mn><mo>+</mo><mn>2048</mn></mrow></math>; double indirect needs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2048</mn><mi mathvariant="normal">/</mi><mn>512</mn><mo>=</mo><mn>4</mn></mrow></math> inner blocks.
+Index blocks <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>=</mo><mn>1</mn></mrow></math> (single) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>1</mn></mrow></math> (double) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>4</mn><mo>=</mo></mrow></math> <strong>6</strong></p>
+<h3>2) File-allocation table (FAT)</h3>
+<p><strong>(a)</strong> <strong>12 → 27 → 5 → 33 → 18</strong></p>
+<p><strong>(b)</strong> Lowest free block = 9: <strong>FAT[18]: EOF → 9</strong>, <strong>FAT[9]: 0 → EOF</strong>.</p>
+<p><strong>(c)</strong> FAT cached: <strong>1 read</strong> (follow 12 → 27 → 5 → 33 in memory, read block 33).
+Linked allocation: <strong>4 reads</strong> (blocks 12, 27, 5 to get the pointers, then block 33).</p>
+<h3>3) Free-space management</h3>
+<p><strong>(a)</strong> <strong>Block 4</strong></p>
+<p><strong>(b)</strong> <strong>(4, 4), (11, 3), (22, 6), (29, 1)</strong></p>

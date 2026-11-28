@@ -1,0 +1,78 @@
+<p>ID <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>21151084</mn></mrow></math>; no <code>for</code> / <code>while</code> / <code>if</code>.</p>
+<h2>Part I (6)</h2>
+<h3>(a)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>A</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mspace width="1em"/><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>5</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>8</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="1em"/><msub><mi>n</mi><mi>x</mi></msub><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>7</mn></mrow></math></p>
+<pre><code class="language-matlab">sid = '21151084';
+A  = str2double(sid(6));
+x  = sid - '0';
+nx = A : A+7;
+</code></pre>
+<h3>(b)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><menclose notation="box"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="false"><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>h</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>h</mi><mn>1</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>∗</mo><msub><mi>h</mi><mn>2</mn></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></mstyle></mstyle></mstyle></menclose></mrow></math></div><h3>(c)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>h</mi><mn>1</mn></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mo>=</mo><mn>0..4</mn><mo separator="true">;</mo><mspace width="2em"/><msub><mi>h</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mo>=</mo><mn>2..5</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>h</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="1em"/><msub><mi>n</mi><mi>h</mi></msub><mo>=</mo><mn>0</mn><mo>+</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>4</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>9</mn></mrow></mstyle></mtd></mtr></mtable></math></div><pre><code class="language-matlab">h1 = [0 1 0 0 1];   nh1 = 0:4;
+h2 = ones(1,4);     nh2 = A+2 : A+5;
+h  = conv(h1, h2)
+nh = nh1(1)+nh2(1) : nh1(end)+nh2(end)
+</code></pre>
+<h3>(d)</h3>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>n</mi><mi>y</mi></msub><mo>=</mo><mn>0</mn><mo>+</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>7</mn><mo>+</mo><mn>9</mn><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>16</mn><mo separator="true">,</mo><mspace width="2em"/><mi>y</mi><mo>=</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>11</mn><mo separator="true">,</mo><mn>11</mn><mo separator="true">,</mo><mn>11</mn><mo separator="true">,</mo><mn>23</mn><mo separator="true">,</mo><mn>21</mn><mo separator="true">,</mo><mn>19</mn><mo separator="true">,</mo><mn>26</mn><mo separator="true">,</mo><mn>17</mn><mo separator="true">,</mo><mn>12</mn><mo separator="true">,</mo><mn>12</mn><mo separator="true">,</mo><mn>4</mn><mo stretchy="false">]</mo></mrow></math></div><pre><code class="language-matlab">y  = conv(x, h)
+ny = nx(1)+nh(1) : nx(end)+nh(end)
+</code></pre>
+<h3>(e)</h3>
+<pre><code class="language-matlab">figure;
+subplot(3,1,1); stem(nx, x, 'b'); xlabel('n'); ylabel('x[n]'); title('Input x[n]');
+subplot(3,1,2); stem(nh, h, 'r'); xlabel('n'); ylabel('h[n]'); title('Overall impulse response h[n]');
+subplot(3,1,3); stem(ny, y, 'g'); xlabel('n'); ylabel('y[n]'); title('Output y[n]');
+</code></pre>
+<h2>Part II (7)</h2>
+<h3>(a)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐟</mi><mi>𝐬</mi></msub><mo>=</mo><mn>𝟏𝟑𝟐𝟑𝟎𝟎</mn><mtext> </mtext><mi>𝐇</mi><mi>𝐳</mi></mrow></math></p>
+<pre><code class="language-matlab">[x2, fs] = audioread('song2a.wav');
+disp(fs);
+</code></pre>
+<h3>(b)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><mo>=</mo><mn>0.18</mn><mtext> </mtext><msub><mi>f</mi><mi>s</mi></msub><mo>=</mo><mn>0.18</mn><mo>×</mo><mn>132300</mn><mo>=</mo><mn>𝟐𝟑𝟖𝟏𝟒</mn></mrow></math></p>
+<pre><code class="language-matlab">N = round(0.18*fs)
+</code></pre>
+<h3>(c)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>𝐡</mi><mn>𝟏</mn></msub><mo stretchy="false">[</mo><mi>𝐧</mi><mo stretchy="false">]</mo><mo>=</mo><mi>𝛅</mi><mo stretchy="false">[</mo><mi>𝐧</mi><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="1em"/><msub><mi>𝐡</mi><mn>𝟐</mn></msub><mo stretchy="false">[</mo><mi>𝐧</mi><mo stretchy="false">]</mo><mo>=</mo><mn>𝟎.𝟕</mn><mtext> </mtext><mi>𝛅</mi><mo stretchy="false">[</mo><mi>𝐧</mi><mo>−</mo><mn>𝟐𝟑𝟖𝟏𝟒</mn><mo stretchy="false">]</mo></mrow></math></p>
+<h3>(d)</h3>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>𝐡</mi><mo stretchy="false">[</mo><mi>𝐧</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>𝐡</mi><mn>𝟏</mn></msub><mo stretchy="false">[</mo><mi>𝐧</mi><mo stretchy="false">]</mo><mo>+</mo><msub><mi>𝐡</mi><mn>𝟐</mn></msub><mo stretchy="false">[</mo><mi>𝐧</mi><mo stretchy="false">]</mo><mo>=</mo><mi>𝛅</mi><mo stretchy="false">[</mo><mi>𝐧</mi><mo stretchy="false">]</mo><mo>+</mo><mn>𝟎.𝟕</mn><mtext> </mtext><mi>𝛅</mi><mo stretchy="false">[</mo><mi>𝐧</mi><mo>−</mo><mn>𝟐𝟑𝟖𝟏𝟒</mn><mo stretchy="false">]</mo></mrow></math></p>
+<h3>(e)</h3>
+<pre><code class="language-matlab">h1 = [1 zeros(1,N)];
+h2 = [zeros(1,N) 0.7];
+h  = h1 + h2;
+</code></pre>
+<h3>(f)</h3>
+<pre><code class="language-matlab">y2 = conv(x2, h);
+sound(x2, fs);  pause(length(x2)/fs + 1);
+sound(y2, fs);
+</code></pre>
+<h3>(g)</h3>
+<p><strong>Echo</strong>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><mn>0.7</mn><mtext> </mtext><mi>x</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><mn>23814</mn><mo stretchy="false">]</mo></mrow></math> (copy delayed <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.18</mn></mrow></math> s, amplitude <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0.7</mn></mrow></math>).</p>
+<h2>Part III (7)</h2>
+<h3>(a)</h3>
+<pre><code class="language-matlab">img = imread('image2a.jpg');
+figure; imshow(img);
+</code></pre>
+<h3>(b)</h3>
+<pre><code class="language-matlab">h1 = [-1 -1 -1; -1 8 -1; -1 -1 -1];
+y1 = convn(double(img), h1, 'same');
+figure; imshow(uint8(y1));
+</code></pre>
+<h3>(c)</h3>
+<p><strong>Edge detection</strong> (high-pass): coefficients sum to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>0</mn></mrow></math> ⇒ flat regions <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>→</mo><mn>0</mn></mrow></math>, edges remain.</p>
+<h3>(d)</h3>
+<pre><code class="language-matlab">h2 = [0 0 0; 0 1 0; 0 0 0];
+y2 = convn(double(img), h2, 'same');
+figure; imshow(uint8(y2));
+</code></pre>
+<h3>(e)</h3>
+<p><strong>Nothing</strong>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>h</mi><mn>2</mn></msub><mo>=</mo><mi>δ</mi><mo stretchy="false">[</mo><mi>m</mi><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">]</mo></mrow></math> ⇒ <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mn>2</mn></msub></mrow></math> = original.</p>
+<h3>(f)</h3>
+<pre><code class="language-matlab">h3 = h1 + h2;
+y3 = convn(double(img), h3, 'same');
+figure; imshow(uint8(y3));
+</code></pre>
+<h3>(g)</h3>
+<p><strong>Sharpening</strong>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mn>3</mn></msub><mo>=</mo><msub><mi>y</mi><mn>1</mn></msub><mo>+</mo><msub><mi>y</mi><mn>2</mn></msub></mrow></math> = original + edges.</p>

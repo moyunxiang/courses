@@ -1,0 +1,283 @@
+<p>Fully executed notebook: <code>a2_assignment_2.ipynb</code> (same folder). PDF: 1.1, 1.3(a), 2.1, 3, plus the Q4 descriptions. Notebook: 1.2, 1.3(b), 2.2, 2.3, 4. Submit both together: <code>StudentID_assignment_2.pdf</code> + <code>StudentID_assignment_2.ipynb</code>.</p>
+<h2>Q1 Uninformed Search</h2>
+<h3>1.1</h3>
+<p><strong>(a)</strong></p>
+<ul>
+<li>BFS: <strong>S→B→G, cost 9, 6 expanded</strong> (S, A, B, C, D, E)</li>
+<li>DFS: <strong>S→A→D→G, cost 9, 3 expanded</strong> (S, A, D)</li>
+<li>UCS: <strong>S→C→F→G, cost 6, 7 expanded</strong> (S, A, C, D, B, F, E; then G(6) is popped)</li>
+</ul>
+<p><strong>(b)</strong> BFS picks the path with the fewest edges and ignores costs; a longer path can be cheaper (S→B→G: 2 edges, cost 9; S→C→F→G: 3 edges, cost 6). BFS is optimal <strong>if all edge costs are equal</strong> (same positive constant).</p>
+<p><strong>(c)</strong> <strong>Terminate when the goal is removed.</strong> At removal <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></math> is the smallest <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi></mrow></math> on the frontier and costs are <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>0</mn></mrow></math>, so no cheaper path exists; at generation a cheaper path may still be pending (here G is first generated with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>g</mi><mo>=</mo><mn>9</mn></mrow></math> via D, optimum is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>6</mn></mrow></math>).</p>
+<h3>1.2 (notebook)</h3>
+<pre><code class="language-python">from collections import deque
+
+def bfs(problem):
+    frontier = deque([([problem.start], 0)])        # FIFO of (path, cost)
+    num_expanded = 0
+    while frontier:
+        path, cost = frontier.popleft()
+        state = path[-1]
+        if problem.is_goal(state):                   # goal test on removal
+            return path, cost, num_expanded
+        num_expanded += 1
+        for nxt, c in problem.successors(state):
+            frontier.append((path + [nxt], cost + c))
+    return None, float('inf'), num_expanded
+
+def dfs(problem):
+    stack = [([problem.start], 0)]
+    num_expanded = 0
+    while stack:
+        path, cost = stack.pop()
+        state = path[-1]
+        if problem.is_goal(state):
+            return path, cost, num_expanded
+        num_expanded += 1
+        for nxt, c in reversed(list(problem.successors(state))):   # reverse alphabetical push
+            stack.append((path + [nxt], cost + c))
+    return None, float('inf'), num_expanded
+
+def uniform_cost_search(problem):
+    frontier = PriorityQueue()
+    frontier.push((problem.start, [problem.start]), 0)
+    best_g = {problem.start: 0}
+    num_expanded = 0
+    while not frontier.empty():
+        (state, path), g = frontier.pop()
+        if g &gt; best_g.get(state, float('inf')):
+            continue                                 # stale entry
+        if problem.is_goal(state):
+            return path, g, num_expanded
+        num_expanded += 1
+        for nxt, c in problem.successors(state):
+            new_g = g + c
+            if new_g &lt; best_g.get(nxt, float('inf')):   # cheaper path found
+                best_g[nxt] = new_g
+                frontier.push((nxt, path + [nxt]), new_g)
+    return None, float('inf'), num_expanded
+</code></pre>
+<p>Output: <code>BFS: (['S','B','G'], 9, 6)</code> · <code>DFS: (['S','A','D','G'], 9, 3)</code> · <code>UCS: (['S','C','F','G'], 6, 7)</code>.</p>
+<h3>1.3</h3>
+<p><strong>(a)</strong> The only solution S→D→K→D→G visits D twice, and D has different successors before and after the key (D→G locked / unlocked), so the node alone does not determine the legal actions. <strong>State = (location, has_key)</strong>, has_key ∈ {False, True}; start (S, False); goal: location = G.</p>
+<p><strong>(b)</strong> (notebook)</p>
+<pre><code class="language-python">class KeyDoorProblem:
+    def __init__(self, graph, start, goal, key='K', locked_edge=('D', 'G')):
+        self.graph, self.goal, self.key, self.locked_edge = graph, goal, key, locked_edge
+        self.start = (start, start == key)           # (location, has_key)
+
+    def is_goal(self, state):
+        return state[0] == self.goal
+
+    def successors(self, state):
+        location, has_key = state
+        result = []
+        for nxt, cost in self.graph.get(location, []):           # alphabetical
+            if (location, nxt) == self.locked_edge and not has_key:
+                continue                                         # door locked
+            result.append(((nxt, has_key or nxt == self.key), cost))
+        return result
+</code></pre>
+<p>Output (BFS and UCS unchanged): <strong><code>[('S',False), ('D',False), ('K',True), ('D',True), ('G',True)]</code>, cost 4, 4 expanded</strong> for both.</p>
+<h2>Q2 Informed Search</h2>
+<h3>2.1</h3>
+<ul>
+<li><strong>Misplaced tiles: admissible.</strong> Each misplaced tile needs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>1</mn></mrow></math> move.</li>
+<li><strong>Manhattan: admissible.</strong> Each move moves one tile one square.</li>
+<li><strong>Row/column count: admissible.</strong> A tile outside its goal row needs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>1</mn></mrow></math> vertical move, outside its goal column <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≥</mo><mn>1</mn></mrow></math> horizontal move; each move does one of these for one tile (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo></mrow></math> Manhattan).</li>
+<li><strong>Nilsson: not admissible.</strong> Counterexample, one move from the goal (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>h</mi><mo>∗</mo></msup><mo>=</mo><mn>1</mn></mrow></math>): <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="1"><mtable rowspacing="0.1em" columnspacing="0.2778em"><mtr><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mi mathvariant="normal">_</mi></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>8</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>7</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>6</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr></mtable></mstyle></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>P</mi><mo>=</mo><mn>1</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>2</mn><mtext> </mtext><mo stretchy="false">(</mo><mn>1</mn><mo>→</mo><mtext>blank</mtext><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn><mtext> </mtext><mo stretchy="false">(</mo><mtext>centre</mtext><mo stretchy="false">)</mo><mo>=</mo><mn>3</mn></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>h</mi><mo>=</mo><mn>1</mn><mo>+</mo><mn>3</mn><mo>⋅</mo><mn>3</mn><mo>=</mo><mn>10</mn><mo>&gt;</mo><mn>1</mn></mrow></math>. (Also A* + Nilsson returns cost 28 on Puzzle 4; optimum 16.)</li>
+</ul>
+<h3>2.2 (notebook)</h3>
+<pre><code class="language-python">def misplaced_tiles(state):
+    return sum(1 for i, t in enumerate(state) if t != 0 and t != GOAL[i])
+
+def manhattan_distance(state):
+    total = 0
+    for i, t in enumerate(state):
+        if t != 0:
+            r, c = divmod(i, 3); gr, gc = GOAL_POSITIONS[t]
+            total += abs(r - gr) + abs(c - gc)
+    return total
+
+def nilsson_sequence_score(state):
+    s = 0
+    for k in range(8):
+        t, nxt = state[PERIMETER[k]], state[PERIMETER[(k + 1) % 8]]   # clockwise, wraparound
+        if t != 0 and nxt != t % 8 + 1:                              # 1-&gt;2-&gt;...-&gt;8-&gt;1
+            s += 2
+    if state[4] != 0:
+        s += 1                                                       # tile in centre
+    return manhattan_distance(state) + 3 * s
+
+def row_column_distance(state):
+    total = 0
+    for i, t in enumerate(state):
+        if t != 0:
+            r, c = divmod(i, 3); gr, gc = GOAL_POSITIONS[t]
+            total += (r != gr) + (c != gc)
+    return total
+
+def astar(problem, heuristic):
+    start = problem.start
+    if problem.is_goal(start):
+        return [start], 0, 0
+    frontier = PriorityQueue()
+    best_g, parent = {start: 0}, {start: None}
+    frontier.push((start, 0), heuristic(start))                     # f = g + h
+    num_expanded = 0
+    while not frontier.empty():
+        (state, g), _ = frontier.pop()
+        if g != best_g[state]:
+            continue                                                 # stale entry
+        if problem.is_goal(state):
+            path = []
+            while state is not None:
+                path.append(state); state = parent[state]
+            return path[::-1], g, num_expanded
+        num_expanded += 1                                            # re-expansions count
+        for nxt, cost in problem.successors(state):
+            new_g = g + cost
+            if new_g &lt; best_g.get(nxt, float('inf')):                # reopen if cheaper
+                best_g[nxt], parent[nxt] = new_g, state
+                frontier.push((nxt, new_g), new_g + heuristic(nxt))
+    return None, float('inf'), num_expanded
+</code></pre>
+<ul>
+<li>Worked example <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mstyle scriptlevel="1"><mtable rowspacing="0.1em" columnspacing="0.2778em"><mtr><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>8</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>6</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>7</mn></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mi mathvariant="normal">_</mi></mstyle></mtd><mtd><mstyle scriptlevel="1" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr></mtable></mstyle></mrow></math>: misplaced 4, Manhattan 5, <strong>Nilsson 32</strong>, row/column 5 (asserted in the notebook).</li>
+</ul>
+<h3>2.3</h3>
+<pre><code class="language-python">NAMES = (&quot;Misplaced tiles&quot;, &quot;Manhattan distance&quot;, &quot;Nilsson&quot;, &quot;Row/column count&quot;)
+for name, h in zip(NAMES, HEURISTICS):
+    counts = [astar(EightPuzzleProblem(p), h)[2] for p in PUZZLES.values()]
+    print(name, counts, sum(counts) / len(counts))
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Heuristic</th>
+<th>P1</th>
+<th>P2</th>
+<th>P3</th>
+<th>P4</th>
+<th>P5</th>
+<th>Average</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Misplaced tiles</td>
+<td>4</td>
+<td>13</td>
+<td>99</td>
+<td>540</td>
+<td>3856</td>
+<td><strong>902.4</strong></td>
+</tr>
+<tr>
+<td>Manhattan distance</td>
+<td>4</td>
+<td>8</td>
+<td>33</td>
+<td>97</td>
+<td>738</td>
+<td><strong>176.0</strong></td>
+</tr>
+<tr>
+<td>Nilsson</td>
+<td>4</td>
+<td>9</td>
+<td>47</td>
+<td>93</td>
+<td>73</td>
+<td><strong>45.2</strong></td>
+</tr>
+<tr>
+<td>Row/column count</td>
+<td>4</td>
+<td>8</td>
+<td>45</td>
+<td>192</td>
+<td>1352</td>
+<td><strong>320.2</strong></td>
+</tr>
+</tbody>
+</table>
+<h2>Q3 CSP</h2>
+<p>Binary constraint on each adjacent pair <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>F</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mi>i</mi></msub><mo mathvariant="normal">≠</mo><msub><mi>F</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mi>i</mi></msub><mo>=</mo><mi>E</mi><mo>⇒</mo><msub><mi>F</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>C</mi></mrow></math>; not both in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo stretchy="false">{</mo><mi>C</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">}</mo></mrow></math>.</p>
+<p><strong>(a)</strong></p>
+<ul>
+<li>Rule 1: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>5</mn></msub><mo>∈</mo><mo stretchy="false">{</mo><mi>C</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">}</mo></mrow></math>. Rule 2: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo mathvariant="normal">∉</mo><msub><mi>D</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>D</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>D</mi><mn>3</mn></msub></mrow></math>. Rule 3 with <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>0</mn></msub><mo>=</mo><mi>M</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>M</mi><mo mathvariant="normal">∉</mo><msub><mi>D</mi><mn>1</mn></msub></mrow></math>.</li>
+<li><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>3</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>4</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>5</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>C</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">}</mo></mrow></math>.</strong></li>
+</ul>
+<p><strong>(b)</strong></p>
+<ul>
+<li>Step 1, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>4</mn></msub><mo>→</mo><msub><mi>F</mi><mn>5</mn></msub></mrow></math>: remove <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo separator="true">,</mo><mi>S</mi></mrow></math> (safe next to safe) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>4</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo stretchy="false">}</mo></mrow></math></strong> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>M</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>5</mn></msub><mo>=</mo><mi>C</mi></mrow></math>; <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>5</mn></msub><mo>=</mo><mi>C</mi></mrow></math>).</li>
+<li>Step 2, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>3</mn></msub><mo>→</mo><msub><mi>F</mi><mn>4</mn></msub></mrow></math>: remove <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math> (needs <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>4</mn></msub><mo>=</mo><mi>C</mi></mrow></math>) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>3</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math></strong>.</li>
+<li>Step 3, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>2</mn></msub><mo>→</mo><msub><mi>F</mi><mn>3</mn></msub></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>M</mi><mo>→</mo><mi>C</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>→</mo><mi>C</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo>→</mo><mi>M</mi></mrow></math> all supported <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>no pruning</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>.</li>
+<li>Step 4, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub><mo>→</mo><msub><mi>F</mi><mn>2</mn></msub></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi><mo>→</mo><mi>C</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><mo>→</mo><mi>M</mi></mrow></math> supported <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>⇒</mo></mrow></math> <strong>no pruning</strong>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math> (same if <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>2</mn></msub></mrow></math> is checked against <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>1</mn></msub></mrow></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>M</mi><mo separator="true">,</mo><mi>E</mi></mrow></math> after <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi></mrow></math> after <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>E</mi></mrow></math>).</li>
+<li><strong>Final: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>3</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>4</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>5</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>C</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">}</mo></mrow></math>.</strong></li>
+</ul>
+<p><strong>(c)</strong></p>
+<ul>
+<li>(i) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mn>4</mn><mn>5</mn></msup><mo>=</mo></mrow></math> <strong>1024</strong></li>
+<li>(ii) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>⋅</mo><mn>3</mn><mo>⋅</mo><mn>3</mn><mo>⋅</mo><mn>4</mn><mo>⋅</mo><mn>2</mn><mo>=</mo></mrow></math> <strong>144</strong></li>
+<li>(iii) <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2</mn><mo>⋅</mo><mn>3</mn><mo>⋅</mo><mn>2</mn><mo>⋅</mo><mn>2</mn><mo>⋅</mo><mn>2</mn><mo>=</mo></mrow></math> <strong>48</strong></li>
+</ul>
+<p><strong>(d)</strong> Search tree (order E, M, S, C within each reduced domain):</p>
+<pre><code class="language-text">root
+└─ F1=E  ✓
+   ├─ F2=E  X  (Rule 3: E,E adjacent; Rule 4: E not followed by C)
+   ├─ F2=M  X  (Rule 4: E not followed by C)
+   └─ F2=C  ✓
+      └─ F3=M  ✓
+         └─ F4=E  ✓
+            ├─ F5=S  X  (Rule 4: E not followed by C)
+            └─ F5=C  ✓  SOLUTION
+</code></pre>
+<p><strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><msub><mi>F</mi><mn>5</mn></msub><mo>=</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo separator="true">,</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi></mrow></math></strong> (full map: M, E, C, M, E, C, Boss).</p>
+<p><strong>(e)</strong> <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub><mo>=</mo><mi>C</mi></mrow></math> prunes only its neighbour <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>2</mn></msub></mrow></math> (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi></mrow></math>: Rule 3 and Rule 5): <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>3</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>C</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>4</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>M</mi><mo separator="true">,</mo><mi>E</mi><mo stretchy="false">}</mo></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>D</mi><mn>5</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mi>C</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">}</mo></mrow></math>.</strong></p>
+<p><strong>(f)</strong> <strong><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><msub><mi>F</mi><mn>5</mn></msub><mo>=</mo><mi>C</mi><mo separator="true">,</mo><mi>E</mi><mo separator="true">,</mo><mi>C</mi><mo separator="true">,</mo><mi>M</mi><mo separator="true">,</mo><mi>S</mi></mrow></math></strong> (map M, C, E, C, M, S, Boss).</p>
+<ul>
+<li>Rule 1: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>5</mn></msub><mo>=</mo><mi>S</mi></mrow></math> ✓</li>
+<li>Rule 2: only S is at <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>5</mn></msub></mrow></math> ✓</li>
+<li>Rule 3: M-C-E-C-M-S, no equal neighbours ✓</li>
+<li>Rule 4: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>2</mn></msub><mo>=</mo><mi>E</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>3</mn></msub><mo>=</mo><mi>C</mi></mrow></math> ✓</li>
+<li>Rule 5: safe floors <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>F</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>F</mi><mn>5</mn></msub></mrow></math>, pairwise non-adjacent ✓</li>
+</ul>
+<h2>Q4 Genetic Algorithm</h2>
+<pre><code class="language-python">def fitness(state, dataset):
+    correct = 0
+    for row in dataset:
+        total = sum(s * m for s, m in zip(row[:-1], state))      # unnormalized total
+        correct += (total &gt;= 50) == (row[-1] == 1)
+    return correct / len(dataset)                                 # accuracy
+
+def crossover(parent1, parent2):
+    return [a if random.random() &lt; 0.5 else b for a, b in zip(parent1, parent2)]   # uniform
+
+def mutate(state, mutation_rate=0.05):
+    return [max(0.0, g + random.gauss(0, 1)) if random.random() &lt; mutation_rate else g
+            for g in state]
+
+def tournament_select(population, scores, k=3):
+    best = max(random.sample(range(len(population)), k), key=lambda i: scores[i])
+    return population[best]
+
+# main loop body (population_size = 30, generations = 200, mutation_rate = 0.2, seed 3211)
+for generation in range(generations):
+    scores = [fitness(s, dataset) for s in population]
+    order = sorted(range(population_size), key=lambda i: scores[i], reverse=True)
+    best_state = population[order[0]]
+    print(f&quot;Generation {generation + 1}: Best Fitness = {scores[order[0]]:.4f}&quot;)
+    new_population = [population[i] for i in order[:2]]                 # elitism
+    while len(new_population) &lt; population_size:
+        p1, p2 = tournament_select(population, scores), tournament_select(population, scores)
+        new_population.append(mutate(crossover(p1, p2), 0.2))
+    population = new_population
+</code></pre>
+<p><strong>(a)</strong> Fitness = accuracy: fraction of the 2000 students for which <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mo>∑</mo><mi>i</mi></msub><msub><mtext>score</mtext><mi>i</mi></msub><mo>⋅</mo><msub><mtext>max</mtext><mi>i</mi></msub><mo>≥</mo><mn>50</mn></mrow></math> matches <code>pass</code>.</p>
+<p><strong>(b)</strong> Uniform crossover: each of the 15 genes comes from parent 1 or parent 2 with probability 0.5.</p>
+<p><strong>(c)</strong> Each gene, with probability 0.2, gets <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mi>𝒩</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> noise, clipped at 0.</p>
+<p><strong>(d)</strong> Keep the 2 fittest states (elitism); the other 28 = tournament selection (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>k</mi><mo>=</mo><mn>3</mn></mrow></math>) of two parents → crossover → mutation. Population 30, 200 generations.</p>
+<p><strong>(e)</strong> <strong>[3.35, 5.32, 5.06, 10.31, 1.55, 4.17, 16.25, 5.48, 7.70, 8.02, 4.14, 1.75, 2.73, 14.04, 9.83]</strong> (sum ≈ 99.7), <strong>fitness 1.0000</strong> (reached at generation 112).</p>
+<p>⚠️ The data only fix the pass/fail boundary, so several vectors reach accuracy 1.0; the exact numbers depend on the GA design and seed.</p>

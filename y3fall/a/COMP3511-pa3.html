@@ -1,0 +1,42 @@
+<p>Only <code>mm_malloc()</code>, <code>mm_free()</code> and <code>mm_combine_nearby_free()</code> are needed; parsing, <code>mm_sbrk()</code> and <code>mm_print()</code> are given. The full source is kept offline, not on this page, because JPlag is run on every submission. Tested with <code>-std=c99</code> on macOS (Apple clang): 5/5 given cases pass, and 2000 random inputs match a model of the official <code>smm</code> logic.</p>
+<p>⚠️ Not yet run on CS Lab 2 (<code>csl2wkXX</code>). Rerun the 5 given cases with <code>diff</code> there before submitting.</p>
+<h2>Heap layout</h2>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>block</mtext><mo>=</mo><munder><munder><mtext mathvariant="monospace">MetaData</mtext><mo stretchy="true">⏟</mo></munder><mrow><mn>9</mn><mtext> B: size (8)</mtext><mo>+</mo><mtext>status (1)</mtext></mrow></munder><mo>+</mo><munder><munder><mtext>data</mtext><mo stretchy="true">⏟</mo></munder><mtext>size B</mtext></munder><mo separator="true">,</mo><mspace width="2em"/><mtext>next</mtext><mo>=</mo><mtext>cur</mtext><mo>+</mo><mn>9</mn><mo>+</mo><mtext>size</mtext><mo separator="true">,</mo><mspace width="2em"/><mtext>walk </mtext><mtext mathvariant="monospace">heap_start</mtext><mo>→</mo><mtext mathvariant="monospace">mm_sbrk(0)</mtext></mrow></math></div><h2>mm_malloc(n): first fit</h2>
+<p>Scan from <code>heap_start</code> and take the <strong>first</strong> block with status <code>f</code> and size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>≥</mo><mi>n</mi></mrow></math>:</p>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>&gt;</mo><mi>n</mi><mo>+</mo><mn>9</mn></mrow></math></td>
+<td><strong>split</strong>: this block becomes OCCP with size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math>; a new FREE block of size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>−</mo><mi>n</mi><mo>−</mo><mn>9</mn></mrow></math> starts at cur <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>9</mn><mo>+</mo><mi>n</mi></mrow></math></td>
+</tr>
+<tr>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi><mo>≤</mo><mi>S</mi><mo>≤</mo><mi>n</mi><mo>+</mo><mn>9</mn></mrow></math></td>
+<td>occupy the <strong>whole</strong> block, no split (the residual block would have <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>≤</mo><mn>0</mn></mrow></math> data bytes)</td>
+</tr>
+<tr>
+<td>no block fits</td>
+<td><code>mm_sbrk(9 + n)</code>, then write a new OCCP block of size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> at the old break</td>
+</tr>
+</tbody>
+</table>
+<p>Return <strong>cur + 9</strong> (the start of the data, not of the meta data).</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext mathvariant="monospace">given1</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>1000</mn><mtext> free</mtext><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mo>=</mo><mn>300</mn><mo>⇒</mo><mn>1000</mn><mo>−</mo><mn>300</mn><mo>−</mo><mn>9</mn><mo>=</mo><mn>691</mn><mtext> FREE</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext mathvariant="monospace">given4</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>300</mn><mtext> free</mtext><mo separator="true">,</mo><mtext> </mtext><mi>n</mi><mo>=</mo><mn>291</mn><mo>⇒</mo><mn>300</mn><mo>−</mo><mn>291</mn><mo>=</mo><mn>9</mn><mo>=</mo><mtext>meta size</mtext><mo>⇒</mo><mtext>no split, OCCP </mtext><mn>300</mn></mrow></mstyle></mtd></mtr></mtable></math></div><h2>mm_free(p)</h2>
+<p>Walk the blocks. When cur <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mn>9</mn><mo>=</mo><mi>p</mi></mrow></math>, set the status to <code>f</code> and return. Do not merge and do not lower the break.</p>
+<h2>mm_combine_nearby_free()</h2>
+<p>For each FREE block, absorb every FREE block directly after it: size <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>+</mo><mo>=</mo><mn>9</mn><mo>+</mo><mtext>next.size</mtext></mrow></math>. Repeat until an OCCP block or the break, then move to the next block.</p>
+<div class="eqn"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext mathvariant="monospace">given1</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>300</mn><mo>+</mo><mn>200</mn><mo>+</mo><mn>9</mn><mo>=</mo><mn>509</mn><mo separator="true">,</mo><mspace width="2em"/><mn>50</mn><mo>+</mo><mn>314</mn><mo>+</mo><mn>9</mn><mo>=</mo><mn>373</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext mathvariant="monospace">given3</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>509</mn><mo>+</mo><mn>100</mn><mo>+</mo><mn>373</mn><mo>+</mo><mn>2</mn><mo>×</mo><mn>9</mn><mo>=</mo><mn>1000</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext mathvariant="monospace">given5</mtext><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mtext> </mtext><mn>26</mn><mo>×</mo><mn>1</mn><mo>+</mo><mn>25</mn><mo>×</mo><mn>9</mn><mo>=</mo><mn>251</mn></mrow></mstyle></mtd></mtr></mtable></math></div><h2>Pitfalls</h2>
+<ul>
+<li>Return the data pointer. <code>main</code> fills <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>n</mi></mrow></math> spaces from it, so returning the meta-data address would overwrite the meta data.</li>
+<li>The split test is strictly <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>&gt;</mo><mi>n</mi><mo>+</mo><mn>9</mn></mrow></math>. A zero-size block is not allowed.</li>
+<li><code>free</code> does not merge blocks; only <code>combine_nearby_free</code> does. After <code>free e</code> in <code>given1</code>, the 50 and 314 blocks stay separate.</li>
+<li>When merging, recompute the next block from the new size. Absorb a whole run of 3 or more free blocks before moving on (<code>given5</code>).</li>
+<li>Grow the heap only through <code>mm_sbrk</code>. Never write <code>heap_current_break</code>.</li>
+<li>The heap is 8000 bytes. Return <code>NULL</code> if <code>mm_sbrk</code> would fail. The official <code>smm</code> does not check this, so the hidden tests should not reach the limit.</li>
+<li>Rename the file to <code>smm.c</code> and fill in your name and ITSC email in the header.</li>
+</ul>
